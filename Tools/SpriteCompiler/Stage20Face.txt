@@ -1,0 +1,3 @@
+comp,E:\Progs\CS_ImageConv\CS_ImageConv\Stage20Face1.bmp
+comp,E:\Progs\CS_ImageConv\CS_ImageConv\Stage20Face2.bmp
+comp,E:\Progs\CS_ImageConv\CS_ImageConv\Stage20Face3.bmp

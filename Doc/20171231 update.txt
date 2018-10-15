@@ -1,0 +1,28 @@
+Hours worked this week: 24 hrs 
+(CPC: 4... ZX:6.5... MSX:10... Misc: 3.5)
+
+A lot of progress this week, firstly some finishing up work on the 1st Level - in the original game there were some glitches which caused enemies to be behind objects that should have been in the background.
+
+When I wrote the level originally I had not worked out a good way to code the level data, so mistakes like this happened all too often, By Episode 2 I had a much more simple way of coding objects so these kind of problems would no longer happen... so a bit of recoding to upgrade the 1st level's layout data and now the layering problems are fixed... I'll be doing a technical post about the level layout in the future, so I won't go into more detail yet!
+
+Second I spent a day recoloring the MSX Loading Screen - it's based on the ZX spectrum one, but I've taken advantage of the 16 color palette to make it look really nice.
+
+Finally... The level 1 boss is pretty much done on all systems... in just a few days it's almost complete - this is as fast as I could have imagined, there were only minor coding problems on the spectrum version - great news, as the Level 1 boss battle uses many coding tricks - so for it to be done so fast on all systems bodes very well for the other levels!
+
+For the CPC version: The boss now has improved background graphics and CPC plus palette - take a look at the screenshot at the bottom of the post, I think the difference is brilliant!... notice you can see more of the boss on the CPC due to the wider 320 pixel screen width!
+
+On the Speccy: all the  boss sprites have been recolored for the speccy, and I've tried to get as many colors in as possible! the toung is yellow, the brains are purple, and the worms in the brain are green! the one thing the speccy has is lots of onscreen colors, and I'm going to try to use them all!
+
+On the MSX2: Recolored sprites to take advantage of the 16 color palette, the same enhanced backgrounds from the CPC!
+
+MSX2+V9990: The v9990 users are in for a treat! all the MSX2 versions goodies, with some enhancements... 
+3 extra paralax layers (the moon in the background, and in the foreground the ribs and large bones,and the clouds) 
+also I've swapped out the sprite of the boss bullets for a little spinning 'bone' sprite - the hitzone is still just the middle square of pixels, but the spinning animation of such a huge number of bullets looks great - especially on the Turbo-R where the animation is running at 60FPS!
+
+I will do some more video of the gameplay, but please remember it all takes time, and an hour spent making vids is an hour I didn't spend making the game!
+
+Next week I'll start doing the Level 2 graphics, and start getting that working - I also plan to do a technical narrated video where I'll introduce the software and scripts I'm using to develop the game..
+
+With level 1 nearly finished I'm feeling pretty optimistic - I'm aiming to get the game finished around March, and it will be available to Patreons immediately, the public release will be about 2 months later - and I will stagger the release of the 3 different versions, with the CPC version coming out first, the spectrum version 2 weeks later, and finally the MSX version (as it's going to be the best, people can wait for it!)
+
+Have a happy new year everyone!

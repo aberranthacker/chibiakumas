@@ -1,0 +1,53 @@
+The 'Level loading Procedure' of Chibiakumas is what makes the game work reliably - because the levels are coded separately then combined together in one big game, it's important that everything works smoothly together, and a consistant 'Init' routine is a big part of that!
+
+When a level is loaded the following procedures occur in this order:
+
+1. The generic 'Loading' screen is shown
+
+2. if available the Level specific loading 'splash' screen is shown, and any text is shown below it.
+
+3. the 'Level Reset' procedure is called - this zero's the star array, object array etc, and resets all the self-modifying code in the core to default settings.
+
+4. The game music is loaded and decompressed
+
+** The above varies slightly level to level, as some levels share music, and others do not have a splash screen - the following is 'Generic' - although there are 1,2,3 and 4 part levels **
+
+5. if present, Part 4 (Txx-C4.D0x) is loaded into 128k memory... then matching MSX RLE sprites are loaded into V-ram
+
+6. if present, Part 3 (Txx-C3.D0x) is loaded into 128k memory... then matching SX RLE sprites are loaded into V-ram
+
+7. if present, Part 2 (Txx-C2.D0x) is loaded into 128k memory... then matching MSX RLE sprites are loaded into V-ram
+
+8. on the MSX V9990, any special paralax for the V9990 is loaded into VRAM
+
+9. The main level (Txx-C1.D0x) is loaded into main memory... then matching MSX RLE sprites are loaded into V-ram
+
+10. The system firware rom is paged out, and the 'Level Init' is called from the Level Jumpblock ... on the CPC this is at &7FF0
+
+---------------- At this point control is passed to the Level code, the Level init typically occurs as follows ------------------------------
+
+1. On MSX: the background tile positions are loaded into selfmodifying code.... on MSX the palette is also initialised (to black)
+2. On MSX: on boss levels the custom bullets are loaded from ram to VDP memory
+3. On CPC: the pointers to the reaster colors are initialised... due to memory limitations there's no room in the core, so these reside in the level datablock
+4. On MSX: depending on if the user has a V9990 the correct background code is enabled by selfmodifying code
+5. On ZX: the background draw code is copied from the top of the leveldata bank, to the top of the 2nd screen buffer bank - this is so the data is in the same position for both screenbuffers.
+6. The eventstream is initialised (level object data)
+7. The music is restarted.
+8. The screenbuffer is initialised
+9. The interrupt handler is initialized.
+
+----------------- The level loop will now begin! the level loop is pretty simple, so lets cover that too! --------------
+
+1. The background is drawn
+2. The eventstream is processed, bringing any new objects into play based on leveltime
+3. The Object array is redrawn (enemy sprite data)
+4. The player handler is called - this handles input, player death and player sprite drawing
+5. The player bullets are drawn
+6. The enemy bullets are drawn
+7. The player Icons (life score etc) are drawn
+8. Any pending fade effects are processed 
+
+**** Some levels have custom code here - such as Boss Warnings, special boss movements etc ****
+
+9. The Screenflip occurs 
+10. The level loop restarts

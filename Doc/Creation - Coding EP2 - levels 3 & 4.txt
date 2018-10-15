@@ -1,0 +1,20 @@
+Level 3 was the 'Tech Noir' Themed stage - designing enemies for this level was very easy, as there was lots of fun 'sci-fi' stuff I could create, It also allowed for some new clever coding!
+The 'Laser cannon' enemies were quite tricky, the game engine could not do a solid 'beam' - so the beam was made up of 32x32 pixel sprites that were timed to appear - I had done this in EP1 with the flame enemies on the vertical stage - but this time I had a twist - you could stop the beam by destroying the laser cannon... this was done by adding code to the 'death' even - which would scan the object array for the beam sprites and remove them.
+
+I also added a quirky enemy called the 'pre-emptive defence satallite' - which the plot defined as a nuclear satellite, that would explode if you shot it! the idea was people would try to avoid shooting it, as it was inert if you did not, but burst into huge deadly stars if you did... in practice, I don't think people paid enough attention to realizes this...
+These satellites also give the unlockable achievemnt, if you blow ALL of them up, you get the 'thermonuclear monster' unlock!
+
+The 3rd level boss was another joke... I thought it would be funny to have a 'Mecha-godzilla' version of Chibiko, and have Chibiko throw an absolute tantrarum over the percieved insult! The sprite was slightly smaller than the 'Combat Bunnytank' from level 1, but it was still very big, and Mecha-Chibikozilla had small 'ChibikoZoooky' drones (parody of the Godzilla and godzooky kids series of the 80's/90's)... The 3rd level boss was the first to use hardware screen shake
+
+
+Level 4 was the Alchemy level, and I added some new background tricks! the first half scrolled right to left, and I used a new Background routine that would allow for 2 frames of animation, also Level 3 was the first time Chibiakumas has had 2 types of scrolling in the same stage as the 2nd half scrolls up ! 
+I wrote a new 2 frame background fill, which allowed 16 pixels of 'background' at either side of the screen, with a blank chunk in the middle!
+
+Because the way the background was drawn meant it could not change scrolling mid level, I created a 'Interlaced fader' which would give a fade out effect, hiding the old background, and fading in the new one when the scrolling changed!
+
+The level 4 unlochable achievement is attained if you avoid all the 'steaks' from the steak launchers in the vertical part - probably impossible unless you take a hit from something else!
+
+Level 4 was the 'antivampire machine' This used a precompiled sprite with animation for a detailed background... the enemy sprites were just small guns at the sides of the screen.
+Again I had a silly joke planned, where Chibiko would 'walk out' of the game, and a fake 'game over' screen would appear!... I also use palette changing for the different enemy attacks to recolour the bullets of the enemy!
+
+I'll cover level 5 next week.

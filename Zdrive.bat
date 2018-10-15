@@ -1,0 +1,2 @@
+subst z: .
+start z:\

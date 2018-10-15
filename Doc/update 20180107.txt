@@ -1,0 +1,23 @@
+Hours worked this week: 27 hrs
+(CPC 5, Spectrum 7, MSX 14, Misc 1)
+
+Well, a lot of work this week!
+
+Firstly, I've started work on the Japanese language version of the game! I'm hoping the game will be popuplar with a Japanese audience, as the style of the game is very much inspired by japanese shooters and anime... the game engine uses it's own font, and for the Japanese version I'm sacraficing the english lowercase symbols to make room for the Japanese characters - even so there is only enough room for hiragana or katakana - Typically NES games and the like use Katakana in such cases, but I'm using hiragana for now as I find it easier to read so it will make proofreading easier. You'll notice my font also has a half-width version - this isn't used much by Chibi Akumas EP1, but is essential for EP2 
+
+Because the font is a bitmap one, the japanese version does not require a japanese MSX, it would also be perfectly possible to support a Japanese CPC version if there were demand, or other languages in the future - note the Spectrum version of the game uses the internal ROM's font, so foreign language support would be limited to the internal rom's character set.
+
+Next... the second level is basically done! To start let's take a look at how the forest level looked in the old Version 1.0
+
+I had wanted this level to look like a nice forest, such as you'd see in wonderboy or similar games - however the old game engine could only do basic gradients - and even then there were strict restrictions on what gradients could be used... so this mess was the best I could do.
+
+When I started EP2 improving the backgrounds was a big priority, I still have to be fairly minimal, as CPU power used drawing the background is lost to the rest of the game, but I'm now able to give a much nicer forest effect!
+
+
+I've also upgraded the boss - recoloring all the sprites, and upgrading all the level code to the new engine! 
+
+Oh, and I've saved the best for last! Bearing in mind the apprearance of the game on the old V1.0 level compared to what I had wanted, BELOW is how the game looks on the V9990! now that's more like it!
+
+There's 5 layers of parallax (3 tree trunk layers, leaf layers) and I think it looks great! there's a video I'll post separately - I've submitted it to technobytes (the V9990 producer) and they've said they'll put it on their games showcase website!
+
+Next week I'll start on Level 3 - work's going to slow down a bit, because I'm back at work again now so the hours I have free will be more limited - but I'm sure you can tell that I'm getting the hang of converting the levels, and I'm hoping to not make any more major changes to the game engine that could cause serious bugs.

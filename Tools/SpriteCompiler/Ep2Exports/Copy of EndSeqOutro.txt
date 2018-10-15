@@ -1,0 +1,176 @@
+setorg,&8000
+setworkingpath,E:\Progs\CS_ImageConv\CS_ImageConv\Ep2Exports\
+//,setgameengine,akuyouC000
+reset
+
+setbank,0
+setxypos,21,51
+col0,0,0,0
+col1,85,0,127
+col2,0,255,0
+col3,255,255,255
+colA,0,255,0
+
+colswap,1,100,126,125,126,
+colswap,1,100,255,82,96,
+colswap,2,100,0,255,255
+//,colswap,2,100,102,240,102,
+
+
+rle,FR023 [Chibiko and bochan endsequence - Chibiko smug] (bochan gunk).png
+rle,FR022 [Chibiko and bochan endsequence - Chibiko surprise].png
+rle,FR021 [Chibiko and bochan endsequence - Bochan shrug].png
+
+
+rle,FR022 [Chibiko and bochan endsequence - Chibiko surprise]b.png
+rle,FR085 [Chibiko endsequence - Chibiko glum].png
+rle,FR023 [Chibiko and bochan endsequence - Chibiko smug] (bochan gunk)b.png
+
+
+rle,FR004 [bochan endsequence - bochan smug].png
+rle,FR005 [bochan endsequence - bochan cautious].png
+
+col1,240,102,102
+col2,0,255,0
+
+colswapreset
+colswap,1,100,255,0,255,
+colswap,2,100,0,147,255,
+
+rle,FR067 [yumi and yume - endsequence - gunk].png
+
+
+col1,240,102,102
+col2,0,147,255
+
+colswapreset
+colswap,1,100,255,0,255,
+
+rle,FR068 [yumi and yume - endsequence  -  leave].png
+rle,FR069 [yumi and yume - endsequence  -  leave question].png
+rle,FR072 [yumi and yume - endsequence - Gratitude].png
+
+
+writeline,LastByte:defb 0
+writeline,save direct "T59-SC1.D04",FirstByte,LastByte-FirstByte
+writeheader,DiskMap_Intro_Screens_Bank0 equ &3BC1
+save,Ep2Intro0.asm
+
+//,////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+reset
+setbank,1
+setxypos,21,51
+col0,0,0,0
+col1,85,0,127
+col2,0,255,0
+col3,255,255,255
+colA,0,255,0
+
+colswap,1,100,126,125,126,
+colswap,1,100,255,82,96,
+colswap,2,100,0,255,255
+//,colswap,2,100,102,240,102,
+
+
+rle,FR023 [Chibiko and bochan endsequence - Chibiko smug] (bochan gunk).png
+rle,FR022 [Chibiko and bochan endsequence - Chibiko surprise].png
+rle,FR021 [Chibiko and bochan endsequence - Bochan shrug].png
+
+
+rle,FR022 [Chibiko and bochan endsequence - Chibiko surprise]b.png
+rle,FR085 [Chibiko endsequence - Chibiko glum].png
+rle,FR023 [Chibiko and bochan endsequence - Chibiko smug] (bochan gunk)b.png
+
+
+rle,FR004 [bochan endsequence - bochan smug].png
+rle,FR005 [bochan endsequence - bochan cautious].png
+
+col1,240,102,102
+col2,0,255,0
+
+colswapreset
+colswap,1,100,255,0,255,
+colswap,2,100,0,147,255,
+
+rle,FR067 [yumi and yume - endsequence - gunk].png
+
+
+col1,240,102,102
+col2,0,147,255
+
+colswapreset
+colswap,1,100,255,0,255,
+
+rle,FR068 [yumi and yume - endsequence  -  leave].png
+rle,FR069 [yumi and yume - endsequence  -  leave question].png
+rle,FR072 [yumi and yume - endsequence - Gratitude].png
+
+
+
+
+writeline,LastByte:defb 1
+writeline,save direct "T59-SC2.D04",FirstByte,LastByte-FirstByte
+writeheader,DiskMap_Intro_Screens_Bank1 equ &3BC2
+save,Ep2Intro1.asm
+
+
+//,////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+reset
+setbank,2
+setxypos,21,51
+col0,0,0,0
+col1,85,0,127
+col2,0,255,0
+col3,255,255,255
+colA,0,255,0
+
+colswap,1,100,126,125,126,
+colswap,1,100,255,82,96,
+colswap,2,100,0,255,255
+//,colswap,2,100,102,240,102,
+
+
+rle,FR023 [Chibiko and bochan endsequence - Chibiko smug] (bochan gunk).png
+rle,FR022 [Chibiko and bochan endsequence - Chibiko surprise].png
+rle,FR021 [Chibiko and bochan endsequence - Bochan shrug].png
+
+
+rle,FR022 [Chibiko and bochan endsequence - Chibiko surprise]b.png
+rle,FR085 [Chibiko endsequence - Chibiko glum].png
+rle,FR023 [Chibiko and bochan endsequence - Chibiko smug] (bochan gunk)b.png
+
+
+rle,FR004 [bochan endsequence - bochan smug].png
+rle,FR005 [bochan endsequence - bochan cautious].png
+
+col1,240,102,102
+col2,0,255,0
+
+colswapreset
+colswap,1,100,255,0,255,
+colswap,2,100,0,147,255,
+
+rle,FR067 [yumi and yume - endsequence - gunk].png
+
+
+col1,240,102,102
+col2,0,147,255
+
+colswapreset
+colswap,1,100,255,0,255,
+
+rle,FR068 [yumi and yume - endsequence  -  leave].png
+rle,FR069 [yumi and yume - endsequence  -  leave question].png
+rle,FR072 [yumi and yume - endsequence - Gratitude].png
+
+
+
+
+
+writeline,LastByte:defb 1
+writeline,save direct "T59-SC3.D04",FirstByte,LastByte-FirstByte
+writeheader,DiskMap_Intro_Screens_Bank2 equ &3BC3
+save,Ep2Intro2.asm
+
