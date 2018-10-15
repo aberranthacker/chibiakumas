@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=cpc464emu
+Comment=Amstrad CPC 464/664/6128 emulator
+Comment[hu]=Amstrad CPC 464/664/6128 emulátor
+Exec=cpc464emu
+Icon=cpc464emu
+Categories=Game;Emulator;

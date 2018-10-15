@@ -1,0 +1,15 @@
+On the amstrad CPC+ Chibi Akumas uses hardware sprites to enhance the game.
+
+The basic CPC screen can only do 4 colors - and ChibiAkumas enhances those colors by switching the palette while the raster dtaws, however this causes the player sprite to change color when it moves across the boundary of a color switch.
+
+To combat this Plus sprites are used to draw the player characters. A CPC plus sprite can be 15 colors with 1 transpartent color, and is 16x16 pixels - The CPC plus can define 16 sprites.
+
+Each player is 32x32 pixels, and is drawn with 4 PlusSprites, as the game is 2 player, 8 sprites are used for the players.
+
+The 'Drones' are also drawn with Plus sprites, bringing the total to 10 - this is why there can only be a maximum of 2 drones even in 2 player mode.
+
+The Heart Life icons , and Scroll Smartbombs are also plus sprites - there is a maximum of 3 each, meaning 6 sprites just for player 1 - this totals 16... however there is a trick! The sprites are relocated half way down the screen, so player 1's hearts and scrolls are in the opposite position to player 2's - this allows 6 hardware sprites to appear as if they are 12!
+
+The 2 frames of flying animation are copied to the sprite definitions in 'ASIC' memory - This 'Asic' memory is enabled via a special OUT... CPC plus sprite memory is odd it only uses the low nibble each byte - however to save memory the 'Flying animation' sprites are held in ram using both nibbles, and bitshifting is done before writing to this Asic memory.
+
+The new EP2 also support the CPC Plus Palette... The CPC plus allows setting of colors from a palette of 4096, and allows line level interrupts - rather than the 300hz ones on the CPC... so rather the MAX 4 raster color switches on the CPC, I use 8 on the CPC+ giving up to 32 colors for the background - and 47 counting the CPC plus sprites!

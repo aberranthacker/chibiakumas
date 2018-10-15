@@ -1,0 +1,4 @@
+comp,E:\Progs\CS_ImageConv\CS_ImageConv\Stage20Back0001.png
+comp,E:\Progs\CS_ImageConv\CS_ImageConv\Stage20Back0002.png
+comp,E:\Progs\CS_ImageConv\CS_ImageConv\Stage20Back0003.png
+comp,E:\Progs\CS_ImageConv\CS_ImageConv\Stage20Back0004.png

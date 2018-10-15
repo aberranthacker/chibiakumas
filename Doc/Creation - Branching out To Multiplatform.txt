@@ -1,0 +1,22 @@
+Early on in the development of EP2 I had started thinking of espanding the game to support the MSX2...
+
+Because development was so long and difficult, I wondered if I could support the MSX as well...encouraged by ArkosPlayer's support of the MSX, and the fact SymbOS had successfully supported the system, I wondered if a port wouldn't be relatively easy.
+
+I started collecting info on the system, and reading about the hardware spec... I had hoped that the MSX would have a 4 color mode similar to the CPC's... but to my shock the graphics were totally different... the screen size was different, and accessing the graphics susbsystem was not possible through memory, it was effectively a separate 'device' connected to the CPC!
+
+None of the coding tricks I had learned would work on the MSX, and since the game had been designed to work well on the CPC's technical requirements, it was questionable whether the game would actually work fast enough at all
+
+Having seen the job would be much harder than I expected, I decided to give up on the MSX, and stick to the CPC for EP2...
+
+ChibiAkumas EP1 had taken 6 months to develop, but judging from my website's traffic and SNS posts, everyone had lost intrest in the game affter 3 months... I wanted to try to get a 'constant stream' of positive feedback, to keep motivation on development, so I thought I'd start previewing the game 3 months in advance, with teaser posts, and preview video's
+
+I did this... but to my surprise, intrest was much lower than for EP1... I had expected that the new improved game would at least recieve as much intrest as the first, but this clearly wasn't likely to be the casethe case... and as no-one had actually played the game to really know what it was like - it seemed unlikely it was due to disappointment with any minor issue withing the game or the content of the game...
+
+A drastic rethink was going to be needed... I started looking over my MSX documentation again more seriously... and if I was going to support something as tough as the MSX it made sense to consider the most popular Z80 system of the time... the ZX Spectrum!
+
+Both systems had very different graphical requirements and abilities to the CPC, and I was disappointed that expanding the game to other platforms would mean it was no longer a 'CPC Exclusive - designed to push Mode 1 to the limit'... but the thought of starting another 6-9 month game when it was clear that EP2 was a failure just wasn't possible... 
+
+I decided to Re-Release EP1 as a Multiplatform Game... I had always planned a Re-Release of it... originally it would just be the first game with the missing 2 player support, but late in EP2's development, I releaised there would be some spare memory and started coding a version of the 'Raster Switcher' that would work on the CPC+ with it's improved color options... this would require new palette defenitions for all the levels, but make the game look better...
+
+Originally the enhanced CPC version would come around Xmas, then I'd move to the ZX/MSX versions... but after EP2 was released.. it was clear that really no-one was interested in playing it, so there seemed no point rushing the re-release out... and I decided to work on all 3 platforms together - which would result in the best game-engine, and shortest total development time overall.
+

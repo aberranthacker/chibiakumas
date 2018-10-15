@@ -1,0 +1,24 @@
+The full screen backgrounds (and animated backgrounds in Ep2) are 'Compiled Sprites'
+
+For those that don't know.. a Compiled Sprite is very different to a Compressed one... Compression aims to make data smaller... Compiled sprites are for speed!
+
+A typical sprite routine is a small program, that copies sprite data from an area of memory to the screen...
+
+A compiled sprite IS a program, and in it's simplest form has no bank of data... it is effectively a machine code program that directly rewrites the screen... the result is the fastest draw possible... but the code could be many times the bitmap data would have been!
+
+
+The ChibiAkumas Sprite compiler does use some 'Compression' as I needed the sprites to be full screen (16k) and at least less than 16k (one bank of CPC ram)
+
+The sprite compiler is a Windows C# application... it reads in one (or multiple) PNG's...  (if multiple are used they are 'differenced' and only the changed areas are saved)
+
+The PNG is broken up into lines, and each line is stored as a separate program (so if two lines are the same the same shared code is used - saving memory)
+
+The C# app looks at the line and works out what best to do with it... data is written to the screen by Stack misuse with PUSH commands... and the program will try to work out the best settings for the BC DE and HL registers... if one needs to change, the quickest way of changing it will be used (eg: Copying part of other registers that have the desired value)... if the bytes are seemingly random and PUSHing won't work, a 'block' of bitmap data will be used instead...
+
+the result? a full screen 'bitmap' that's almost as fast as clearing the screen!
+
+Compiled sprites work on CPC and Spectrum... they will also work on Enterprise and SamCoupe... they do not work on MSX as there's no fast way to access MSX screen ram in that way - the V9990 doesn't need to, as it has so much free ram anyway... but it means the regular MSX2 is a bit stuck!
+
+The newer 'Alternative' to compiled sprites is RLE ... they are much slower, so only appropriate for 'Loading screens' and the like... but give much better quality for the same data space.
+
+In the original EP1, 'Loading' and 'Set Disk' were Compiled, but they are now RLE for better quality at the same space... 'Continue' is still compiled for speed - as you see it a lot in game!

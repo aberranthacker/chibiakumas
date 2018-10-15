@@ -1,0 +1,32 @@
+
+By the end of 2016 the game was pretty much finished... apart from mentioning I was developing my first ASM game on CpcWiki, I had kept the game secret - as I was concerned it wouldn't be up to the standard that the community would expect, but it was time to finally make an official release announcement - or neve release it at all.
+
+I prepared some AniGifs and a youtube video, and announced the game would be released for new year... as the game was pretty much done.
+
+I finished the last few bits of code, cleaned up the 'bootstrap' which handled the loading and transition between levels, and gave the game a thourough testing on emulator... at 200% speed to save time!!
+
+When I was satisfied the game was working on emulatiors, I switched over to real hardware...
+At that time I didn't have a 464, but I did have a 6128 and 6128+
+I played the entire game through on the 6128 without issue... satisfied the game worked fine I moved over to the 6128+. I played the game all the way through without problem, so all that was left was to try the intro.
+
+Halfway through the intro the game crashed!... and all of a sudden the SD card (I used HxC disk emulators) was corrupt!
+
+Hmm... bad SD card? well after I'd tried 3 cards... that seemed unlikely!
+
+I tried creating a new blank dsk image, and copying all the files into it (thinking there may be some undetectable partial corruption in my old disk image)... but the same happened again.
+
+Using a Hex editor, I could see the corruption was happening to the file... this was crazy, not only should the intro NOT write to the disk, but the game only has one funtion that writes, and that only writes to one named file... this seemed to be a random disk write!
+
+This was a disaster ? I had no idea how it could be happening, and I couldn't replicate it on an emulator, so I had to resort to making code changes, and run across the room to the HXC with a new SD card... run it for 5 mins and try again when it corrupted
+
+Finally a small breakthrough as  I noticed the HXCÅfs LCD display showed a W briefly, this meant "Write" so at least I had an idea of when the write was occuring - it was during the scene where the screen only had red text on it.
+
+At first my theory was that a bug in the self-modifying code must be causing a random byte to end up on the stack, or a call to a random memory location was causing the firmware to write... but this seemed odd - as why did it not happen on emulators with the same firmware?
+
+I had a think, and came to the conlusion that the problem must be the raster color switching code - this didn't really make sense, as the Intro used the exact same code as the levels - so why would the code that worked so well only play up on the intro only on the CPC+?
+
+I looked over the code, and did some more research... Eventually I figured it out!
+My Z80 documentation said OUTI uses the register (C), however I read online that the CPC is wired unconventionally  and actually uses (B) - which is automatically incremented by OUTI so my color changing code was sending random commands across the CPC ? and while it worked at every point during the game ? that one combination of red colors on that CPC plus was causing the disk to corrupt!
+
+The game finally worked on the CPC+... after days of horrid debugging during which I thought the game was unrealeasable I thought 'F--k it! Get it released before I find another problem!' ... so I packaged it up and released it a day early!
+

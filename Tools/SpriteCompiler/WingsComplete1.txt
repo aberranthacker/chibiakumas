@@ -1,0 +1,4 @@
+comp,E:\Progs\CS_ImageConv\CS_ImageConv\WingsComplete1a.bmp
+comp,E:\Progs\CS_ImageConv\CS_ImageConv\WingsComplete1.bmp
+comp,E:\Progs\CS_ImageConv\CS_ImageConv\WingsComplete2.bmp
+comp,E:\Progs\CS_ImageConv\CS_ImageConv\WingsComplete3.bmp

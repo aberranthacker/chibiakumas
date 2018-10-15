@@ -1,0 +1,11 @@
+
+<!DOCTYPE xomds>
+<DebugSession version="0.1">
+    <Symbols/>
+    <Breakpoints>
+        <Breakpoint type="breakpoint" id="bp#1" primarySlot="3" secondarySlot="0" segment="1">
+            <address>34954</address>
+            <condition></condition>
+        </Breakpoint>
+    </Breakpoints>
+</DebugSession>

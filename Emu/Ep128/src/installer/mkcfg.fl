@@ -1,0 +1,153 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0302 
+do_not_include_H_from_C 
+header_name {.hpp} 
+code_name {.cpp}
+decl {\#include "ep128emu.hpp"} {selected private local
+} 
+
+decl {\#include "mkcfg_fl.hpp"} {private local
+} 
+
+class Ep128EmuConfigInstallerGUI {open
+} {
+  decl {bool enablePresetCfgInstall;} {public local
+  }
+  decl {bool enableCfgInstall;} {public local
+  }
+  decl {bool enableROMDownload;} {public local
+  }
+  decl {bool keyboardMapHU;} {public local
+  }
+  decl {bool okButtonPressed;} {public local
+  }
+  decl {bool cancelButtonPressed;} {public local
+  }
+  decl {static size_t curlRecvCallback(void *buf, size_t size, size_t n, void *userData);} {private local
+  }
+  decl {bool unpackROMFiles(const std::string& romDir, double& decompressTime);} {public local
+  }
+  Function {Ep128EmuConfigInstallerGUI()} {open
+  } {
+    code {{
+  enablePresetCfgInstall = true;
+  enableCfgInstall = false;
+  enableROMDownload = false;
+  keyboardMapHU = false;
+  okButtonPressed = false;
+  cancelButtonPressed = false;
+}} {}
+    Fl_Window mainWindow {
+      label {Install ep128emu configuration files}
+      callback {{
+  okButtonPressed = false;
+  cancelButtonPressed = true;
+}} open
+      xywh {81 72 370 170} type Double color 48 visible
+    } {
+      Fl_Check_Button {} {
+        callback {{
+  enablePresetCfgInstall = (o->value() != 0);
+}}
+        xywh {10 15 25 25} down_box DOWN_BOX value 1
+        code0 {o->value(1);}
+      }
+      Fl_Box {} {
+        label {Install preset configuration files}
+        xywh {35 15 250 25} color 48 align 20
+      }
+      Fl_Check_Button cfgInstallValuator {
+        callback {{
+  enableCfgInstall = (o->value() != 0);
+}}
+        xywh {10 40 25 25} down_box DOWN_BOX
+        code0 {o->value(0);}
+      }
+      Fl_Box {} {
+        label {Install user configuration files (resets settings)}
+        xywh {35 40 320 25} color 48 align 20
+      }
+      Fl_Check_Button romDownloadValuator {
+        callback {{
+  enableROMDownload = (o->value() != 0);
+}}
+        xywh {10 65 25 25} down_box DOWN_BOX deactivate
+        code0 {o->value(0);}
+      }
+      Fl_Box romDownloadLabel {
+        label {Download ROM images}
+        xywh {35 65 250 25} color 48 align 20 deactivate
+      }
+      Fl_Check_Button {} {
+        callback {{
+  keyboardMapHU = (o->value() != 0);
+}}
+        xywh {10 90 25 25} down_box DOWN_BOX
+        code0 {o->value(0);}
+      }
+      Fl_Box {} {
+        label {Use Hungarian keyboard map}
+        xywh {35 90 250 25} color 48 align 20
+      }
+      Fl_Button okButton {
+        label OK
+        callback {{
+  okButtonPressed = true;
+}}
+        xywh {210 130 70 25} selection_color 50
+      }
+      Fl_Button cancelButton {
+        label Cancel
+        callback {{
+  cancelButtonPressed = true;
+}}
+        xywh {290 130 70 25} selection_color 50
+      }
+    }
+    Fl_Window errorWindow {
+      label Error open
+      xywh {100 283 330 150} type Double color 48 modal visible
+    } {
+      Fl_Box {} {
+        xywh {10 10 310 95} box THIN_UP_BOX
+      }
+      Fl_Box errorMessageText {
+        xywh {15 15 300 85} box FLAT_BOX align 144
+      }
+      Fl_Button {} {
+        label OK
+        callback {{
+  errorWindow->hide();
+}}
+        xywh {130 115 70 25} selection_color 50
+      }
+    }
+  }
+  Function {~Ep128EmuConfigInstallerGUI()} {open
+  } {
+    code {{
+  if (mainWindow->shown())
+    mainWindow->hide();
+  if (errorWindow->shown())
+    errorWindow->hide();
+  Fl::wait(0.0);
+  delete mainWindow;
+  delete errorWindow;
+}} {}
+  }
+  Function {errorMessage(const char *msg)} {open return_type void
+  } {
+    code {{
+  if (msg)
+    errorMessageText->copy_label(msg);
+  else
+    errorMessageText->label("");
+  errorWindow->set_modal();
+  errorWindow->show();
+  do {
+    Fl::wait(0.05);
+  } while (errorWindow->shown());
+  errorMessageText->label("");
+}} {}
+  }
+} 

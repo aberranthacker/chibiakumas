@@ -1,0 +1,9 @@
+setworkingpath,E:\Progs\CS_ImageConv\CS_ImageConv\Ep2Exports\
+
+col1,96,0,96
+col2,0,255,255
+col3,255,255,255
+
+comp,Loading2..png
+comp,Ep2Continue.png_Processed.png
+rle,SetDisk3.png

@@ -1,0 +1,53 @@
+Speccy
+	all Sprites improved
+	Changes to alignment code to reduce color clash
+	Gameover screens & RLE decoder improvements
+
+CPC:
+	Finished up color fade code
+	New colors on gameover screen
+
+
+MSX:
+	Turbo R version
+	GSX enabled
+	V9990 enhancements
+	Color fade code copied from CPC ver
+	Colored gameover screens
+
+All:	Reorganize level data
+	fadeouts on all systems
+
+
+Firstly, I'd like to wish you all a Happy Christmas, I hope you have a great holiday, and all the success and happiness in whatever you're up to over the next couple of weeks!
+
+Hours worked this week: 28.5 Hours (Programming time - not counting recording videos etc)
+CPC: 2.5... Spectrum:14.5... MSX:10.5... Geenral:1
+Well work ended for me last friday, so I've had more time to do some work!
+CPC: The Fading code is finished, and tested, I've got a fade in and out on the level... unfortunately I messed up yesteday's video, and the fade in was missed, I'll get it right next time!... 
+At the moment the biggest challenge on the CPC is to keep the thing working, as the game engine and level code is being gutted and rebuilt for the ZX & MSX...
+Spectrum:
+I reworked all the graphics for the player and level 1 sprites to try to reduce color clash, you probably won't notice the effect much on the video, but trust me it's there! I also changed the code, so all sprites such as coins and drones are locked to an 8x8 pixel location, so they do not mix with the background colors, it looks a lot better, and despite the jerky movement, I'm confident it's the right choice!
+That's not possible with the player sprite, as the player needs fine movement to dodge bullets, but I've altered the sprite code, so the player will be affected by the background color, more than the other way round - Chibiko's hair was making the sky bright purple and things which looked nasty! it will happen far less now I've made her hair darker to reduce the effect too - I'm not sure what the best solution on the speccy is - but I'm happy what I'm doing is as good as the better spectrum games I've seen.
+I've also recolored the game over and continue screens for the spectrum, you can see them all at the end of this post
+I even have a simple fade out effect on the spectrum! All the colors will go to dark - then blue... looks quite nice considering the spectrum's limited graphics
+MSX:
+Big work on the V9990+Turbo-R version the game will run with much smoother animation which looks great!... due to the simplicity of the game engine (required for speed on 8 bits) the game will play somewhat differently on this system, but I think it looks great, and the alternative gameplay will give people something different to try!
+The regular MSX2+V9990 is limited to 30fps... this is because the Z80 is too slow to keep the speed up, and the game was racing when nothing was on screen, and slowing down when the action started... I've put a limit in so it should be more constantly 30fps
+I've also added support for the 5mhz mode of the Panasonic GSX... it will be turned on automatically, the extra speed should reduce slowdown, but it only offered about 30% extra power with the V9990, so it's not enough to use even part of the 'Turbo-R' mode
+The MSX also has game over screens now! and they look great in 16 colors!
+I also ported over the CPC's fade code, so the MSX now has nice fadein/fadeout too!
+All:
+A big job I've started this week is tidying up the level code...
+At the moment I've only upgraded stage 1 (the level 1 boss is stage 2) and I'll be using the stage 1 code as a 'template' for the other levels.
+The level code in ChibiAkumas includes sprite bitmaps, event data and program code to draw the background (had to be fast, and no room in the core on CPC), handle special effects (Fades, level specific complex animation eg boss battles), and the like... 
+this means that there is hardware specific code in the level data:
+4 different background drawing routines (CPC,Spectrum,MSX,V9990)
+4 different fade effects (CPC,CPC+, MSX,Spectrum)
+
+Not to mention special things like special backgrounds, and the 1000 bullet attack the last boss uses!
+Because of all this complexity I've been reorganizing the level code to make everything as neat and well documented as possible - it should reduce the number of problems I have upgrading the later stages, and stop any serious bugs cropping up if I can avoid it... unfortunately it's taken a lot of time!
+
+Plans for next week:
+I'll keep working on any odd bits of code I think I can clean up - silly things like the screen border of the spectrum is not black - and the CPC version uses the wrong music!!), I want to finish the game over (the last stage is to reload the title screen and show the main menu)... and I'm going to start recoloring the 1st boss sprites!
+I'll be taking things a little easier on the programming next week, as I have some 'home soldering' kits to do this holiday, including a 'build your own spectrum'!!.. there's also a SD-card disk emulator for the ZX spectrum under the tree, so hopefully I can do some video of the game running on real hardware sometime soon!

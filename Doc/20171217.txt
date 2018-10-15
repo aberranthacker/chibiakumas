@@ -1,0 +1,53 @@
+2017/12/17 Update - With Video
+
+Total hours spent: 18... CPC: 3hrs, Spectrum: 7 hrs, MSX: 8 hrs
+Ok! so what's been going on? Well, I've been pretty busy!
+
+On the general front, I've upped the bullet limit on the player from 36 to 128... There was a bit of memory spare, and while it may slow the game down a bit in places, the players onscreen bullet limit was making the Xfire mode useless - so I'm going to give it a go.
+
+
+The CPC Plus version now has a nice fade in/fade out function - taking full advantage of the CPC plus palette, I wrote it first on wednesday, but it was a bit cruddy (it increased each color chanel at the same speed, so there was color distortion)... I did the job again properly on thursday, with each chanel increasing in propotion which looks far better...
+
+I'm not very good at maths, so I struggle to get these routines working right quite a lot, and it took me a few hours to work out how to do the smooth color change without the multiplication or devide commands I'd use if I was programming C++, but I got there in the end - and I take a lot of pride in managing to figure these things out for myself.
+
+
+The Spectrum has been giving me a hard time! 
+
+If you look at the screenshot below, you'll see that in some positions the drone sprite will color the background, which looks weird - I programmed an alternate sprite routine, where the sprites would have black borders, and any excess would be cropped off, to stop this, but having big black borders around the characters looked more strange than the occasional color clashing, so for now I've left it.
+
+I also had some horrid glitching which wasted some time, I eventually realised this was because of my onscreen level time (the numbers in the top-middle of the screen)... because one of the screenbuffers is at &C000, and the level data is also at &C000 (in a different bank).. when the level code tried to draw the time it was corrupting its own sprites and level data - which was making a total mess!
+
+I have some commands in the core, which I can call to swap to the screen bank (bank 7), call a function, swap the bank back, and return to the level code - this allows me to get around the problem, but it's a bit of hassle! (see attachment)
+
+this isn't a problem on the CPC or MSX, but with 1/4 of the addressable memory locked to the rom, I have a lot of problems - Between that the color clash and the multiple disk systems - the speccy version is a bit of a pain!
+
+Finally the MSX version!
+
+I've been putting a lot of work into the V9990 version this week, as I've got to work out how (if) I can use the huge amount of power it offers!
+
+I've been trying two things:
+
+1. The particle array - this is a 'firework effect' where enemies explode into red stars when you kill them, and power ups will trail stars across the screen... it's a just a tweak of the bullet aray code - suffice to say, the particles don't hurt you, but they do make things quite confusing, so I'm not sure what to make of the idea.
+
+2. More paralax layers
+
+If you take a look at the video below, you'll see there are now two mountain layers in the distance, and a 'foreground' layer in front of everything else!
+'Unfortunately' the V9990 just laughs at this stuff - it doesn't make the game one ounce slower - just look at the Turbo-R version below to see how fast things run when the CPU isnt' the bottleneck!
+
+Here's the game running on the MSX2 with the V9990:
+https://www.youtube.com/watch?v=mLeI5L2fNbI
+
+And just to show how stupidly overpowered the V9990 is, here's the game running on the Turbo-R
+https://www.youtube.com/watch?v=YKMd2Mmknb0
+
+**** Please let me know what you think of the particle effects, and the extra layers ****
+
+Next week:
+
+I'm going to do some more work on the CPC fades, I need to check the code will fade out OK, and I need to do crossfades between other colors for the caves level.
+
+I'm planning to do a special version for the Turbo-R - I will try to halve the speed of all the enemies so the game runs smoother at higher framerate - unfortunately this will not always be possible, as the game engine wasn't designed to run on such a fast machine.
+
+I need to redo some sprites on all systems, the Castle in the background on CPC and MSX is interlaced at the moment, this was a trick on the CPC version, where a sprite was interlaced to make it bigger, but not use more cpu power, but it doesn't work on MSX or ZX, so I'm ditching it on all 3 - and I want the castle looking good!
+
+Also need to do some work trying to reduce color clash on the Spectrum sprites, and on the MSX2 I need to set the sprites which appear at the top/bottom of the screen as 'transparent' and the ones in the middle as 'pset' which wipe anything behind them- the pset sprites are faster on the MSX VDP (all sprites are transparent on the V9990)... also there's a small bug in my sprite editor - when the sprites are exported for the MSX - occasionally there's a pixel of a different sprite at the edge.

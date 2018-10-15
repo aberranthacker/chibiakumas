@@ -1,0 +1,14 @@
+setworkingpath,E:\Progs\CS_ImageConv\CS_ImageConv\Ep2Exports\
+
+col1,240,102,102
+col2,255,0,255
+col3,255,255,255
+
+colswap,1,100,126,125,126,
+colswap,1,100,255,82,96,
+colswap,2,100,102,240,102
+
+setxypos,21,01
+
+rle,FR059 [Yume - Endsequence -  Shrug].png
+rle,FR058 [Yume - Endsequence -  dejected].png

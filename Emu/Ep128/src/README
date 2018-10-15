@@ -1,0 +1,1107 @@
+ep128emu 2.0.11.1
+=================
+
+ep128emu is an open source, portable emulator of the Enterprise 128,
+ZX Spectrum 48/128, Amstrad CPC 464/664/6128 and Videoton TVC computers,
+written in C++, and supporting Windows and POSIX platforms (32 and 64
+bit Windows and Linux, and MacOS X have been tested).
+It implements accurate, high quality hardware emulation, however, the
+system requirements are higher than that of most other emulators.
+
+Features
+========
+
+General
+-------
+
+  * graphical user interface using the FLTK library
+  * software (FLTK based) or OpenGL video, with resizable emulator
+    window, fullscreen mode, brightness, contrast, gamma, hue, and color
+    saturation control; additional features in OpenGL mode only: single
+    or double buffered (with synchronization to vertical refresh) mode,
+    linear texture filtering, resampling video output to the monitor
+    refresh rate, and some display effects: motion blur, scanline
+    shading, and (if OpenGL 2.0 shaders are available) PAL TV emulation
+  * real time audio output uses the PortAudio library (v18 or v19), with
+    support for many native audio APIs (MME/DirectSound/WDM-KS/WASAPI on
+    Windows, OSS/ALSA/JACK on Linux, and CoreAudio on MacOS X); high
+    quality sample rate conversion with low aliasing; volume control,
+    two first order highpass filters with configurable cutoff frequency,
+    and an optional parametric equalizer can be applied to the audio
+    signal
+  * recording audio output to a WAV format sound file
+  * recording video and sound output to an AVI format video file, with
+    768x576 RLE8 or 384x288 uncompressed YV12 video at 24 to 60 frames
+    per second, and 48000 Hz stereo 16-bit PCM audio
+  * saving screenshots as 768x576 8-bit PNG format files
+  * saving and loading snapshots of the state of the emulated machine
+  * demo recording (snapshot combined with stream of keyboard and mouse
+    events which can be played back with accurate timing)
+  * tape emulation with playback, recording, and setting tape position;
+    markers can be created for quick positioning to specific tape
+    locations (useful for tapes with multiple files); uses custom file
+    format which is PCM audio data with 1 to 8 bits of sample resolution
+    and variable sample rate, and header including the table of markers;
+    there is also limited (read only) support for EPTE format tape
+    files, as well as read-write (although without markers) support for
+    sound files like WAV, AIFF, etc.
+  * GUI tape editor utility for copying Enterprise files from/to
+    ep128emu tape images
+  * GUI debugger with support for breakpoints/watchpoints, viewing the
+    current state of CPU registers and memory paging, displaying memory
+    dump and searching for a pattern of bytes, and disassembler with
+    support for all documented and undocumented Z80 opcodes.
+    A simple monitor is also included, with commands like assemble,
+    disassemble (also to file), trace, memory and I/O port dump and
+    modify, printing and changing CPU registers, memory compare, copy,
+    fill, search, load and save, and more.
+    For most operations, addresses can be 16 bit CPU (affected by
+    current paging) or 22 bit physical (all ROM and RAM data can be
+    accessed, regardless of memory paging) addresses. Watchpoints can
+    also be set on I/O ports and physical addresses.
+    The debugger supports scripting in the Lua language, to allow for
+    advanced uses like breakpoints with custom defined, complex set of
+    conditions.
+  * configurable keyboard map for the emulated machine; it is also
+    possible to use external game controller devices like joysticks and
+    gamepads
+
+Enterprise emulation
+--------------------
+
+  * instruction based emulation of the Z80 CPU, supports all documented
+    and undocumented opcodes, and memory wait states (including
+    synchronization with the NICK chip when accessing video memory)
+  * RAM size can be set in 16 kilobyte steps in the range 64 to 3712
+  * ROM can be loaded from external image files to segments 0 to 7,
+    16 to 19 (decimal), 32 to 35, 48 to 51, and 64 to 67
+  * using external configuration files, it is also possible to define
+    any memory configuration without the above limitations
+  * NICK chip emulation, supporting all documented and undocumented
+    video modes
+  * DAVE emulation, including timers, interrupts, external ports for
+    tape and keyboard/joystick, memory paging, and sound output (all
+    effects are supported, and the polynomial counters generate the same
+    pseudo-random "noise" pattern as on the real machine)
+  * tape emulation (see general features for details)
+  * WD177x (floppy drive controller) emulation for EXDOS
+  * IDE hard disk emulation; supports up to 4 2 GB disks, image files
+    can be in raw or VHD format
+  * optional extension ROM (epfileio.rom) that implements a FILE: device
+    for direct access to files on the host system in a single user
+    selectable directory
+  * Spectrum emulator card emulation
+  * real time clock (at ports 7E, 7F)
+  * external 4-channel 8-bit DAC at ports F0 to F3
+  * mouse emulation, an EnterMice device with up to 5 buttons and mouse
+    wheel is emulated in native mode on column K of the keyboard matrix
+  * SD card (SDEXT) emulation, this is an experimental feature based on
+    code from LGB's Xep128 emulator
+  * SID card emulation at ports 0E (address) and 0F (data) using reSID
+    1.0; NOTE: this currently breaks the external DAC emulation when
+    active
+
+Spectrum emulation
+------------------
+
+  * instruction based emulation of the Z80 CPU, supports all documented
+    and undocumented opcodes, and cycle accurate synchronization with
+    the ULA chip when accessing video memory and I/O ports
+  * RAM size can be 16, 48, or 128 kilobytes
+  * ROM can be loaded from external image files
+  * ULA, AY-3-8912, keyboard, and Kempston joystick emulation
+  * tape emulation (see general features for details)
+  * Spectrum tape files in .tap format can be used as tape images for
+    read-only hardware level tape emulation, or loaded directly to
+    memory if the "Enable virtual file I/O" option is checked in the
+    machine configuration
+  * it is also possible to load .tzx format tape images, although the
+    support for these is not complete yet
+  * loading SNA and Z80 format snapshot files created by other emulators
+    is supported; however, snapshot saving and demo recording are only
+    possible in the native ep128emu format
+
+Amstrad CPC emulation
+---------------------
+
+  * instruction based emulation of the Z80 CPU, supports all documented
+    and undocumented opcodes, and cycle accurate synchronization with
+    the CRTC and gate array when accessing video memory and I/O ports
+  * RAM size can be 64, 128, 192, 320, or 576 kilobytes
+  * ROM can be loaded from external image files to the lower ROM and
+    expansion ROMs 0 to 7
+  * 6845 CRTC (currently type 0 only), gate array, AY-3-8912, 8255 PPI
+    (modes 1 and 2 are not supported yet), keyboard, and joystick
+    emulation
+  * tape emulation (see general features for details)
+  * CPC tape files in .cdt (same as Spectrum .tzx) format can be used as
+    tape images for read-only hardware level tape emulation, although
+    the support for this format is not complete yet
+  * uPD765 (floppy drive controller) emulation; it supports standard and
+    extended .DSK files, and also access to real disks (not very useful
+    in practice, since only PC format disks can be used this way), as
+    well as limited emulation of the timing of disk rotation, stepping,
+    and data transfers. The FORMAT TRACK (0x0D) command is not
+    implemented yet, and some copy protected games and .DSK files with
+    unusual track formats may not work correctly
+  * loading SNA snapshot files (v1 or v2; v3 is loaded, but the extra
+    information about the internal state of the hardware is currently
+    ignored) created by other emulators is supported; however, snapshot
+    saving and demo recording are only possible in the native ep128emu
+    format
+
+Videoton TVC emulation
+----------------------
+
+  * instruction based emulation of the Z80 CPU, supports all documented
+    and undocumented opcodes, and cycle level synchronization with the
+    CRTC and other devices when accessing video memory and I/O ports
+  * RAM size can be 48, 80 or 128 kilobytes (TVC 32, 64 or 64+)
+  * ROM can be loaded from external image files to SYS, CART and EXT
+  * 6845 CRTC (currently type 0 only), audio, keyboard and joystick
+    emulation
+  * tape emulation (see general features for details)
+  * WD1773/1793 (floppy drive controller) emulation for VT-DOS
+  * optional extension ROM (tvcfileio.rom) that implements a FILE device
+    for direct access to files on the host system in a single user
+    selectable directory
+  * SD card (SDEXT) emulation, this is an experimental feature based on
+    code from LGB's Xep128 emulator
+
+Installation
+============
+
+Linux
+-----
+
+On Linux and other POSIX platforms, the emulator is installed from the
+source code, available at the GitHub download page
+  https://github.com/istvan-v/ep128emu/releases/
+or the most recent state of the code can be downloaded from Git with the
+following command:
+  git clone https://github.com/istvan-v/ep128emu.git
+In addition to the standard development tools (a recent version of the
+GNU C/C++ compiler, binutils, etc.), you need the following packages:
+
+  * SCons (http://www.scons.org/)
+  * Python interpreter for running SCons
+  * FLTK 1.3.x (http://www.fltk.org/software.php?VERSION=1.3.4) or
+    1.1.x (http://www.fltk.org/software.php?VERSION=1.1.10)
+    NOTES:
+      * this library should be compiled with the --enable-threads
+        'configure' option - many Linux distributions include binaries
+        of FLTK 1.1 built without --enable-threads, so you may need to
+        compile it from sources
+      * on MacOS X, FLTK 1.1.7 needs to be patched with the included
+        fltk-1.1.7-MacOSX.patch file
+  * PortAudio (http://www.portaudio.com/download.html), version 18 and
+    19 are supported, but v19 is recommended
+  * libsndfile (http://www.mega-nerd.com/libsndfile/#Download)
+
+The following packages are optional:
+
+  * OpenGL for improved video display and effects
+  * SDL (http://www.libsdl.org/) 1.2 for joystick input; NOTE: on Linux,
+    versions 1.2.10 and newer do not work if they are statically linked
+    and were built with video support (--enable-video)
+  * Lua (http://www.lua.org/ or http://www.luajit.org/) for scripting in
+    the debugger; version 5.1 or newer is recommended, but 5.0 is also
+    supported
+  * libcurl (https://curl.haxx.se/) for ROM download support in
+    epmakecfg
+
+Once these are installed, you can edit the file 'SConstruct' in the top
+level source directory for setting compiler flags etc., and run the
+command 'scons -j 2' for building the emulator. The following options
+can be passed to scons:
+
+  -j N
+      Maximum number of parallel jobs to be run by scons. It is
+      recommended to set N to the number of logical cores of your CPU
+  win64=1
+      Cross-compile Windows x86_64 binaries using Wine
+      (http://www.winehq.com/) and MinGW; complete pacakges of MinGW for
+      building the emulator can be downloaded from:
+        https://www.dropbox.com/s/ex0zxz7e6bmcb9r/mingw_w64-x64.7z?dl=1
+        https://www.dropbox.com/s/a336x3bs1p0gv3t/mingw_w64-x86.7z?dl=1
+  win32=1
+      Cross-compile Windows i686 binaries using Wine and MinGW
+  linux32=1
+      Build 32-bit Linux binaries on a 64-bit system without using
+      pkg-config
+  nosdl=1
+      Disable the use of SDL and joystick support. This option may be
+      needed on Linux with statically linked SDL versions 1.2.10 and
+      newer that were built with video support enabled
+  nolua=1
+      Build without support for Lua scripting
+  utils=0
+      Do not build the optional utilities (epimgconv, epcompress and
+      dtf)
+  glshaders=0
+      Disable the use of OpenGL shaders
+  debug=1
+      Compile binaries for debugging: no optimization and more warnings
+  release=0
+      Do not build a release version: binaries are not stripped and are
+      compiled with less optimization. Implied by debug=1
+  luajit=1
+      Use LuaJIT (installed as Lua 5.1) on Windows
+  z80cmos=1
+      Emulate the CMOS version of the Z80 CPU
+  sdext=0
+      Disable SD card (SDEXT) emulation
+  resid=0
+      Disable SID card emulation
+  curl=0
+      Do not use libcurl in epmakecfg for downloading the ROM package
+  cflags="..."
+      Additional flags to be passed to the compiler or linker
+  nopkgconfig=1
+      Disable the use of pkg-config and fltk-config to automatically
+      configure libraries
+  cache=1
+      Enable the use of scons build cache in '.build_cache'
+
+An 'install' target is also supported by SConstruct, this will install
+the emulator binaries under ~/bin, and the configuration and data files
+under ~/.local/share/ep128emu. Running 'scons -c install' will remove
+most of the installed files.
+Alternatively, you can copy the executables (dtf, ep128emu, epcompress,
+epimgconv, epmakecfg and tapeedit) to any directory that is in the PATH;
+on MacOS X, an .app package is created in 'ep128emu.app'.
+
+When installing the first time, you also need to set up configuration
+files and ROM images. If epmakecfg was built with libcurl support, the
+following steps can be skipped, the configuration utility is run
+automatically by ep128emu when needed, and it can download and install
+the ROM images.
+Before installation, download ep128emu_roms-2.0.11.bin from
+  https://enterpriseforever.com/letoltesek-downloads/egyeb-misc/msg61025
+and copy it to:
+  ~/.local/share/ep128emu/roms                (for 'scons install')
+  ~/.ep128emu/roms                            (for manual installation)
+  ~/Library/Application Support/ep128emu/roms (on Mac OS X)
+If not using 'scons install', run 'epmakecfg' and click OK to the
+windows that pop up asking for the base directory of configuration and
+data files, and if configuration files should be installed.
+
+It is possible to reinstall configuration files later by running the
+'epmakecfg' utility. ROM images can be installed manually by downloading
+ep128emu_roms-2.0.11.7z from the above location and extracting it in the
+correct directory. The .bin format ROM package can be unpacked with the
+command 'epcompress -x -a ep128emu_roms-2.0.11.bin' in the current
+directory, 'epmakecfg' does this automatically if it finds the package
+where the ROM images need to be installed.
+
+Windows
+-------
+
+A binary package with an installer is available at the GitHub download
+page:
+  https://github.com/istvan-v/ep128emu/releases/
+Older (pre-2.0.10) versions can be downloaded from SourceForge:
+  https://sourceforge.net/projects/ep128emu/files/
+To install, just run the executable, and follow the instructions. The
+installer can automatically download the ROM images needed for running
+the emulator, but these can also be installed manually by downloading
+ep128emu_roms-2.0.11.7z from
+  https://enterpriseforever.com/letoltesek-downloads/egyeb-misc/msg61025
+and extracting it to roms\ under the selected installation folder.
+When asked if configuration files should be reinstalled, click 'OK'
+when installing the first time, but this step can be skipped in later
+installations to preserve the configuration.
+
+WARNING: on Windows, there may be timing problems when using some dual
+core CPUs, or power management features that change the clock frequency
+of the CPU while the emulator is running. These issues can result in
+slow or erratic emulation speed, not running at 100% speed in real-time
+mode, or temporary lockups. If you encounter such problems, forcing the
+emulator to run on a single core (by setting the CPU affinity for
+ep128emu.exe), and/or disabling dynamic changes to the CPU clock
+frequency by power management could fix the timing issues. Installing
+and using an utility like AMD Dual Core Optimizer may also solve the
+problem.
+Note that bad emulation performance might also be caused by display or
+audio drivers, so it is recommended to check (and upgrade, if necessary)
+those as well.
+
+Usage
+=====
+
+Command line options
+--------------------
+
+  -h
+  -help
+  --help
+    print the list of available command line options
+  -ep128
+  -zx
+  -cpc
+  -tvc
+    select the type of machine (Enterprise, ZX Spectrum, CPC or TVC) to
+    be emulated
+  -cfg <FILENAME>
+    load an ASCII format configuration file on startup, and apply
+    settings
+  -snapshot <FILENAME>
+    load snapshot or demo file on startup
+  -opengl
+    use OpenGL video driver (this is the default, and is recommended
+    when hardware accelerated OpenGL is available)
+  -no-opengl
+    use software video driver; this is slower than OpenGL when used at
+    high resolutions, and also disables many display effects, but should
+    work on all machines; however, it will use a color depth of 24 bits,
+    while in OpenGL mode the textures are 16 bit (R5G6B5) only, to
+    improve performance
+  -colorscheme <N>
+    select GUI color scheme N (0, 1, 2, or 3)
+  OPTION=VALUE
+    set configuration variable 'OPTION' to 'VALUE'; the available
+    variable names are the same as those used in ASCII format
+    configuration files
+  OPTION
+    set boolean configuration variable 'OPTION' to true
+
+'File' menu
+-----------
+
+Configuration / Load from ASCII file (Alt + Q)
+
+  Select and load an ASCII format configuration file and apply the new
+  settings. If the configuration file does not include all the supported
+  options, those that are omitted are left unchanged.
+
+Configuration / Load from binary file (Alt + L)
+
+  Load an ep128emu format binary file, which may be a previously saved
+  snapshot, demo, or a binary format configuration file.
+
+Configuration / Save as ASCII file
+
+  Save the current emulator configuration to an ASCII text file, which
+  can be edited with any text editor, and can be loaded at a later time.
+
+Configuration / Save
+
+  Save the current emulator configuration in binary format to the
+  default file (~/.ep128emu/ep128cfg.dat). This is also automatically
+  done when exiting the emulator.
+
+Configuration / Revert
+
+  Reload emulator configuration from ~/.ep128emu/ep128cfg.dat, and apply
+  the original settings.
+
+Save snapshot (Alt + S)
+
+  Save a snapshot of the current state of the emulated machine to the
+  selected file. The snapshot will also include the current memory
+  configuration and ROM images, but clock frequency and timing settings
+  are not restored when loading a snapshot. The file format may be
+  subject to changes between different releases of the emulator, but new
+  versions of the emulator can still load old snapshots. Note that the
+  state of any disk drives is currently not saved, and the drives are
+  reset on loading a snapshot.
+  Starting from version 2.0.10 of ep128emu, snapshot and demo files can
+  optionally be saved in a compressed format, if this feature is enabled
+  in the machine configuration. Compressing a large snapshot can take a
+  few seconds on a slow PC, but the loading time is not affected
+  noticeably.
+
+Load snapshot (Alt + L)
+
+  Load an ep128emu format binary file, which may be a previously saved
+  snapshot, demo, or a binary format configuration file.
+
+Quick snapshot / Set file name
+
+  Select file name for quick snapshots. The default is
+  ~/.ep128emu/qs_ep128.dat. This setting is not saved on exit, and quick
+  snapshots are always saved in uncompressed format.
+
+Quick snapshot / Save (Ctrl + F9)
+
+  Save snapshot to the quick snapshot file (see notes above).
+
+Quick snapshot / Load (Ctrl + F10)
+
+  Load the quick snapshot file if it exists.
+
+Record demo
+
+  Save snapshot (including clock frequency and timing settings) and
+  record keyboard events to the selected file until the recording is
+  stopped. The events can be replayed with accurate timing when the
+  file is loaded later. Note that the file format may change between
+  different releases of the emulator, and the timing may also be
+  incorrect when using a different version to play a demo file.
+
+Stop demo (Alt + K)
+
+  Stop any currently running demo playback or recording.
+
+Load demo (Alt + L)
+
+  Load an ep128emu format binary file, which may be a previously saved
+  snapshot, demo, or a binary format configuration file.
+
+Record audio / Start...
+
+  Write 16 bit signed PCM sound output to a WAV format sound file.
+
+Record audio / Stop
+
+  Close sound output file if it is currently being written.
+
+Record video / Start...
+
+  Open new AVI file for video recording. This increases the CPU usage
+  significantly, and since the data is written without compression, it
+  will take up a lot of disk space. If the size of the output file
+  reaches 2 GB, it is automatically closed, and the emulator asks for
+  a new file to continue the recording.
+  NOTE: the video and audio streams in the AVI file are not affected by
+  any of the display or sound configuration settings. There are two
+  options in the machine configuration that affect the video capture:
+  the frame rate and the codec. It is recommended to use the defaults
+  (RLE8 768x576 at 50 fps) when possible, but RLE8 is not always
+  supported by other software, in those cases it may be necessary to use
+  the YV12 codec, which decreases the quality while usually increasing
+  the output file size and CPU usage.
+
+Record video / Stop
+
+  Stop video capture, and close any AVI file that is currently being
+  written.
+
+Save screenshot (F12, Alt + C)
+
+  Save a screenshot in 8 bit PNG format. The video output is captured
+  immediately after activating this menu item, and is saved at a
+  resolution of 768x576 without any processing (color correction,
+  effects, etc.).
+
+Quit (Shift + F12)
+
+  Exit the emulator.
+
+'Machine' menu
+--------------
+
+Reset / Reset (F11)
+
+  This has the same effect as using the reset button on the real
+  machine.
+
+Reset / Force reset (Ctrl + F11)
+
+  In addition to a normal reset, make sure that the emulated machine is
+  really restarted using the standard ROM reset routines, and do not
+  allow programs to disable reset by setting custom (RAM) handlers.
+
+Reset / Reset clock frequencies
+
+  Reset clock frequency and timing settings to those specified in the
+  machine configuration; this is normally only useful after demo
+  playback, which may override the settings.
+
+Reset / Reset machine configuration (Shift + F11)
+
+  Reset memory configuration (RAM size, ROM images), clock frequency,
+  and timing settings according to the machine configuration, and clear
+  all RAM data. Implies 'Force reset' and 'Reset clock frequencies'.
+  Reverting the configuration can be useful after snapshot loading or
+  demo playback, as these may change the settings.
+
+Quick configuration / Load config 1 (PageDown)
+
+  Load the configuration file ~/.ep128emu/epvmcfg1.cfg, and apply the
+  new settings.
+
+Quick configuration / Load config 2 (PageUp)
+
+  Load the configuration file ~/.ep128emu/epvmcfg2.cfg, and apply the
+  new settings.
+
+Quick configuration / Save config 1
+
+  Save the current clock frequency and timing settings to
+  ~/.ep128emu/epvmcfg1.cfg.
+
+Quick configuration / Save config 2
+
+  Save the current clock frequency and timing settings to
+  ~/.ep128emu/epvmcfg2.cfg.
+
+'Options' menu
+--------------
+
+Display / Set size to 384x288
+Display / Set size to 768x576
+Display / Set size to 1152x864
+
+  Resize the emulator window to predefined width/height values; this has
+  no effect in fullscreen mode. While the window can also be resized
+  using the window manager, sizes that are integer multiples of the
+  actual screen resolution of the emulated machine may look better,
+  particularly when texture filtering is not used, and are also slightly
+  faster when using the software video driver.
+
+Display / Cycle display mode (F9)
+
+  Cycle between these four display modes:
+    window with no menu bar
+    window with menu bar (this is the default)
+    fullscreen with menu bar
+    fullscreen with no menu bar (recommended for mouse emulation)
+
+Sound / Increase volume
+
+  Increase sound output volume by about 2 dB.
+
+Sound / Decrease volume
+
+  Decrease sound output volume by about 2 dB.
+
+Disk / Configure... (Alt + D)
+
+  Opens a dialog for setting up floppy, IDE and SD card emulation.
+
+  For each floppy drive, an image file can be selected, and disk
+  geometry parameters can be specified. If the file name is left empty,
+  that means having no disk in that particular drive. It may also be
+  possible to directly access a real disk by using the /dev/fd* devices
+  (on Linux) or \\.\A: (on Windows) as the image file.
+  Any of the geometry parameters can be zero or negative to have the
+  value calculated automatically from the others (if available), the
+  image file size, and the file system header.
+
+  The IDE and SD card emulation support image files in raw and VHD
+  format (the latter should have a .vhd extension), with a file size of
+  up to 2 GB. In the case of VHD files, the disk geometry is determined
+  by the VHD footer, while the geometry of raw images is calculated from
+  the file size. Depending on the image format, the model number string
+  of the emulated drive will include "(VHD)" or the automatically
+  assigned geometry.
+  The emulator package includes a 126 MB VHD format IDE disk image in
+  disk/ide126m.vhd.bz2, with 4 FAT12 formatted 31.5 MB partitions.
+  Note that with the current version of IDE.ROM, after changing IDE disk
+  images, a cold reset is required for the changes to be detected, and
+  the disk change flag is also set on snapshot or demo loading.
+
+  All data storage devices are disabled while recording or playing a
+  demo.
+
+Disk / Remove floppy / Drive A
+Disk / Remove floppy / Drive B
+Disk / Remove floppy / Drive C
+Disk / Remove floppy / Drive D
+Disk / Remove floppy / All drives
+
+  These are just shortcuts for setting the image file name for a
+  specific floppy drive to an empty string.
+
+Disk / Replace floppy / Drive A (Alt + H)
+Disk / Replace floppy / Drive B
+Disk / Replace floppy / Drive C
+Disk / Replace floppy / Drive D
+Disk / Replace floppy / All drives
+
+  Set the image file name for a specific (or all) floppy drive to an
+  empty string, and then set the original file name again. This is
+  mostly useful when accessing real floppy disks, and should be used
+  after the disk is changed.
+
+Set working directory (Alt + F)
+
+  Set the directory to be accessed by the optional file I/O ROM
+  extension modules.
+
+Memory configuration files
+--------------------------
+
+While the GUI based memory configuration is easy to use, and is
+sufficient for creating the most commonly used configurations, it does
+have a number of limitations. Using a configuration file - which is a
+simple text file with a format described below - makes it possible to
+have RAM, ROM, or no memory at any segment, and image files can also be
+loaded to RAM (e.g. for emulating static RAM).
+NOTE: if a memory configuration file is specified, the RAM/ROM settings
+in the "Machine configuration" GUI are ignored.
+
+A memory configuration file may contain any number of segment range
+definitions, each being a line in one of the following formats for RAM
+or ROM:
+  0xNN RAM "fileName" nSegments
+  0xNN ROM "fileName" nSegments
+where 'NN' is the number of the first segment (hexadecimal), 'fileName'
+is the name of the file to be loaded (with full path; backslash or
+double quote characters in the name should be escaped with a backslash),
+and 'nSegments' is the number of segments to be defined as RAM or ROM
+(decimal). If 'nSegments' is not specified, then it defaults to 1 for an
+empty file name, otherwise it is determined by the size of the image
+file. If 'fileName' is also omitted, then it means a single empty
+segment.
+The configuration file may also include comments and empty lines.
+A comment can begin with the semicolon or '#' character, and the rest of
+the line is ignored.
+Similarly to images loaded in the GUI ROM configuration, it is not
+necessary for the files to have a size that is an integer multiple of
+16384 bytes: the last segment is padded with FFh bytes. An empty file
+name will initialize RAM segments to FFh bytes, while in the case of
+ROM, it means that the segments will be empty. If the file is longer
+than the size defined by 'nSegments', the data is truncated; if it is
+too short, then the segments are repeated.
+By default, segments 00h..FBh are empty, and FCh..FFh are RAM. The type
+of the last four segments (the video memory) cannot be changed to ROM.
+
+A simple example file, assuming that the emulator is installed to
+"C:\Program Files\ep128emu2":
+
+  ; EXOS 2.1 at segments 0, 1 (and repeated at segments 2, 3)
+  0x00 ROM "C:\\Program Files\\ep128emu2\\roms\\exos21.rom" 4
+  ; IS-BASIC 2.1 at segment 4
+  0x04 ROM "C:\\Program Files\\ep128emu2\\roms\\basic21.rom"
+  ; 128K RAM at segments F8h..FFh
+  0xF8 RAM "" 8
+
+Reading I/O ports in the debugger
+---------------------------------
+
+Write-only I/O ports are readable in the monitor and Lua scripts, and
+return the last value written to the port. There are also some changes
+to the address decoding compared to what is seen by the emulated Z80
+code, depending on the machine type:
+  - Spectrum:
+    - below port address 20H, the Kempston joystick state is read from
+      all addresses
+    - the last value written to the ULA is read from any other even
+      address that is less than 100H
+    - in Spectrum 128 mode, if the address is less than 100H, and the
+      lowest two bits are 01B, the memory paging register is returned
+    - reading any other I/O port below 100H returns FFH
+    - reading from ports 0xxxxxxxxxxxxx0xB does not write the data bus
+      state to the memory paging register
+  - CPC:
+    - when reading the gate array/RAM configuration port, the function
+      (pen/color/video mode/memory configuration) can be selected in
+      bits 6 and 7 of the address; for example, reading port 7F40H
+      returns the color of the currently selected pen
+    - in the address range 0 to 9FH, many I/O registers can be read
+      directly:
+      - 00H-1FH: 6845 CRTC registers
+      - 20H-2FH: gate array palette
+      - 30H-3FH: gate array border color
+      - 40H-4FH: AY-3-8912 registers
+      - 50H-5FH: 8255 PPI registers
+          0101x000B: port A current state (input or output)
+          0101x001B: port B current state (input or output)
+          0101x010B: port C current state (input or output)
+          0101xx11B: control register
+          0101x100B: last value written to port A register
+          0101x101B: last value written to port B register
+          0101x110B: last value written to port C register
+      - 60H-6FH: keyboard matrix state
+      - 70H:     currently selected CRTC register
+      - 71H:     CRTC flags
+          bit 0: 1 if the "display enabled" output is active
+          bit 1: 1 if the HSYNC output is active
+          bit 2: 1 if the VSYNC output is active
+          bit 3: 1 if the current field is odd in interlaced modes
+          bit 4: 1 if the "cursor enabled" output is active
+      - 72H:     current video memory address / low
+      - 73H:     current video memory address / high
+      - 74H:     video mode (0 to 3)
+      - 75H:     currently selected pen number
+      - 76H:     gate array IRQ counter (0 to 51)
+      - 77H:     AY-3-8912 register selected
+      - 78H:     RAM configuration (bits 6 and 7 are RAM enable flags
+                 for page 0 and page 3)
+      - 79H:     currently selected expansion ROM bank
+      - 7AH-7FH: unused, FFH is returned
+      - 80H-9FH: uPD765 floppy drive controller registers and state
+          80H: FDC phase (0: idle, 1: command, 2: execution, 3: result)
+          81H: last command code
+          82H: motor state (last byte written to 0FA7EH & 01H)
+          83H: currently selected physical head (0 or 1) * 4 + drive
+          84H: CPU<->FDC data transfer position LSB
+          85H: CPU<->FDC data transfer position MSB
+          86H: CPU<->FDC data transfer size LSB
+          87H: CPU<->FDC data transfer size MSB
+          88H: logical cylinder ID
+          89H: logical head ID
+          8AH: logical sector ID
+          8BH: sector size code
+          8CH: last sector ID (EOT), or sector count for format track
+          8DH: gap length
+          8EH: sector data length (DTL), or STP for scan commands
+          8FH: filler byte (format track only)
+          90H: first byte in command/data/result buffer
+          91H: second byte in command/data/result buffer
+          92H: third byte in command/data/result buffer
+          93H: fourth byte in command/data/result buffer
+          94H: ST1 for read/write commands
+          95H: ST2 for read/write commands
+          96H: specify parameter 1 (step rate / head unload time)
+          97H: specify parameter 2 (head load time)
+          98H: ST3 for sense drive status on drive 0
+          99H: ST3 for sense drive status on drive 1
+          9AH: ST3 for sense drive status on drive 2
+          9BH: ST3 for sense drive status on drive 3
+          9CH: drive 0 cylinder number (PCN0)
+          9DH: drive 1 cylinder number (PCN1)
+          9EH: drive 2 cylinder number (PCN2)
+          9FH: drive 3 cylinder number (PCN3)
+    - unlike the other machine types, I/O watchpoints are set on the
+      upper 8 bits of the address
+  - Enterprise: when the SD card emulation is enabled, segment 07H is
+    handled in a special way, and its original contents cannot be
+    accessed:
+    - 0000H-1FFFH: a 8 KB page of the 64 KB flash ROM
+    - 2000H-3BFFH: 7 KB static RAM
+    - 3C00H-3FFFH: memory mapped I/O, 4 registers are repeated 256 times
+    Reading the I/O area in the debugger ignores the high speed mode
+    bit, and some of the registers have additional readable bits:
+    - xxxxxxxxxxxx01B (status):
+        bit 0: 1 if CS0 is active
+        bit 1: 1 if CS1 is active
+        bit 2: 1 if the card is in idle state
+    - xxxxxxxxxxxx10B (ROM page) is readable in the debugger
+    - xxxxxxxxxxxx11B (high speed read configuration):
+        bit 7: 1 if high speed reading is enabled
+
+Lua scripting
+-------------
+
+Starting from version 2.0.5, it is possible to run scripts written in
+Lua from the debugger. This document only describes the use of scripts
+in the emulator, and the new API functions added; for general
+information about programming in Lua, see http://www.lua.org/docs.html
+
+Clicking the 'Run' button will run the script, and also enable the
+breakpoint callback function (see below) if it is defined. If there are
+any syntax or runtime errors, the script is terminated, and the
+breakpoint callback is disabled. After making any changes to the script,
+you need to click 'Run' and restart the script for the changes to take
+effect.
+
+It is possible to define a breakpoint callback function in the script,
+which will be automatically called whenever a breakpoint is triggered,
+and the debugger window would be shown. This function has the following
+syntax:
+
+  function breakPointCallback(bpType, addr, value)
+    ...
+    return showWindow
+  end
+
+where 'showWindow' is a boolean value, which, if true, will allow the
+debugger window to be shown like normal, or have the emulated program
+continue without any break if it is false. The four parameters passed to
+the function are as follows:
+
+  bpType
+
+    The type of break, one of the following:
+      0: breakpoint at opcode read by the CPU
+      1: data read from memory
+      2: data written to memory
+      3: opcode read in single step mode; this happens when 'Step' or
+         'Step over' are being used, and if the breakpoint callback
+         function returns false, breaks will continue to occur until
+         true is returned
+      5: I/O port read
+      6: I/O port write
+
+  addr
+
+    This is the 16 bit address where the break occured.
+
+  value
+
+    The value or CPU opcode read from or written to memory or I/O port.
+
+The breakpoint callback function will remain active until either a new
+script is run which does not define one, or the 'Stop' button is
+clicked.
+
+NOTE: an infinite loop in the script will hang the emulator, and a very
+frequently called and/or complex breakpoint callback may slow down the
+emulation.
+
+The following new functions are defined by the emulator for use in the
+scripts:
+
+  AND(...)    OR(...)    XOR(...)    SHL(a, b)    SHR(a, b)
+
+    These simple helper functions implement bitwise operations that are
+    not available in versions 5.2 and older of the Lua language by
+    default. If the emulator is built with Lua 5.3 or newer, then using
+    the operators &, |, ~, <<, and >> is recommended.
+    AND, OR, and XOR can take any number of integer arguments, and
+    return the bitwise AND, OR, and XOR of the values, respectively. In
+    the case of zero arguments, OR and XOR return zero, while AND
+    returns -1.
+    SHL returns 'a' shifted to the left by 'b' bits, and SHR returns 'a'
+    shifted to the right by 'b' bits. If 'b' is zero, the value is not
+    changed, while a negative 'b' will reverse the direction of
+    shifting. The result of shifting negative values to the right is
+    unspecified.
+
+  setBreakPoint(bptype, addr, priority)
+
+    Set a breakpoint or watchpoint at address 'addr' (0-0xFFFF), with
+    priority 'priority' (0 to 3). 'bptype' can be one of the following
+    values:
+
+      0: any memory access (read, write, or Z80 opcode read)
+      1: memory read
+      2: memory write
+      3: any memory access, same as bptype == 0
+      4: Z80 opcode read
+      5: I/O port read
+      6: I/O port write
+      7: I/O port read or write
+
+    For memory breakpoints, it is possible to add 8 to 'bpType' to
+    interpret the address as a 22 bit value in the range 0 to 0x3FFFFF,
+    with the segment number determined by the most significant 8 bits.
+    If the address is greater than 0xFFFF, it is also automatically
+    assumed to be in 22 bit format.
+    An "ignore" breakpoint can be defined by adding 16 to 'bpType', this
+    will disable other breakpoints when the program counter is at the
+    address to be ignored. It is still possible to have a normal read or
+    write breakpoint as well at the same address, by setting the lowest
+    three bits of 'bpType' to 1, 2, or 3.
+    A 'priority' value of -1 will delete an existing breakpoint at the
+    specified address.
+    The read, write, execute, and ignore flags are combined (bitwise OR)
+    if multiple breakpoints are set at the same address, while the
+    priority will be the highest value specified.
+
+    NOTE: the changes made to the breakpoint list by the script are not
+    reflected in the breakpoint editor. To restore the previously
+    defined breakpoints, click the 'Apply' button.
+
+  clearBreakPoints()
+
+    Deletes all previously defined breakpoints.
+
+  getMemoryPage(n)
+
+    Returns the segment selected for page 'n' (0 to 3).
+    In Spectrum or CPC emulation mode, RAM is mapped starting from
+    segment 00H. For the CPC, segments 00H to 03H are the internal RAM,
+    the lower ROM is at segment 80H, and expansion ROM 'n' is at segment
+    C0H + 'n'; this function returns the number of the segment for read
+    access (i.e. ROM if it is enabled). In the case of ZX Spectrum, the
+    ROM is at segment 80H (Spectrum 16 and 48), or segments 80H and 81H
+    (Spectrum 128).
+
+  readMemory(addr)
+
+    Read a byte from 'addr' (0 to 0xFFFF) in the address space of the
+    CPU.
+
+  writeMemory(addr, value)
+
+    Write 'value' to 'addr' (0 to 0xFFFF) in the address space of the
+    CPU.
+
+  readMemoryRaw(addr)
+
+    Read a byte from 'addr' (0 to 0x3FFFFF) in the "physical" address
+    space; the most significant 8 bits of 'addr' select the segment
+    number.
+
+  writeMemoryRaw(addr, value)
+
+    Write 'value' to 'addr' (0 to 0x3FFFFF) in the "physical" address
+    space; the most significant 8 bits of 'addr' select the segment
+    number.
+
+  writeROM(addr, value)
+
+    This function is similar to writeMemoryRaw(), but it can write to
+    any valid segment, even if it is ROM.
+
+  readWord(addr)
+  writeWord(addr, value)
+  readWordRaw(addr)
+  writeWordRaw(addr, value)
+  writeWordROM(addr, value)
+
+    These are similar to the memory read/write functions above, but read
+    and write 16-bit LSB-first words instead of single bytes.
+
+  readIOPort(addr)
+
+    Read a byte from I/O port 'addr' (0 to 0xFFFF).
+
+  writeIOPort(addr, value)
+
+    Write 'value' to I/O port 'addr' (0 to 0xFFFF).
+
+  getPC()    getA()     getF()     getAF()    getB()     getC()
+  getBC()    getD()     getE()     getDE()    getH()     getL()
+  getHL()    getSP()    getIX()    getIY()    getAF_()   getBC_()
+  getDE_()   getHL_()   getIM()    getI()     getR()     getIFF1()
+  getIFF2()
+
+    These functions return the registers of the CPU.
+
+  setPC(n)   setA(n)    setF(n)    setAF(n)   setB(n)    setC(n)
+  setBC(n)   setD(n)    setE(n)    setDE(n)   setH(n)    setL(n)
+  setHL(n)   setSP(n)   setIX(n)   setIY(n)   setAF_(n)  setBC_(n)
+  setDE_(n)  setHL_(n)  setIM(n)   setI(n)    setR(n)    setIFF1(n)
+  setIFF2(n)
+
+    Set CPU registers. Note that changing the program counter only takes
+    effect after the execution of one instruction is completed.
+
+  getNextOpcodeAddr(addr[, cpuAddressMode])
+
+    Returns the address of the next Z80 instruction after the
+    instruction at 'addr'. 'cpuAddressMode' selects the use of 16 bit
+    CPU (if true or not specified) or 22 bit physical (if false)
+    addresses.
+
+  getVideoPosition()
+
+    Returns the current video position as two values (horizontal and
+    vertical).
+
+    In the case of Spectrum emulation, both values are in pixels, in the
+    range 0 to 447 and 0 to 311 for the Spectrum 48, or 0 to 455 and 0
+    to 310 for the Spectrum 128.
+    The upper left corner of the screen is at 0,0 (it is the cycle when
+    the byte read from 4000H appears on the floating bus), and the lower
+    right corner is at 255,191.
+    The line number is incremented 64 pixels before X=0 (X=384 or X=392
+    in 48K or 128K mode, respectively), but this may possibly change in
+    future versions.
+
+    For the Enterprise, the horizontal position is in characters, in the
+    range 0 to 56. The vertical position is the sum of the 8-bit line
+    counter within the current line parameter block (LPB), which counts
+    up to 255, and the video memory address of the LPB multiplied by 16.
+
+    In CPC emulation mode, the horizontal position is in characters, and
+    the vertical position is in raster lines, i.e. 0 to 63 and 0 to 311
+    with the default CRTC settings. Position 0,0 is the upper left
+    corner of the screen, this is the CRTC cycle when the first two
+    bytes of the screen memory are read. In the case of interlaced video
+    mode (CRTC register 8 = 3), the vertical position is in frame lines,
+    and is incremented by two each line (it is even or odd depending on
+    the current field).
+
+  getRawAddress(segment, offset)
+
+    Calculates a 22-bit physical address from the specified segment and
+    offset; only the 14 least significant bits of 'offset' are used.
+
+  getRawAddress(addr)
+
+    Calculates a 22-bit physical address from a 16-bit CPU address,
+    using the current memory paging.
+
+  loadMemory(fname, asciiMode, cpuAddressMode, startAddr[, endAddr])
+
+    Loads a file to the memory area at 'startAddr' to 'endAddr' (the
+    byte at 'endAddr' is still loaded). If no end address is specified,
+    all data is read into memory. The file is searched in the working
+    directory set for file I/O, and if the name is an empty string, a
+    file selection dialog is shown. The expected file format is binary
+    if 'asciiMode' is false, and hexadecimal dump (as written by
+    saveMemory() or the 'S' monitor command) if 'asciiMode' is true.
+    'cpuAddressMode' selects the use of 16 bit CPU (if true) or 22 bit
+    physical (if false) addresses.
+    The return value is the number of bytes actually read.
+
+  saveMemory(fname, asciiMode, cpuAddressMode, startAddr, endAddr)
+
+    Save the memory area at 'startAddr' to 'endAddr' (the byte at
+    'endAddr' is still written) to a file, in binary (if 'asciiMode' is
+    false) or hexadecimal dump (if 'asciiMode' is true) format.
+    'cpuAddressMode' selects the use of 16 bit CPU (if true) or 22 bit
+    physical (if false) addresses.
+
+  loadROMSegment(segment, fname, offset)
+
+    Load a file to the specified segment as ROM, skipping 'offset' bytes
+    at the beginning of the file. An empty file name deletes the
+    segment.
+
+  mprint(...)
+
+    Prints any number of strings or numbers to the monitor.
+    No separator characters are inserted between the arguments being
+    printed, and a newline character is automatically added at the end
+    of the message.
+
+Example:
+
+  mprint("Running Lua script example...")
+  clearBreakPoints()
+  setBreakPoint(4, 0x0040, 2)   -- break on reading Z80 opcode at 0x0040
+  function breakPointCallback(t, a, v)
+    if t == 3 then              -- allow stepping
+      return true
+    end
+    -- check for EXOS 1 call with A=102
+    if getPC() ~= 0x0040 or getA() ~= 1 or readMemory(0x005A) ~= 102 then
+      return false
+    end
+    -- read name parameter from memory
+    s = ""
+    n = readMemory(getDE())
+    for i = 1, n do
+      s = s..string.char(readMemory(getDE() + i))
+    end
+    mprint("Channel #102 is opened with name '", s, "'")
+    return true
+  end
+  mprint("done.")
+
+This will break when channel 102 is opened, and print the name parameter
+passed to the EXOS call.
+
+------------------------------------------------------------------------
+
+Copyright
+=========
+
+ep128emu is copyright © 2003-2017 by Istvan Varga
+<istvanv@users.sourceforge.net>. Z80 emulation copyright © 1999-2003 by
+Kevin Thacker and Vincze Béla György. dotconf 1.3 is copyright by Lukas
+Schröder and William Hubbs. reSID 1.0 copyright © 2010 by Dag Lem.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+Credits
+-------
+
+Thanks to:
+
+Zozosoft      - hardware testing and information, ROM packages
+MrPrise       - ep128emu.enterpriseforever.com web site
+Attus         - Linux fixes and binary packages for the UHU distribution
+Martin Bantz  - PCLinuxOS RPM spec file
+LGB           - GitHub import from SourceForge, Linux testing and fixes,
+                SD card emulation
+

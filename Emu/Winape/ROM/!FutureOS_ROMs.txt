@@ -1,0 +1,151 @@
+
+  ________       ________         ___    ______       ___    _____   2016-09-18
+     /    /   /     /     /   /  /   |  /            /   |  /
+   _/_   /   /     /     /   /  /___/  /___   ___   /    / /____
+   /    /   /     /     /   /  / \    /            /    /      /
+  /     |__/|    /      |__/| /   \  /______       |___/  ____/
+
+
+             Idea, Programming, Realisation by TFM of
+
+
+          ________       ________         ___    ______
+             /    /   /     /     /   /  /   |  /
+           _/_   /   /     /     /   /  /___/  /___
+           /    /   /     /     /   /  / \    /
+          /     |__/|    /      |__/| /   \  /______
+
+                _____  ___  ________  ________
+               /      /   |    /         /
+              /____  /   /   _/_        /
+                  / /   /    /         /
+            _____/  |__/    /         /
+
+_______________________________________________________________________________
+
+
+   System .8 - Ver. 23.08.2015 (CPC) // 23.08.2015 (Plus)
+   Sprache: Deutsch
+   CPC: 6128 alte Generation und 6128Plus
+
+Laden Sie die ROM Dateien an die ROM Positionen 10, 11, 12 und 13.
+
+FOSC-A.ROM --> ROM Nummer 10 = &0A    / CPC 6128
+FOSC-B.ROM --> ROM Nummer 11 = &0B   /
+FOSC-C.ROM --> ROM Nummer 12 = &0C  /
+FOSC-D.ROM --> ROM Nummer 13 = &0D /
+
+... oder ...
+
+FOSP-A.ROM --> ROM Nummer 10 = &0A    / 6128 Plus
+FOSP-B.ROM --> ROM Nummer 11 = &0B   /
+FOSP-C.ROM --> ROM Nummer 12 = &0C  /
+FOSP-D.ROM --> ROM Nummer 13 = &0D /
+
+Installieren Sie die vier ROMs (6128 oder Plus) nur an die Positionen 10-13.
+Die ROM-Nummern sind hart kodiert.
+
+Um die ROMs nach der Installation zu verschieben können Besitzer einer RRB das
+"SchiebeROMs" Programm benutzen. Ansonsten benutzen Sie bitte die Installations-Diskette
+
+_______________________________________________________________________________
+
+
+   System .8 - Ver. 23.08.2015
+   Language: English
+   Computer: CPC6128 and 6128 Plus
+
+Load the ROM files in the ROM slots 10, 11, 12 and 13.
+
+FOSC-E-A.ROM --> ROM number 10 = &0A    / CPC 6128
+FOSC-E-B.ROM --> ROM number 11 = &0B   /
+FOSC-E-C.ROM --> ROM number 12 = &0C  /
+FOSC-E-D.ROM --> ROM number 13 = &0D /
+
+... or ...
+
+FOSP-E-A.ROM --> ROM number 10 = &0A    / 6128 Plus
+FOSP-E-B.ROM --> ROM number 11 = &0B   /
+FOSP-E-C.ROM --> ROM number 12 = &0C  /
+FOSP-E-D.ROM --> ROM number 13 = &0D /
+
+Don't use other ROM selects, because the ROM numbers are hard-coded.
+To change ROM numbers after install use the "SchiebeROMs" utility.
+
+_______________________________________________________________________________
+
+
+   System .8 - Ver. 24.08.2015
+   Langue: Francais
+   Ordinateur: CPC 6128 et 6128 Plus
+
+Load the ROM files in the ROM slots 10, 11, 12 and 13.
+
+FOSC-F-A.ROM --> ROM numero 10 = &0A    / CPC 6128
+FOSC-F-B.ROM --> ROM numero 11 = &0B   /
+FOSC-F-C.ROM --> ROM numero 12 = &0C  /
+FOSC-F-D.ROM --> ROM numero 13 = &0D /
+
+... ou ...
+
+FOSP-F-A.ROM --> ROM numero 10 = &0A    / 6128 Plus
+FOSP-F-B.ROM --> ROM numero 11 = &0B   /
+FOSP-F-C.ROM --> ROM numero 12 = &0C  /
+FOSP-F-D.ROM --> ROM numero 13 = &0D /
+
+Don't use other ROM selects, because the ROM numbers are hard-coded.
+To change ROM numbers after install use the "SchiebeROMs" utility.
+
+_______________________________________________________________________________
+
+   System .8 - Ver. 23.08.2015
+   Language: Espanol
+   Computador: CPC6128 y 6128 Plus
+
+Load the ROM files in the ROM slots 10, 11, 12 and 13.
+
+FOSC-S-A.ROM --> ROM posición 10 = &0A    / CPC 6128
+FOSC-S-B.ROM --> ROM posición 11 = &0B   /
+FOSC-S-C.ROM --> ROM posición 12 = &0C  /
+FOSC-S-D.ROM --> ROM posición 13 = &0D /
+
+... or ...
+
+FOSP-S-A.ROM --> ROM posición 10 = &0A    / 6128 Plus
+FOSP-S-B.ROM --> ROM posición 11 = &0B   /
+FOSP-S-C.ROM --> ROM posición 12 = &0C  /
+FOSP-S-D.ROM --> ROM posición 13 = &0D /
+
+Don't use other ROM selects, because the ROM numbers are hard-coded.
+To change ROM numbers after install use the "SchiebeROMs" utility.
+
+_______________________________________________________________________________
+
+The file "LowerROM_4_FutureOS.rom" serves as a lower ROM replacement.
+It's used to autostart FutureOS when you switch on your CPC.
+_______________________________________________________________________________
+
+
+_______________________________________________________________________________
+
+The folders "MacDeath" contain FutureOS including the MacDeath Edition icon set
+_______________________________________________________________________________
+
+
+
+Further information? Look at:
+
+http://www.FutureOS.de
+http://groups.yahoo.com/group/FutureOS/
+
+
+Viel Spass mit FutureOS!
+Have much fun with FutureOS!
+
+Dr. Stefan W. Sumpferl aka TFM of FutureSoft
+
+
+Change log
+==========
+Please refer to the Installaion Disc Archive!
+

@@ -1,0 +1,3 @@
+RLE,Z:\Tools\SpriteCompiler\0.Loading..png
+comp,Z:\Tools\SpriteCompiler\2.Continue..png
+RLE,Z:\Tools\SpriteCompiler\SetDisk3.PNG

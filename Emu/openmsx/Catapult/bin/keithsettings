@@ -1,0 +1,9 @@
+<!DOCTYPE settings SYSTEM 'settings.dtd'>
+<settings>
+  <settings>
+    <setting id="invalid_psg_directions_callback">psgdirectioncallback</setting>
+    <setting id="di_halt_callback">dihaltcallback</setting>
+    <setting id="osd_disk_path">O:/EngToBackup/Msx/assembly/disk</setting>
+  </settings>
+  <bindings/>
+</settings>

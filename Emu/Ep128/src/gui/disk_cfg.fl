@@ -1,0 +1,704 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0109 
+do_not_include_H_from_C 
+header_name {.hpp} 
+code_name {.cpp}
+decl {\#include "gui.hpp"} {selected private local
+} 
+
+decl {\#include "ep128vm.hpp"} {private local
+} 
+
+decl {\#include "tvc64vm.hpp"} {private local
+} 
+
+decl {\#include <typeinfo>} {private local
+} 
+
+class Ep128EmuGUI_DiskConfigWindow {open
+} {
+  decl {Ep128EmuGUI& gui;} {private local
+  }
+  Function {Ep128EmuGUI_DiskConfigWindow(Ep128EmuGUI& gui_) : gui(gui_)} {open
+  } {
+    Fl_Window window {
+      label {Disk configuration}
+      callback {{
+  try {
+    gui.applyEmulatorConfiguration();
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+  updateWindow();
+  window->hide();
+}} open
+      xywh {88 224 400 450} type Double color 48 visible
+    } {
+      Fl_Tabs diskConfigTabs {open
+        xywh {10 10 380 395}
+      } {
+        Fl_Group {} {
+          label Floppy open
+          xywh {10 35 380 370} box THIN_UP_BOX
+        } {
+          Fl_Group {} {open
+            tooltip {Note: you can set any of the disk geometry parameters to -1 to have it calculated from the image file size and the file system header} xywh {20 45 360 80} box THIN_UP_BOX
+          } {
+            Fl_Button floppyADeviceButton {
+              label {A:}
+              callback {{
+  try {
+\#ifdef WIN32
+    gui.config["floppy.a.imageFile"] = "\\\\\\\\.\\\\A:";
+\#else
+    gui.config["floppy.a.imageFile"] = "/dev/fd0";
+\#endif
+    floppyAImageFileValuator->value(gui.config.floppy.a.imageFile.c_str());
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              tooltip {Use real floppy disk in drive A} xywh {28 55 25 25} color 50 selection_color 51 labelfont 1
+            }
+            Fl_Input floppyAImageFileValuator {
+              callback {{
+  try {
+    gui.config["floppy.a.imageFile"] = o->value();
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              tooltip {File names like /dev/fd0u720 (Linux) or \\\\.\\A: (Windows) can be used for direct access to actual floppy disks; leave the file name blank to have no disk emulated in this drive} xywh {55 55 205 25}
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+            Fl_Button {} {
+              label {...}
+              callback {{
+  try {
+    std::string tmp;
+    if (gui.browseFile(tmp, gui.diskImageDirectory,
+                       "Disk image files\\t*",
+                       Fl_Native_File_Chooser::BROWSE_FILE,
+                       "Select disk image file")) {
+      gui.config["floppy.a.imageFile"] = tmp;
+      floppyAImageFileValuator->value(tmp.c_str());
+    }
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              xywh {265 55 25 25} color 50 selection_color 51
+            }
+            Fl_Box {} {
+              label {Image file}
+              xywh {300 55 70 25} align 20
+            }
+            Fl_Value_Input floppyATracksValuator {
+              label Tracks
+              callback {{
+  gui.config.floppy.a.tracks = int(o->clamp(o->value()) + 1.5) - 1;
+  gui.config.floppyAChanged = true;
+  o->value(double(gui.config.floppy.a.tracks));
+}}
+              xywh {30 92 40 23} align 8 when 4 minimum -1 maximum 254 step 1 value -1
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+            Fl_Value_Input floppyASidesValuator {
+              label Sides
+              callback {{
+  gui.config.floppy.a.sides = int(o->clamp(o->value()) + 1.5) - 1;
+  gui.config.floppyAChanged = true;
+  o->value(double(gui.config.floppy.a.sides));
+}}
+              xywh {130 92 35 23} align 8 when 4 minimum -1 maximum 2 step 1 value -1
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+            Fl_Value_Input floppyASectorsPerTrackValuator {
+              label {Sectors per track}
+              callback {{
+  gui.config.floppy.a.sectorsPerTrack = int(o->clamp(o->value()) + 1.5) - 1;
+  gui.config.floppyAChanged = true;
+  o->value(double(gui.config.floppy.a.sectorsPerTrack));
+}}
+              xywh {215 92 40 23} align 8 when 4 minimum -1 maximum 240 step 1 value -1
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+          }
+          Fl_Group {} {open
+            tooltip {Note: you can set any of the disk geometry parameters to -1 to have it calculated from the image file size and the file system header} xywh {20 135 360 80} box THIN_UP_BOX
+          } {
+            Fl_Button floppyBDeviceButton {
+              label {B:}
+              callback {{
+  try {
+\#ifdef WIN32
+    gui.config["floppy.b.imageFile"] = "\\\\\\\\.\\\\B:";
+\#else
+    gui.config["floppy.b.imageFile"] = "/dev/fd1";
+\#endif
+    floppyBImageFileValuator->value(gui.config.floppy.b.imageFile.c_str());
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              tooltip {Use real floppy disk in drive B} xywh {28 145 25 25} color 50 selection_color 51 labelfont 1
+            }
+            Fl_Input floppyBImageFileValuator {
+              callback {{
+  try {
+    gui.config["floppy.b.imageFile"] = o->value();
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              tooltip {File names like /dev/fd0u720 (Linux) or \\\\.\\A: (Windows) can be used for direct access to actual floppy disks; leave the file name blank to have no disk emulated in this drive} xywh {55 145 205 25}
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+            Fl_Button {} {
+              label {...}
+              callback {{
+  try {
+    std::string tmp;
+    if (gui.browseFile(tmp, gui.diskImageDirectory,
+                       "Disk image files\\t*",
+                       Fl_Native_File_Chooser::BROWSE_FILE,
+                       "Select disk image file")) {
+      gui.config["floppy.b.imageFile"] = tmp;
+      floppyBImageFileValuator->value(tmp.c_str());
+    }
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              xywh {265 145 25 25} color 50 selection_color 51
+            }
+            Fl_Box {} {
+              label {Image file}
+              xywh {300 145 70 25} align 20
+            }
+            Fl_Value_Input floppyBTracksValuator {
+              label Tracks
+              callback {{
+  gui.config.floppy.b.tracks = int(o->clamp(o->value()) + 1.5) - 1;
+  gui.config.floppyBChanged = true;
+  o->value(double(gui.config.floppy.b.tracks));
+}}
+              xywh {30 182 40 23} align 8 when 4 minimum -1 maximum 254 step 1 value -1
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+            Fl_Value_Input floppyBSidesValuator {
+              label Sides
+              callback {{
+  gui.config.floppy.b.sides = int(o->clamp(o->value()) + 1.5) - 1;
+  gui.config.floppyBChanged = true;
+  o->value(double(gui.config.floppy.b.sides));
+}}
+              xywh {130 182 35 23} align 8 when 4 minimum -1 maximum 2 step 1 value -1
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+            Fl_Value_Input floppyBSectorsPerTrackValuator {
+              label {Sectors per track}
+              callback {{
+  gui.config.floppy.b.sectorsPerTrack = int(o->clamp(o->value()) + 1.5) - 1;
+  gui.config.floppyBChanged = true;
+  o->value(double(gui.config.floppy.b.sectorsPerTrack));
+}}
+              xywh {215 182 40 23} align 8 when 4 minimum -1 maximum 240 step 1 value -1
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+          }
+          Fl_Group {} {open
+            tooltip {Note: you can set any of the disk geometry parameters to -1 to have it calculated from the image file size and the file system header} xywh {20 225 360 80} box THIN_UP_BOX
+          } {
+            Fl_Input floppyCImageFileValuator {
+              label {C: }
+              callback {{
+  try {
+    gui.config["floppy.c.imageFile"] = o->value();
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              tooltip {File names like /dev/fd0u720 (Linux) or \\\\.\\A: (Windows) can be used for direct access to actual floppy disks; leave the file name blank to have no disk emulated in this drive} xywh {55 235 205 25} labelfont 1
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+            Fl_Button {} {
+              label {...}
+              callback {{
+  try {
+    std::string tmp;
+    if (gui.browseFile(tmp, gui.diskImageDirectory,
+                       "Disk image files\\t*",
+                       Fl_Native_File_Chooser::BROWSE_FILE,
+                       "Select disk image file")) {
+      gui.config["floppy.c.imageFile"] = tmp;
+      floppyCImageFileValuator->value(tmp.c_str());
+    }
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              xywh {265 235 25 25} color 50 selection_color 51
+            }
+            Fl_Box {} {
+              label {Image file}
+              xywh {300 235 70 25} align 20
+            }
+            Fl_Value_Input floppyCTracksValuator {
+              label Tracks
+              callback {{
+  gui.config.floppy.c.tracks = int(o->clamp(o->value()) + 1.5) - 1;
+  gui.config.floppyCChanged = true;
+  o->value(double(gui.config.floppy.c.tracks));
+}}
+              xywh {30 272 40 23} align 8 when 4 minimum -1 maximum 254 step 1 value -1
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+            Fl_Value_Input floppyCSidesValuator {
+              label Sides
+              callback {{
+  gui.config.floppy.c.sides = int(o->clamp(o->value()) + 1.5) - 1;
+  gui.config.floppyCChanged = true;
+  o->value(double(gui.config.floppy.c.sides));
+}}
+              xywh {130 272 35 23} align 8 when 4 minimum -1 maximum 2 step 1 value -1
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+            Fl_Value_Input floppyCSectorsPerTrackValuator {
+              label {Sectors per track}
+              callback {{
+  gui.config.floppy.c.sectorsPerTrack = int(o->clamp(o->value()) + 1.5) - 1;
+  gui.config.floppyCChanged = true;
+  o->value(double(gui.config.floppy.c.sectorsPerTrack));
+}}
+              xywh {215 272 40 23} align 8 when 4 minimum -1 maximum 240 step 1 value -1
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+          }
+          Fl_Group {} {open
+            tooltip {Note: you can set any of the disk geometry parameters to -1 to have it calculated from the image file size and the file system header} xywh {20 315 360 80} box THIN_UP_BOX
+          } {
+            Fl_Input floppyDImageFileValuator {
+              label {D: }
+              callback {{
+  try {
+    gui.config["floppy.d.imageFile"] = o->value();
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              tooltip {File names like /dev/fd0u720 (Linux) or \\\\.\\A: (Windows) can be used for direct access to actual floppy disks; leave the file name blank to have no disk emulated in this drive} xywh {55 325 205 25} labelfont 1
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+            Fl_Button {} {
+              label {...}
+              callback {{
+  try {
+    std::string tmp;
+    if (gui.browseFile(tmp, gui.diskImageDirectory,
+                       "Disk image files\\t*",
+                       Fl_Native_File_Chooser::BROWSE_FILE,
+                       "Select disk image file")) {
+      gui.config["floppy.d.imageFile"] = tmp;
+      floppyDImageFileValuator->value(tmp.c_str());
+    }
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              xywh {265 325 25 25} color 50 selection_color 51
+            }
+            Fl_Box {} {
+              label {Image file}
+              xywh {300 325 70 25} align 20
+            }
+            Fl_Value_Input floppyDTracksValuator {
+              label Tracks
+              callback {{
+  gui.config.floppy.d.tracks = int(o->clamp(o->value()) + 1.5) - 1;
+  gui.config.floppyDChanged = true;
+  o->value(double(gui.config.floppy.d.tracks));
+}}
+              xywh {30 362 40 23} align 8 when 4 minimum -1 maximum 254 step 1 value -1
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+            Fl_Value_Input floppyDSidesValuator {
+              label Sides
+              callback {{
+  gui.config.floppy.d.sides = int(o->clamp(o->value()) + 1.5) - 1;
+  gui.config.floppyDChanged = true;
+  o->value(double(gui.config.floppy.d.sides));
+}}
+              xywh {130 362 35 23} align 8 when 4 minimum -1 maximum 2 step 1 value -1
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+            Fl_Value_Input floppyDSectorsPerTrackValuator {
+              label {Sectors per track}
+              callback {{
+  gui.config.floppy.d.sectorsPerTrack = int(o->clamp(o->value()) + 1.5) - 1;
+  gui.config.floppyDChanged = true;
+  o->value(double(gui.config.floppy.d.sectorsPerTrack));
+}}
+              xywh {215 362 40 23} align 8 when 4 minimum -1 maximum 240 step 1 value -1
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+          }
+        }
+        Fl_Group ideConfigGroup {
+          label IDE/SD open
+          xywh {10 35 380 370} box THIN_UP_BOX hide
+        } {
+          Fl_Group {} {
+            label {Primary master} open
+            xywh {20 45 360 61} box THIN_UP_BOX align 21
+          } {
+            Fl_Input ide0ImageFileValuator {
+              callback {{
+  try {
+    gui.config["ide.imageFile0"] = o->value();
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              xywh {30 71 310 25}
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+            Fl_Button {} {
+              label {...}
+              callback {{
+  try {
+    std::string tmp;
+    if (gui.browseFile(tmp, gui.diskImageDirectory,
+                       "Hard disk image files\\t*",
+                       Fl_Native_File_Chooser::BROWSE_FILE,
+                       "Select IDE disk image file")) {
+      gui.config["ide.imageFile0"] = tmp;
+      ide0ImageFileValuator->value(tmp.c_str());
+    }
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              xywh {345 71 25 25} color 50 selection_color 51
+            }
+          }
+          Fl_Group {} {
+            label {Primary slave} open
+            xywh {20 116 360 61} box THIN_UP_BOX align 21
+          } {
+            Fl_Input ide1ImageFileValuator {
+              callback {{
+  try {
+    gui.config["ide.imageFile1"] = o->value();
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              xywh {30 142 310 25}
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+            Fl_Button {} {
+              label {...}
+              callback {{
+  try {
+    std::string tmp;
+    if (gui.browseFile(tmp, gui.diskImageDirectory,
+                       "Hard disk image files\\t*",
+                       Fl_Native_File_Chooser::BROWSE_FILE,
+                       "Select IDE disk image file")) {
+      gui.config["ide.imageFile1"] = tmp;
+      ide1ImageFileValuator->value(tmp.c_str());
+    }
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              xywh {345 142 25 25} color 50 selection_color 51
+            }
+          }
+          Fl_Group {} {
+            label {Secondary master} open
+            xywh {20 187 360 61} box THIN_UP_BOX align 21
+          } {
+            Fl_Input ide2ImageFileValuator {
+              callback {{
+  try {
+    gui.config["ide.imageFile2"] = o->value();
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              xywh {30 213 310 25}
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+            Fl_Button {} {
+              label {...}
+              callback {{
+  try {
+    std::string tmp;
+    if (gui.browseFile(tmp, gui.diskImageDirectory,
+                       "Hard disk image files\\t*",
+                       Fl_Native_File_Chooser::BROWSE_FILE,
+                       "Select IDE disk image file")) {
+      gui.config["ide.imageFile2"] = tmp;
+      ide2ImageFileValuator->value(tmp.c_str());
+    }
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              xywh {345 213 25 25} color 50 selection_color 51
+            }
+          }
+          Fl_Group {} {
+            label {Secondary slave} open
+            xywh {20 258 360 61} box THIN_UP_BOX align 21
+          } {
+            Fl_Input ide3ImageFileValuator {
+              callback {{
+  try {
+    gui.config["ide.imageFile3"] = o->value();
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              xywh {30 284 310 25}
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+            Fl_Button {} {
+              label {...}
+              callback {{
+  try {
+    std::string tmp;
+    if (gui.browseFile(tmp, gui.diskImageDirectory,
+                       "Hard disk image files\\t*",
+                       Fl_Native_File_Chooser::BROWSE_FILE,
+                       "Select IDE disk image file")) {
+      gui.config["ide.imageFile3"] = tmp;
+      ide3ImageFileValuator->value(tmp.c_str());
+    }
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              xywh {345 284 25 25} color 50 selection_color 51
+            }
+          }
+          Fl_Group sdCardImageGroup {
+            label {SD card} open
+            xywh {20 334 360 61} box ENGRAVED_FRAME align 21
+          } {
+            Fl_Input sdExtImageFileValuator {
+              callback {{
+  try {
+    if (gui.config.sdext.imageFile != o->value()) {
+      gui.config.sdext.imageFile = o->value();
+      gui.config.sdCardImageChanged = true;
+    }
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              xywh {30 360 310 25}
+              code0 {o->cursor_color(Fl_Color(3));}
+            }
+            Fl_Button {} {
+              label {...}
+              callback {{
+  try {
+    std::string tmp;
+    if (gui.browseFile(tmp, gui.diskImageDirectory,
+                       "Hard disk image files\\t*",
+                       Fl_Native_File_Chooser::BROWSE_FILE,
+                       "Select SD card image file")) {
+      if (tmp != gui.config.sdext.imageFile) {
+        gui.config.sdext.imageFile = tmp;
+        gui.config.sdCardImageChanged = true;
+        sdExtImageFileValuator->value(gui.config.sdext.imageFile.c_str());
+      }
+    }
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+}}
+              xywh {345 360 25 25} color 50 selection_color 51
+            }
+          }
+        }
+      }
+      Fl_Button {} {
+        label {Clear all}
+        callback {{
+  try {
+    if (diskConfigTabs->value() != ideConfigGroup) {
+      gui.config.floppy.a.tracks = -1;
+      gui.config.floppy.a.sides = -1;
+      gui.config.floppy.a.sectorsPerTrack = -1;
+      gui.config.floppyAChanged = true;
+      gui.config.floppy.a.imageFile.clear();
+      gui.config.floppy.b.tracks = -1;
+      gui.config.floppy.b.sides = -1;
+      gui.config.floppy.b.sectorsPerTrack = -1;
+      gui.config.floppyBChanged = true;
+      gui.config.floppy.b.imageFile.clear();
+      gui.config.floppy.c.tracks = -1;
+      gui.config.floppy.c.sides = -1;
+      gui.config.floppy.c.sectorsPerTrack = -1;
+      gui.config.floppyCChanged = true;
+      gui.config.floppy.c.imageFile.clear();
+      gui.config.floppy.d.tracks = -1;
+      gui.config.floppy.d.sides = -1;
+      gui.config.floppy.d.sectorsPerTrack = -1;
+      gui.config.floppyDChanged = true;
+      gui.config.floppy.d.imageFile.clear();
+    }
+    else {
+      gui.config.ideDisk0Changed = true;
+      gui.config.ide.imageFile0.clear();
+      gui.config.ideDisk1Changed = true;
+      gui.config.ide.imageFile1.clear();
+      gui.config.ideDisk2Changed = true;
+      gui.config.ide.imageFile2.clear();
+      gui.config.ideDisk3Changed = true;
+      gui.config.ide.imageFile3.clear();
+      gui.config.sdCardImageChanged = true;
+      gui.config.sdext.imageFile.clear();
+    }
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+  updateWindow();
+}}
+        xywh {15 415 80 25} selection_color 50
+      }
+      Fl_Button {} {
+        label Apply
+        callback {{
+  try {
+    gui.applyEmulatorConfiguration();
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+  updateWindow();
+}}
+        xywh {255 415 60 25} selection_color 50
+      }
+      Fl_Button {} {
+        label OK
+        callback {{
+  try {
+    gui.applyEmulatorConfiguration();
+  }
+  catch (std::exception& e) {
+    gui.errorMessage(e.what());
+  }
+  updateWindow();
+  window->hide();
+}}
+        xywh {325 415 60 25} selection_color 50
+      }
+    }
+  }
+  Function {~Ep128EmuGUI_DiskConfigWindow()} {open
+  } {
+    code {{
+  delete window;
+}} {}
+  }
+  Function {show()} {open return_type void
+  } {
+    code {{
+  updateWindow();
+  window->show();
+}} {}
+  }
+  Function {shown()} {open return_type bool
+  } {
+    code {{
+  return bool(window->shown());
+}} {}
+  }
+  Function {hide()} {open return_type void
+  } {
+    code {{
+  window->hide();
+}} {}
+  }
+  Function {updateWindow()} {open return_type void
+  } {
+    code {{
+  floppyAImageFileValuator->value(gui.config.floppy.a.imageFile.c_str());
+  floppyBImageFileValuator->value(gui.config.floppy.b.imageFile.c_str());
+  floppyCImageFileValuator->value(gui.config.floppy.c.imageFile.c_str());
+  floppyDImageFileValuator->value(gui.config.floppy.d.imageFile.c_str());
+  if (typeid(gui.vm) != typeid(Ep128::Ep128VM) &&
+      typeid(gui.vm) != typeid(TVC64::TVC64VM)) {
+    ideConfigGroup->deactivate();
+    ideConfigGroup->hide();
+    diskConfigTabs->remove(*ideConfigGroup);
+    floppyATracksValuator->deactivate();
+    floppyASidesValuator->deactivate();
+    floppyASectorsPerTrackValuator->deactivate();
+    floppyBTracksValuator->deactivate();
+    floppyBSidesValuator->deactivate();
+    floppyBSectorsPerTrackValuator->deactivate();
+    floppyCTracksValuator->deactivate();
+    floppyCSidesValuator->deactivate();
+    floppyCSectorsPerTrackValuator->deactivate();
+    floppyDTracksValuator->deactivate();
+    floppyDSidesValuator->deactivate();
+    floppyDSectorsPerTrackValuator->deactivate();
+  }
+  else {
+    floppyATracksValuator->value(double(gui.config.floppy.a.tracks));
+    floppyASidesValuator->value(double(gui.config.floppy.a.sides));
+    floppyASectorsPerTrackValuator->value(double(gui.config.floppy.a.sectorsPerTrack));
+    floppyBTracksValuator->value(double(gui.config.floppy.b.tracks));
+    floppyBSidesValuator->value(double(gui.config.floppy.b.sides));
+    floppyBSectorsPerTrackValuator->value(double(gui.config.floppy.b.sectorsPerTrack));
+    floppyCTracksValuator->value(double(gui.config.floppy.c.tracks));
+    floppyCSidesValuator->value(double(gui.config.floppy.c.sides));
+    floppyCSectorsPerTrackValuator->value(double(gui.config.floppy.c.sectorsPerTrack));
+    floppyDTracksValuator->value(double(gui.config.floppy.d.tracks));
+    floppyDSidesValuator->value(double(gui.config.floppy.d.sides));
+    floppyDSectorsPerTrackValuator->value(double(gui.config.floppy.d.sectorsPerTrack));
+    if (typeid(gui.vm) == typeid(TVC64::TVC64VM)) {
+      ide0ImageFileValuator->deactivate();
+      ide1ImageFileValuator->deactivate();
+      ide2ImageFileValuator->deactivate();
+      ide3ImageFileValuator->deactivate();
+    }
+    else {
+      ide0ImageFileValuator->value(gui.config.ide.imageFile0.c_str());
+      ide1ImageFileValuator->value(gui.config.ide.imageFile1.c_str());
+      ide2ImageFileValuator->value(gui.config.ide.imageFile2.c_str());
+      ide3ImageFileValuator->value(gui.config.ide.imageFile3.c_str());
+    }
+    sdExtImageFileValuator->value(gui.config.sdext.imageFile.c_str());
+  }
+}} {}
+  }
+} 
