@@ -1,4 +1,4 @@
-read "CoreDefs.asm"
+read "core_defs.asm"
 nolist
 
 ;Bank C4 - Level Sprites 3+4 / Level Compiled Sprites (7B00 - alternate (boss) music)
@@ -10,53 +10,6 @@ DiskMap1 equ 1
 DiskMap2 equ 2
 DiskMap3 equ 3
 DiskMap4 equ 4
-
-ifdef buildENT ; {{{
-    write "..\BldENT\BootStrp.aku"
-endif ; }}}
-ifdef buildMSX ; {{{
-    ifndef buildMSX_V9K
-        if BuildLang =''
-            write "..\ResMSX\BootStrp.aku"
-        else
-            write "..\ResMSXj\BootStrp.aku"
-        endif
-    else
-        if BuildLang =''
-            write "..\ResMSX\BootStrp.V9K"
-        else
-            write "..\ResMSXj\BootStrp.V9K"
-        endif
-    endif
-;   db &FE     ; magic number
-;   dw FileBeginBootStrap    ; begin address
-;   dw FileEndBootStrap - 1  ; end address
-;   dw FileBeginBootStrap;Execute  ; program execution address (for ,R option)
-endif ; }}}
-ifdef buildZXS ; {{{
-    if BuildLang =''
-        ifdef buildZXS_DSK
-            write "..\BldZX\BootStrp_DSK.bin"
-        endif
-        ifdef buildZXS_TRD
-            write "..\BldZX\BootStrp_TRD.bin"
-        endif
-        ifdef buildZXS_TAP
-            write "..\BldZX\BootStrp_TAP.bin"
-        endif
-    endif
-    if BuildLang ='r'
-        ifdef buildZXS_DSK
-            write "..\BldZXr\BootStrp_DSK.bin"
-        endif
-        ifdef buildZXS_TRD
-            write "..\BldZXr\BootStrp_TRD.bin"
-        endif
-        ifdef buildZXS_TAP
-            write "..\BldZXr\BootStrp_TAP.bin"
-        endif
-    endif
-endif ; }}}
 
 ;limit Akuyou_LevelStart+&6500
 org Akuyou_BootStrapStart
@@ -99,12 +52,10 @@ else
 endif
 
 Bootstrap_Launch:
-ifdef buildCPC
     ld bc,&7f8D ; Reset the firmware to OFF
     out (c),c
     ld hl,RasterColors_InitColors
     call SetColors
-endif
     ld h,0
     ld l,0
 
@@ -117,7 +68,6 @@ Bootstrap_FromHL:
     jr z,Bootstrap_SystemEvent
     cp 1
     jr z,Bootstrap_Level
-
     ; Bootstrap Level
 ret
 
@@ -243,87 +193,14 @@ endif
 ret
 
 BootsStrap_StartGame:
-    ifdef buildCPC
-        read "..\AkuCPC\BootsStrap_StartGame_CPC.asm"
-    endif
-    ifdef buildENT ; {{{
-        read "..\AkuENT\BootsStrap_StartGame_ENT.asm"
-    endif ; }}}
-    ifdef buildMSX ; {{{
-        read "..\AkuMSX\BootStrap_StartGame_MSX.asm"
-    endif ; }}}
-    ifdef buildZXS ; {{{
-        read "..\AkuZX\BootStrap_StartGame_ZX.asm"
-    endif ; }}}
+    read "..\AkuCPC\BootsStrap_StartGame_CPC.asm"
 
-    ;bochanonly {{{
-
-
-
-    ;ld a,0*3
-    ;call Akuyou_ShowCompiledSprite
-
-
-;   call StartANewGame
-;   xor a
-;   call Enable_Player_CheatMode
-;   call Cheat_BochanOnly
-;   call Cheat_ChibikoOnly
-;   call Cheat_TwoPlayer
-
-
-
-;   jp Bootstrap_Level_TEST
-
-;   jp GameOverWin
-;   jp GameOver
-
-    ;Episode 1
-;   jp Bootstrap_Level_0Again
-;   call FireMode_4D
-;   jp Bootstrap_Level_1
-;   jp Bootstrap_Level_2
-;   jp Bootstrap_Level_3
-;   jp Bootstrap_Level_4
-;   jp Bootstrap_Level_5
-;   jp Bootstrap_Level_6
-;   jp Bootstrap_Level_7
-;   jp Bootstrap_Level_8
-;   jp Bootstrap_Level_9
-;   JP Bootstrap_Level_EndIntro ;Shown before the last level
-;   JP Bootstrap_Level_EndOutro ; End Sequence
-;   JP Bootstrap_Level_Intro
-
-
-;   jp NewGame_EP2_2P
-;   jp Bootstrap_Stage_11
-;   jp Bootstrap_Stage_12
-;   jp Bootstrap_Stage_13
-;   jp Bootstrap_Stage_15
-;   jp Bootstrap_Stage_15
-;   jp Bootstrap_Stage_16
-;   jp Bootstrap_Stage_17
-;   jp Bootstrap_Stage_18
-;   jp Bootstrap_Stage_19
-;   jp Bootstrap_Stage_20
-;   jp Bootstrap_Level_Ep2Intro
-;   jp Bootstrap_Level_Ep2EndOutro
-;   jp Bootstrap_Level_Ep2EndIntro
-
-;jp GameOverWin
-
-
-;   jp Bootstrap_Level_Intro
-;   jp Bootstrap_Level_EndOutro
-; bochanonly }}}
     jp Bootstrap_Level_0    ; Start the menu
 
 Enable_Player_CheatMode:
     xor a
     ld (CheatMode_Plus1-1),a
     ret
-
-;!endif
 
 ;For testing the game from an intro - cheat the game to start with certain players
 Cheat_BochanOnly:
@@ -357,15 +234,6 @@ ret
 ;but if we have spare space somewhere else, lets's use it!
 LocateAndShowTextLines:
     call Akuyou_DrawText_LocateSprite
-    ifdef BuildZXS ; {{{
-        push bc
-        push hl
-            ld a,1
-            ld c,64+2
-            call Akuyou_ZXSGPU_CommandNum
-        pop hl
-        pop bc
-    endif ; }}}
 ShowTextLines:
     push hl
     push bc
@@ -408,9 +276,6 @@ InitPlayer:
     ret
 
 NewGame_CheatStart:
-ifdef BuildZXS ; {{{
-    pop hl
-endif ; }}}
     pop hl  ;junk
     call StartANewGame
     pop hl  ;Get CheatSettings
@@ -461,17 +326,15 @@ NewGame_EP2_2P:
     ld de,Akuyou_PlayerSeparator
     add iy,de
     call InitPlayer
-ifdef CompileEP2
-    jr Bootstrap_Stage_11
-endif
 ifdef CompileEP1
     jp Bootstrap_Level_1
 endif
-
+ifdef CompileEP2
+    jr Bootstrap_Stage_11
+endif
 
 NewGame_EP2_1UP:
 ;   call Akuyou_Music_Stop
-
     call StartANewGame
     ld iy,Player_Array
 
@@ -482,7 +345,6 @@ endif
 ifdef CompileEP1
     jp Bootstrap_Level_1
 endif
-
 
 NewGame_EP2_2UP:
     call StartANewGame
@@ -815,60 +677,24 @@ load256k: ; {{{
 db 2, "Please Wait, Loading 256K Sprites..","."+&80
 db 0 ; }}}
 
-ifdef buildMSX ; {{{
-    LoadRLE_WithPushes:
-    push bc
-    push hl
-        inc h
-;       ld ix,0
-;       call VDP_rleProcessor
-        call LoadLZ48RLE
-LoadRLE_WithPushesDone:
-    pop hl
-    pop bc
-    call VDP_RLEProcessor_GetLastY  ; Load last IY end
-    ld (VDP_NextFreeYPos_Plus2-2),IY
-ret
-LoadRLE_WithPushesV9K:
-    push bc
-    push hl
-        inc h
-        ld ix,0
-        call VDP_rleProcessor
-jr LoadRLE_WithPushesDone
-endif ; }}}
-
 LoadDiscSector_WithPushes:
-    ifdef buildMSX ; {{{
-        push iy
-    endif ; }}}
         push bc
         push hl
             call Akuyou_LoadDiscSector
         pop hl
         pop bc
-    ifdef buildMSX ; {{{
-        pop iy
-    endif ; }}}
 ret
 
 LoadDiscSectorZ_WithPushes:
-    ifdef buildMSX ; {{{
-        push iy
-    endif ; }}}
         push bc
         push hl
             call Akuyou_LoadDiscSectorZ
         pop hl
         pop bc
-    ifdef buildMSX ; {{{
-        pop iy
-    endif ; }}}
 ret
 
 ;Compressed Loader
 Bootstrap_LoadEP2LoadScreen_Z:
-ifdef BuildCPC
     ld a,&C0
     ld de,&4000
     ld ix,&4000+&4000
@@ -882,53 +708,6 @@ ifdef BuildCPC
         call &4000
         pop bc
         exx
-endif
-ifdef BuildENT ; {{{
-    ld a,Akuyou_LevelStart_Bank
-    ld de,&4000
-    ld ix,&4000+&4000
-    ld l,&C8
-        call LoadDiscSector_WithPushes
-
-        ld de,EntSafePalette
-        call ENT_UpdatePlusRastersAlt
-
-        call Akuyou_CLS
-        di
-
-        call &4000
-endif ; }}}
-ifdef BuildMSX ; {{{
-        push hl
-        push bc
-            call Akuyou_CLS
-
-        pop bc
-        pop hl
-        ld l,&C8
-        ld ix,64
-        ld iy,0
-        call LoadLZ48RLE_AltX
-endif ; }}}
-ifdef BuildZXS ; {{{
-    ld a,Akuyou_LevelStart_Bank
-    ld de,&C000
-    ld ix,&C000+&4000
-    ld l,&C8
-        call LoadDiscSectorZ_WithPushes
-        call Akuyou_CLS
-
-        exx
-        push bc
-            ld de,Akuyou_LevelStart
-            ld a,Akuyou_LevelStart_Bank
-            ld hl,Rle_FromPointers
-            call Akuyou_Bankswapper_CallHL
-        pop bc
-        exx
-        ld iy,&5C3A ;apparently good practice?
-endif ; }}}
-
     ret
 
 Bootstrap_LoadEP2AltMusic_Z:
@@ -938,19 +717,11 @@ Bootstrap_LoadEP2AltMusic_Z:
     jp Akuyou_LoadDiscSectorZ
 
 Bootstrap_LoadEP2Music_Z:
-    ifdef BuildENT
-        in a,(&B0)
-    else
-        ld a,Akuyou_Music_Bank
-    endif
+    ld a,Akuyou_Music_Bank
     ld de,Akuyou_MusicPos
     ld ix,Akuyou_MusicPos+&400
     ld l,&C9
-ifdef BuildZXS
-    jp LoadDiscSector_WithPushes    ;Z is corrupting my speccy SFX - I don't know why!
-else
     jp LoadDiscSectorZ_WithPushes
-endif
 
 Bootstrap_LoadEP2Level_2Part_Z:
     ld a,&C1           ;128k Part
@@ -985,21 +756,11 @@ Bootstrap_LoadEP2Level_3PartAlt:
     jp Bootstrap_LoadEP2Level_2Part
 
 Bootstrap_LoadEP2Level_2PartBegin:
-    ifdef buildMSX ; {{{
-        ld iy,Akuyou_LevelSprites_Y
-    endif ; }}}
     jr Bootstrap_LoadEP2Level_2Part
 
 Bootstrap_LoadEP2Level_4PartBegin:
-    ifdef buildMSX ; {{{
-        ld iy,Akuyou_LevelSprites_Y
-    endif ; }}}
 Bootstrap_LoadEP2Level_4Part:
     ld l,&C4
-ifdef buildMSX ; {{{
-    ld (Bank3_Ypos_Plus2-2),IY
-    call LoadRLE_WithPushes
-endif ; }}}
     ld a,LevelData128kpos_D_Bank ;&C4
 
     ld de,LevelData128kpos_D ;&6000
@@ -1008,10 +769,6 @@ endif ; }}}
 
 Bootstrap_LoadEP2Level_3Part:
     ld l,&C3
-ifdef buildMSX ; {{{
-    ld (Bank2_Ypos_Plus2-2),IY
-    call LoadRLE_WithPushes
-endif ; }}}
     ld a,LevelData128kpos_C_Bank ;&C4
     ld de,LevelData128kpos_C;&4000
     ld ix,LevelData128kpos_C +&2000;&6000
@@ -1019,10 +776,6 @@ endif ; }}}
 
 Bootstrap_LoadEP2Level_2Part:
     ld l,&C2
-ifdef buildMSX ; {{{
-    ld (Bank1_Ypos_Plus2-2),IY
-    call LoadRLE_WithPushes
-endif ; }}}
     ld a,LevelData128kpos_Bank ;&C1        ;128k Part
 
     ld de,LevelData128kpos
@@ -1030,19 +783,9 @@ endif ; }}}
     call LoadDiscSector_WithPushes
 
 Bootstrap_LoadEP2Level_1Part:
-ifdef buildMSX_V9K ; {{{
-    ld iy,Akuyou_V9K_Paralax_Y
-    ld l,&C9
-    call LoadRLE_WithPushesV9K  :V9K_Part_Plus2
-endif ; }}}
 
 Bootstrap_LoadEP2Level_1PartOnly:
     ld l,&C1
-ifdef buildMSX ; {{{
-    ld (Bank0_Ypos_Plus2-2),IY
-    call LoadRLE_WithPushes
-    ld (LoadTilePos_Plus2-2),IY
-endif ; }}}
 
     ld a,Akuyou_LevelStart_Bank ;&C0        ; Base Part
 
@@ -1056,10 +799,6 @@ else
 endif
     jp GenericStartLevel
 Bootstrap_Level_NoV9K:
-ifdef buildMSX_V9K ; {{{
-    ld hl,null
-    ld (V9K_Part_Plus2-2),hl
-endif ; }}}
 
     ret
 
@@ -1096,25 +835,7 @@ GenericStartLevel:
     di
     call Akuyou_Firmware_Kill ; Backup the firmware so the Level can override it
 
-ifdef buildZXS
-; {{{
-    ld a,1
-    ld c,64+7
-    call Akuyou_ZXSGPU_CommandNum
-
-    ld a,Akuyou_LevelStart_Bank
-    ld hl,LevelData_StartLevel
-    call Akuyou_Bankswapper_CallHL
-; }}}
-else
-    ifdef BuildENT ; {{{
-        ld a,Akuyou_LevelStart_Bank
-        call BankSwitch_C0_SetCurrent
-        ld de,EntBlackoutPalette
-        call ENT_UpdatePlusRastersAlt
-    endif ; }}}
     jp LevelData_StartLevel ; the Bootstrap will be overwritten by the screenbuffer
-endif
 
 ; Part Compressed - For Testing
 Bootstrap_LoadEP2Level_4Part_Zpartial:
@@ -1157,17 +878,15 @@ Bootstrap_Level_0Again:
     ;call Akuyou_ScreenBuffer_
 
     ei
-    ifdef BuildCPC
-        ld hl,RasterColors_ZeroColors
-        call SetColors
-        halt
-        halt
-        halt
-        halt
-        halt
-    endif
 
-ifdef BuildCPC
+    ld hl,RasterColors_ZeroColors
+    call SetColors
+    halt
+    halt
+    halt
+    halt
+    halt
+
     ;call Akuyou_Firmware_Restore
     ld a,(CPCVer)
     and %10000000
@@ -1190,45 +909,6 @@ ReloadTitleCPC64k:
     jr ReloadTitleCPC
 ReloadTitleCPC:
     call Akuyou_LoadDiscSectorZ
-;       ld a,Akuyou_LevelStart_Bank
-;       ld hl,DiskMap_LoadingScreen
-;       ld c,DiskMap_LoadingScreen_Disk
-;       ld de,&C000
-;       ld ix,&C000+&3FFF ;Akuyou_LevelStart+&3FFF
-;       call Akuyou_LoadDiscSectorZ
-endif
-ifdef BuildENT ; {{{
-    ld a,LevelData128kpos_Bank
-    ld hl,DiskMap_LoadingScreen
-    ld c,DiskMap_LoadingScreen_Disk
-    ld de,&C000
-    ld ix,&8000-1;-8523
-    call Akuyou_LoadDiscSector
-
-    ld a,LevelData128kpos_Bank
-    ld hl,&4000
-    ld de,&C000
-    ld bc,&3F00 ; Don't corrupt the stack!
-    call Akuyou_BankSwitch_C0_BankCopy
-endif ; }}}
-ifdef BuildMSX ; {{{
-    call cls
-    call Akuyou_Music_Stop
-    ;Show the Loading Screen
-    ld hl,DiskMap_LoadingScreen     ;&26C1 ; T38-SC1.D01
-    ld c, DiskMap_LoadingScreen_Disk
-    ld iy,&0000
-    call LoadLZ48RLE
-endif ; }}}
-ifdef BuildZXS ; {{{
-    ;Show the Loading Screen
-    ld de,&4000
-    ld hl,DiskMap_LoadingScreen     ;&26C1 ; T38-SC1.D01
-    ld c, DiskMap_LoadingScreen_Disk
-    ld a, 0
-    ld IX,&FFFF;&5B00;B000
-    call LoadDiscSectorZ
-endif ; }}}
 
 ;Why???
 ;   ld hl,FileName_Settings
@@ -1883,20 +1563,8 @@ endif
     ld hl,FileName_Settings
     ld bc,SavedSettings_Last-SavedSettings
     ld de,SavedSettings
-ifdef BuildENT ; {{{
-    call DiskDriver_Save
-endif ; }}}
-ifdef BuildMSX ; {{{
-    call DiskDriver_Save
-endif ; }}}
-ifdef BuildZXS ; {{{
-    call DiskDriver_Save
-    call SetKempson
-endif ; }}}
-ifdef BuildCPC
     call BootStrap_SaveDiskFile
     call &BB54 ; VDU enable
-endif
 
     ret
 
@@ -1907,59 +1575,13 @@ RasterColors_InitColors:
 
 ;Before the core is active we load files by filename, afterwards we use Track-Sector-Disk
 
-ifdef BuildCPC
 FileName_Settings:
     db "SETTINGS.V02"
-endif
-ifdef BuildENT ; {{{
-FileName_Settings:
-    db 12,"SETTINGS.V02"
-endif ; }}}
-ifdef BuildMSX ; {{{
-FileName_Settings:
-    db "SETTINGSV02"
-endif ; }}}
 FileName_Core:
     db "CORE    .AKU"
 
 ;FileName_LoadingScreen:
 ;   db "T38-SC1 .D01"
-
-; commented out {{{
-;*******************************************************************************
-;                   Generic Startlevel
-;*******************************************************************************
-;ifdef Support128k
-;GenericStartLevel128k
-;   di
-;
-;   push hl
-;       ld bc,&7f8D ; Reset the firmware to OFF
-;       out (c),c
-;       call Akuyou_Firmware_Kill ; Backup the firmware so the Level can override it
-;   pop hl
-;
-    ;copy the music back
-;   ld a,&C4
-;   ld de,Akuyou_MusicPos;&B000
-;   ld bc,&400
-;   call BankSwitch_C0_BankCopy
-
-    ;get the plus sprites
-;ifdef SupportPlus
-;   ld a,(CPCVer)
-;   and 1
-;   jp z,GenericStartLevel128kB
-;This part is plus only
-;   ld a,&C4
-;   ld hl,&4000
-;   ld de,Akuyou_PlusSpritesPos;&A800
-;   ld bc,&800
-;   call BankSwitch_C0_BankCopy
-
-;jp GenericStartLevel128kB
-;endif
-; }}}
 
 ;*******************************************************************************
 ;                   Music Loader
@@ -2022,19 +1644,11 @@ endif ; }}}
 BootsStrap_ContinueMsg:
 ;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
 ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-if BuildLang =''
     db 15,"You're Dead!"," "+&80
     db 17,"(Again!)"," "+&80
     db 0
-else ; {{{
-    db 17,125,158,125,159,109,112,129,"!",255
-;   db 15,"You're Dead!",255
-    db 18,139,159,114,113,119,"!",255
-    db 0 ; }}}
-endif
-ifdef BuildCPC
     TurnOffPlusRaster:
-    di
+        di
         ld a,(CPCVer)
         and %00000001
         ret z
@@ -2047,25 +1661,13 @@ ifdef BuildCPC
         ld bc,&7fa0 ;TurnPluss Off
         out (c),c
     ret
-endif
 
 BootsStrap_ContinueScreen:
-
     ;call Akuyou_Music_Restart
-ifdef buildCPC
     ld de,RasterColors_Safe_ForInterrupt
     call BootsStrap_BasicColors
     call RasterColors_RestoreInterrupt
-endif
     ;call Akuyou_RasterColors_MusicOnly
-
-ifdef BuildMSX ; {{{
-    ei
-endif ; }}}
-ifdef BuildZXS ; {{{
-    call Firmware_Kill  ;needed for font
-    call INT_Init
-endif ; }}}
 
     ld a,2
     call SpriteBank_Font
@@ -2075,70 +1677,25 @@ endif ; }}}
     or a
     jp z,GameOver
 
-ifdef BuildCPC
-        Call TurnOffPlusRaster
-        ld a,CSprite_Continue       ;Loading
-        call Akuyou_ShowCompiledSprite
-
-        ifdef Support64k
-        ;simpler compiled sprite for 64k
-            ld a,(CPCVer)
-            and 128
-            jr nz,Skip64kcompiled
-
-            ld l,1
-            call Akuyou_DrawText_LocateSprite
-            ld bc,BootsStrap_ContinueMsg
-            call ShowTextLines
-
-            call CompiledSpriteContinue
-        endif
-    Skip64kcompiled:
-endif
-ifdef BuildENT ; {{{
-    ld a,CSprite_Continue       ;Loading
-    call Akuyou_ShowCompiledSprite
-    call INT_Init
-endif ; }}}
-ifdef BuildMSX ; {{{
-    call ScreenBuffer_Reset
-
+    Call TurnOffPlusRaster
     ld a,CSprite_Continue       ;Loading
     call Akuyou_ShowCompiledSprite
 
-    ld hl,MSXGameoverPalette
-    if BuildLang='j' ; {{{
-        ld b,10
-    else
-        ld b,8
-    endif ; }}}
-    ld a,4
-    call Akuyou_VDP_CommandNum
+    ifdef Support64k
+    ;simpler compiled sprite for 64k
+        ld a,(CPCVer)
+        and 128
+        jr nz,Skip64kcompiled
 
-    ifndef buildMSX_V9K ; {{{
-        ld l,0
+        ld l,1
         call Akuyou_DrawText_LocateSprite
         ld bc,BootsStrap_ContinueMsg
         call ShowTextLines
 
-        ld hl,RleContinue
-        ld de,RleContinue_End
-        ld bc,RleContinue_End-RleContinue
-        ld ix,128-48
-        ld iy,32
-        call Akuyou_VDP_RLEProcessorFromMemory
-    endif ; }}}
-endif ; }}}
-ifdef BuildZXS ; {{{
-;       Call CLS
-;       ld l,0
-;       call Akuyou_DrawText_LocateSprite
-;       ld bc,BootsStrap_ContinueMsg
-;       call ShowTextLines
-;       call SpecRLE_Continue
-        ld a,CSprite_Continue       ;Loading
-        call Akuyou_ShowCompiledSprite
-endif ; }}}
+        call CompiledSpriteContinue
+    endif
+
+    Skip64kcompiled:
 
     ld a,2
     call SpriteBank_Font
@@ -2228,14 +1785,6 @@ ifdef buildCPC
     ld a,&80
     jp CLS
 endif
-ifdef BuildENT ; {{{
-    call ENT_UpdatePlusRasters
-    ld a,&80
-    jp CLS
-endif ; }}}
-ifdef BuildMSX ; {{{
-    jp CLS
-endif ; }}}
 
     ret
 
@@ -2247,13 +1796,13 @@ PauseASecB:
             call AkuYou_Player_ReadControls
         pop bc
     ei
-ifdef buildCPC
+
     halt
     halt
     halt
     halt
     halt
-endif
+
     halt
     djnz PauseASecB
 
@@ -2327,76 +1876,26 @@ txtGameOver1Msg: ; {{{
     endif ; }}}
         db 0 ; }}}
 RankText:
-    if BuildLang=''
-    ;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
-    ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-        if BuildCPCv+BuildENTv
-             db 3,"Your 'Chibiko Scoring System (TM)","'"+&80
-        else
-             db 17,"Your"," "+&80
-             db 6,"'Chibiko Scoring System (TM)","'"+&80
-        endif
-        db 15,"Rank was","-"+&80
-        db 0
-        RankF: ; {{{
-            db 17,"*****"," "+&80
-            db 17,"*    "," "+&80
-            db 17,"*****"," "+&80
-            db 17,"*    "," "+&80
-            db 17,"*    "," "+&80
-            db 0 ; }}}
-        ChibikoReview: ; {{{
-            db 12,"Chibiko says:"," "+&80
-            db 0 ; }}}
+;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
+;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+    if BuildCPCv+BuildENTv
+         db 3,"Your 'Chibiko Scoring System (TM)","'"+&80
     else
-        ; {{{
-        if BuildLang=''
-            db 17,"YOUR"," ",255
-            db 6,"'CHIBIKO SCORING SYSTEM (TM)","'",255
-            db 15,"RANK WAS","-",255
-        endif
-        if BuildLang='j' ; {{{
-            db 17," "," ",255
-                   ;      19      18      17      16      15      14      13      12      11      10       9       8       7       6       5       4       3       2       1   0
-            db 10,114,134,129,138,099,130,140,159,123," ",124,115,132,158," ",125,126,132,146,100,255
-            db 17,125,159,110,158,115,139,255
-        endif ; }}}
-        if BuildLang='r' ; {{{
-            db 17,"YOUR"," ",255
-            db 6,"'CHIBIKO SCORING SYSTEM (TM)","'",255
-            db 15,"RANK WAS","-",255
-        endif ; }}}
-        if BuildLang='s' ; {{{
-            db 17,"YOUR"," ",255
-            db 6,"'CHIBIKO SCORING SYSTEM (TM)","'",255
-            db 15,"RANK WAS","-",255
-        endif ; }}}
-            db 0
-        RankF: ; {{{
-            db 17,"*****"," ",255
-            db 17,"*    "," ",255
-            db 17,"*****"," ",255
-            db 17,"*    "," ",255
-            db 17,"*    "," ",255
-            db 0 ; }}}
-        ChibikoReview: ; {{{
-            if BuildLang=''
-                db 12,"CHIBIKO SAYS:"," ",255
-            endif
-            if BuildLang='j' ; {{{
-                       ;      19      18      17      16      15      14      13      12      11      10       9       8       7       6       5       4       3       2       1   0
-                db 15,130,140,159,123,138," ",115,122,158,255
-            endif ; }}}
-            if BuildLang='r' ; {{{
-                db 12,"CHIBIKO SAYS:"," ",255
-            endif ; }}}
-            if BuildLang='s' ; {{{
-                db 12,"CHIBIKO SAYS:"," ",255
-            endif ; }}}
-                db 0 ; }}}
-        ; }}}
+         db 17,"Your"," "+&80
+         db 6,"'Chibiko Scoring System (TM)","'"+&80
     endif
-endif ; Missing endif !!!
+    db 15,"Rank was","-"+&80
+    db 0
+RankF:
+    db 17,"*****"," "+&80
+    db 17,"*    "," "+&80
+    db 17,"*****"," "+&80
+    db 17,"*    "," "+&80
+    db 17,"*    "," "+&80
+    db 0
+ChibikoReview:
+    db 12,"Chibiko says:"," "+&80
+    db 0
 
 ChibikoReviewsWin:
     defw ChibikoReviewWin
@@ -3069,57 +2568,6 @@ ifdef buildCPC
     ld de,RasterColors_Black_ForInterrupt
     call BootsStrap_BasicColors
 endif
-ifdef buildENT ; {{{
-    call Firmware_Restore
-
-    ld a,Akuyou_LevelStart_Bank ;; bank number
-    ld de,&4000         ;; load address
-    ld hl,DiskMap_GameOver
-    ld b,DiskMap_GameOver_Size
-    ld c,DiskMap_GameOver_Disk
-    ld ix,&4000+&4000
-    call Akuyou_LoadDiscSector;z
-
-    call Firmware_Kill
-
-    ld de,EntBlackoutPalette
-    call ENT_UpdatePlusRastersAlt
-
-;   ld de,RasterColors_Black_ForInterrupt
-;   call BootsStrap_BasicColors
-endif ; }}}
-ifdef buildMSX ; {{{
-    call Firmware_Restore
-    ld a,   Akuyou_LevelStart_Bank
-    ld de,Akuyou_LevelStart
-    ld hl,DiskMap_GameOver
-    ld b,DiskMap_GameOver_Size
-    ld c,DiskMap_GameOver_Disk
-    ld iy,Akuyou_LevelSprites_Y
-;   ld ix,0
-;   call VDP_rleProcessor
-    call LoadLZ48RLE
-
-    call Firmware_Kill
-
-    ld hl,MSXGameoverPalette
-    call Akuyou_VDP_SetPalette
-endif ; }}}
-ifdef buildZXS ; {{{
-    call Firmware_Restore
-    ld a,   Akuyou_LevelStart_Bank
-    ld de,Akuyou_LevelStart
-    ld hl,DiskMap_GameOver
-    ld b,DiskMap_GameOver_Size
-    ld c,DiskMap_GameOver_Disk
-    ld ix,Akuyou_LevelStart+&4000
-    call Akuyou_LoadDiscSectorz
-
-    call Firmware_Kill
-    di
-
-;   call &4000
-endif ; }}}
 
     call INT_Init
     ei
@@ -4469,7 +3917,6 @@ LoadGiveUp:
 endif
 
 
-ifdef buildCPC
 BootStrap_SaveDiskFile:
     ;ld hl,filename ;; HL = address of the start of the filename
     ;bc lengh of file
@@ -4490,7 +3937,7 @@ BootStrap_SaveDiskFile:
         call cas_out_open ;; firmware function to open a file for writing
 
     pop hl  ;ld hl,&c000;; HL = load address
-    pop de  ;   ld de,&4000;; DE = length
+    pop de  ;ld de,&4000;; DE = length
     ld bc,&0000;; BC = execution address
 
     ld a,2 ;; A = file type (2 = binary)
@@ -4500,12 +3947,10 @@ BootStrap_SaveDiskFile:
 
     ld bc,&FA7E         ; FLOPPY MOTOR OFF
         out (c),c
-endif
 ret
 
 ;Mini continue compiles sprite for 64k
-ifdef BuildCPC
-    CompiledSpriteContinue:
+CompiledSpriteContinue:
     ifdef Support64k
         ifdef CompileEP1
             read "ContinueCompiled64k.asm"
@@ -4514,15 +3959,6 @@ ifdef BuildCPC
             read "ContinueCompiled64k_Ep2.asm"
         endif
     endif
-endif
-ifdef BuildMSX ; {{{
-RleContinue:
-    incBin "..\ResMSX\Continue.RLE"
-RleContinue_End:
-endif ; }}}
-ifdef BuildZXS ; {{{
-            read "..\ResZX\Rle_Continue.asm"
-endif ; }}}
 
 list
 lastbyte defb 0
@@ -4530,6 +3966,4 @@ nolist
 
 FileEndBootStrap:
 
-ifdef buildCPC
-    save direct "BootStrp.AKU",Akuyou_BootStrapStart,FileEndBootStrap-Akuyou_BootStrapStart ;address,size...}[,exec_address]
-endif
+save direct "BootStrp.AKU",Akuyou_BootStrapStart,FileEndBootStrap-Akuyou_BootStrapStart ;address,size...}[,exec_address]

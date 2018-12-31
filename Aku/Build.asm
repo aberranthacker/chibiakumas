@@ -5,7 +5,7 @@ CompileEP1 equ 1
 ;BuildLang equ 'j' ; J=Japanese
 ;BuildLang equ 'r' ; Russian
 
-buildCPC equ 1     ;Amstrad CPC 
+buildCPC equ 1     ;Amstrad CPC
 ;buildENT equ 1     ;Enterprise 128
 ;buildMSX equ 1     ;MSX
 ;buildZXS equ 1     ;ZX Spectrum
@@ -15,16 +15,14 @@ BuildTI8v equ 0     ;unsupported
 ifdef BuildCPC
 ;   DiskMap_SingleDisk equ 1
 endif
-
-ifdef buildMSX
+ifdef buildMSX ; {{{
 ;   buildMSX_V9K equ 1  ;V9990 support
-endif
-
-ifdef buildZXS
+endif ; }}}
+ifdef buildZXS ; {{{
 ;   buildZXS_DSK equ 1  ;- for disksystem
     buildZXS_TRD equ 1  ;- for disksystem
 ;   buildZXS_TAP equ 1  ;- for disksystem
-endif
+endif ; }}}
 
 PolyPlay equ 1
 
@@ -34,41 +32,38 @@ PolyPlay equ 1
 ;Monitor_Full equ 1
 ;Debug_Monitor equ 1
 ;Monitor_Pause equ 1
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-ifndef BuildLang 
+ifndef BuildLang
     BuildLang equ ''
 endif
 
 ifdef BuildCPC
     AdvancedInterrupts equ 1 ;Enable shadow stack so stack abuse can occur during interrupts!
 
-    print " *** CPC Build *** " 
+    print " *** CPC Build *** "
     BuildCPCv equ 1
     Support64k equ 1  ; enable code only needed by 64k
 ;   Support128k equ 1 ; enable code only needed by 128k+ (keep enabled for 256/512k etc)
 ;   SupportPlus equ 1
     CPC320 equ 1     ;CPC Screen width=320 (otherwise 256)
-else 
+else
     BuildCPCv equ 0
 endif
-
-ifdef BuildENT
+ifdef BuildENT ; {{{
     AdvancedInterrupts equ 1
 
     DiskMap_SingleDisk equ 1
 
-    print " *** Enterprise Build *** " 
+    print " *** Enterprise Build *** "
     BuildENTv equ 1
     Support64k equ 1  ; enable code only needed by 64k
 ;   Support128k equ 1 ; enable code only needed by 128k+ (keep enabled for 256/512k etc)
     CPC320 equ 1    ;CPC Screen width=320 (otherwise 256)
-else 
+else
     BuildENTv equ 0
-endif
-
-ifdef BuildZXS
-    print " *** Spectrum Build *** " 
+endif ; }}}
+ifdef BuildZXS ; {{{
+    print " *** Spectrum Build *** "
 
     ifdef buildZXS_TRD
         DiskMap_SingleDisk equ 1
@@ -77,7 +72,6 @@ ifdef BuildZXS
         DiskMap_SingleDisk equ 1
     endif
 
-
     BuildZXSv equ 1
     ;buildCPC equ 1
     Support64k equ 1  ; enable code only needed by 64k
@@ -85,13 +79,11 @@ ifdef BuildZXS
     ;SupportPlus equ 1
 else
     BuildZXSv equ 0
-endif
-
-
-ifdef buildMSX
-    print " *** MSX Build *** " 
+endif ; }}}
+ifdef buildMSX ; {{{
+    print " *** MSX Build *** "
     ifdef buildMSX_V9K
-    print " *** V9990 Build *** " 
+    print " *** V9990 Build *** "
     endif
 
     DiskMap_SingleDisk equ 1
@@ -101,10 +93,9 @@ ifdef buildMSX
     Support64k equ 1  ; enable code only needed by 64k
     Support128k equ 1 ; enable code only needed by 128k+ (keep enabled for 256/512k etc)
     ;SupportPlus equ 1
-else 
+else
     BuildMSXv equ 0
-endif
-
+endif ; }}}
 
 ifdef BuildCPC
     if BuildMSXv+BuildZXSv+BuildENTv+BuildSAMv+BuildTI8v
@@ -112,31 +103,30 @@ ifdef BuildCPC
         stop
     endif
 endif
-ifdef BuildMSX
+ifdef BuildMSX ; {{{
     if BuildCPCv+BuildZXSv+BuildENTv+BuildSAMv+BuildTI8v
         print "Bad Build - Multiple targets selected"
         stop
     endif
-endif
-ifdef BuildZXS
+endif ; }}}
+ifdef BuildZXS ; {{{
     if BuildCPCv+BuildMSXv+BuildENTv+BuildSAMv+BuildTI8v
         print "Bad Build - Multiple targets selected"
         stop
     endif
-endif
+endif ; }}}
 
-
-if BuildLang ='j'
-    print " *** Japanese Build *** " 
-endif
 if BuildLang =''
     chrHeart equ 122+5
 
-    print " *** English Build *** " 
+    print " *** English Build *** "
 endif
-if BuildLang ='r'
-    print " *** Russian Build *** " 
-endif
+if BuildLang ='j' ; {{{
+    print " *** Japanese Build *** "
+endif ; }}}
+if BuildLang ='r' ; {{{
+    print " *** Russian Build *** "
+endif ; }}}
 
 ifndef BuildLevel
     Read "..\Aku\Core.asm"
