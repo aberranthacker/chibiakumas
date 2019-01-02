@@ -1,4 +1,3 @@
-
     ld sp,&BFFF ; we are not returning, so reset the stack
 
     ;Border To black
