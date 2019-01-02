@@ -23,7 +23,7 @@ PolyPlay equ 1
 ;Debug_Monitor equ 1
 ;Monitor_Pause equ 1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-AdvancedInterrupts equ 1 ;Enable shadow stack so stack abuse can occur during interrupts!
+AdvancedInterrupts equ 0 ;Enable shadow stack so stack abuse can occur during interrupts!
 
 Support64k equ 1  ; enable code only needed by 64k
 ;Support128k equ 1 ; enable code only needed by 128k+ (keep enabled for 256/512k etc)
