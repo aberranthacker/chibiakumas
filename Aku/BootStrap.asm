@@ -1,5 +1,4 @@
 read "CoreDefs.asm"
-nolist
 
 ;Bank C4 - Level Sprites 3+4 / Level Compiled Sprites (7B00 - alternate (boss) music)
 ;Bank C5 - Bootstrap Cache
@@ -28,7 +27,7 @@ FileBeginBootStrap:
 ; When the bootstrap is in memory, the Bitmap font will be available at &7000
 ; This is for the Main menu and similar
 
-; on the 464 it will be loaded in each time
+; on the  464 it will be loaded in each time
 ; in the 6128 it will be always in memory
 ;-------------------------------------------------------------------------------
 ; Make Instructions:
@@ -37,14 +36,9 @@ FileBeginBootStrap:
 ; Both must be compiled together, as Bootstrap points to locations in Core -
 ; you will get a crash otherwise!
 ;-------------------------------------------------------------------------------
-;mc_screen_offset equ &bd1f
-;scr_set_position equ &bd55
-;KeyboardScanner_Flush equ &BB03
-
 jp Bootstrap_Launch    ; &4000
 jp Bootstrap_FromBasic ; &4003
 jp Bootstrap_FromHL    ; &4006
-;jp Bootstrap_Reload    ; &4009
 ifdef SupportPlus
     jp Bootstrap_ReloadPlusSprites ; &400C
 else
@@ -69,8 +63,6 @@ Bootstrap_FromHL:
     jr z,Bootstrap_SystemEvent
     cp 1
     jr z,Bootstrap_Level
-
-    ; Bootstrap Level
 ret
 
 Bootstrap_SystemEvent:
@@ -170,7 +162,7 @@ Bootstrap_FromBasic:
 ;*******************************************************************************
 ;*                   Start Game
 ;*******************************************************************************
-Blackout64k:            ;Blackout screen on 64k, do nothing on 128
+Blackout64k: ;Blackout screen on 64k, do nothing on 128
 ifdef Support64k
     ifdef debug
         ret
@@ -193,66 +185,6 @@ ret
 
 BootsStrap_StartGame:
     read "..\AkuCPC\BootsStrap_StartGame_CPC.asm"
-    ;bochanonly {{{
-
-
-
-    ;ld a,0*3
-    ;call Akuyou_ShowCompiledSprite
-
-
-;   call StartANewGame
-;   xor a
-;   call Enable_Player_CheatMode
-;   call Cheat_BochanOnly
-;   call Cheat_ChibikoOnly
-;   call Cheat_TwoPlayer
-
-
-
-;   jp Bootstrap_Level_TEST
-
-;   jp GameOverWin
-;   jp GameOver
-
-    ;Episode 1
-;   jp Bootstrap_Level_0Again
-;   call FireMode_4D
-;   jp Bootstrap_Level_1
-;   jp Bootstrap_Level_2
-;   jp Bootstrap_Level_3
-;   jp Bootstrap_Level_4
-;   jp Bootstrap_Level_5
-;   jp Bootstrap_Level_6
-;   jp Bootstrap_Level_7
-;   jp Bootstrap_Level_8
-;   jp Bootstrap_Level_9
-;   JP Bootstrap_Level_EndIntro ;Shown before the last level
-;   JP Bootstrap_Level_EndOutro ; End Sequence
-;   JP Bootstrap_Level_Intro
-
-
-;   jp NewGame_EP2_2P
-;   jp Bootstrap_Stage_11
-;   jp Bootstrap_Stage_12
-;   jp Bootstrap_Stage_13
-;   jp Bootstrap_Stage_15
-;   jp Bootstrap_Stage_15
-;   jp Bootstrap_Stage_16
-;   jp Bootstrap_Stage_17
-;   jp Bootstrap_Stage_18
-;   jp Bootstrap_Stage_19
-;   jp Bootstrap_Stage_20
-;   jp Bootstrap_Level_Ep2Intro
-;   jp Bootstrap_Level_Ep2EndOutro
-;   jp Bootstrap_Level_Ep2EndIntro
-
-;jp GameOverWin
-
-
-;   jp Bootstrap_Level_Intro
-;   jp Bootstrap_Level_EndOutro
-; bochanonly }}}
     jp Bootstrap_Level_0    ; Start the menu
 
 Enable_Player_CheatMode:
@@ -307,7 +239,7 @@ ShowTextLinesAgain:
     call Akuyou_DrawText_LocateSprite
 
     ld a,255
-    ldia
+    ld i,a
     push hl
         call Akuyou_DrawText_PrintString
     pop hl
@@ -322,8 +254,8 @@ ifdef Debug
     DebugBuild:
     ;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
     ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-    db 13,"Debug Build","!"+&80
-    db 0
+    db 13, "Debug Build", "!"+&80
+    db  0
 endif
 
 InitPlayer:
@@ -358,8 +290,6 @@ ApplyCheatPlayerCall:
 
     xor a
     call Enable_Player_CheatMode
-;   call Cheat_BochanOnly
-;   call Cheat_ChibikoOnly
 
 ApplyCheatNoCheatMode:
     call null :CheatPlayerCall_Plus2
@@ -382,28 +312,24 @@ NewGame_EP2_2P:
     ld de,Akuyou_PlayerSeparator
     add iy,de
     call InitPlayer
-ifdef CompileEP2
-    jr Bootstrap_Stage_11
-endif
 ifdef CompileEP1
     jp Bootstrap_Level_1
 endif
-
+ifdef CompileEP2
+    jr Bootstrap_Stage_11
+endif
 
 NewGame_EP2_1UP:
-;   call Akuyou_Music_Stop
-
     call StartANewGame
     ld iy,Player_Array
 
     call InitPlayer
-ifdef CompileEP2
-    jr Bootstrap_Stage_11
-endif
 ifdef CompileEP1
     jp Bootstrap_Level_1
 endif
-
+ifdef CompileEP2
+    jr Bootstrap_Stage_11
+endif
 
 NewGame_EP2_2UP:
     call StartANewGame
@@ -412,11 +338,11 @@ NewGame_EP2_2UP:
     ld de,Akuyou_PlayerSeparator
     add iy,de
     call InitPlayer
-ifdef CompileEP2
-    jr Bootstrap_Stage_11
-endif
 ifdef CompileEP1
     jp Bootstrap_Level_1
+endif
+ifdef CompileEP2
+    jr Bootstrap_Stage_11
 endif
 
 ifdef CompileEP2 ; {{{
@@ -431,7 +357,6 @@ Bootstrap_Stage_11:
     call Bootstrap_LoadEP2Music_Z
 
     jp Bootstrap_LoadEP2Level_2PartZ;_Zpartial
-;   jp Bootstrap_LoadEP2Level_2Part_Z
 
 Bootstrap_Stage_12:
     call Akuyou_RasterColors_DefaultSafe
@@ -453,7 +378,6 @@ Bootstrap_Stage_12:
     ld c,DiskMap_Level2_Disk
 
     jp Bootstrap_LoadEP2Level_4PartZ
-;ret
 
 Bootstrap_Stage_13:
     call Akuyou_RasterColors_DefaultSafe
@@ -542,12 +466,6 @@ Bootstrap_Stage_18:
     ld c,2  ;T20-SC1.D02
     call Bootstrap_LoadEP2Music_Z
 
-;   ld a,&C4
-;   ld hl,DiskMap_Level4_C
-;   ld c,2  ;T17-SC3.D02
-;   ld de,&4000
-;   call Akuyou_LoadDiscSectorz
-
     ld hl,DiskMap_Level4
     ld c,2  ;T24-SC1.D02
 
@@ -577,7 +495,6 @@ Bootstrap_Stage_18:
     pop hl
     pop bc
 
-
 jp Bootstrap_LoadEP2Level_1PartZ
 
 Bootstrap_Level_Ep2EndOutro:
@@ -597,7 +514,6 @@ Bootstrap_Level_Ep2EndIntro:
     call Bootstrap_LoadEP2Music_Z
 
     jp Bootstrap_LoadEP2Level_1PartZ
-
 
 Bootstrap_Level_Ep2Intro:
     ld hl,DiskMap_Intro     ;T56-SC1.D04
@@ -622,28 +538,6 @@ Bootstrap_Stage_19:
 
     call Bootstrap_LoadEP2Music_Z
 
-;   ld a,&C4
-;   ld l,&C4
-;   ld de,&6000
-;   ld ix,Akuyou_MusicPosAlt;&8000
-;   call LoadDiscSectorZ_WithPushes
-
-
-
-;   ld c,3  ;Disk3
-
-
-;   ld a,&C4
-;   ld l,&C3
-;   ld de,&4000
-;   ld ix,&6000
-    ;call LoadDiscSectorZ_WithPushes
-    ;push hl
-;   push bc
-;       call &4000
-;   pop bc
-;   pop hl
-
     jp Bootstrap_LoadEP2Level_4PartZ
 
 Bootstrap_Stage_20:
@@ -658,7 +552,6 @@ Bootstrap_Stage_20:
 
     call Bootstrap_LoadEP2Music_Z
 
-;   ld a,&C0
     ld hl,DiskMap_Stage_20  ;T31-SC1.D02
     ld c,DiskMap_Stage_20_Disk
 
@@ -793,7 +686,7 @@ Bootstrap_LoadEP2Level_1Part_Z:
     ld a,&C0        ; Base Part
     ld l,&C1
     ld de,Akuyou_LevelStart+&1000
-    ld ix,&8000;7FFF
+    ld ix,&8000
     call Akuyou_LoadDiscSectorZ
 
     jp GenericStartLevel
@@ -855,7 +748,6 @@ Bootstrap_LoadEP2Level_1PartOnly:
     jp GenericStartLevel
 
 Bootstrap_Level_NoV9K:
-
     ret
 
 Bootstrap_LoadEP2Level_4PartZ:
@@ -886,7 +778,6 @@ Bootstrap_LoadEP2Level_1PartZ:
     ld ix,&8000;7FFF
     call Akuyou_LoadDiscSectorZ
 
-;   jp GenericStartLevel
 GenericStartLevel:
     di
     call Akuyou_Firmware_Kill ; Backup the firmware so the Level can override it
@@ -927,12 +818,6 @@ Bootstrap_LoadEP2Level_1Part_Zpartial:
 Bootstrap_Level_0Again:
     ld sp,SPReset   ; we are not returning, so reset the stack
 
-;   call StartANewGame
-;   call LevelReset0000
-
-    ;call Akuyou_Firmware_Restore
-    ;call Akuyou_ScreenBuffer_
-
     ei
 
     ld hl,RasterColors_ZeroColors
@@ -943,7 +828,6 @@ Bootstrap_Level_0Again:
     halt
     halt
 
-    ;call Akuyou_Firmware_Restore
     ld a,(CPCVer)
     and %10000000
     jr z,ReloadTitleCPC64k
@@ -978,75 +862,41 @@ Bootstrap_Level_0: ; main menu {{{
     ld hl,DiskMap_MainMenu      ;T08-SC1.D01
     ld c,DiskMap_MainMenu_Disk
 
-    ifdef buildMSX ; {{{
-        ld iy,Akuyou_LevelSprites_Y
-    endif ; }}}
-
     ;need to use Specail MSX version - no extra tilemaps
     jp Bootstrap_LoadEP2Level_1PartOnly;Bootstrap_LoadEP2Level_1Part;Z;_Zpartial
 ret ; }}}
 
 Level_1Msg: ; {{{
-if BuildLang='j' ; {{{
-         ;      19      18      17      16      15      14      13      12      11      10       9       8       7       6       5       4       3       2       1   0
-    db 008,140,133,139,159,158,125,159,110,116," ",146,152,140,159,133,129,130,103," ",143,159,121,124,131,125,132,255
-    db 010,122,131,117,120,103," ",114,131,147,132," ",130,140,159,123,139," ",131,119,155,129,119,152,255
-    db 009,115,130,135,130,125,159,110,116," ",118,149,126,145,126,154," ",131,148,153,129,159,112,129,122,133,159,255
-    db 007,133,131,127,159,158," ",128,116,128,159,116,125,121,132," ",139,159,119,139,159,119,125,115,255
-    db 009,142,129,121,128,135," ",119,119,155,129," ",119,115,141,159,131,119,159," ",118,125,156,135,255
-    db 008,125,138,140,159,123,158,132,159," ",116,154,124,121," ",133,140,159,144,157,112,132,115,144,126,098,255
-    db 011,130,140,159,123,139," ",128,116,115,116," ",125,131,155,115,134,123,133,103,255
-    db 013,145,138,119,159,126,157,122," ",114,153,144,127,158,119,152,255
-    db 011,123,155,119,152," ",123,138," ",119,115,141,159,131,103," ",129,159,125,129,255
-    db 010,140,133,135," ",115,120,125,159,123,159,121,103," ",145,127,132,114,122,159,154,"!",255
-endif ; }}}
-if BuildLang='r' ; {{{
-         ;      19      18      17      16      15      14      13      12      11      10       9       8       7       6       5       4       3       2       1   0
-    db 006,112,143,146,140,134," ",142,143,152,142,143,138," ",139,145,143,131,129,131,143,138," ",135,129,147,131,156," ",131,255
-    db 007,143,139,145,134,146,147,142,156,150," ",146,134,140,134,142,157,160,150," ",148," ",120,137,130,137,139,143,255
-    db 007,131,156,133,129,140,143,146,157," ",144,129,145,148," ",133,142,134,138," ",133,140,160," ",146,142,129,".",255
-    db 006,99,142,134,136,129,144,142,143," ",134,134," ",145,129,136,130,148,133,137,140," ",142,134,131,142,160,147,142,156,138,255
-    db 006,153,148,141,","," ",144,143,150,143,135,137,138," ",142,129," ",145,143,138," ",142,129,146,134,139,143,141,156,150,".",255
-    db 009,107,147,143,-147,143," ",131,147,143,145,132,146,160," ",131," ",136,129,141,143,139," ",137,255
-    db 009,142,129,145,148,153,137,140," ",132,145,143,130,143,131,143,138," ",144,143,139,143,138,"!",255
-    db 007,120,137,130,137,139,143," ",142,134," ",147,129," ",131,129,141,144,137,145," ",139,143,147,143,145,129,160,255
-    db 007,136,129,139,145,143,134,147," ",142,129," ",158,147,143," ",132,140,129,136,129,"!"," ",99,145,134,141,160,255
-    db 006,"<",131,146,147,129,147,157," ",137,136," ",141,143,132,137,140,156,">"," ",137," ",143,147,144,145,129,131,137,147,157,255
-    db 006,131," ",129,133," ",147,134,150," ",139,147,143," ",144,143,130,134,146,144,143,139,143,137,140," ",134,134,"!",255
-endif ; }}}
-
-if BuildLang=""
     ifndef CPC320
         ;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0
         ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5
-        db 6 ,"After a hard night massacring"," "+&80
-        db 6 ,"villagers and harvesting their"," "+&80
-        db 6 ,"Blood,Chibiko is having a well"," "+&80
-        db 6 ,"earned days sleep. Suddenly She"," "+&80
-        db 6 ,"is awoken by A swarm of noizy,"," "+&80
-        db 6 ,"ill concieved and badly drawn"," "+&80
-        db 5 ,"Monsters, that are invading her"," "+&80
-        db 5 ,"Castle and disturbing the peace!"," "+&80
-        db 7 ,"Chibiko's not the kind of"," "+&80
-        db 6 ,"Vampire to take that! Time to"," "+&80
-        db 5 ,"'Rise from your grave' and give"," "+&80
-        db 7 ,"hell to whoever sent them","!"+&80
+        db 6, "After a hard night massacring"," "+&80
+        db 6, "villagers and harvesting their"," "+&80
+        db 6, "Blood,Chibiko is having a well"," "+&80
+        db 6, "earned days sleep. Suddenly She"," "+&80
+        db 6, "is awoken by A swarm of noizy,"," "+&80
+        db 6, "ill concieved and badly drawn"," "+&80
+        db 5, "Monsters, that are invading her"," "+&80
+        db 5, "Castle and disturbing the peace!"," "+&80
+        db 7, "Chibiko's not the kind of"," "+&80
+        db 6, "Vampire to take that! Time to"," "+&80
+        db 5, "'Rise from your grave' and give"," "+&80
+        db 7, "hell to whoever sent them","!"+&80
     else
-        db 2 ,"After a hard nights work massacrin","g"+&80
-        db 2 ,"villagers and harvesting their bloo","d"+&80
-        db 1 ,"Chibiko is having a well earned day'","s"+&80
-        db 1 ,"sleep... Suddenly she is awoken by ","a"+&80
-        db 4 ,"commotion. A swarm of noizy, stupi","d"+&80
-        db 2 ,"ill concieved and badly drawn monster","s"+&80
-        db 2 ,"are being drawn to her castle, and ar","e"+&80
-        db 4 ,"seriously disturbing the peace","!"+&80
-        db 4 ,"No self respecting vampire ca","n"+&80
-        db 3 ,"overlook this insult! its time t","o"+&80
-        db 3 ,"'Rise from your grave' and unleas","h"+&80
-        db 6 ,"hell on whoever sent them","!"+&80
+        db 2, "After a hard nights work massacrin","g"+&80
+        db 2, "villagers and harvesting their bloo","d"+&80
+        db 1, "Chibiko is having a well earned day'","s"+&80
+        db 1, "sleep... Suddenly she is awoken by ","a"+&80
+        db 4, "commotion. A swarm of noizy, stupi","d"+&80
+        db 2, "ill concieved and badly drawn monster","s"+&80
+        db 2, "are being drawn to her castle, and ar","e"+&80
+        db 4, "seriously disturbing the peace","!"+&80
+        db 4, "No self respecting vampire ca","n"+&80
+        db 3, "overlook this insult! its time t","o"+&80
+        db 3, "'Rise from your grave' and unleas","h"+&80
+        db 6, "hell on whoever sent them","!"+&80
     endif
-endif
-db &0 ; end of Level_1MsG }}}
+        db &0 ; end of Level_1MsG }}}
 
 Bootstrap_Level_TEST: ; {{{
     ld a,CSprite_Loading
@@ -1065,7 +915,6 @@ Bootstrap_Level_TEST: ; {{{
 ; }}}
 Bootstrap_Level_1: ; {{{
 ;Turn these on later
-;   call Akuyou_RasterColors_DefaultSafe
     ld a,CSprite_Loading
     call Akuyou_ShowCompiledSprite
 
@@ -1078,7 +927,6 @@ Bootstrap_Level_1: ; {{{
     ld l,12
     ld bc,Level_1Msg
     call LocateAndShowTextLines
-
 
     ld hl,DiskMap_Level1        ;T10-SC1.D01
     ld c,DiskMap_Level1_Disk
@@ -1109,31 +957,31 @@ Level_3Msg: ; {{{
 ifndef CPC320
     ;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0
     ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5
-    db 7 ,"The monsters climbing the"," "+&80
-    db 7 ,"mountain seem to be coming"," "+&80
-    db 6 ,"from the forest.Its time to"," "+&80
-    db 6,"push forward, and stop the"," "+&80
-    db 14,"invasion!"," "+&80
-    db 5 ,"The animals of the forest seem"," "+&80
-    db 5 ,"to have become mutants,zombies"," "+&80
-    db 6 ,"& generally super-annoyin","g"+&80
-    db 6 ,"But no matter what monster","s"+&80
-    db 6 ,"lurks in the forest it will"," "+&80
-    db 7 ,"be no match for Chibiko'","s"+&80
-    db 11,"Black Magic!!","!"+&80
+    db  7, "The monsters climbing the"," "+&80
+    db  7, "mountain seem to be coming"," "+&80
+    db  6, "from the forest.Its time to"," "+&80
+    db  6, "push forward, and stop the"," "+&80
+    db 14, "invasion!"," "+&80
+    db  5, "The animals of the forest seem"," "+&80
+    db  5, "to have become mutants,zombies"," "+&80
+    db  6, "& generally super-annoyin","g"+&80
+    db  6, "But no matter what monster","s"+&80
+    db  6, "lurks in the forest it will"," "+&80
+    db  7, "be no match for Chibiko'","s"+&80
+    db 11, "Black Magic!!","!"+&80
 else
-    db 3 ,"The monsters climbing the mountai","n"+&80
-    db 3 ,"Seem to be coming from the fores","t"+&80
-    db 3 ,"Its time to push forward, and sto","p"+&80
-    db 13,"the invasion","!"+&80
-    db 3 ,"The animals of the forest seem t","o"+&80
-    db 3 ,"have become mutants, zombies, an","d"+&80
-    db 8 ,"generally super-annoyin","g"+&80
-    db 15," "," "+&80
-    db 3 ,"But no matter what zombified evi","l"+&80
-    db 3 ,"lurks in the heart of the fores","t"+&80
-    db 3 ,"it will be no match for Chibiko'","s"+&80
-    db 13,"Black Magic!!","!"+&80
+    db  3, "The monsters climbing the mountai","n"+&80
+    db  3, "Seem to be coming from the fores","t"+&80
+    db  3, "Its time to push forward, and sto","p"+&80
+    db 13, "the invasion","!"+&80
+    db  3, "The animals of the forest seem t","o"+&80
+    db  3, "have become mutants, zombies, an","d"+&80
+    db  8, "generally super-annoyin","g"+&80
+    db 15, " "," "+&80
+    db  3, "But no matter what zombified evi","l"+&80
+    db  3, "lurks in the heart of the fores","t"+&80
+    db  3, "it will be no match for Chibiko'","s"+&80
+    db 13, "Black Magic!!","!"+&80
 endif
     db &0 ; }}}
 Bootstrap_Level_3: ; {{{
@@ -1159,7 +1007,6 @@ Bootstrap_Level_3: ; {{{
     ld c,DiskMap_Level3_Disk
 
     jp Bootstrap_LoadEP2Level_2PartBegin
-;ret
 ; }}}
 Bootstrap_Level_4: ; {{{
     ld a,CSprite_Loading        ;Loading
@@ -1183,29 +1030,29 @@ Level_5Msg: ; {{{
 ifndef CPC320
     ;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0
     ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5
-    db  5,"After defeating the zombified"," "+&80
-    db  7,"merchandise cash-cow,and"," "+&80
-    db  6,"narrowly avoiding buying the"," "+&80
-    db  5,"plush doll,Chibiko headed down"," "+&80
-    db  5,"to the river, only to find it"," "+&80
-    db  5,"also full of weird stuff too!"," "+&80
-    db  6,"Heading to the source will"," "+&80
-    db  8,"reveal whoever sent the","m"+&80
-    db  5,"and stop this annoyance once"," "+&80
-    db 14,"and for all","!"+&80
+    db  5, "After defeating the zombified"," "+&80
+    db  7, "merchandise cash-cow,and"," "+&80
+    db  6, "narrowly avoiding buying the"," "+&80
+    db  5, "plush doll,Chibiko headed down"," "+&80
+    db  5, "to the river, only to find it"," "+&80
+    db  5, "also full of weird stuff too!"," "+&80
+    db  6, "Heading to the source will"," "+&80
+    db  8, "reveal whoever sent the","m"+&80
+    db  5, "and stop this annoyance once"," "+&80
+    db 14, "and for all","!"+&80
 else
     ;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
     ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-    db 15,""," "+&80
-    db  2,"After defeating the evil zombifie","d"+&80
-    db  3,"merchandise cash-cow,and narrowl","y"+&80
-    db  4,"avoiding buying the plush dol","l"+&80
-    db  3,"Chibiko headed down to the river",","+&80
-    db  3,"only to find it also full of weir","d"+&80
-    db  4,"stuff too! Heading to the sourc","e"+&80
-    db  5,"will reveal whoever sent the","m"+&80
-    db  3,"and stop this annoyance once an","d"+&80
-    db 15,"for all","!"+&80
+    db 15, ""," "+&80
+    db  2, "After defeating the evil zombifie","d"+&80
+    db  3, "merchandise cash-cow,and narrowl","y"+&80
+    db  4, "avoiding buying the plush dol","l"+&80
+    db  3, "Chibiko headed down to the river",","+&80
+    db  3, "only to find it also full of weir","d"+&80
+    db  4, "stuff too! Heading to the sourc","e"+&80
+    db  5, "will reveal whoever sent the","m"+&80
+    db  3, "and stop this annoyance once an","d"+&80
+    db 15, "for all","!"+&80
 endif
     db &0 ; }}}
 
@@ -1255,7 +1102,7 @@ PressFireMessage:
     call Akuyou_DrawText_LocateSprite
     ld bc,PressFireMsg
     ld a,255
-    ldia
+    ld i,a
     call Akuyou_DrawText_PrintString
 
     jp WaitForFire
@@ -1264,34 +1111,33 @@ PressFireMsg:
 
 Level_7Msg: ; {{{
 ifndef CPC320
-
     ;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0
     ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5
-    db 6 ,"The monsters are coming from"," "+&80
-    db 6 ,"this cave! There's only one"," "+&80
-    db 5 ,"entrance,So whoever is sending"," "+&80
-    db 9 ,"them must be in there","!"+&80
-    db 5 ,"Its difficult to see, as the"," "+&80
-    db 7 ,"cave is are only lit by "," "+&80
-    db 7 ,"phosphor rock and Glowing"," "+&80
-    db 14,"creatures!"," "+&80
-    db 6 ,"Victory is in your grasp","!"+&80
-    db 6 ,"Go in there, and sort this"," "+&80
-    db 14,"Shit out!"," "+&80
+    db  6, "The monsters are coming from"," "+&80
+    db  6, "this cave! There's only one"," "+&80
+    db  5, "entrance,So whoever is sending"," "+&80
+    db  9, "them must be in there","!"+&80
+    db  5, "Its difficult to see, as the"," "+&80
+    db  7, "cave is are only lit by "," "+&80
+    db  7, "phosphor rock and Glowing"," "+&80
+    db 14, "creatures!"," "+&80
+    db  6, "Victory is in your grasp","!"+&80
+    db  6, "Go in there, and sort this"," "+&80
+    db 14, "Shit out!"," "+&80
 else
     ;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
     ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-    db 3 ,"The monsters are coming from thi","s"+&80
-    db 3 ,"cave! There's only one entranc","e"+&80
-    db 2 ,"So whoever is sending them must b","e"+&80
-    db 15,"in there","!"+&80
-    db 15," "," "+&80
-    db 3 ,"Its difficult to see, as the cave","s"+&80
-    db 2 ,"is are only lit by phosphor rock","s"+&80
-    db 09,"and Glowing Creature","s"+&80
-    db 15," "," "+&80
-    db 7 ,"Victory is in your grasp","!"+&80
-    db 1 ,"Go in there, and 'Sort that shit out!","'"+&80
+    db  3, "The monsters are coming from thi","s"+&80
+    db  3, "cave! There's only one entranc","e"+&80
+    db  2, "So whoever is sending them must b","e"+&80
+    db 15, "in there","!"+&80
+    db 15, " "," "+&80
+    db  3, "Its difficult to see, as the cave","s"+&80
+    db  2, "is are only lit by phosphor rock","s"+&80
+    db 09, "and Glowing Creature","s"+&80
+    db 15, " "," "+&80
+    db  7, "Victory is in your grasp","!"+&80
+    db  1, "Go in there, and 'Sort that shit out!","'"+&80
 endif
     db &0 ; }}}
 Bootstrap_Level_7: ; {{{
@@ -1331,7 +1177,6 @@ Bootstrap_Level_8: ; {{{
     ld c,DiskMap_Level8_Disk
     jp Bootstrap_LoadEP2Level_2PartBegin
 ; }}}
-;ret
 Bootstrap_Level_9: ; {{{
     ld a,CSprite_Loading        ;Loading
     call Akuyou_ShowCompiledSprite
@@ -1341,7 +1186,6 @@ Bootstrap_Level_9: ; {{{
     ld c,DiskMap_Level6_Disk
     call Bootstrap_LoadEP2Music_Z
 
-
     ld hl,DiskMap_Level9
     ld c,DiskMap_Level9_Disk
     jp Bootstrap_LoadEP2Level_2PartBegin
@@ -1350,7 +1194,6 @@ Bootstrap_Level_Intro: ; {{{
     ld a,CSprite_Loading        ;Loading
     call Akuyou_ShowCompiledSprite
     call LevelReset0000
-
 
     call Bootstrap_Level_NoV9K
 
@@ -1368,7 +1211,6 @@ Bootstrap_Level_EndIntro: ; {{{
     call LevelReset0000
 
     call Bootstrap_Level_NoV9K
-
 
     ld hl,DiskMap_Level5
     ld c,DiskMap_Level5_Disk
@@ -1403,13 +1245,10 @@ Bootstrap_ReloadPlusSprites:
     ld c,DiskMap_PlusSprites_Disk
     ld de,Akuyou_PlusSpritesPos
     ld ix,Akuyou_PlusSpritesPos+&800-1
-;   ld ix,&E800
     call Akuyou_LoadDiscSectorz
-
 
     ld a,&C0
     call BankSwitch_C0_SetCurrent
-
         di
         ld b,4
         ld a,2
@@ -1457,28 +1296,11 @@ Bootstrap_ReloadPlusSprites:
 
         ei
 
-
-
     ld a,&C0
     ld hl,DiskMap_PlusSpritesChibiko
     ld c,DiskMap_PlusSpritesChibiko_Disk
     ld de,Akuyou_PlayerSpritePos
-;   ld ix,&3800+&800;-1
     call Akuyou_LoadDiscSector
-
-
-;   ld a,&C1
-;   ld hl,DiskMap_PlusSpritesBo
-;   ld c,DiskMap_PlusSpritesBo_Disk
-;   ld de,&F800
-;   call Akuyou_LoadDiscSector
-
-;   ld a,&C1
-;   ld hl,DiskMap_PlusSpritesBoUD
-;   ld c,0
-;   ld de,&F000
-;   call Akuyou_LoadDiscSector
-
 
     ld a,&C1
     ld hl,DiskMap_PlusSpritesBo;DiskMap_PlusSpritesChibikoUD
@@ -1496,7 +1318,7 @@ endif ; }}}
 ; it seemed a bad choice to limit compatibility like that.
 ; note the SIZE variables are redundant, the reader never uses them!
 
-read "diskmap.asm"
+read "DiskMap.asm"
 
 SetColors:
     ld a,1
@@ -1523,7 +1345,6 @@ RasterColors_InitBasic:
     ret
 
 ;Savesettings save the Highscore, Controls etc
-
 Bootstrap_SaveSettings:
     call &BB57 ; VDU Disable
 
@@ -1535,56 +1356,12 @@ Bootstrap_SaveSettings:
 
     ret
 
-RasterColors_ZeroColors:
-    defb 0,0,0
-RasterColors_InitColors:
-    defb 0,4,14,26
+RasterColors_ZeroColors: defb 0,0,0
+RasterColors_InitColors: defb 0,4,14,26
 
 ;Before the core is active we load files by filename, afterwards we use Track-Sector-Disk
-
-FileName_Settings:
-    db "SETTINGS.V02"
-FileName_Core:
-    db "CORE    .AKU"
-
-;FileName_LoadingScreen:
-;   db "T38-SC1 .D01"
-
-; commented out {{{
-;*******************************************************************************
-;                   Generic Startlevel
-;*******************************************************************************
-;ifdef Support128k
-;GenericStartLevel128k
-;   di
-;
-;   push hl
-;       ld bc,&7f8D ; Reset the firmware to OFF
-;       out (c),c
-;       call Akuyou_Firmware_Kill ; Backup the firmware so the Level can override it
-;   pop hl
-;
-    ;copy the music back
-;   ld a,&C4
-;   ld de,Akuyou_MusicPos;&B000
-;   ld bc,&400
-;   call BankSwitch_C0_BankCopy
-
-    ;get the plus sprites
-;ifdef SupportPlus
-;   ld a,(CPCVer)
-;   and 1
-;   jp z,GenericStartLevel128kB
-;This part is plus only
-;   ld a,&C4
-;   ld hl,&4000
-;   ld de,Akuyou_PlusSpritesPos;&A800
-;   ld bc,&800
-;   call BankSwitch_C0_BankCopy
-
-;jp GenericStartLevel128kB
-;endif
-; }}}
+FileName_Settings: db "SETTINGS.V02"
+FileName_Core:     db "CORE    .AKU"
 
 ;*******************************************************************************
 ;                   Music Loader
@@ -1632,7 +1409,6 @@ Plus_BankCopy:
         ld c,&8D
         out (c),c
     pop bc
-    ;call &b909
 
     ldir
     ld bc,&7fA8
@@ -1645,8 +1421,8 @@ endif ; }}}
 BootsStrap_ContinueMsg:
 ;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
 ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-    db 15,"You're Dead!"," "+&80
-    db 17,"(Again!)"," "+&80
+    db 15, "You're Dead!", " "+&80
+    db 17, "(Again!)", " "+&80
     db 0
 TurnOffPlusRaster:
     di
@@ -1664,11 +1440,9 @@ TurnOffPlusRaster:
     ret
 
 BootsStrap_ContinueScreen:
-    ;call Akuyou_Music_Restart
     ld de,RasterColors_Safe_ForInterrupt
     call BootsStrap_BasicColors
     call RasterColors_RestoreInterrupt
-    ;call Akuyou_RasterColors_MusicOnly
 
     ld a,2
     call SpriteBank_Font
@@ -1704,17 +1478,10 @@ Skip64kcompiled:
     call Akuyou_DrawText_LocateSprite
     ld bc,txtPressButtonMsg2;txtContinueMsg
     ld a,255
-    ldia
+    ld i,a
     call Akuyou_DrawText_PrintString
 
     ld l,&15                ; show how many credits are left
-;   call Akuyou_DrawText_LocateSprite
-;   ld bc,txtCreditsMsg
-;   ld a,255
-;   ld i,a
-;   call Akuyou_DrawText_PrintString
-
-;   call AkuYou_Player_GetPlayerVars
 
     call ShowContinues
 
@@ -1760,7 +1527,6 @@ Player_Dead_Resumep2:
     ld iy,Player_Array2
     jr Player_Dead_ResumeB
 Player_Dead_Resume:
-;   call AkuYou_Player_GetPlayerVars
     ld iy,Player_Array
 Player_Dead_ResumeB:
     ld a,3
@@ -1779,7 +1545,6 @@ SpendCreditSelfMod2:    ld iy,Player_Array      ; All credits are (currently) st
     di
 
     call BootsStrap_RestoreColors
-;   call Firmware_Kill
     call RasterColors_RestoreInterrupt
     ld a,&80
     jp CLS
@@ -1790,9 +1555,9 @@ PauseASec:
     push bc
     ld b,60
 PauseASecB:
-        push bc
-            call AkuYou_Player_ReadControls
-        pop bc
+    push bc
+        call AkuYou_Player_ReadControls
+    pop bc
     ei
     halt
     halt
@@ -1835,58 +1600,33 @@ ret
 ;Insulting player messages!
 ifdef CompileEP1
 txtGameOver1Msg: ; {{{
-        ;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
-        ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-    if BuildLang=''
-            db 6,"The Monster Hoarde Has Drive","n"+&80
-            db 8,"Chibiko from her homelan","d"+&80
-        if BuildCPCv+BuildENTv
-            db 2,"She is forced to live in a cardboar","d"+&80
-        else
-            db 7,"She is forced to live in ","a"+&80
-        endif
-            db 8,"box as a street vampire","!"+&80
-            db 10,"With Chibiko gone",","+&80
-            db 10,"Peace and harmon","y"+&80
-            db 6,"Spreads through out the land","."+&80
-            db 8,"(Boy! Did you fuck up!",")"+&80
-    endif
-    if BuildLang='j' ; {{{
-         ;      19      18      17      16      15      14      13      12      11      10       9       8       7       6       5       4       3       2       1   0
-        db 7,119,115,125,159,110,116,129,130,139,130,140,159,123,103,116,130,119,152,118,115,129,159,125,129,"!",255
-        db 7,116,130,119,159,134,121,132,101,130,140,159,123,139,129,159,158,143,159,113,154,121,159,152,125,"!",255
-        db 7,130,140,159,123,138,115,134,115,144,130,139,101,142,115,157,119,159,148,133,159,153,144,125,129,"!",255
-        db 13,147,132,159,129,125,"!",147,132,159,129,125,"!",255
-        db 12,"(",149,112,130,109,112,129,137,"!",118,144,117,152,"!",")",255
-    endif ; }}}
-    if BuildLang='r' ; {{{
-           ;      19      18      17      16      15      14      13      12      11      10       9       8       7       6       5       4       3       2       1   0
-        defb 10,111,145,133,156, 141,143,142,146,147,145,143,131, 137,136,132,142,129,140,137,255
-        defb 9,120,137,130,137,139,143, 137,136, 146,131,143,137,150, 131,140,129,133,134,142,137,138,255
-        defb 8,104,129,146,147,129,131,137,131, 131, 139,143,145,143,130,139,134, 139,129,145,147,143,142,142,143,138,255
-        defb 8,144,143,146,134,140,137,147,146,160, 142,129, 136,129,130,145,143,153,134,142,143,141, 139,140,129,133,130,137,154,134,'.',255
-        defb 4,114, 148,150,143,133,143,141, 120,137,130,137,139,143,',', 141,137,145, 137, 132,129,145,141,143,142,137,160,255
-        defb 6,99,143,146,147,129,142,143,131,137,140,129,146,157, 131, 141,134,145,147,131,156,150, 136,134,141,140,160,150,',',255
-        defb 9,105, 131,146,134, 135,137,140,137, 131,134,152,142,143, 137, 146,152,129,146,140,137,131,143,".",255
-        defb 12,97, 147,156, 143,130,140,129,135,129,140,146,160,"!",255
-    endif ; }}}
-        db 0 ; }}}
+    ;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
+    ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+    db  6, "The Monster Hoarde Has Drive", "n"+&80
+    db  8, "Chibiko from her homelan", "d"+&80
+    db  2, "She is forced to live in a cardboar", "d"+&80
+    db  8, "box as a street vampire", "!"+&80
+    db 10, "With Chibiko gone", ","+&80
+    db 10, "Peace and harmon", "y"+&80
+    db  6, "Spreads through out the land", "."+&80
+    db  8, "(Boy! Did you fuck up!", ")"+&80
+    db  0 ; }}}
 RankText:
 ;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
 ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-    db 3,"Your 'Chibiko Scoring System (TM)","'"+&80
-    db 15,"Rank was","-"+&80
-    db 0
+    db  3, "Your 'Chibiko Scoring System (TM)", "'"+&80
+    db 15, "Rank was", "-"+&80
+    db  0
 RankF:
-    db 17,"*****"," "+&80
-    db 17,"*    "," "+&80
-    db 17,"*****"," "+&80
-    db 17,"*    "," "+&80
-    db 17,"*    "," "+&80
-    db 0
+    db 17, "*****", " "+&80
+    db 17, "*    ", " "+&80
+    db 17, "*****", " "+&80
+    db 17, "*    ", " "+&80
+    db 17, "*    ", " "+&80
+    db  0
 ChibikoReview:
-    db 12,"Chibiko says:"," "+&80
-    db 0
+    db 12, "Chibiko says:", " "+&80
+    db  0
 
 ChibikoReviewsWin:
     defw ChibikoReviewWin
@@ -1910,26 +1650,26 @@ endif
 ifdef CompileEP1 ; {{{
 ChibikoReviewWin: ; {{{
     ifdef CPC320
-        db ScoreXPos,"Well, you won","!"+&80
-        db ScoreXPos,"But I'm still giving you an F","!"+&80
-        db ScoreXPos," "," "+&80
-        db ScoreXPos,"Try get a better score nex","t"+&80
-        db ScoreXPos,"time sucker! ;-)"," "+&80
+        db ScoreXPos, "Well, you won","!"+&80
+        db ScoreXPos, "But I'm still giving you an F","!"+&80
+        db ScoreXPos, " "," "+&80
+        db ScoreXPos, "Try get a better score nex","t"+&80
+        db ScoreXPos, "time sucker! ;-)"," "+&80
     else
     ;                 12345678901234567890123
-        db ScoreXPos,"Well, you won","!"+&80
-        db ScoreXPos,"But I'm still giving"," "+&80
-        db ScoreXPos,"you an F! "," "+&80
-        db ScoreXPos,"Try get a better score"," "+&80
-        db ScoreXPos,"next time sucker! ;-)"," "+&80
+        db ScoreXPos, "Well, you won","!"+&80
+        db ScoreXPos, "But I'm still giving"," "+&80
+        db ScoreXPos, "you an F! "," "+&80
+        db ScoreXPos, "Try get a better score"," "+&80
+        db ScoreXPos, "next time sucker! ;-)"," "+&80
     endif
     db 0 ; }}}
 ChibikoReview1: ; {{{
     ifdef CPC320
-        db ScoreXPos,"Good Job","!"+&80
-        db ScoreXPos,"Now try plugging the controlle","r"+&80
-        db ScoreXPos,"in first before starting th","e"+&80
-        db ScoreXPos,"game","!"+&80
+        db ScoreXPos, "Good Job","!"+&80
+        db ScoreXPos, "Now try plugging the controlle","r"+&80
+        db ScoreXPos, "in first before starting th","e"+&80
+        db ScoreXPos, "game","!"+&80
     else
     ;                 12345678901234567890123
         db ScoreXPos,"Good Job","!"+&80
@@ -1941,175 +1681,175 @@ ChibikoReview1: ; {{{
     db 0 ; }}}
 ChibikoReview2: ; {{{
     ifdef CPC320
-        db ScoreXPos,"Amazing!!","!"+&80
-        db ScoreXPos,"You survived SUCH a long tim","e"+&80
-        db ScoreXPos,"by aimlessly hitting button","s"+&80
-        db ScoreXPos,"at random","!"+&80
+        db ScoreXPos, "Amazing!!","!"+&80
+        db ScoreXPos, "You survived SUCH a long tim","e"+&80
+        db ScoreXPos, "by aimlessly hitting button","s"+&80
+        db ScoreXPos, "at random","!"+&80
     else
     ;                 12345678901234567890123
-        db ScoreXPos,"Amazing!!","!"+&80
-        db ScoreXPos,"You survived SUCH a"," "+&80
-        db ScoreXPos,"long time by aimlessly"," "+&80
-        db ScoreXPos,"hitting buttons at"," "+&80
-        db ScoreXPos,"random!"," "+&80
+        db ScoreXPos, "Amazing!!","!"+&80
+        db ScoreXPos, "You survived SUCH a"," "+&80
+        db ScoreXPos, "long time by aimlessly"," "+&80
+        db ScoreXPos, "hitting buttons at"," "+&80
+        db ScoreXPos, "random!"," "+&80
     endif
     db 0 ; }}}
 ChibikoReview3: ; {{{
     ifdef CPC320
-        db ScoreXPos,"Superb Performace","!"+&80
-        db ScoreXPos,"Imagine how good you'll b","e"+&80
-        db ScoreXPos,"when you actually learn ho","w"+&80
-        db ScoreXPos,"to play","!"+&80
+        db ScoreXPos, "Superb Performace","!"+&80
+        db ScoreXPos, "Imagine how good you'll b","e"+&80
+        db ScoreXPos, "when you actually learn ho","w"+&80
+        db ScoreXPos, "to play","!"+&80
     else
     ;                 12345678901234567890123
-        db ScoreXPos,"Superb Performace","!"+&80
-        db ScoreXPos,"Imagine how good you'll"," "+&80
-        db ScoreXPos,"be when you actually"," "+&80
-        db ScoreXPos,"learn how to play","!"+&80
+        db ScoreXPos, "Superb Performace","!"+&80
+        db ScoreXPos, "Imagine how good you'll"," "+&80
+        db ScoreXPos, "be when you actually"," "+&80
+        db ScoreXPos, "learn how to play","!"+&80
     endif
     db 0 ; }}}
 ChibikoReview4: ; {{{
     ifdef CPC320
-        db ScoreXPos,"Well Done","!"+&80
-        db ScoreXPos,"I'm sure there's worse player","s"+&80
-        db ScoreXPos,"out there, I mean, the worl","d"+&80
-        db ScoreXPos,"population is 7 billio","n"+&80
-        db ScoreXPos,"....There MUST be, right","?"+&80
+        db ScoreXPos, "Well Done","!"+&80
+        db ScoreXPos, "I'm sure there's worse player","s"+&80
+        db ScoreXPos, "out there, I mean, the worl","d"+&80
+        db ScoreXPos, "population is 7 billio","n"+&80
+        db ScoreXPos, "....There MUST be, right","?"+&80
     else
     ;                 12345678901234567890123
-        db ScoreXPos,"Well Done","!"+&80
-        db ScoreXPos,"I'm sure there's worse"," "+&80
-        db ScoreXPos,"players out there,"," "+&80
-        db ScoreXPos,"I mean, the world"," "+&80
-        db ScoreXPos,"population is 7 billion"," "+&80
-        db ScoreXPos,"There MUST be, right","?"+&80
+        db ScoreXPos, "Well Done","!"+&80
+        db ScoreXPos, "I'm sure there's worse"," "+&80
+        db ScoreXPos, "players out there,"," "+&80
+        db ScoreXPos, "I mean, the world"," "+&80
+        db ScoreXPos, "population is 7 billion"," "+&80
+        db ScoreXPos, "There MUST be, right","?"+&80
     endif
     db 0 ; }}}
 ChibikoReview5: ; {{{
     ifdef CPC320
     ;                 12345678901234567890123
-        db ScoreXPos,"You're really something, afte","r"+&80
-        db ScoreXPos,"all, It's rare to see someon","e"+&80
-        db ScoreXPos,"CLINICALLY BRAINDEAD still abl","e"+&80
-        db ScoreXPos,"to play computer games","!"+&80
+        db ScoreXPos, "You're really something, afte","r"+&80
+        db ScoreXPos, "all, It's rare to see someon","e"+&80
+        db ScoreXPos, "CLINICALLY BRAINDEAD still abl","e"+&80
+        db ScoreXPos, "to play computer games","!"+&80
     else
     ;                 12345678901234567890123
-        db ScoreXPos,"You're really something"," "+&80
-        db ScoreXPos,"after all, It's rare to"," "+&80
-        db ScoreXPos,"see someone CLINICALLY"," "+&80
-        db ScoreXPos,"BRAINDEAD still able to"," "+&80
-        db ScoreXPos,"play computer games!"," "+&80
+        db ScoreXPos, "You're really something"," "+&80
+        db ScoreXPos, "after all, It's rare to"," "+&80
+        db ScoreXPos, "see someone CLINICALLY"," "+&80
+        db ScoreXPos, "BRAINDEAD still able to"," "+&80
+        db ScoreXPos, "play computer games!"," "+&80
     endif
     db 0 ; }}}
 ChibikoReview6: ; {{{
     ifdef CPC320
     ;                 12345678901234567890123
-        db ScoreXPos,"If YOU are the result of 2"," "+&80
-        db ScoreXPos,"million years of human"," "+&80
-        db ScoreXPos,"evolution I'd say the species"," "+&80
-        db ScoreXPos,"is seriously fucked","!"+&80
+        db ScoreXPos, "If YOU are the result of 2"," "+&80
+        db ScoreXPos, "million years of human"," "+&80
+        db ScoreXPos, "evolution I'd say the species"," "+&80
+        db ScoreXPos, "is seriously fucked","!"+&80
 
     else
     ;                 12345678901234567890123
-        db ScoreXPos,"If YOU are the result"," "+&80
-        db ScoreXPos,"of 2 million years of"," "+&80
-        db ScoreXPos,"human evolution I'd say"," "+&80
-        db ScoreXPos,"the species is"," "+&80
-        db ScoreXPos,"seriously fucked","!"+&80
+        db ScoreXPos, "If YOU are the result"," "+&80
+        db ScoreXPos, "of 2 million years of"," "+&80
+        db ScoreXPos, "human evolution I'd say"," "+&80
+        db ScoreXPos, "the species is"," "+&80
+        db ScoreXPos, "seriously fucked","!"+&80
     endif
     db 0 ; }}}
 ChibikoReview7: ; {{{
     ifdef CPC320
-        db ScoreXPos,"Never mind","!"+&80
-        db ScoreXPos,"Maybe you will manage to serv","e"+&80
-        db ScoreXPos,"some purpose one day!?","!"+&80
-        db ScoreXPos,"You DO own an organ donor"," "+&80
-        db ScoreXPos,"card don't you","?"+&80
+        db ScoreXPos, "Never mind","!"+&80
+        db ScoreXPos, "Maybe you will manage to serv","e"+&80
+        db ScoreXPos, "some purpose one day!?","!"+&80
+        db ScoreXPos, "You DO own an organ donor"," "+&80
+        db ScoreXPos, "card don't you","?"+&80
     else
     ;                 12345678901234567890123
-        db ScoreXPos,"Never mind","!"+&80
-        db ScoreXPos,"Maybe you will manage"," "+&80
-        db ScoreXPos,"to serve some purpose"," "+&80
-        db ScoreXPos,"one day!?!"," "+&80
-        db ScoreXPos,"You DO own an organ"," "+&80
-        db ScoreXPos,"donor card don't you","?"+&80
+        db ScoreXPos, "Never mind","!"+&80
+        db ScoreXPos, "Maybe you will manage"," "+&80
+        db ScoreXPos, "to serve some purpose"," "+&80
+        db ScoreXPos, "one day!?!"," "+&80
+        db ScoreXPos, "You DO own an organ"," "+&80
+        db ScoreXPos, "donor card don't you","?"+&80
     endif
     db 0 ; }}}
 ChibikoReview8: ; {{{
     ifdef CPC320
-        db ScoreXPos,"I'd say the purpose of you","r"+&80
-        db ScoreXPos,"existance is to defin","e"+&80
-        db ScoreXPos,"utter failure so the res","t"+&80
-        db ScoreXPos,"of the population can fee","l"+&80
-        db ScoreXPos,"superior","!"+&80
+        db ScoreXPos, "I'd say the purpose of you","r"+&80
+        db ScoreXPos, "existance is to defin","e"+&80
+        db ScoreXPos, "utter failure so the res","t"+&80
+        db ScoreXPos, "of the population can fee","l"+&80
+        db ScoreXPos, "superior","!"+&80
     else
     ;                 12345678901234567890123
-        db ScoreXPos,"I'd say the purpose"," "+&80
-        db ScoreXPos,"of your existance is"," "+&80
-        db ScoreXPos,"to define utter failure"," "+&80
-        db ScoreXPos,"so the rest of the"," "+&80
-        db ScoreXPos,"population can feel"," "+&80
-        db ScoreXPos,"superior!"," "+&80
+        db ScoreXPos, "I'd say the purpose"," "+&80
+        db ScoreXPos, "of your existance is"," "+&80
+        db ScoreXPos, "to define utter failure"," "+&80
+        db ScoreXPos, "so the rest of the"," "+&80
+        db ScoreXPos, "population can feel"," "+&80
+        db ScoreXPos, "superior!"," "+&80
     endif
     db 0 ; }}}
 endif ; CompileEP1 }}}
 ifdef CompileEP2 ; {{{
 ChibikoReviewWin:
-    db 10,"Well, you won","!"+&80
-    db 10,"But I'm still giving you a F","!"+&80
-    db 10,"Haven't you learned yet","?"+&80
-    db 10,"The only way to win is not "," "+&80
-    db 10,"to play!"," "+&80
+    db 10, "Well, you won","!"+&80
+    db 10, "But I'm still giving you a F","!"+&80
+    db 10, "Haven't you learned yet","?"+&80
+    db 10, "The only way to win is not "," "+&80
+    db 10, "to play!"," "+&80
     db 0
 ChibikoReview1:
-    db 10,"Well done","!"+&80
-    db 10,"You played the game"," "+&80
-    db 10,"ALL BY YOURSELF!"," "+&80
-    db 10,"Won't your mommy be proud","!"+&80
+    db 10, "Well done","!"+&80
+    db 10, "You played the game"," "+&80
+    db 10, "ALL BY YOURSELF!"," "+&80
+    db 10, "Won't your mommy be proud","!"+&80
     db 0
 ChibikoReview2:
-    db 10,"Amazing!!","!"+&80
-    db 10,"Maybe one day you'll eve","n"+&80
-    db 10,"Be able to tie your shoe","e"+&80
-    db 10,"without drooling all over"," "+&80
-    db 10,"Yourself firs","t"+&80
+    db 10, "Amazing!!","!"+&80
+    db 10, "Maybe one day you'll eve","n"+&80
+    db 10, "Be able to tie your shoe","e"+&80
+    db 10, "without drooling all over"," "+&80
+    db 10, "Yourself firs","t"+&80
     db 0
 ChibikoReview3:
-    db 10,"Superb Performance","!"+&80
-    db 10," "," "+&80
-    db 10,"Nah! I'm humoring you",","+&80
+    db 10, "Superb Performance","!"+&80
+    db 10, " "," "+&80
+    db 10, "Nah! I'm humoring you",","+&80
 ;          123456789012345678901234567890
-    db 10,"Really, you were just awful","!"+&80
+    db 10, "Really, you were just awful","!"+&80
     db 0
 ChibikoReview4:
-    db 10,"You call that playing","?"+&80
-    db 10,"I've seen things on fir","e"+&80
-    db 10,"Move better than that","!"+&80
+    db 10, "You call that playing","?"+&80
+    db 10, "I've seen things on fir","e"+&80
+    db 10, "Move better than that","!"+&80
     db 0
 ChibikoReview5:
-    db 10,"Whoa! What happened there","!"+&80
-    db 10,"I'd call you a complete an","d"+&80
-    db 10,"utter waste of life, bu","t"+&80
-    db 10,"You'd take it as a compliment","!"+&80
+    db 10, "Whoa! What happened there","!"+&80
+    db 10, "I'd call you a complete an","d"+&80
+    db 10, "utter waste of life, bu","t"+&80
+    db 10, "You'd take it as a compliment","!"+&80
     db 0
 ChibikoReview6:
-    db 10,"Sooo! you're as useless as "," "+&80
-    db 10,"You are stupid and ugly!!"," "+&80
-    db 10,"Well, at least you're","!"+&80
-    db 10,"consistent","!"+&80
+    db 10, "Sooo! you're as useless as "," "+&80
+    db 10, "You are stupid and ugly!!"," "+&80
+    db 10, "Well, at least you're","!"+&80
+    db 10, "consistent","!"+&80
     db 0
 ChibikoReview7:
-    db 10,"Well..","."+&80
-    db 10,"After seeing you in actio","n"+&80
-    db 10,"I think we can rule out"," "+&80
-    db 10,"'Intelligent Design' as th","e"+&80
-    db 10,"source of your species","!"+&80
+    db 10, "Well..","."+&80
+    db 10, "After seeing you in actio","n"+&80
+    db 10, "I think we can rule out"," "+&80
+    db 10, "'Intelligent Design' as th","e"+&80
+    db 10, "source of your species","!"+&80
     db 0
 ChibikoReview8:
-    db 10,"That's the best you can do","?"+&80
-    db 10,"I'd say you best bet is to kil","l"+&80
-    db 10,"yourself and hope that","t"+&80
-    db 10,"reincarnation is a thing","!"+&80
+    db 10, "That's the best you can do","?"+&80
+    db 10, "I'd say you best bet is to kil","l"+&80
+    db 10, "yourself and hope that","t"+&80
+    db 10, "reincarnation is a thing","!"+&80
     db 0
 endif ; CompileEP2 }}}
 
@@ -2167,85 +1907,42 @@ GameOverWin:
             defb 0
             defb &54,&4C,&52,&4B
     endif ; }}}
-    ; commented out code {{{
-    ;   RasterColors_ColorArray1x:
-    ;       defb 1
-    ;       defb 1
-    ;       defb 64+20,64+24,64+29,64+11
-    ;   RasterColors_ColorArray2x:
-    ;       defb 5
-    ;;      defb 1
-    ;
-    ;       defb 64+20,64+12,64+13,64+11
-    ;       defb 0
-    ;       defb 64+20,64+24,64+29,64+11
-    ;       defb 12
-    ;       defb 64+20,64+12,64+13,64+11
-    ;       defb 0
-    ;       defb 64+20,64+24,64+29,64+11
-    ;       defb 0
-    ;       defb 64+20,64+12,64+13,64+11
-    ;   RasterColors_ColorArray3x:
-    ;       defb 1
-    ;       defb 1
-    ;       defb 64+20,64+12,64+13,64+11
-    ;       defb 0
-    ;       defb 64+20,64+12,64+13,64+11
-    ;       defb 0
-    ;       defb 64+20,64+12,64+13,64+11
-    ;       defb 0
-    ;       defb 64+20,64+12,64+13,64+11
-    ;       defb 0
-    ;       defb 64+20,64+12,64+13,64+11
-    ;   RasterColors_ColorArray4x:
-    ;       defb 1
-    ;       defb 1
-    ;       defb 64+20,64+31,64+14,64+11
-    ;       defb 0
-    ;       defb 64+20,64+12,64+13,64+11
-    ;       defb 0
-    ;       defb 64+20,64+31,64+14,64+11
-    ;       defb 0
-    ;       defb 64+20,64+12,64+13,64+11
-    ;       defb 0
-    ;       defb 64+20,64+31,64+14,64+11
-    ; }}}
 
 ifdef CompileEP2 ; {{{
     txtGameOver2aMsg: ; {{{
         ;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
         ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-        db 1,"The Yuushas restored"," "+&80
-        db 1,"Chibiko and Bochan"," "+&80
-        db 3,"to humanity..."," "+&80
-        db 1," "," "+&80
-        db 1,"Chibiko was sent to"," "+&80
-        db 3,"Sunday School"," "+&80
-        db 2,"to repent for her"," "+&80
-        db 7,"Sins!"," "+&80
+        db 1, "The Yuushas restored"," "+&80
+        db 1, "Chibiko and Bochan"," "+&80
+        db 3, "to humanity..."," "+&80
+        db 1, " "," "+&80
+        db 1, "Chibiko was sent to"," "+&80
+        db 3, "Sunday School"," "+&80
+        db 2, "to repent for her"," "+&80
+        db 7, "Sins!"," "+&80
         db 0 ; }}}
     txtGameOver2bMsg: ; {{{
         ;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
         ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-        db 22+2,"And Bochan was"," "+&80
-        db 22+1,"Forced on an all"," "+&80
-        db 22+1,"vegetable detox!"," "+&80
+        db 22+2, "And Bochan was"," "+&80
+        db 22+1, "Forced on an all"," "+&80
+        db 22+1, "vegetable detox!"," "+&80
         db  0 ; }}}
     txtGameOver2cMsg: ; {{{
         ;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
         ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-        db 15,"No Bochan,"," "+&80
-        db 5,"That's a common misconception!"," "+&80
-        db 1,"In fact the toaster makes an excellent"," "+&80
-        db 15,"Bath toy!"," "+&80
-        db 1," "," "+&80
-        db 1,"Now you take your bath, I'm going to"," "+&80
-        db 1,"spend the afternoon playing with this"," "+&80
-        db 6,"dangerously sharp crucifix!"," "+&80
-        db 1," "," "+&80
-        db 3,"Once we're dead and cursed, we'll"," "+&80
-        db 3,"get our magic powers back and be"," "+&80
-        db 1,"able to get revenge for this outrage!"," "+&80
+        db 15, "No Bochan,"," "+&80
+        db  5, "That's a common misconception!"," "+&80
+        db  1, "In fact the toaster makes an excellent"," "+&80
+        db 15, "Bath toy!"," "+&80
+        db  1, " "," "+&80
+        db  1, "Now you take your bath, I'm going to"," "+&80
+        db  1, "spend the afternoon playing with this"," "+&80
+        db  6, "dangerously sharp crucifix!"," "+&80
+        db  1, " "," "+&80
+        db  3, "Once we're dead and cursed, we'll"," "+&80
+        db  3, "get our magic powers back and be"," "+&80
+        db  1, "able to get revenge for this outrage!"," "+&80
         db  0 ; }}}
 endif ; }}}
 
@@ -2284,21 +1981,6 @@ GameOverDoLoad:
     ei
     call Akuyou_Music_Play
 
-;   DiskMap_GameOver        equ &22C2   ;T34-SC2.D01
-;   DiskMap_GameOver_Size   equ 12
-;   DiskMap_GameOver_Disk   equ 1
-
-;   call restoremusic
-;   ld hl,(MusicRestore)
-;   call CallHL
-;   ld a,1
-;   ld bc,RasterColors_ColorArray1x
-;   ld de,RasterColors_ColorArray2x
-;   ld hl,RasterColors_ColorArray3x
-;   ld ix,RasterColors_ColorArray4x
-;   ld iy,null
-;   call Akuyou_RasterColors_SetPointers
-
     ld bc,GameoverColors1
     ld de,GameoverColors2
     ld hl,GameoverColors3
@@ -2311,14 +1993,20 @@ GameOverDoLoad:
     ei
 
     ld hl,Font_RegularSizePos;&4000
-    call    Akuyou_ShowSprite_SetBankAddr
+    call Akuyou_ShowSprite_SetBankAddr
 ret
-
 
 GameOver:
     call GameOverDoLoad
 
-ifdef CompileEP2
+ifdef CompileEP1
+    call &4000
+    ld l,16
+    call Akuyou_DrawText_LocateSprite
+    ld bc,txtGameOver1Msg
+endif
+
+ifdef CompileEP2 ; // {{{
         ;ep 2 ver
         ld l,&2
         call Akuyou_DrawText_LocateSprite
@@ -2341,17 +2029,10 @@ ifdef CompileEP2
     ld l,13
     call Akuyou_DrawText_LocateSprite
     ld bc,txtGameOver2cMsg
-endif
-
-ifdef CompileEP1
-    call &4000
-    ld l,16
-    call Akuyou_DrawText_LocateSprite
-    ld bc,txtGameOver1Msg
-endif
+endif ; // }}}
 
     call ShowTextLines
-    Call WaitForFire
+    call WaitForFire
 
 GameOverWinB:
 ;see if we have a highscore
@@ -2413,14 +2094,14 @@ endif
     call Akuyou_DrawText_LocateSprite
     ld bc,txtYourScoreMsg
     ld a,255
-    ldia
+    ld i,a
     call Akuyou_DrawText_PrintString
 
     ld hl,&0A02             ; Show the Continue message
     call Akuyou_DrawText_LocateSprite
     ld bc,txtHighScoreMsg
     ld a,255
-    ldia
+    ld i,a
     call Akuyou_DrawText_PrintString
 
         ld hl,&2000
@@ -2512,7 +2193,6 @@ GameOverReloadMenu:
     call BootsStrap_BasicColors
     call Akuyou_RasterColors_Blackout
 
-
     call Akuyou_Music_Stop ;Put before firmware restore - corrupts BC
     call Firmware_Restore
 
@@ -2524,7 +2204,7 @@ GameOverScore_NextDigit:
 
         ld a,(hl)
             add 48 ; Move to the correct digit (first 32 are not in font)
-             ;add 8
+                   ;add 8
             ld b,-2 ; we are drawing backwards!
 
     call DrawText_CharSpriteDirect;DrawText_DigitSprite
@@ -2536,10 +2216,8 @@ GameOverScore_NextDigit:
     jp nz,GameOverScore_NextDigit
     ret
 
-txtYourScoreMsg:
-    db "Your Score was",":"+&80
-txtHighScoreMsg:
-    db "HighScore",":"+&80
+txtYourScoreMsg: db "Your Score was", ":"+&80
+txtHighScoreMsg: db "HighScore", ":"+&80
 
 WaitForFire:
     call PauseASec
@@ -2554,52 +2232,6 @@ WaitForFire_Continue:
     cp 255
     jp z,WaitForFire_Continue
 ret
-
-; commented out code {{{
-;DrawText_Decimal:
-;   ld c,0
-;DrawText_DecimalSub100:
-;   cp 100
-;   jp c,DrawText_DecimalLessThan100
-;   inc c
-;   sub 100
-;   jp DrawText_DecimalSub100
-;DrawText_DecimalLessThan100:
-;   ld b,a
-;   ld a,c
-;   or a
-;   jp z,SkipDigit100
-;   add 48
-;   push bc
-;       call Akuyou_DrawText_CharSprite
-;   pop bc
-
-;SkipDigit100:
-;   ld a,b
-;   ld c,0
-;DrawText_DecimalSubTen:
-;   cp 10
-;   jp c,DrawText_DecimalLessThanTen
-;   inc c
-;   sub 10
-;   jr DrawText_DecimalSubTen
-;DrawText_DecimalLessThanTen:
-;   ld b,a
-;   ld a,c
-;   or a
-;   jp z,SkipDigit10
-;   add 48
-;   push bc
-;       call Akuyou_DrawText_CharSprite
-;   pop bc
-;SkipDigit10:
-;   ld a,b
-;   add 48
-;   push bc
-;       call Akuyou_DrawText_CharSprite
-;   pop bc
-;   ret
-; }}}
 
 FireMode_Normal:
     ld hl,null
@@ -2645,7 +2277,6 @@ endif ; }}}
     xor a
     ld (ShowContinueCounter_Plus1-1),a
 
-
     ld hl,&00c6 ;add 0 - faster than nop nop
     ld (JR64K_1),hl
     ld (JR64K_2),hl
@@ -2682,11 +2313,7 @@ StartANewGameNot64k:
     jr nz,ContinueModeSet
 
     ld de,&21FD
-;ifdef CPC320
     ld bc,&C90E     ;Shared Continues
-;else
-;   ld bc,&C90B     ;Shared Continues
-;endif
 ContinueModeSet:
     ld a,b
     ld (ShowContinuesSelfMod),a
@@ -2771,7 +2398,6 @@ useheaven:
 
     ld a,(iy-11)
     and %00000011
-;   or a
     jp z,Difficulty_Normal
     cp 1
     jp z,Difficulty_Easy
@@ -2798,18 +2424,11 @@ StartANewGamePlayer:
     ld a,&67
     ld (iy+15),a    ;Fire Dir
 
-    ;init player lives
-;   ld a,3;3
-;   ld (iy+9),a
     ld a,(SmartbombsReset)
     ld (iy+3),a
 
     ld a,(ContinuesReset)
     ld (iy+5),a
-
-;   ld a,(iy+5)
-;   dec a
-;   ld (iy+5),a
 
     ;invincibility
     ld a,%00000111
@@ -2819,48 +2438,16 @@ ret
 Difficulty_Easy:
     ld a,%00100000
     jr Difficulty_Generic
-    ;ld (FireFrequencyA_Plus1-1),a
-    ;ld a,%00010000
-    ;ld (FireFrequencyB_Plus1-1),a
-    ;ld a,%00010000
-    ;ld (FireFrequencyC_Plus1-1),a
-    ;ld a,%00001000;
-    ;ld (FireFrequencyD_Plus1-1),a
-    ;ld a,%00000100;
-    ;ld (FireFrequencyE_Plus1-1),a
-    ;ret
 Difficulty_Normal:
     ld a,%00010000
     jr Difficulty_Generic
-    ;ld (FireFrequencyA_Plus1-1),a
-    ;ld a,%00001000
-    ;ld (FireFrequencyB_Plus1-1),a
-    ;ld a,%00001000
-    ;ld (FireFrequencyC_Plus1-1),a
-    ;ld a,%00000100;
-    ;ld (FireFrequencyD_Plus1-1),a
-    ;ld a,%00000010;
-    ;ld (FireFrequencyE_Plus1-1),a
-    ;ret
 Difficulty_Hard:
     ld a,%00001000
     jr Difficulty_Generic
-    ;ld (FireFrequencyA_Plus1-1),a
-    ;ld a,%00000100
-    ;ld (FireFrequencyB_Plus1-1),a
-    ;ld a,%00000100
-    ;ld (FireFrequencyC_Plus1-1),a
-    ;ld a,%00000010;
-    ;ld (FireFrequencyD_Plus1-1),a
-    ;ld a,%00000001;
-    ;ld (FireFrequencyE_Plus1-1),a
-    ;ret
 Difficulty_Generic:
-    ;ld a,%00001000
     ld (FireFrequencyA_Plus1-1),a
     rrca;ld a,%00000100
     ld (FireFrequencyB_Plus1-1),a
-    ;ld a,%00000100
     ld (FireFrequencyC_Plus1-1),a
     rrca;   ld a,%00000010;
     ld (FireFrequencyD_Plus1-1),a
@@ -2899,11 +2486,6 @@ ResetCore:
 
     or a
     call DroneFlipFire
-;   ld (Event_LevelTime),a
-;   ld a,(hl)
-;   ld (Event_NextEventTime_Plus1-1),a
-;   inc hl
-;   ld (Event_NextEventPointer_Plus2-2),hl
 
     ; reset reporgrammable stuff  - I AM USING EXX in these, so make sure that EX af and EXX are not used
     ;at this point!!!
@@ -2928,12 +2510,6 @@ endif
     ld (CustomSmartBombEnemy_Plus2-2),hl
     ld (customPlayerHitter_Plus2-2),hl
     ld (CustomShotToDeathCall_Plus2-2),hl
-;   defb 100;Y
-;   defb 64 ;X
-
-;   ld bc,Background_ShiftNow
-;   call set_BackgroundScrollDirection
-    ;ld a,&05   ;Dec B  ;04 - INC B
 
     xor a
     ld (Sfx_CurrentPriority_Plus1-1),a  ; clear the to-do
@@ -2945,29 +2521,16 @@ endif
 
     call AkuYou_Player_GetPlayerVars
 
-;   ld a,(iy-8)
-;   and %00010000
-;   ld a,&AF ; Xor a
-;   jr z,Turbo_ShowBackgroundSprites
-    ;ld a,&C9   ; Disabled for now
-;Turbo_ShowBackgroundSprites
-;   ld (BackgroundNoSpritesTurbo_Plus1-1),a
-
     read "..\AkuCPC\Bootstrap_ReconfigureCore_CPC.asm"
     jp AkuYou_Player_GetPlayerVars
 
-
 BootsStrap_ConfigureControls:
     ei
-;   ld hl,RasterColors_InitColors
-;   call SetColors
     call TurnOffPlusRaster
 
     ld e,1
     ld hl,RasterColors_Safe
     call RasterColors_NoDelay
-;   ld de,RasterColors_Safe_ForInterrupt
-;   call BootsStrap_BasicColors
 call PauseASec;call KeyboardScanner_Flush ; flush the key buffer
 
     ld a,2
@@ -2991,7 +2554,7 @@ ConfigureControls_Nextkey:
 
         push de
             ld a,255
-            ldia    ;show 255 chars
+            ld i,a    ;show 255 chars
             push bc
                 call cls
                 ld hl,&0D05
@@ -3018,19 +2581,9 @@ ConfigureControls_Delay
             inc hl
             ld (hl),c
 
-            ;call DrawText_PrintHex
-            ;ld a,"-"
-            ;call DrawText_PrintChar
-            ;ld a,c
-            ;call DrawText_PrintHex
         pop de
-;       inc de
-;       inc de
     pop bc
     djnz ConfigureControls_Nextkey
-
-;   ld hl,(MusicRestore)
-;   call CallHL
 ret
 
 KeyName: ; {{{
@@ -3055,53 +2608,26 @@ KeyName: ; {{{
 
 ;We use - rather than space so the old text is overwritten - remember our
 ;spritefont has no space!
-if BuildLang ='' ; {{{
              ;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
-                 ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-    KeyMapString0: db  "Press Key For",":"+&80
-    KeyMapString8: db  "--P1-Pause","-"+&80
-    KeyMapString7: db  "-P1-SBomb-","-"+&80
-    KeyMapString6: db  "-P1-FireR-","-"+&80
-    KeyMapString5: db  "-P1-FireL-","-"+&80
-    KeyMapString4: db  "-P1-Right-","-"+&80
-    KeyMapString3: db  "--P1-Left-","-"+&80
-    KeyMapString2: db  "--P1-Down-","-"+&80
-    KeyMapString1: db  "--P1-Up---","-"+&80
+             ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+KeyMapString0: db  "Press Key For", ":"+&80
+KeyMapString8: db  "--P1-Pause",    "-"+&80
+KeyMapString7: db  "-P1-SBomb-",    "-"+&80
+KeyMapString6: db  "-P1-FireR-",    "-"+&80
+KeyMapString5: db  "-P1-FireL-",    "-"+&80
+KeyMapString4: db  "-P1-Right-",    "-"+&80
+KeyMapString3: db  "--P1-Left-",    "-"+&80
+KeyMapString2: db  "--P1-Down-",    "-"+&80
+KeyMapString1: db  "--P1-Up---",    "-"+&80
 
-    KeyMapString8b: db  "--P2-Pause","-"+&80
-    KeyMapString7b: db  "-P2-SBomb-","-"+&80
-    KeyMapString6b: db  "-P2-FireR-","-"+&80
-    KeyMapString5b: db  "-P2-FireL-","-"+&80
-    KeyMapString4b: db  "-P2-Right-","-"+&80
-    KeyMapString3b: db  "--P2-Left-","-"+&80
-    KeyMapString2b: db  "--P2-Down-","-"+&80
-    KeyMapString1b: db  "--P2-Up---","-"+&80
-    ; }}}
-else ; {{{
-    if BuildLang ='j'
-        KeyMapString0: db  "PRESS KEY FOR",":",255
-    endif
-    if BuildLang ='r'
-        KeyMapString0: db  " ",143,159,129,158,103," ",127,158,129,121,125,132,255
-    endif
-    KeyMapString8: db  "--P1-PAUSE","-",255
-    KeyMapString7: db  "-P1-SBOMB-","-",255
-    KeyMapString6: db  "-P1-FIRER-","-",255
-    KeyMapString5: db  "-P1-FIREL-","-",255
-    KeyMapString4: db  "-P1-RIGHT-","-",255
-    KeyMapString3: db  "--P1-LEFT-","-",255
-    KeyMapString2: db  "--P1-DOWN-","-",255
-    KeyMapString1: db  "--P1-UP---","-",255
-
-    KeyMapString8b: db  "--P2-PAUSE","-",255
-    KeyMapString7b: db  "-P2-SBOMB-","-",255
-    KeyMapString6b: db  "-P2-FIRER-","-",255
-    KeyMapString5b: db  "-P2-FIREL-","-",255
-    KeyMapString4b: db  "-P2-RIGHT-","-",255
-    KeyMapString3b: db  "--P2-LEFT-","-",255
-    KeyMapString2b: db  "--P2-DOWN-","-",255
-    KeyMapString1b: db  "--P2-UP---","-",255
-endif ; }}}
+KeyMapString8b: db  "--P2-Pause",   "-"+&80
+KeyMapString7b: db  "-P2-SBomb-",   "-"+&80
+KeyMapString6b: db  "-P2-FireR-",   "-"+&80
+KeyMapString5b: db  "-P2-FireL-",   "-"+&80
+KeyMapString4b: db  "-P2-Right-",   "-"+&80
+KeyMapString3b: db  "--P2-Left-",   "-"+&80
+KeyMapString2b: db  "--P2-Down-",   "-"+&80
+KeyMapString1b: db  "--P2-Up---",   "-"+&80
 
 ClearC000:
     di
@@ -3176,7 +2702,6 @@ BulletConfigHeaven: ; {{{
     defw &FFFF;defw &1311
     defw &1b19
     defb 0
-
     ;Stars_AddBurst_Right;
     defw &2725
     defw &FFFF;defw &2f2D
@@ -3210,7 +2735,6 @@ BulletConfigHeaven: ; {{{
     defw &FFFF;defw &3735
     defw &FFFF;defw &3f3D
     defb 0
-
     ;Stars_AddBurst_Outer
     defw &FFFF;defw &3737
     defw &FFFF;defw &2727
@@ -3227,7 +2751,6 @@ BulletConfigHeaven: ; {{{
     defw &0F09
     ;Stars_AddObjectOne
     defb 0
-
     ;Stars_AddBurst
     defw &FFFF
     defb &FF,&FF
@@ -3268,7 +2791,6 @@ BulletConfigHell: ; {{{
     defw &1311
     defw &1b19
     defb 0
-
     ;Stars_AddBurst_Right
     defw &2725
     defw &2f2D
@@ -3302,7 +2824,6 @@ BulletConfigHell: ; {{{
     defw &3735
     defw &3f3D
     defb 0
-
     ;Stars_AddBurst_Outer
     defw &3737
     defw &2727
@@ -3319,7 +2840,6 @@ BulletConfigHell: ; {{{
     defw &0F09
     ;Stars_AddObjectOne
     defb 0
-
     ;Stars_AddBurst
     defw &3f08
     defb 0,0
@@ -3344,7 +2864,6 @@ BulletConfigHell: ; {{{
     defw &2221
     defw &1b19
     defw &2b29
-
     defb 0
     ;Stars_AddBurst_BottomWide
     defw &2d2b
@@ -3358,21 +2877,21 @@ PlusInitSequence:
     defb &ff,&00,&ff,&77,&b3,&51,&a8,&d4,&62,&39,&9c,&46,&2b,&15,&8a,&cd,&ee
 ; }}}
 PlusPaletteGame: ; {{{
-    defw &0000          ;; colour for sprite pen 1
-    defw &0555          ;; colour for sprite pen 2
-    defw &0AAA          ;; colour for sprite pen 3
-    defw &0FFF          ;; colour for sprite pen 4
-    defw &0066          ;; colour for sprite pen 5
-    defw &00AA          ;; colour for sprite pen 6
-    defw &0808          ;; colour for sprite pen 7
-    defw &0F0F          ;; colour for sprite pen 8
-    defw &0FAC          ;; colour for sprite pen 9
-    defw &00F0          ;; colour for sprite pen 10
-    defw &06F7          ;; colour for sprite pen 11
-    defw &0F00          ;; colour for sprite pen 12
-    defw &0800          ;; colour for sprite pen 13
-    defw &0373          ;; colour for sprite pen 14
-    defw &0333          ;; colour for sprite pen 15
+    defw &0000 ; colour for sprite pen 1
+    defw &0555 ; colour for sprite pen 2
+    defw &0AAA ; colour for sprite pen 3
+    defw &0FFF ; colour for sprite pen 4
+    defw &0066 ; colour for sprite pen 5
+    defw &00AA ; colour for sprite pen 6
+    defw &0808 ; colour for sprite pen 7
+    defw &0F0F ; colour for sprite pen 8
+    defw &0FAC ; colour for sprite pen 9
+    defw &00F0 ; colour for sprite pen 10
+    defw &06F7 ; colour for sprite pen 11
+    defw &0F00 ; colour for sprite pen 12
+    defw &0800 ; colour for sprite pen 13
+    defw &0373 ; colour for sprite pen 14
+    defw &0333 ; colour for sprite pen 15
 ;************************************************************************** }}}
 
 BootStrap_EntTitlePalette:  ;The 'Normal' level palette {{{
@@ -3398,43 +2917,23 @@ BootStrap_EntTitlePalette:  ;The 'Normal' level palette {{{
     defw &0EEE
     defb 140
     defw &0000
-ifdef PolyPlay
     defw &0408
     defw &0b2f
-else
-    defw &0800
-    defw &0E66
-endif
     defw &0EEE
     defb 200-16-2
     defw &0000
-ifdef PolyPlay
     defw &0408
     defw &0b2f
-else
-    defw &0800
-    defw &0E66
-endif
     defw &FFFF
     defb 200-8-2
     defw &0000
-ifdef PolyPlay
     defw &0408
     defw &0b2f
-else
-    defw &0800
-    defw &0E66
-endif
     defw &FFFF
     defb 200
     defw &0000
-ifdef PolyPlay
     defw &0408
     defw &0b2f
-else
-    defw &0800
-    defw &0E66
-endif
     defw &FFFF
 ; }}}
 
@@ -3446,11 +2945,11 @@ endif
 .cas_out_close  equ &bc8f
 
 BootStrap_LoadDiskFile:
-; HL - pointer to disk file
-; DE - Destination to write to
+    ; HL - pointer to disk file
+    ; DE - Destination to write to
     push de
-    ld de,&C000 ;; address of 2k buffer,
-    ld b,12     ;12 chars
+    ld de,&C000 ; address of 2k buffer,
+    ld b,12     ; 12 chars
     call cas_in_open
 
     pop hl
@@ -3460,14 +2959,9 @@ LoadGiveUp:
     jp cas_in_close
 
 BootStrap_SaveDiskFile:
-    ;ld hl,filename ;; HL = address of the start of the filename
-    ;bc lengh of file
-    ;de source mem pos
-
     ifdef ReadOnly
         ret
     endif
-
 
     push bc
     push de
@@ -3479,16 +2973,16 @@ BootStrap_SaveDiskFile:
         call cas_out_open ;; firmware function to open a file for writing
 
     pop hl  ;ld hl,&c000;; HL = load address
-    pop de  ;   ld de,&4000;; DE = length
-    ld bc,&0000;; BC = execution address
+    pop de  ;ld de,&4000;; DE = length
+    ld bc,&0000 ; BC = execution address
 
-    ld a,2 ;; A = file type (2 = binary)
+    ld a,2 ; A = file type (2 = binary)
 
-    call cas_out_direct ;; write file
-    call cas_out_close  ;; firmware function to close a file opened for writing
+    call cas_out_direct ; write file
+    call cas_out_close  ; firmware function to close a file opened for writing
 
     ld bc,&FA7E         ; FLOPPY MOTOR OFF
-        out (c),c
+    out (c),c
 ret
 
 ;Mini continue compiles sprite for 64k
@@ -3507,5 +3001,5 @@ lastbyte defb 0
 nolist
 
 FileEndBootStrap:
-
-save direct "BootStrp.AKU",Akuyou_BootStrapStart,FileEndBootStrap-Akuyou_BootStrapStart ;address,size...}[,exec_address]
+    ;file_name, address,size...} [,exec_address]
+    save direct "BootStrp.AKU",Akuyou_BootStrapStart,FileEndBootStrap-Akuyou_BootStrapStart
