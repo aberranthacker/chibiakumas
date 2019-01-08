@@ -13,47 +13,8 @@ read "BootStrap.asm"
 ; Star and object Array Init is oblsolete
 ;setting Event_SavedSettings_Plus2 is depricated for Event_StreamInit
 ;defining backgrounds in the event stream is deprecated
-;nolist
-
-;DualChibikoHack equ 1
-
-
-; Enable these to alter functions
-;DebugSprite equ 1  ; mark slow sprites
-;Debug equ 1        ; enable debugging options
-;SingleDisk equ 1   ; Disables Disk messages
-;ReadOnly equ 1     ; Disable Disk writes - For Cartridge versions!
 
 ;coredefined equ 1
-
-; Enable Support64k and Support128k for a core that supports everything
-; Support64k or Support128k for a core that supports one
-; but DO NOT UNTICK BOTH OF THESE AT THE SAME TIME, or you will get
-; a core that supports nothing! also and remember
-; the game will crash if run on a 64k machine with no 64k support
-; or 128k mne with no 128k support (unless CPCVer is set to 64 of course!)
-;
-;Support64k equ 1  ; enable code only needed by 64k
-;Support128k equ 1 ; enable code only needed by 128k+ (keep enabled for 256/512k etc)
-
-; This can be used with or without the two options above
-;SupportPlus equ 1 ; enable code only needed by CPC Plus
-
-; If you have spare space, enable this, if you don't disable it!
-;MinimizeCore equ 1 ; Reduce size of the core at the cost of speed - works on 64k or 128k
-
-; This no-loger works, I had to remove too many files from disk 2 to remove disk 3
-;AllowDisk2 equ 1   ;skip optional stuff on disk 1 (allowed starting at level 5 for testing - not useful any more)
-
-
-;CPC320 equ 1   ;CPC Screen width=320 (otherwise 256)
-
-;buildCPC equ 1
-;buildMSX equ 1
-;buildZXS equ 1
-;buildZXS_DSK equ 1
-;buildZXS_TRD equ 1
-;buildZXS_TAP equ 1
 
 Arkos_VarsDefined equ 1
 
@@ -157,30 +118,14 @@ SprShow_Y equ SprShow_Y_Plus1-1
 SprShow_BankAddr equ SprShow_BankAddr_Plus2-2
 SprShow_SprNum   equ SprShow_SprNum_Plus1-1
 
-;ObjectArray_Size equ ObjectArray_Size_Plus1-1
-
-;ObjectArrayAddress equ ObjectArrayAddress_Plus2-2
-
 Timer_TicksOccured equ Timer_TicksOccured_Plus1-1
 
 ;***************************************************************************************************
 ;                   Main Project Code
 ;***************************************************************************************************
-;org &A00
-
-;StarArraySize equ 255
-
-;StarY.....,StarX.....,StarMovement.....
-
-;limit &A500
-
-org Akuyou_CoreStart ;&8000
+org Akuyou_CoreStart ;&450
 
 FileBeginCore:
-    ifdef Akuyou_BasicSafe
-        WRITE DIRECT -1, -1, &C2   ; Write into 128k ram to allow basic to use the CORE!
-    endif
-
     jp ShowSprite       ;8000
     jp ExecuteBootStrap ;8003
     jp LoadDiscSector   ;8006
@@ -247,9 +192,9 @@ FileBeginCore:
     jp RasterColors_StopMusic   ;80A5
     jp ShowCompiledSprite       ;80A8
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    jp CPCGPU_CommandNum ; jp Plus_SetSprite            ;80AB  CPCGPU_CommandNum
-    jp null              ; jp Plus_CopySpriteCompressed ;80AE
-    jp null              ; jp Plus_SetPalette           ;80B1
+    jp CPCGPU_CommandNum        ;80AB
+    jp null                     ;80AE
+    jp null                     ;80B1
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     jp ScreenBuffer_Alt         ;80B4
     jp BankSwitch_C0_SetCurrent ;80B7
@@ -259,73 +204,75 @@ FileBeginCore:
     jp RasterColors_Blackout    ;80BD
     jp RasterColors_DefaultSafe ;80C0
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    jp Background_GradientScroll ;00C3
-    jp Timer_SetCurrentTick      ;00C6
-    jp Background_Gradient       ;00C9
-    jp DrawText_LocateSprite4CR  ;00CC
-    jp LoadDiscSectorZ      ;00CF
-    jp GetNxtLin            ;00D2
-    jp DoObjectSpawn        ;00D5
-    jp Player2Start         ;00D8
-    jp Player_Hit_Injure_2  ;80DB
-    jp GetMemPos            ;00DE
-    jp DrawText_Decimal     ;00E1
-    jp GetSpriteXY          ;00E4
+    jp Background_GradientScroll;00C3
+    jp Timer_SetCurrentTick     ;00C6
+    jp Background_Gradient      ;00C9
+    jp DrawText_LocateSprite4CR ;00CC
+    jp LoadDiscSectorZ          ;00CF
+    jp GetNxtLin                ;00D2
+    jp DoObjectSpawn            ;00D5
+    jp Player2Start             ;00D8
+    jp Player_Hit_Injure_2      ;80DB
+    jp GetMemPos                ;00DE
+    jp DrawText_Decimal         ;00E1
+    jp GetSpriteXY              ;00E4
     ifdef SupportPlus
-        jp Plus_HideSprites ;00E7
+        jp Plus_HideSprites     ;00E7
     else
-        jp null             ;00E7
+        jp null                 ;00E7
     endif
-    jp SetStarArrayPalette  ;00EA
-    jp Aku_CommandNum       ;equ &00ED
+    jp SetStarArrayPalette      ;00EA
+    jp Aku_CommandNum           ;equ &00ED
 ;*******************************************************************************
 ;                   Aligned Code
 ;*******************************************************************************
 SavedSettings:
-    defb 255       ;spare  -20
-    defb 0         ;spare  -19
-    defb 0         ;spare  -18
-    defb 0         ;spare  -17
-    defb %00000001 ;GameOptions (xxxxxxxS) Screen shake        -16
-    
-    defb 0      ;playmode 0 normal / 128 - 4D  -15
-ContinueMode:    defb 0  ;Continue Sharing (0/1)     -14
-SmartbombsReset: defb 3  ;SmartbombsReset        -13
-ContinuesReset:  defb 60 ;-12 - Continues Reset
-GameDifficulty:  defb 0  ;-11 - Game difficulty (enemy Fire Speed 0= normal, 1=easy, 2=hard) +128 = heaven mode , +64 = star Speedup
-                 defb %00000000 ;Achievements (WPx54321)  -10 (W=Won P=Played)
-MultiplayConfig: defb %00000000 ;Joy Config   (xxxxxxFM)   -9
+        defb 255         ;pos -20 spare
+        defb 0           ;pos -19 spare
+        defb 0           ;pos -18 spare
+        defb 0           ;pos -17 spare
+        defb %00000001   ;pos -16 GameOptions (xxxxxxxS) Screen shake
+        defb 0           ;pos -15 playmode 0 normal / 128 - 4D
+ContinueMode:    defb 0  ;pos -14 Continue Sharing (0/1)
+SmartbombsReset: defb 3  ;pos -13 SmartbombsReset
+ContinuesReset:  defb 60 ;pos -12 Continues Reset
+GameDifficulty:  defb 0  ;pos -11 Game difficulty
+                         ;        (enemy Fire Speed 0=normal, ;1=easy, 2=hard)
+                         ;        +128 = heaven mode , +64 = star Speedup
+                 defb %00000000 ;pos -10 Achievements (WPx54321) (W=Won P=Played)
+MultiplayConfig: defb %00000000 ;pos  -9 Joy Config   (xxxxxxFM)
                 ;M=Multiplay
                 ;F=Swap Fire 1/2
-TurboMode:       defb %00000000 ;-8 - ------XX = Turbo mode [/////NoInsults/NoBackground/NoRaster/NoMusic]
-LivePlayers:     defb 1;2;1;0   ;-7 Number of players currently active in the game
-TimerTicks:      defb 0         ;-6 ;used for benchmarking
-BlockHeavyPageFlippedColors: defb 64; pos -5 0/255=on  64=off
-BlockPageFlippedColors:      defb 255;64; pos -4 0/255=on  64=off
-ScreenBuffer_ActiveScreen:   defb &c0; pos -3
-ScreenBuffer_VisibleScreen:  defb &c0; pos -2
-CPCVer : defb 00
+TurboMode:       defb %00000000       ;pos -8 ------XX = Turbo mode [NoInsults/NoBackground/NoRaster/NoMusic]
+LivePlayers:     defb 1               ;pos -7 Number of players currently active in the game [2/1/0]
+TimerTicks:      defb 0               ;pos -6 ;used for benchmarking
+BlockHeavyPageFlippedColors: defb 64  ;pos -5 0/255=on  64=off
+BlockPageFlippedColors:      defb 255 ;pos -4 0/255=on  64=off
+ScreenBuffer_ActiveScreen:   defb &c0 ;pos -3
+ScreenBuffer_VisibleScreen:  defb &c0 ;pos -2
+CPCVer: defb 00
 
 ;CPC 0  =464 , 128=128 ; 129 = 128 plus ; 192 = 128 plus with 512k; 193 = 128 plus with 512k pos -1
 ;MSX 1=V9990  4=turbo R
 ;ZX  0=TAP 1=TRD 2=DSK   128= 128k ;192 = +3 or black +2
+
 Player_Array:
-    P1_P00: defb 100;Y     ;0
-    P1_P01: defb 32 ;X     ;1
-    P1_P02: defb 0         ;2 shoot delay
-    P1_P03: defb 2         ;3 - smartbombs
-    P1_P04: defb 0         ;4 drones (0/1/2)
-    P1_P05: defb 60        ;5 - continues
-    P1_P06: defb 0         ;6 - drone pos
-    P1_P07: defb %00000111 ;7 - Invincibility
-    P1_P08: defb 0         ;8 - Player SpriteNum
-    P1_P09: defb 3         ;9 - Lives
+    P1_P00: defb 100;Y     ; 0
+    P1_P01: defb 32 ;X     ; 1
+    P1_P02: defb 0         ; 2 - shoot delay
+    P1_P03: defb 2         ; 3 - smartbombs
+    P1_P04: defb 0         ; 4 - drones (0/1/2)
+    P1_P05: defb 60        ; 5 - continues
+    P1_P06: defb 0         ; 6 - drone pos
+    P1_P07: defb %00000111 ; 7 - Invincibility
+    P1_P08: defb 0         ; 8 - Player SpriteNum
+    P1_P09: defb 3         ; 9 - Lives
     P1_P10: defb 100       ;10 - Burst Fire (Xfire)
     P1_P11: defb %00000100 ;11 - Fire Speed - PlayerShootSpeed_Plus1
     P1_P12: defb 0         ;12 - Player num (0=1, 1=2)
-    P1_P13: defb 0        ;13             ; Points to add to player 1 - used to make score 'roll up'
+    P1_P13: defb 0         ;13 Points to add to player 1 - used to make score 'roll up'
     P1_P14: defb 0         ;14 - PlayerShootPower_Plus1
-    P1_P15: defb &67       ;15  - FireDir
+    P1_P15: defb &67       ;15 - FireDir
 
 Player_Array2:      ;Player 2 is 16 bytes after player 1
     P2_P00: defb 150;Y     ; 0
@@ -341,7 +288,7 @@ Player_Array2:      ;Player 2 is 16 bytes after player 1
     P2_P10: defb 0         ;10 - Burst Fire
     P2_P11: defb %00000100 ;11 - Fire speed
     P2_P12: defb 128       ;12 - Player num (0=1,1=2)
-    P2_P13:Player_ScoreAdd2 defb 0 ;13             ; Points to add to player 2 - used to make score 'roll up'
+    P2_P13:Player_ScoreAdd2: defb 0 ;13             ; Points to add to player 2 - used to make score 'roll up'
     P2_P14: defb 0         ;14 - PlayerShootPower_Plus1
     P2_P15: defb &67       ;15 - FireDir
 
@@ -357,15 +304,15 @@ KeyMap2:
 
 KeyMap:
     defb &F7,       &03 ;Pause bit 20
-    defb %11111011, &02 ;Fire3   19
-    defb %11111011, &04 ;Fire2R
-    defb %11110111, &04 ;Fire1L
-    defb &FD,       &00 ;Right 16
-    defb &FE,       &01 ;Left  15
-    defb &FB,       &00 ;Down  14
-    defb &FE,       &00 ;Up    13
+    defb %11111011, &02 ;Fire3     19
+    defb %11111011, &04 ;Fire2R    18
+    defb %11110111, &04 ;Fire1L    17
+    defb &FD,       &00 ;Right     16
+    defb &FE,       &01 ;Left      15
+    defb &FB,       &00 ;Down      14
+    defb &FE,       &00 ;Up        13
 
-    KeyboardScanner_KeyPresses ds 10 ;Player1
+KeyboardScanner_KeyPresses ds 10 ;Player1
 
 ;This is the raw keypress data
 
@@ -402,10 +349,8 @@ PlusSprites_Config2:
 ;*******************************************************************************
 ;                   Rastercolors Aligned Code
 ;*******************************************************************************
-
 ; Some template rastercolors to use for blackout (when using the screen for
 ; temp space) and continue screens and the like with basic colors
-
 align 256, &00
 
 DiskRemap:
@@ -415,18 +360,13 @@ DiskRemap:
         defb 0, 1, 2, 3, 4
     endif
 
-RasterColors_Safe_ForInterrupt:
-    defb 1
-    defb 1
-RasterColors_Safe:
-    defb &54, &58, &5F, &4B
-RasterColors_Black_ForInterrupt:
-    defb 1
-    defb 1
-RasterColors_Black:
-    defb &54, &54, &54, &54
+RasterColors_Safe_ForInterrupt: defb 1, 1
+RasterColors_Safe:              defb &54, &58, &5F, &4B
+RasterColors_Black_ForInterrupt: defb 1, 1
+RasterColors_Black:              defb &54, &54, &54, &54
 
-; These are the default memory locations for the rastercolors - note they are memory aligned - they are often overrided by the Level code
+; These are the default memory locations for the rastercolors - note they are
+; memory aligned - they are often overrided by the Level code
 RasterColors_ColorArray1:
 RasterColors_ColorArray3:
 RasterColors_ColorArray4:
@@ -478,44 +418,40 @@ PlusRasterPalette: ; {{{
     defw &0000
     defb 0      ;next split }}}
 
-TranspColors:   ; Transparent colors are used by the sprite, if the byte matches it is skipped to effect transparency without an 'alpha map'
-    defb &00, &F0, &0F, &FF, &AC, &53
-
+; Transparent colors are used by the sprite, if the byte matches it is skipped
+; to effect transparency without an 'alpha map'
+TranspColors:   defb &00, &F0, &0F, &FF, &AC, &53
 ; Smartbomb effect shows a flashing background, these are the bytes used
-Background_SmartBombColors:
-    defb &FF, &0, &FF, &0, &FF
+Background_SmartBombColors: defb &FF, &0, &FF, &0, &FF
 
-;align 40,&0
 ; table/array for screen addresses for each scan line
 ifdef MinimizeCore
-    scr_addr_tableMajor ; BYTES -XXXX--- %01111000
+    scr_addr_tableMajor: ; BYTES -XXXX--- %01111000
         defw &0000,&0050,&00A0,&00F0,&0140,&0190,&01E0,&0230,&0280,&02D0,&0320,&0370,&03C0,&0410,&0460,&04B0
-    scr_addr_tableMinor ; BYTES -----XXX ; do not need aligning
+    scr_addr_tableMinor: ; BYTES -----XXX ; do not need aligning
         defb &00,&08,&10,&18,&20,&28,&30,&38
 endif
-;RasterColors_TickerEventBlock
-;   defs 10
 
 ;These are used by Arkostracker
 ;There are two holes in the l ist, because the Volume registers are set relatively to the Frequency of the same Channel (+7, always).
 ;Also, the Reg7 is passed as a register, so is not kept in the memory.
-PLY_PSGRegistersArray
-    PLY_PSGReg0  db 0
-    PLY_PSGReg1  db 0
-    PLY_PSGReg2  db 0
-    PLY_PSGReg3  db 0
-    PLY_PSGReg4  db 0
-    PLY_PSGReg5  db 0
-    PLY_PSGReg6  db 0
-    PLY_PSGReg8  db 0        ;+7
-                 db 0
-    PLY_PSGReg9  db 0        ;+9
-                 db 0
-    PLY_PSGReg10 db 0       ;+11
-    PLY_PSGReg11 db 0
-    PLY_PSGReg12 db 0
-    PLY_PSGReg13 db 0
-PLY_PSGRegistersArray_End
+PLY_PSGRegistersArray:
+    PLY_PSGReg0  db 0 ; +0
+    PLY_PSGReg1  db 0 ; +1
+    PLY_PSGReg2  db 0 ; +2
+    PLY_PSGReg3  db 0 ; +3
+    PLY_PSGReg4  db 0 ; +4
+    PLY_PSGReg5  db 0 ; +5
+    PLY_PSGReg6  db 0 ; +6
+    PLY_PSGReg8  db 0 ; +7
+                 db 0 ; +8
+    PLY_PSGReg9  db 0 ; +9
+                 db 0 ;+10
+    PLY_PSGReg10 db 0 ;+11
+    PLY_PSGReg11 db 0 ;+12
+    PLY_PSGReg12 db 0 ;+13
+    PLY_PSGReg13 db 0 ;+14
+PLY_PSGRegistersArray_End:
 
 StarsOneByteDirs:
     defb &21,&09,&0C,&0F,&27,&3F,&3C,&39,&61,&49,&4c,&4f,&67,&7f,&7c,&79
@@ -576,12 +512,12 @@ Event_VectorArray:
     defw null                              ;224
     defw Event_CoreReprogram               ;240
 
-read "..\srcCPC\Akuyou_CPC_InterruptHandler.asm"
+read "..\SrcCPC\Akuyou_CPC_InterruptHandler.asm"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; End of aligned code
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-PLY_FrequencyTable
+PLY_FrequencyTable:
     dw 3822, 3608, 3405, 3214, 3034, 2863, 2703, 2551, 2408, 2273, 2145, 2025
     dw 1911, 1804, 1703, 1607, 1517, 1432, 1351, 1276, 1204, 1136, 1073, 1012
     dw  956,  902,  851,  804,  758,  716,  676,  638,  602,  568,  536,  506
@@ -596,39 +532,39 @@ PLY_FrequencyTable
     dw    2,    2,    2,    2,    1,    1,    1,    1,    1,    1,    1,    1
 
 ifdef CPC320
-    read "..\srcCpc\Akuyou_CPC_VirtualScreenPos_320.asm"
+    read "..\SrcCPC\Akuyou_CPC_VirtualScreenPos_320.asm"
 else
-    read "..\srcCpc\Akuyou_CPC_VirtualScreenPos_256.asm"
+    read "..\SrcCPC\Akuyou_CPC_VirtualScreenPos_256.asm"
 endif
 read "..\SrcCPC\Akuyou_CPC_ShowSprite.asm"
 
-read "..\SrcAll\Akuyou_Multiplatform_Stararray.asm"
-read "..\SrcAll\Akuyou_Multiplatform_Stararray_Add.asm"
-read "..\SrcAll\Akuyou_Multiplatform_DoMoves.asm"
+read "..\SrcALL\Akuyou_Multiplatform_Stararray.asm"
+read "..\SrcALL\Akuyou_Multiplatform_Stararray_Add.asm"
+read "..\SrcALL\Akuyou_Multiplatform_DoMoves.asm"
 
 ;;;;;;;;;;;;;;;;;;;;Input Driver;;;;;;;;;;;;;;;;;;;;;;;;
-read "..\srcCPC\Akuyou_CPC_KeyboardDriver.asm"
+read "..\SrcCPC\Akuyou_CPC_KeyboardDriver.asm"
 ;;;;;;;;;;;;;;;;;;;;Disk Driver;;;;;;;;;;;;;;;;;;;;;;;;
-read "..\srcCPC\Akuyou_CPC_DiskDriver.asm"
-read "..\srcCPC\Akuyou_CPC_ExecuteBootstrap.asm"
+read "..\SrcCPC\Akuyou_CPC_DiskDriver.asm"
+read "..\SrcCPC\Akuyou_CPC_ExecuteBootstrap.asm"
 read "..\SrcCPC\Akuyou_CPC_TextDriver.asm"
 
-read "..\SrcAll\Akuyou_Multiplatform_SFX.asm"
+read "..\SrcALL\Akuyou_Multiplatform_SFX.asm"
 
 read "..\SrcCPC\Akuyou_CPC_CompiledSpriteViewer.asm"    ;also includes CLS
 read "..\SrcCPC\Akuyou_CPC_BankSwapper.asm"
 
-read "..\SrcAll\Akuyou_Multiplatform_PlayerDriver.asm"
-read "..\SrcAll\Akuyou_Multiplatform_Timer.asm"
+read "..\SrcALL\Akuyou_Multiplatform_PlayerDriver.asm"
+read "..\SrcALL\Akuyou_Multiplatform_Timer.asm"
 
 read "..\SrcCPC\Akuyou_CPC_Gradient.asm"
 
-read "..\SrcAll\Akuyou_Multiplatform_ObjectDriver.asm"
+read "..\SrcALL\Akuyou_Multiplatform_ObjectDriver.asm"
 read "..\SrcALL\Akuyou_Multiplatform_EventStream.asm"
 read "..\SrcCPC\Akuyou_CPC_CpcPlus.asm"
 read "..\SrcALL\Akuyou_Multiplatform_ArkosTrackerLite.asm"
 read "..\SrcCPC\Akuyou_CPC_ScreenMemory.asm"
-read "..\SrcAll\Akuyou_Multiplatform_AkuCommandVectorArray.asm"
+read "..\SrcALL\Akuyou_Multiplatform_AkuCommandVectorArray.asm"
 
 ifdef Debug_Monitor
 ;   read "..\SrcALL\Multiplatform_Monitor.asm"
@@ -640,3 +576,4 @@ list
 Null:ret
 FileEndCore:
     save direct "CORE    .AKU",Akuyou_CoreStart,&3000   ;address,size...}[,exec_address]
+nolist
