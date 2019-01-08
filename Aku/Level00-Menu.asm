@@ -117,24 +117,16 @@ PaletteInit:        ;The palette when the level starts (black) {{{
     defb 140
     defw &0000
 
-ifdef PolyPlay
     defw &0608
     defw &0E2C
-else
-    defw &0420
-    defw &0A66
-endif
+
     defw &0EEE
     defb 200-16-2
     defw &0000
 
-ifdef PolyPlay
     defw &0408
     defw &0b2f
-else
-    defw &0800
-    defw &0E66
-endif
+
     defw &FFFF
     defb 200-8-2
     defw &0000
@@ -143,13 +135,10 @@ endif
     defw &FFFF
     defb 200
     defw &0000
-ifdef PolyPlay
+
     defw &0408
     defw &0b2f
-else
-    defw &0800
-    defw &0E66
-endif
+
     defw &FFFF
 
 RasterColors_ColorArray1:
@@ -620,8 +609,6 @@ defb 4
     defb 60                 ; new time
 
 Safepalette:
-;Safepalette
-
 defb 1,%01110000+4          ; 4 Commands
     defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
@@ -642,7 +629,6 @@ defb 1,%01110000+4          ; 4 Commands
     defb 1
     defb 1
     defb &54,&54,&54,&54
-
 
     defb 1,evtCallAddress
     defw SetFaderRegular
@@ -750,7 +736,6 @@ defb 2,%01110000+4          ; 4 Commands
     defb 1
     defb &54,&54,&54,&54
 
-
 defb 8,%10001001            ;Call a memory location
     defw    EndLevel
 EndLevel:
@@ -772,9 +757,6 @@ ResetEventStream:
 ret
 
 EventStreamArray_ContentWarning:
-
-;defb 1,128,&24,128+64+60       ; Move Static
-
 defb 0,%01110000+4          ; 4 Commands
     defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
@@ -834,13 +816,11 @@ defb 2,%01110000+4          ; 4 Commands
     defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1
     defb 64
-;   defb &54,&47,&4D,&4B
     defb &54,&55,&5F,&4B
 
     defb 240,26*2+6,6               ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
-;   defb &54,&47,&4D,&4B
     defb &54,&55,&5F,&4B
 
 defb 4
@@ -1111,7 +1091,6 @@ ifdef CompileEP2
     systemis64k:
 endif
 
-    ;ld a,(iy-5)
     ld a,1
     ld (PaletteNo_Plus1-1),a
     call RasterColorsSetPalette1
@@ -1132,7 +1111,7 @@ endif
     call Akuyou_SpriteBank_Font
 
     ld a,255
-    ldia        ; show up to 255 chars
+    ld i,a        ; show up to 255 chars
 
 ;ep1    ld l,&17
 ifdef CompileEP2
@@ -1171,7 +1150,6 @@ ShowTitlePic_Loop:
     jr ShowTitlePic_Loop
 
 ShowMenu:
-
 ifdef CompileEP2
     call AkuYou_Player_GetPlayerVars
     ld a,(iy-10)
@@ -1204,7 +1182,7 @@ endif
     call Akuyou_SpriteBank_Font
 
     ld a,255
-    ldia        ; show up to 255 chars
+    ld i,a        ; show up to 255 chars
 
     ld l,10
     ld bc,MenuText1
@@ -1241,8 +1219,6 @@ else
 endif
     call OnscreenCursorDefine
 ShowMenu_Loop:
-
-
     call Akuyou_Timer_UpdateTimer
 
     call Akuyou_EventStream_Process
@@ -1428,20 +1404,6 @@ PlusPalette_EP1Menu:
     defw &0666
     defw &06F0
     defw &0FF0
-         ;0GRB
-
-;   or Keymap_AnyFire;%11110001
-;   cp 255
-;   jp nz,StartGame     ; Check for any of the 3 fires being pressed
-;   jp nz,StartGameEp2_1UP
-
-
-;   ld a,ixh
-;   or Keymap_AnyFire;%11110001
-;   cp 255
-;   jp nz,StartGame     ; Check for any of the 3 fires being pressed
-;   jp nz,StartGameEp2_2UP
-
 
 MainMenuSelection:
     ld a,(CursorCurrentPosXY_Plus2-2)
@@ -1633,8 +1595,6 @@ ShowCursorPos: ;for debugging
 ret
 
 ifdef Debug_ShowLevelTime
-;   ld a,2      ;Remember to set the font!
-;   call Akuyou_SpriteBank_Font
     push hl
         ld hl,&1002
         call Akuyou_DrawText_LocateSprite
@@ -1655,11 +1615,9 @@ endif
 MenuScore_NextDigit:
     push bc
     push hl
-
         ld a,(hl)
         add 48
         call Akuyou_DrawText_CharSprite
-
     pop hl
     pop bc
     dec hl
@@ -1679,25 +1637,21 @@ MenuScore_NextDigit:
     db  11,"Start 2 Player gam","e"+&80
     db  11,"Watch the Intr","o"+&80
     db  11,"Configure Setting","s"+&80
+    ifdef CompileEP1
+        db  11,""," "+&80
+    endif
     ifdef CompileEP2
         db  11,"Special Conten","t"+&80
     endif
     db  11,"Credits & Thank","s"+&80
 
-    ifdef CompileEP1
-        db  11,""," "+&80
-    endif
     db  10,"", " "+&80
     db  10," "," "+&80
     db  10," "," "+&80
 
-;           .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
-;               .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-   ;db  10, "www.chibiakumas.com"," "+&80
     db  10, "www.xxibiakumas.com"," "+&80
     db  10,""," "+&80
     db  9,"HighScore",":"+&80
-    ;b  "12345678901234567890123456789","0"+&80
     db &0
 
 CheatsOn: db &0
@@ -1713,15 +1667,10 @@ endif
 
 txtContinues:     db "Continues",":"+&80
 txtSmartbombs:    db "Smartbombs",":"+&80
-ifdef CPC320
-    txtContinueMode:  db "2P Continue Mode",":"+&80
-else
-    txtContinueMode:  db "2P Mode",":"+&80
-endif
+txtContinueMode:  db "2P Continue Mode",":"+&80
 txtContinueMode0: db "Co-Existance"," "+&80
 
 txtContinueMode1: db "Brood Reduction"," "+&80;fratricide
-
 
 txtGameplayMode: db "Gameplay Mode",":"+&80
 txtGameplayMode0: db "Normal"," "+&80
@@ -1797,8 +1746,6 @@ lstDifficulty:
     defw txtDifficulty2
     defb 1+128
     defw txtDifficulty1
-;   defb 1
-;   defw txtDifficulty1b
     defb 0  ;First one again - this is the loop
     defw 00 ;Command to show end of list
     defw lstDifficulty
@@ -1941,24 +1888,14 @@ ResetFlickerColors:
     call OnscreenCursorDefine;test
 
 GameplaySettingsRedraw:
-ifdef CPC320
-
-else
-
-endif
-
     call Akuyou_CLS
-ifdef CPC320
     TxtMidpoint equ 20
-else
-    TxtMidpoint equ 16
-endif
+
     ld a,2
     call Akuyou_SpriteBank_Font
 
     ld a,255
-    ldia        ; show up to 255 chars
-    ;ld l,0
+    ld i,a        ; show up to 255 chars
 
     ;Smartbombs
     ld hl,&0A00+posConfigTitle
@@ -1992,7 +1929,6 @@ endif
     call AddAndLocate
     call AkuYou_Player_GetPlayerVars
     ld a,(IY-11)
-;   call Akuyou_DrawText_Decimal
     ld hl,lstDifficulty
     call DrawTextFromLookup
 
@@ -2101,22 +2037,9 @@ endif
 
 ;MainMenu
     ld hl,&0A00+posMainMenu
-;   push hl
         call Akuyou_DrawText_LocateSprite
         ld bc,txtMainMenu
         call Akuyou_DrawText_PrintString
-;   pop hl
-
-
-
-;   ld bc,GameplayText
-;   call ShowText
-
-;   ld a,255
-;   ld i,a      ; show up to 255 chars
-;   ld l,24
-;   ld bc,BlankMsgGamePlaySettingsMessage_Plus2
-;   call ShowText
 
 GameplaySettings_Loop:
     call Akuyou_Timer_UpdateTimer
@@ -2241,68 +2164,6 @@ GameplaySettings_ApplyContinuesZero:
     add 10
     ld (IY-12),a
     jp GameplaySettingsRedraw
-;   jp GameplaySettings_Loop
-
-
-;Continues10
-;   ld a,10
-;   ld bc,Continues10Text
-;   jr SetContinues
-;Continues20
-;   ld a,20
-;   ld bc,Continues20Text
-;   jr SetContinues
-;Continues255
-;   ld a,255
-;   ld bc,Continues255Text
-;   jr SetContinues
-
-
-;Difficulty1
-;   ld a,1
-;   ld bc,DifficultyEText
-;   jr SetDifficulty
-;Difficulty0
-;   xor a
-;   ld bc,DifficultyMText
-;   jr SetDifficulty
-;Difficulty2
-;   ld a,2
-;   ld bc,DifficultyHText
-;   jr SetDifficulty
-
-;TogglePlusFlicker
-;   ld a,(iy-4)
-;   xor 64
-;   ld (iy-4),a
-;CheckToggle
-;   jr z,SetToggleOn
-;   cp 255
-;   jr z,SetToggleOn
-;jr SetToggleOff
-
-;ToggleRasterFlicker
-;   ld a,(iy-5)
-;   xor 64
-;   ld (iy-5),a
-;;  jr CheckToggle
-
-;SetDifficulty
-;   ld (iy-11),a
-;jr ShowGameplaySetting
-;SetToggleOff
-;   ld bc,ToggleOffText
-;   jr ShowGameplaySetting
-;SetToggleOn
-;   ld bc,ToggleOnText
-;   jr ShowGameplaySetting
-;SetContinues
-;   ld (iy-12),a
-;ShowGameplaySetting
-
-;   ld (GamePlaySettingsMessage_Plus2-2),bc
-;   jp GameplaySettingsRedraw
-
 
 BlankMsg: db  4,""," "+&80,0
 
@@ -2320,12 +2181,6 @@ StartGame_2P:
     ld hl,  &0007               ;load level 11 (Episode 2 start)
     jp  Akuyou_ExecuteBootStrap ; Start the game, no return
 
-
-;StartGame
-;   call clsB
-;   ld hl,  &0101               ;load level 1
-;   jp  Akuyou_ExecuteBootStrap ; Start the game, no return
-
 ShowCredits:
     call Keys_WaitForRelease
     call Akuyou_CLS
@@ -2339,7 +2194,7 @@ ShowCredits:
     call Akuyou_SpriteBank_Font
 
     ld a,255
-    ldia        ; show up to 255 chars
+    ld i,a        ; show up to 255 chars
 
     ld l,2
     ld bc,Credits_TextString
@@ -2418,7 +2273,6 @@ Cheater:
     ld (CheatsOn),a
     ret
 
-
 Credits_TextString:
     ifdef CompileEP2
         db 8,"Chibi Akumas Episode 2","!"+&80
@@ -2449,7 +2303,6 @@ Credits_TextString:
     db 5,  "Michael Steil, Peter Jones, Rajasekaran Senthil Kumaran,"," "+&80
     db 7 , "Rob Uttley, Shane O'Brien & Themistocles/Gryzor"," "+&80
 
-
     db 5,""," "+&80
 
     ;      .1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
@@ -2471,7 +2324,6 @@ Keys_WaitForRelease_More:
     djnz Keys_WaitForRelease_More
 ret
 
-    ;call RasterColors_Reset
 LevelLoop:
     ;jp ShowCheats
     jp ShowMenu
@@ -2479,7 +2331,6 @@ LevelLoop:
 LevelShutdown:
 
 ret
-
 
 ;-------------------------------------------------------------------------------
 ;                   Cheat For Victory!
@@ -2501,12 +2352,12 @@ txtPlayers2: db "Two Playe","r"+&80
 intGameEngineMode: db 0
 
 txtGameEngineMode: db "Game Engin","e"+&80
-txtEngine0:  db "464"," "+&80
-txtEngine1:  db "464+"," "+&80
-txtEngine2:  db "6128"," "+&80
-txtEngine3:  db "6128+"," "+&80
-txtEngine4:  db "7256"," "+&80
-txtEngine5:  db "7256+"," "+&80
+txtEngine0:  db   "464", " "+&80
+txtEngine1:  db  "464+", " "+&80
+txtEngine2:  db  "6128", " "+&80
+txtEngine3:  db "6128+", " "+&80
+txtEngine4:  db  "7256", " "+&80
+txtEngine5:  db "7256+", " "+&80
 
 txtGameEngineApply: db "Apply Game Engine","e"+&80
 
@@ -2517,35 +2368,35 @@ txtLevelJumpApply: db "Make Level Jum","p"+&80
 txtLevel0: db "0 - Men","u"+&80
 
 ifdef CompileEP1
-    txtLevel1: db "1.1 - Ep","1"+&80
-    txtLevel2: db "1.2 - Ep","1"+&80
-    txtLevel3: db "2.1 - Ep","1"+&80
-    txtLevel4: db "2.2 - Ep","1"+&80
-    txtLevel5: db "3.1 - Ep","1"+&80
-    txtLevel6: db "3.2 - Ep","1"+&80
-    txtLevel7: db "4.1 - Ep","1"+&80
-    txtLevel8: db "4.2 - Ep","1"+&80
-    txtLevel9: db "4.3 - Ep","1"+&80
+    txtLevel1: db "1.1 - Ep", "1"+&80
+    txtLevel2: db "1.2 - Ep", "1"+&80
+    txtLevel3: db "2.1 - Ep", "1"+&80
+    txtLevel4: db "2.2 - Ep", "1"+&80
+    txtLevel5: db "3.1 - Ep", "1"+&80
+    txtLevel6: db "3.2 - Ep", "1"+&80
+    txtLevel7: db "4.1 - Ep", "1"+&80
+    txtLevel8: db "4.2 - Ep", "1"+&80
+    txtLevel9: db "4.3 - Ep", "1"+&80
 
-    txtLevel250: db "EndIntro - Ep","1"+&80
-    txtLevel251: db "EndOutro - Ep","1"+&80
-    txtLevel252: db "Intro - Ep","1"+&80
+    txtLevel250: db "EndIntro - Ep", "1"+&80
+    txtLevel251: db "EndOutro - Ep", "1"+&80
+    txtLevel252: db "Intro - Ep",    "1"+&80
 endif
 
-txtLevel11: db "1.1 - Ep","2"+&80
-txtLevel12: db "1.2 - Ep","2"+&80
-txtLevel13: db "2.1 - Ep","2"+&80
-txtLevel14: db "2.2 - Ep","2"+&80
-txtLevel15: db "3.1 - Ep","2"+&80
-txtLevel16: db "3.2 - Ep","2"+&80
-txtLevel17: db "4.1 - Ep","2"+&80
-txtLevel18: db "4.2 - Ep","2"+&80
-txtLevel19: db "5.1 - Ep","2"+&80
-txtLevel20: db "5.2 - Ep","2"+&80
+txtLevel11: db "1.1 - Ep", "2"+&80
+txtLevel12: db "1.2 - Ep", "2"+&80
+txtLevel13: db "2.1 - Ep", "2"+&80
+txtLevel14: db "2.2 - Ep", "2"+&80
+txtLevel15: db "3.1 - Ep", "2"+&80
+txtLevel16: db "3.2 - Ep", "2"+&80
+txtLevel17: db "4.1 - Ep", "2"+&80
+txtLevel18: db "4.2 - Ep", "2"+&80
+txtLevel19: db "5.1 - Ep", "2"+&80
+txtLevel20: db "5.2 - Ep", "2"+&80
 
-txtLevel240: db "Intro - Ep","2"+&80
-txtLevel241: db "EndIntro - Ep","2"+&80
-txtLevel242: db "EndOutro - Ep","2"+&80
+txtLevel240: db "Intro - Ep",    "2"+&80
+txtLevel241: db "EndIntro - Ep", "2"+&80
+txtLevel242: db "EndOutro - Ep", "2"+&80
 
 lstGameEngineMode:
     defb 0
@@ -2678,7 +2529,7 @@ ShowCheatsAgain:
     halt
     halt
     ld a,255
-    ldia        ; show up to 255 chars
+    ld i,a        ; show up to 255 chars
     call Akuyou_CLS
     ld l,4
     ld bc,CheatsText
@@ -2694,7 +2545,6 @@ ShowCheatsAgain:
     ld a,20
     call AddAndLocate
     ld a,(intJumpToLevel)
-;   call Akuyou_DrawText_Decimal
     ld hl,lstLevelJump
     call DrawTextFromLookup
 
@@ -2708,7 +2558,6 @@ ShowCheatsAgain:
     ld a,20
     call AddAndLocate
     ld a,(intPlayersNum)
-;   call Akuyou_DrawText_Decimal
     ld hl,lstPlayers
     call DrawTextFromLookup
 
@@ -2743,7 +2592,6 @@ ShowCheatsAgain:
     ld a,20
     call AddAndLocate
     ld a,(intGameEngineMode)
-;   call Akuyou_DrawText_Decimal
     ld hl,lstGameEngineMode
     call DrawTextFromLookup
 
@@ -2877,7 +2725,7 @@ ShowText:
 
 ShowText_MoreText:
     ld a,255
-    ldia    ; show up to 255 chars
+    ld i,a    ; show up to 255 chars
 
     ld a,(bc)
     cp 252
@@ -2903,9 +2751,8 @@ ShowText_MoreText:
     ld a,(bc)
     or a
     jp nz,ShowText_MoreText
-
-
 ret
+
 ZeroPos:
     xor a
     ret
@@ -3013,7 +2860,7 @@ ifdef CompileEP2 ; {{{
         call Akuyou_SpriteBank_Font
 
         ld a,255
-        ldia        ; show up to 255 chars
+        ld i,a        ; show up to 255 chars
 
         ld l,10
         ld bc,EyeCatches_Menu
@@ -3357,8 +3204,7 @@ LevelJumpBlock:
 
 FileEndLevel:
     limit &FFFF
-    ;save file_name, address, size...} [,exec_address]
-    ;
+    ;;save file_name, address, size...} [,exec_address]
     ;;save "Z:\ResCPC\T08-SC1.D01",FileBeginLevel,FileEndLevel-FileBeginLevel
     save direct "T08-SC1 .D01", FileBeginLevel, FileEndLevel-FileBeginLevel
     ;;save direct "T08-SC1.D01", LevelOrigin+LevelDataStart, &3ff8-LevelDataStart
