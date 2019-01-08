@@ -19,8 +19,6 @@ T[xx]-SC[y].[c]0[d]
 
 So, that's the naming converntion! lets take a look at a typical command:
 
-
-
 		ld a,&C7			;A=Memory Bank (platform dependant C0-C7 on 6128, 0-7 on ZX128, ignored on MSX)
 		ld hl,&24C1		;H=Track L=Sector
 		ld c,2			;C=Disk
@@ -33,7 +31,6 @@ Note, I typically use defined symbols to make it all a bit readable, but I've ta
 
 
 The MSX has a special similar command, which loads an RLE bitmap straight into video memory! - it does not use any temporary memory (except a small 128 byte buffer which I use for all diskops)
-
 
 	ld hl,DiskMap_Font			;H=Track L=Sector
 	ld c, DiskMap_Font_Disk		;C=Disk
