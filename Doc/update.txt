@@ -1,9 +1,0 @@
-I've been doing work on the 3rd level this week, I've made a start, but it's more complex than earlier levels, as it has two backgrounds with a transition - so it's going to take some time to get done. I use a 'fader' that fades out the background through an interlacing effect in EP2 when I need to change backgrounds - I've ported this to the Spectrum and MSX, but I need to finish the background code and other bits, so plently left to do!
-
-one good thing though! I found some bad design in the RLE decoder on the MSX which was hugely increasing load times for no reason! removing it will save me a lot of testing time if nothing else! the current version is pretty much cloned from the CPC/Spectrum one, but there's some code relating to screen memory the MSX doesn't need, so I will take another look later for wasted cpu time!
-
-I've spent a lot of time on the Spectrum version this week, I made a change to the sprite render, so sprites can be set to 'preserve backcolor' this is for the water effect on the river level, also I've done more work on the bullets - the conclusion of the spectrum community was that 'Big is beautiful' so I've reprogrammed the bullets to be a 6x6 sprite - this means altering up to 12 bytes now (it depends on screen position) - compared to the 4 the code used to, so there will be a performance hit, but it's what everyone seems to want, and the game is still fast enough. 
-
-also I'm redesigning the 'hit zone' on the player sprites to make it clearer on all systems to make dodging the bullets easier.
-
-Finally, as I mentioned in my othe post, I've had some Tshirts printed, and I'll be doing a prize draw shortly as a thankyou to my patreons!

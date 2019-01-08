@@ -15,45 +15,49 @@ programatically the animator byte in the object array is split into two nibbles,
 
 As mentioned an animator has 3 byte variables which I will call X,Y,Z
 
-00 anmEmpty 		Null - this does nothing
-01 anmSprite 		Set object Sprite=X - used for complex animaton - eg fire routines
-02 anmMove 		Set object Move=X - used for changing object movement direction
-03 anmProgram 		Set object program=X -used for changing fire mode, or for custom frame animation patterns
-04 anmLoop 	  	Loop the animation 
-05 anmSpriteMoveProg   	Set object Sprite=X,Move=Y,Program=Z - sets all attributes in one go
-06 anmSwitchAnimator  	switch to a different animator X - you can also set frame by adding Frame*16 to X
-07 anmCondLoop 	 	loop until tick AND X is nonzero... used for wave movement patterns or slow firing
-08 anmCondjmp 	 	if tick AND X is nonzero, jump to frame X*anmFrameNum (eg 7*anmFrameNum = frame 7)... used for wave patterns
-09 anmSpawnObject 	 	Spawn a new object based on object saved-setting "X" at current position (must be from the first bank of saved settings)
-10 anmKill	 		Kill the object
-11 anmCall	 	Call memory location YX
-12 anmHalt	 	End animation without loop
-
+00 anmEmpty           Null - this does nothing
+01 anmSprite          Set object Sprite=X - used for complex animaton - eg fire routines
+02 anmMove            Set object Move=X - used for changing object movement direction
+03 anmProgram         Set object program=X -used for changing fire mode, or for custom frame animation patterns
+04 anmLoop            Loop the animation 
+05 anmSpriteMoveProg  Set object Sprite=X,Move=Y,Program=Z - sets all attributes in one go
+06 anmSwitchAnimator  switch to a different animator X - you can also set frame by adding Frame*16 to X
+07 anmCondLoop        loop until tick AND X is nonzero... used for wave movement patterns or slow firing
+08 anmCondjmp         if tick AND X is nonzero, jump to frame X*anmFrameNum (eg 7*anmFrameNum = frame 7)... used for wave patterns
+09 anmSpawnObject     Spawn a new object based on object saved-setting "X" at current position (must be from the first bank of saved settings)
+10 anmKill            Kill the object
+11 anmCall            Call memory location YX
+12 anmHalt            End animation without loop
 
 lets look at an example animator:
 
-AnimatorPointers:			;This is the table which defines all the levels animators
-defw Animator_Shark
-defw Animator_QuadSnake
-defw Animator_Firebird
-defw Animator_Canon
-defw Animator_Rocket
-defw Animator_DogAplult
-defw Animator_BobbleDragon
-defw Animator_Flappybara
-defw Animator_Archer
-defw Animator_NutsMonkeys
+AnimatorPointers:           ;This is the table which defines all the levels animators
+    defw Animator_Shark
+    defw Animator_QuadSnake
+    defw Animator_Firebird
+    defw Animator_Canon
+    defw Animator_Rocket
+    defw Animator_DogAplult
+    defw Animator_BobbleDragon
+    defw Animator_Flappybara
+    defw Animator_Archer
+    defw Animator_NutsMonkeys
 
 
-Animator_Flappybara:					;Definition of the start of one animator
-defb %00000010						;Anim Freq - this means every other frame 
-defb anmSprite,TwoFrameSprite+17,0,0				;Sprite Anim 0
-defb anmSprite,TwoFrameSprite+18,0,0				;Sprite Anim 1
-defb anmCondLoop,%00001000,0,0				;Repeat loop
-defb anmCondjmp, %00010000,7*anmFrameNum,0			;Anim switch - note this will happen half the time, causing a wave animation
-defb anmSpriteMoveProg,TwoFrameSprite+17,&13,prgFireMid2+fireLeftWide	;Change program, movement and sprite - move up
-defb anmSpriteMoveProg,TwoFrameSprite+18,&13,prgFireMid2+fireLeftWide	;Change program, movement and sprite - move up
-defb anmLoop,0,0,0				;loop back to start
-defb anmSpriteMoveProg,TwoFrameSprite+17,&33,prgFireMid2+fireLeftWide	;Change program, movement and sprite - move down
-defb anmSpriteMoveProg,TwoFrameSprite+18,&33,prgFireMid2+fireLeftWide	;Change program, movement and sprite - move down
-defb anmLoop,0,0,0				;loop back to start
+Animator_Flappybara: ;Definition of the start of one animator
+    defb %00000010                       ;Anim Freq - this means every other frame 
+    defb anmSprite,TwoFrameSprite+17,0,0 ;Sprite Anim 0
+    defb anmSprite,TwoFrameSprite+18,0,0 ;Sprite Anim 1
+    defb anmCondLoop,%00001000,0,0       ;Repeat loop
+    ;Anim switch - note this will happen half the time, causing a wave animation
+    defb anmCondjmp, %00010000, 7*anmFrameNum, 0 
+    ;Change program, movement and sprite - move up
+    defb anmSpriteMoveProg, TwoFrameSprite+17, &13, prgFireMid2+fireLeftWide
+    ;Change program, movement and sprite - move up
+    defb anmSpriteMoveProg,TwoFrameSprite+18,&13,prgFireMid2+fireLeftWide
+    defb anmLoop,0,0,0                   ;loop back to start
+    ;Change program, movement and sprite - move down
+    defb anmSpriteMoveProg,TwoFrameSprite+17,&33,prgFireMid2+fireLeftWide
+    ;Change program, movement and sprite - move down
+    defb anmSpriteMoveProg,TwoFrameSprite+18,&33,prgFireMid2+fireLeftWide
+    defb anmLoop,0,0,0                   ;loop back to start

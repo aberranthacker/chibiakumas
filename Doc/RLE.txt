@@ -1,9 +1,0 @@
-Rle File format:
-
-MSX version has two plain BMP bytes at the start - this is because the VDP init command needs one byte, and the encoder works in pairs.
-
-Byte structure
-
-CCCCNNNN 	CCCC = Chunk of pixel data = number of repetitions, if NNNN=15 add the next byte, if it's 255 keep adding the next byte too
-0000NNNN 	Raw BMP data if NNNN=15 add the next byte, if it's 255 keep adding the next byte too
-000000000 	One repeated byte follows
