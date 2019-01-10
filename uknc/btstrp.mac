@@ -5,7 +5,7 @@ DiskMap2 =: 2
 DiskMap3 =: 3
 DiskMap4 =: 4
                 .ASect
-                .=100000
+                .=040600 ; 16768 0x4180
 START:
 
 FileBeginBootStrap:
@@ -50,7 +50,7 @@ Bootstrap_SystemEvent:
                                         ;     jp z,NewGame_CheatStart
                                         ; ret
 BootsStrap_StartGame:
-        .Include /BSSTGM.MAC/           ;     read "..\AkuCPC\BootsStrap_StartGame_CPC.asm"
+        .Include /BSSTGM.MAC/ ;<------- ;     read "..\AkuCPC\BootsStrap_StartGame_CPC.asm"
         JMP Bootstrap_Level_0           ;     jp Bootstrap_Level_0    ; Start the menu
 ;----------------------------------------------------------------------------}}}
 Bootstrap_Level_0:                      ; main menu -------------------------{{{
