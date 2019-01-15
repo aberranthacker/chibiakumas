@@ -26,5 +26,5 @@ configure it to support PDP-11
    make install
 ```
 and thats it.
-Now you ready to run the `uknc/build.sh` script which will do the rest. 
+Now you are all set to run the `uknc/build.sh` script which will do the rest. 
       
