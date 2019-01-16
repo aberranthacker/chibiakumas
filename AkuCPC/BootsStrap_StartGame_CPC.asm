@@ -7,7 +7,6 @@
     call &bc38  ; set border 0 to black
 
     ifndef debug
-        ;ld hl,RasterColors_InitColors
         ld hl,RasterColors_ZeroColors
         call SetColors
     endif
@@ -37,8 +36,6 @@
     ld (FirwareRestoreDriveNo_Plus1-1),a
     ld hl,(&BAFE)
     ld (ParadosSettings_Plus2-2),hl
-;   ld hl,(&A700)
-;   ld (AmsDosDiskSettings_Plus2-2),hl
 
     di
     ld hl,(&bd37+1)             ;Get the Restore High Jumpblock command
@@ -113,7 +110,6 @@ DetectedNonPlus:
     ; reset location
 
     ld a,&c0
-;   call SetScreenMemPos
     ld hl,&0000
     call &bd1f  ;call mc_screen_offset
 
@@ -132,8 +128,6 @@ DetectedNonPlus:
 
     ld hl,RasterColors_InitColors
     call SetColors
-
-;   call ScreenBackupC000
 
 ifdef Support128k ; {{{
     ;test to see if we have multiple ram banks
@@ -346,7 +340,6 @@ endif ; }}}
     ld ix,Akuyou_PlayerSpritePos+&800-1
     call Akuyou_LoadDiscSectorz
 
-    ;DiskMap_PlayerSpriteUD         equ &06C3 ;T06-SC3.D00
     ld a,&C7
     ld hl,DiskMap_PlayerSpriteBo
     ld c,0

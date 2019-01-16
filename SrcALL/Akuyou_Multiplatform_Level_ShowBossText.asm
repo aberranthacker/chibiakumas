@@ -28,7 +28,7 @@ pop bc
 
 	ld l,4
 	ld a,1:BossCharNum_Plus1
-	ldia	; show up to 255 chars
+	ld i,a	; show up to 255 chars
 
 ShowBossText_MoreText:
 ifdef buildZXS
@@ -67,7 +67,7 @@ endif
 	inc l
 	inc l
 	inc l
-	ldai
+	ld a,i
 	dec a
 	inc bc
 	jp nz,ShowBossText_MoreText

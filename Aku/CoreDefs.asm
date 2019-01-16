@@ -1,30 +1,12 @@
-macro exxdi
-    di
-mend
-macro exxei
-    ei
-mend
-macro RstSix
-    rst 6
-mend
-
-macro ldai
-    ld a,i
-mend
-macro ldia
-    ld i,a
-mend
-
 SPReset equ &BFFF
+
 Akuyou_CoreStart      equ &450
-Akuyou_BootStrapStart equ &8000
+Akuyou_BootStrapStart equ &8000 
 
 Akuyou_GameVars    equ &3100 ; Need &700 bytes!
 PlusSprite_ExtBank equ &C7
 Akuyou_PlayerSpritePos equ &3800
-Akuyou_PlusSpritesPos  equ &3800;&A800-&8000
-;Akuyou_PlusSpritesPosOneByte equ &38;&A800-&8000
-;Akuyou_PlusSpritesBoPosOneByte equ &F8
+Akuyou_PlusSpritesPos  equ &3800
 
 Akuyou_Music_Bank  equ &C0
 Akuyou_MusicPos    equ &50   ;Akuyou only allows &400 bytes for music
@@ -49,8 +31,8 @@ CSprite_Continue equ 1*3
 CSprite_Loading  equ 0*3
 
 Font_Membank        equ &C6
-Font_RegularSizePos equ &7000;&F000
-Font_SmallSizePos   equ &7800;&F800
+Font_RegularSizePos equ &7000
+Font_SmallSizePos   equ &7800
 
 ;Platform Specific Core commands;
 Akuyou_RasterColors_SetPointers equ Akuyou_CoreStart+&009C ;Set the memory location of the CPC raster switching data
@@ -65,7 +47,6 @@ Akuyou_RasterColors_Disable equ Akuyou_CoreStart+&0033 ;Disable raster flips
 Akuyou_CPCGPU_CommandNum equ Akuyou_CoreStart+&00AB ;Run a graphics command from the CPC Graphics vector array
 
 ;Core Jumpblock definitions
-
 Akuyou_ExecuteBootStrap   equ Akuyou_CoreStart+&0003 ;Execute a bootstrap command
 Akuyou_ShowCompiledSprite equ Akuyou_CoreStart+&00A8 ;show a 'compiled' sprite (Fullscreen images for
                                                      ;loading/insert disk etc)
@@ -171,14 +152,8 @@ Akuyou_Plus_HideSprites equ Akuyou_CoreStart+&00E7 ; Hide CPC plus sprite
 
 Akuyou_Aku_CommandNum equ Akuyou_CoreStart+&000ED ;Core Vector array - for rare Core commands
 
-;obsolete
-;Akuyou_ScreenBuffer_FlipWait   equ     Akuyou_CoreStart+&00A8
-
 ;Levels contain small amounts of executable code
-;LevelData_Resume     equ Akuyou_LevelStart+&3ff6 ; Restart Level after being shutdown
-;LevelData_MainLoop   equ Akuyou_LevelStart+&3ff3 ; Level Loop - Must have been INIT
 LevelData_StartLevel equ Akuyou_LevelStart+&3ff0 ; Start the level with INIT
-;LevelData_Shutdown   equ Akuyou_LevelStart+&3ff9 ; Restart Level after being shutdown
 
 ;Special one off used for a cheap joke!
 ChibiAkumasEp2_Player2Start equ Akuyou_CoreStart+&00D8
@@ -186,13 +161,13 @@ ChibiAkumasEp2_Player2Start equ Akuyou_CoreStart+&00D8
 Akuyou_PlayerSeparator equ 16 ;-Player 2's data starts XX bytes after player so you can use IY+XX+1 to get
                               ;a var from player 2 without changing IY
 
-Keymap_U  equ 0
-Keymap_D  equ 1
-Keymap_L  equ 2
-Keymap_R  equ 3
-Keymap_F1 equ 4
-Keymap_F2 equ 5
-Keymap_F3 equ 6
+Keymap_U     equ 0
+Keymap_D     equ 1
+Keymap_L     equ 2
+Keymap_R     equ 3
+Keymap_F1    equ 4
+Keymap_F2    equ 5
+Keymap_F3    equ 6
 Keymap_Pause equ 7
 
 Keymap_AnyFire equ %11001111
@@ -205,22 +180,12 @@ PlayerStarArraySize equ 128
 
 align 256,&00
 
-StarArrayPointer:
-    defs 256*3,&00
+StarArrayPointer: defs 256*3,&00
 
 align 256,&00
-ObjectArrayPointer:
 ;first ObjectArraySize*2 of each 256 are used - rest (>128) are spare
-    defs 256*4,&00
-
-PlayerStarArrayPointer equ  ObjectArrayPointer+128 ;First 128 are used by object array
-;used           equ 256*1+ObjectArrayPointer+128
-;used           equ 256*2+ObjectArrayPointer+128
-
-Event_SavedSettings equ 256*3+ObjectArrayPointer+128 ;Out the way of the Object array!??
-
-;need to allocate your own ram for these!
-;Event_SavedSettingsB   equ 256*4+ObjectArrayPointer+128;Out the way of the Object array!??
-;CustomRam      equ 256*4+ObjectArrayPointer+128
-
-;org 256*4+ObjectArrayPointer
+ObjectArrayPointer:    defs 256*4,&00
+;First 128 are used by object array
+PlayerStarArrayPointer equ  ObjectArrayPointer+128
+;Out the way of the Object array!??
+Event_SavedSettings    equ 256*3+ObjectArrayPointer+128

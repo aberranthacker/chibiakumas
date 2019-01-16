@@ -2,7 +2,7 @@
 ; get rid of ORG statements
 ; apply new Init
 ;		call Akuyou_Interrupt_Init	instead of 	call Akuyou_RasterColors_Init
-; replace ldia 
+; replace ld i,a 
 ; Check NULL is in spectrum copied block
 
 ;replace background object definitions
@@ -2630,7 +2630,7 @@ ShowBossText_StartText:
 
 	ld l,&14 :OnscreenTextPos_Plus1
 	ld a,1:BossCharNum_Plus1
-	ldia	; show up to 255 chars
+	ld i,a	; show up to 255 chars
 	
 ShowBossText_MoreText:
 	ei
@@ -2652,7 +2652,7 @@ ShowBossText_MoreText:
 	;inc l
 	;inc l
 	inc l
-	ldai
+	ld a,i
 	dec a
 	inc bc
 	jp nz,ShowBossText_MoreText
@@ -4658,13 +4658,13 @@ CustomMoveBouncer:
 		ld h,a
 
 		;shift the time
-		ldai
+		ld a,i
 		ld l,a
 
 		ld a,d
 		and %00001111
 		add a,l
-		ldia
+		ld i,a
 
 
 		bit 5,a
@@ -4688,7 +4688,7 @@ CustomMoveBouncer_DoJump
 		add c
 		ld c,a
 		
-		ldai
+		ld a,i
 		and %00011111
 		cp  %00001110
 		jp nz,CustomMoveBouncer_FireNormal
@@ -4798,7 +4798,7 @@ CustomMovePattern:		; B=X C=Y D=Move
 
 		call Akuyou_Timer_GetTimer
 		ld d,a
-		ldai	; Level time
+		ld a,i	; Level time
 		ld e,a
 
 

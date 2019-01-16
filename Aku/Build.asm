@@ -14,9 +14,16 @@ BuildLang equ ''    ;english language
 
 ;DiskMap_SingleDisk equ 1
 
-PolyPlay equ 1
+; If you have spare space, enable this, if you don't disable it!
+;MinimizeCore equ 1 ; Reduce size of the core at the cost of speed - works on 64k or 128k
+;DualChibikoHack equ 1
 
-;DebugSprite equ 1
+; Enable these to alter functions
+;SingleDisk equ 1   ; Disables Disk messages
+;ReadOnly equ 1     ; Disable Disk writes - For Cartridge versions!
+
+;Debug equ 1        ; enable debugging options
+;DebugSprite equ 1  ; mark slow sprites
 ;Debug_ShowLevelTime equ 1
 
 ;Monitor_Full equ 1
@@ -33,5 +40,5 @@ CPC320 equ 1     ;CPC Screen width=320 (otherwise 256)
 chrHeart equ 122+5
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ifndef BuildLevel
-    Read "..\Aku\Core.asm"
+    read "..\Aku\Core.asm"
 endif

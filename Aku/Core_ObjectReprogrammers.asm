@@ -1,6 +1,6 @@
 
 SetObjectcheck:
-	ldia
+	ld i,a
 	ld a,h
 	cp &69
 	ret nz		;stay if not on screen yet
@@ -53,7 +53,7 @@ SetObjectH1:
 	inc h;	add hl,de 	
 SetObjectH0:
 SetObjectFound:
-	ldai
+	ld a,i
 	ld (hl),a
 	pop hl
 ret

@@ -3,7 +3,7 @@
 ; get rid of ORG statements
 ; apply new Init
 ;		call Akuyou_Interrupt_Init	instead of 	call Akuyou_RasterColors_Init
-; replace ldia 
+; replace ld i,a 
 ; Check NULL is in spectrum copied block
 
 ;replace background object definitions
@@ -803,7 +803,7 @@ ShowBossText_StartText:
 
 	ld l,&14 :OnscreenTextPos_Plus1
 	ld a,1:BossCharNum_Plus1
-	ldia	; show up to 255 chars
+	ld i,a	; show up to 255 chars
 	
 ShowBossText_MoreText:
 	ei
@@ -824,7 +824,7 @@ ShowBossText_MoreText:
 	;inc l
 	;inc l
 	inc l
-	ldai
+	ld a,i
 	dec a
 	inc bc
 	jp nz,ShowBossText_MoreText

@@ -1,52 +1,34 @@
-
-
-;***************************************************************************************************
-
+;*******************************************************************************
 ; 					Show Sprite
-
-;***************************************************************************************************
-;SpritePointerInit	; We have two sprite pointers, one for player sprites (which actually never moves!) and one for level sprites
-			; Note.. the second bank of sprites (128k only) is always located in &D000 in memory config C1/C3
-;	ld (ObjectSpritePointer_Plus2-2),hl
-;	ld (PlayerSpritePointer_Plus2-2),de
-
-;ret
-
+;*******************************************************************************
 SprShow_W equ SprShow_W_Plus1-1
 
-SprShow_Xoff equ SprShow_Xoff_Plus1-1
-SprShow_Yoff equ SprShow_Yoff_Plus1-1
-
+SprShow_Xoff  equ SprShow_Xoff_Plus1-1
+SprShow_Yoff  equ SprShow_Yoff_Plus1-1
 
 SprShow_TempX equ ScreenBuffer_ActiveScreenDirectC_Plus1-2
 SprShow_TempY equ SprShow_TempY_Plus2-2
 SprShow_TempW equ SprShow_TempW_Plus1-1
 SprShow_TempH equ SprShow_TempH_Plus1-1
-SprShow_OldX equ SprShow_OldX_Plus1-1
-
-;SprShow_TempW defw &00
-
+SprShow_OldX  equ SprShow_OldX_Plus1-1
 
 SprShow_TempAddr equ SprShow_TempAddr_Plus2-2 ; defw &0000
 
-;SprShow_Address  defw &0000
-
-ifdef buildCPC
-
 SpriteBank_Font2:			
 	ld a,2
-SpriteBank_Font:			;Init the spritefont location - Corrupts HL and now BC
-
-;SpriteBank_FontNum ;A= 1 = Chibifont   2 = regularfont
+SpriteBank_Font: ;Init the spritefont location - Corrupts HL and now BC
+    ;SpriteBank_FontNum ;A= 1 = Chibifont   2 = regularfont
 	cp 1 
 	jr z,SpriteBank_FontNumChibi
 	ld bc,DrawText_DicharSprite_NextLine-DrawText_DicharSprite_Font_Plus1
-	ld hl,Font_RegularSizePos			;The font is located at &C000/4000 in bank C1/C3, or &7000 in the Bootstrap block
+    ;The font is located at &C000/4000 in bank C1/C3, or &7000 in the Bootstrap block
+	ld hl,Font_RegularSizePos
 
 	jr ShowSprite_SetFontBankAddr
 SpriteBank_FontNumChibi:
 		ld bc,DrawText_DicharSprite_NextLineMini-DrawText_DicharSprite_Font_Plus1
-		ld hl,Font_SmallSizePos			;The font is located at &C000 in bank C1/C3, or &7000 in the Bootstrap block
+        ;The font is located at &C000 in bank C1/C3, or &7000 in the Bootstrap block
+		ld hl,Font_SmallSizePos
 ShowSprite_SetFontBankAddr:
 	ld (DrawText_CharSpriteMoveSize_Plus1-1),a
 	ld a,c
@@ -55,12 +37,11 @@ ShowSprite_SetBankAddr:
 	ld (SprShow_BankAddr),hl
 ret
 
-endif
-
 ; We can preread a sprite to get the width/height
-; This is used for Direct sprites, and was used by the object loop - the object loop now assumes the sprite is 24x24, this was done to save time as 97% of the time - it is
+; This is used for Direct sprites, and was used by the object loop - the object
+; loop now assumes the sprite is 24x24, this was done to save time as 97% of the time - it is
 ShowSprite_ReadInfo:
-ld a,&0 :SprShow_SprNum_Plus1
+    ld a,&0 :SprShow_SprNum_Plus1
 	ld c,a
 	
 	ld b,0
@@ -72,12 +53,10 @@ ld a,&0 :SprShow_SprNum_Plus1
 	ld d,h
 	ld e,l
 	add hl,bc
-	add hl,bc	; 6 bytes per sprite
+	add hl,bc ; 6 bytes per sprite
 	add hl,bc
 
 	ld a,(hl)
-;	ld (SprShow_H),a
-;	ld a,&18 SprShow_H_Plus1		;(Sprite Height)
 	or a
 	jr z,SpriteGiveUp
 	ld (SprShow_TempH),a
@@ -95,45 +74,38 @@ ld a,&0 :SprShow_SprNum_Plus1
 	inc hl
 
 	ld a,(hl)
-	ld (SprShow_Xoff),a		; Note Xoffset is never actually used for x-coords
-					; the mem pos is actually sprite attribs
-					; such as PSet, Doubleheight and trans color
+	ld (SprShow_Xoff),a	; Note Xoffset is never actually used for x-coords
+					    ; the mem pos is actually sprite attribs
+					    ; such as PSet, Doubleheight and trans color
 	inc hl
 	;leave with Sprbankaddr in DE 
 	;Width in B and Xoff in A
-	
 ret
+
 SpriteGiveUp:
 	pop af ;Forcably quit not just getting info - but showing the sprite
 ret
-;ShowSpriteDirect is a cruder version of ShowSprite, it does not use the 'virtual' screen res of (160x200) and cannot do clipping - it was designed for the UI objects 
-;which never moved and never needed clipping 
+
+;ShowSpriteDirect is a cruder version of ShowSprite, it does not use the
+;'virtual' screen res of (160x200) and cannot do clipping - it was designed for
+;the UI objects which never moved and never needed clipping 
 ShowSpriteDirect:
-	;ld hl,SprDrawChooseRender;pset
-	;ld (ShowSprite_Ready_Return_Plus2-2),hl
 	;set draw pos into Temp_X and Temp_Y
 	call ShowSprite_ReadInfo
-	
 
 	ld c,(hl)
 	inc hl
 	ld b,(hl)
 
-
 	ex de,hl
 	add hl,bc
 	ld (SprShow_TempAddr),hl
 	ex de,hl
-
-;		ld A,B
-		
 		ld a,(SprShow_Yoff)
 		ld c,a
 		ld a,(SprShow_TempY)
 		add c
 		ld (SprShow_TempY),A
-
-
 	;Quick shortcuts for fonts
 	ld a,(SprShow_TempW)
 	ld (SprShow_W),a
@@ -154,7 +126,6 @@ ShowSpriteDirect:
 	jp z,ShowSprite_OK_Xoff2
 	ld hl,SprDrawChooseRenderpset
 
-
 	ShowSprite_OK_Xoff2:
 
 	ld (ShowSprite_Ready_Return_Plus2-2),hl
@@ -162,20 +133,17 @@ ShowSpriteDirect:
 
 ShowSpriteDirectFourByteSpecial:
 	ld (TranspBitA_Plus1-1),a
-;	ld (SprShow_Xoff),a
 	ld hl,SprDraw16pxInit
 	ld (ShowSprite_Ready_Return_Plus2-2),hl
 	jp ShowSprite_Ready
 ShowSpriteDirectTwoByteSpecial:
 	;shortcut for our minifont!
-;	ld (SprShow_Xoff),a
 	ld hl, SprDrawPset8pxInit
 	ld (ShowSprite_Ready_Return_Plus2-2),hl
 	jp ShowSprite_Ready
 
 ShowSpriteDirectOneByteSpecial:
 	;shortcut for our minifont!
-;	ld (SprShow_Xoff),a
 	ld hl, SprDrawLnStartBegin
 	ld (ShowSprite_Ready_Return_Plus2-2),hl
 	jp ShowSprite_Ready
@@ -186,27 +154,19 @@ GetSpriteXY
 	ld a,(SprShow_Y)
  	ld c,a
 ret
-ShowSprite:	
-; ShowSprite is the main routine of our program!
-	
-	;ld hl,SprDrawChooseRender;pset
-	;ld (ShowSprite_Ready_Return_Plus2-2),hl
-
-
- 		; *********  Get Sprite Details *********
+ShowSprite:	; ShowSprite is the main routine of our program!
+ 	; *********  Get Sprite Details *********
 	call ShowSprite_ReadInfo
 	di
 
 	ex af,af'
 	ld a,b
 	cp 6 :SpriteSizeConfig6_Plus1
-	call  nz,ShowSpriteReconfigure	:ShowSpriteReconfigureCommand_Plus2
-
+	call nz,ShowSpriteReconfigure	:ShowSpriteReconfigureCommand_Plus2
 
 	ld c,(hl)
 	inc hl
 	ld b,(hl)
-
 
 	ex de,hl
 	add hl,bc
@@ -222,38 +182,22 @@ ShowSprite:
 	ld a,(bc)
 	ld (TranspBitA_Plus1-1),a
 
-;	ld a,(SprShow_Y)
-;	or a
-;	ret Z
-
-
- 		; *********  show a new sprite *********
-
+    ; *********  show a new sprite *********
 
 ShowSprite_OK:
-
-	;ld (SprShow_Y),a
-;	ld C,a				; load C for the Screen lookup
-
 	ld a,48: SprShow_Yoff_Plus1
 	add 48:SprShow_Y_Plus1
 	ld C,a
 
-
-
-	;ld (SprShow_TempY),a
-
-
 	ld B,48 :SprShow_X_Plus1
-
-;	ld B,a				; load B for the Screen lookup
 
 	ld a,48: SprShow_Xoff_Plus1
 
 
 	bit 6,a
 	jp z,ShowSprite_OK_NoDoubler
-	ld hl,SprDrawChooseRenderLineDoubler ; Doubler gives an interlacing effect, used for faux big sprites without slowdown
+    ; Doubler gives an interlacing effect, used for faux big sprites without slowdown
+	ld hl,SprDrawChooseRenderLineDoubler
 	
 	bit 7,a
 	jp z,ShowSprite_OK_Xoff
@@ -261,14 +205,11 @@ ShowSprite_OK:
 
 	jp ShowSprite_OK_Xoff
 ShowSprite_OK_NoDoubler:			
-	;push hl
 	ld hl,SprDrawChooseRender;pset		; Normal sprite	
 	bit 7,a
 	jp z,ShowSprite_OK_Xoff
 
-;	ld hl,SprDrawChooseRenderPsetAligned - Tested code - incomplete
 	ld hl,SprDrawChooseRenderpset		; PSET sprite - deletes background, fast no transp
-
 
 ShowSprite_OK_Xoff:
 	and %00000000 ; Bit 7 forces "pset" - wipes background but faster ; Bit 6 doubles height ;123=transp
@@ -276,15 +217,9 @@ ShowSprite_OK_Xoff:
 	ld B,a
 	
 	ld (ShowSprite_Ready_Return_Plus2-2),hl
-	;pop hl
-	
-
-;	ex af,af'	;	push af 			;store width for later
-
-
 		call VirtualPosToScreenByte
-		;		H X bytes to skip	L	X bytes to remove
-		;		D Y bytes to skip	E	Y bytes to remove
+		; H X bytes to skip	L	X bytes to remove
+		; D Y bytes to skip	E	Y bytes to remove
 
 		ld A,B
 		ld (SprShow_TempX),A
@@ -312,7 +247,6 @@ ShowSprite_OK_Xoff:
 		ld a,h
 		ld (SprShow_OldX),a
 		push de
-
 			ld a,(SprShow_TempH)
 			dec a
 			cp E
@@ -348,10 +282,8 @@ ShowSprite_OK_Xoff:
 
 	; we can only use the basic slow render - the others cannot clip
 
-	;pop bc  	; Get the counter out the stack
 	ex af,af'
 	ld b,a
-	;ld a,b
 	or a
 	jr Z,ShowSprite_AddressOK
  
@@ -362,7 +294,6 @@ ShowSprite_OK_Xoff:
 ShowSprite_AddressOK:	;Address does not need changing
 	ld b,0
 	ld c,&00 :SprShow_OldX_Plus1
-;	ld bc,(SprShow_OldX)
 	add hl,bc ; add the width to the address
 
 	ld (SprShow_TempAddr),hl ; save the new start address
@@ -371,19 +302,12 @@ ShowSprite_AddressOK:	;Address does not need changing
 	jp ShowSprite_Ready
 	;we have messed with the co-ords, so can only use the basic render not supefast ones
 
-
-
 ShowSprite_SkipChanges:
 	; No co-ord tweaks were needed, all sprite is onscreen
 	;pop af 		;restore width
 	ex af,af'
-;	jp ShowSprite_Ready
-
 
 ShowSprite_Ready:
-;	ld B,&69SprShow_TempX_Plus1		;xpos
-;	ld C,&00 SprShow_TempY_Plus1 ;(SprShow_TempY)
-;	call GetMemPosQuickA
 	ld hl,&0000 :SprShow_TempY_Plus2
 	add hl,hl 		; table is two bytes so double hl
 
@@ -395,25 +319,16 @@ ShowSprite_Ready:
 	ld h,(hl)
 	ld l,a	; hl now is the memory loc of the line
 	
-;	ld a,b	;get the X col
 	ld de,&C069 :ScreenBuffer_ActiveScreenDirectC_Plus1
-;	ld e,&SprShow_TempX_Plus1
 
 	add hl,de  	; hl = memory line, bc = X pos = hl is now the location on screen
-	
 
 ;;;;;;;;;;;;;;;;
 
 	ld c,&00 :SprShow_TempH_Plus1
 	ld iy,&0000 :SprShow_TempAddr_Plus2
-
 	
 	jp SprDrawLnStartBegin :ShowSprite_Ready_Return_Plus2
-
-
-
-
-
 
 SprDrawChooseRenderLineDoubler:
 ;	ex af,af'
@@ -444,12 +359,8 @@ SprDrawChooseRender:	; Pick the render based on width
 	jr z,SprDraw96pxInit
 	cp 18
 	jr z,SprDraw72pxInit
-	;cp 255
-	;jr z,SprDraw24pxInit
 
 SprDrawLnStartBegin:			; This is our most basic render, its slow, but can do any size and clipping
-
-
 
 SprDrawLnStartBeginB:
 	ld a,(TranspBitA_Plus1-1)	
@@ -462,9 +373,6 @@ SprDrawLnStartBeginB:
 	jp z,SprDrawLn_NoDoubler
 
 	ld hl,SprDrawLnDoubleLine
-	;ld a,c
-	;add c
-	;ld c,a
 
 SprDrawLn_NoDoubler:
 	ld (SprDrawLnDoubleLineJump_Plus2-2),hl
@@ -472,14 +380,9 @@ SprDrawLn_NoDoubler:
 
 	ei
 SprDrawLnStart2:
-	;push bc
 	push hl
-
-
 		ld d,IYH
 		ld e,IYL
-
-
 
 		ld b,&00 :SprShow_TempW_Plus1;a	
 		SprDrawPixelLoop:
@@ -499,9 +402,6 @@ SprDrawLnStart2:
 		ld e,0 :SprShow_W_Plus1
 		add iy,de
 	pop hl
-
-
-;	call GetNxtLin
 
 	ld a,h
 	add a,&08
@@ -553,7 +453,6 @@ SprDraw96pxInit:
 
 SprDrawTurboPrep:
 	ld (Sprdraw24PxJumpPos_Plus2-2),de
-	;ld  	B,0 ;B is ZERO
 
 SprDrawTurboPrep2:
 ifndef AdvancedInterrupts
@@ -570,7 +469,6 @@ else
 	ei
 endif
 
-
 SprDrawTurbo_StartLine:
 	ld (SprDrawTurbo_HLrestore_Plus2-2),hl
 
@@ -580,7 +478,6 @@ SprDrawTurbo_StartLine:
 		; ********** A MUST BE the transparent byte for THIS WHOLE LOOP! ***********
 
 Sprdraw24PxVer_Double:	;Line doubler - does two nextlines each time
-		
 		bit 0,C
 		jp z,SprDrawTurbo_LineSkip
 		jp Sprdraw24PxVer
@@ -714,7 +611,6 @@ Sprdraw32PxVer:
 		SprDraw24pxW_SkipB:
 		inc hl
 
-
 Sprdraw24PxVer:
 		pop de
 		cp e
@@ -782,7 +678,6 @@ else
 SprDrawTurbo_AllowInterruptsB:
 	ld de,&c050
 	add hl,de
-	;bit 0,c
 	ld a,c
 	and %00000011
 	jp nz,SprDrawTurbo_StartLine
@@ -795,9 +690,6 @@ SprDrawTurbo_AllowInterruptsB:
 	jp SprDrawTurbo_StartLine
 endif
 
-
-
-
 SprDrawTurbo_Done:
 ifndef AdvancedInterrupts
 	ld sp,(SprDrawTurbo_StackRestore_Plus2-2)
@@ -806,13 +698,6 @@ else
 	ld sp,&6969 :SprDrawTurbo_StackRestore_Plus2
 endif
 	ret
-
-
-
-
-
-
-
 
 ;--------------------Pset Version! no transparentcy, so fast! ----------------
 SprDrawChooseRenderLineDoublerPset:
@@ -825,7 +710,6 @@ SprDrawChooseRenderLineDoublerPset:
 	ex af,af';pop af
 	ld de,SprdrawPset_Double
 	jp SprDrawPsetPrep
-
 
 SprDrawChooseRenderPset:		; Can do any size between 8-48 pixels
 	ld a,(SprShow_TempW)
@@ -892,7 +776,6 @@ SprDrawPsetPrep2:
 	ei
 	ex hl,de
  
-
 	push iy
 	pop hl
 
@@ -976,6 +859,3 @@ PsetScreenLoopCheck_Minus1:
 		ex hl,de
 	pop hl
 jp SprDrawPset_StartLine
-
-
-

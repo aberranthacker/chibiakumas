@@ -198,12 +198,12 @@ Event_MoveSwitch_0011:				;Set the next move
 
 
 Event_ProgramMoveLifeSwitch_0100:		;Set Prog,MoveLife
-	RstSix;rst 6	; Jp (IY)
+	rst 6;rst 6	; Jp (IY)
 	;ld a,(hl)	;Program Type
 	ld (EventObjectProgramToAdd_Plus1-1),a
 	;inc hl						;Fall into Move Life code
 Event_MoveLifeSwitch_0000:
-	RstSix;rst 6	; Jp (IY)
+	rst 6;rst 6	; Jp (IY)
 	;ld a,(hl)	;Move Type
 	ld (EventObjectMoveToAdd_Plus1-1),a
 	;inc hl						; Fall into Life code
@@ -212,7 +212,7 @@ Event_LifeSwitch_0010:
 	ld de,EventObjectLifeToAdd_Plus1-1
 
 Event_CoreReprogram_ByteCopy:			
-	RstSix;rst 6	; Jp (IY)			
+	rst 6;rst 6	; Jp (IY)			
 	;ld a,(hl)	;read in a byte
 	ld (de),a		; put it at DE
 	;inc hl
@@ -231,20 +231,20 @@ Event_CoreReprogram:	;1111????
 ;Powerup objects are defined by their sprite, which changes each level
 ; OK so I didn't think this through very well!
 Event_CoreReprogram_PowerupSprites:
-	RstSix;	rst 6	; Jp (IY)
+	rst 6;	rst 6	; Jp (IY)
 	;ld a,(hl)
 	ld (DroneSprite_Plus1-1),a
 	;inc hl
 	;ld a,(hl)
-	RstSix;	rst 6	; Jp (IY)
+	rst 6;	rst 6	; Jp (IY)
 	ld (ShootSpeedSprite_Plus1-1),a
 	;inc hl
 	;ld a,(hl)
-	RstSix;	rst 6	; Jp (IY)
+	rst 6;	rst 6	; Jp (IY)
 	ld (ShootPowerSprite_Plus1-1),a
 	;inc hl
 	;ld a,(hl)
-	RstSix;	rst 6	; Jp (IY)
+	rst 6;	rst 6	; Jp (IY)
 	ld (PointsSprite_Plus1-1),a
 	ld (PointsSpriteB_Plus1-1),a
 	ld (PointsSpriteC_Plus1-1),a
@@ -432,7 +432,7 @@ Event_AddXX:
 ; Change time between events, used on water level when waterlevel changes - it was
 ; too slow by default
 Event_ChangeStreamSpeed_1100:
-	RstSix;	rst 6	; Jp (IY)
+	rst 6;	rst 6	; Jp (IY)
 	ld (Event_LevelSpeed_Plus1-1),a
 	ret;jp Event_LoadNextEvt
 
@@ -447,7 +447,7 @@ Event_ObjStrip:
 	inc hl
 	;fall into next event
 Event_ObjStrip_Next:
-	RstSix;	rst 6	; Jp (IY)
+	rst 6;	rst 6	; Jp (IY)
 	;ld a,(hl)	; sprnum
 	;inc hl
 	ld (EventObjectSpriteToAdd_Plus1-1),a
@@ -471,7 +471,7 @@ Event_ObjColumn:
 	ld e,b
 	inc hl
     Event_ObjColumn_Next:
-	RstSix;	rst 6	; Jp (IY)
+	rst 6;	rst 6	; Jp (IY)
 	;ld a,(hl)	; sprnum
 	;inc hl
 	ld (EventObjectSpriteToAdd_Plus1-1),a
@@ -534,7 +534,7 @@ Event_LoadNextEvt:
 	ld a,0 :Event_MultipleEventCount_Plus1
 	or a
 	jp nz,Event_MoreEventsDec		; there are multiple events at this point
-	RstSix;	rst 6	; Jp (IY)
+	rst 6;	rst 6	; Jp (IY)
 	;ld a,(hl)
 	;inc hl
 	ld (Event_NextEventTime),a
@@ -543,7 +543,7 @@ Event_LoadNextEvt:
 	ld b,a
 	jp Event_MoreEvents
 EventoneObject:
-	RstSix;	rst 6	; Jp (IY)
+	rst 6;	rst 6	; Jp (IY)
 	;ld a,(hl)	; sprnum
 	ld (EventObjectSpriteToAdd_Plus1-1),a
 	;inc hl
@@ -676,7 +676,7 @@ Event_CoreSaveLoadSettingsStart: ;     1001XXXX Save/Load object settings XXXX b
 	and %00001111	; bank no
 	cp  %00001111
 	jr nz,Event_CoreSaveLoadSettings_Load1	;15 means save
-	RstSix;	rst 6	; Jp (IY)
+	rst 6;	rst 6	; Jp (IY)
 	;ld a,(hl)	;Bank no is next byte when saving
 	;inc hl
 	jr Event_CoreSaveLoadSettings_Part2
@@ -705,19 +705,19 @@ ret
 
 
 DoSettingsLoad:
-	RstSix;		rst 6	; Jp (IY)
+	rst 6;		rst 6	; Jp (IY)
 		ld (EventObjectProgramToAdd_Plus1-1),a
-	RstSix;		rst 6	; Jp (IY)
+	rst 6;		rst 6	; Jp (IY)
 		ld (EventObjectMoveToAdd_Plus1-1),a
-	RstSix;		rst 6	; Jp (IY)
+	rst 6;		rst 6	; Jp (IY)
 		ld (EventObjectLifeToAdd_Plus1-1),a
-	RstSix;		rst 6	; Jp (IY)
+	rst 6;		rst 6	; Jp (IY)
 		ld (EventObjectSpriteToAdd_Plus1-1),a
-	RstSix;		rst 6	; Jp (IY)
+	rst 6;		rst 6	; Jp (IY)
 		ld (EventObjectSpriteSizeToAdd_Plus1-1),a
-	RstSix;		rst 6	; Jp (IY)
+	rst 6;		rst 6	; Jp (IY)
 		ld (EventObjectAnimatorToAdd_Plus1-1),a
-	RstSix;		rst 6	; Jp (IY)
+	rst 6;		rst 6	; Jp (IY)
 		ld (ObjectAddToForeBack_Plus1-1),a
 ret
 

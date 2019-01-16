@@ -105,7 +105,7 @@ OuterBurstPatternLoop:
 	ret z
 	push hl
 		ld h,a
-		RstSix
+		rst 6
 	pop hl
 	inc hl
 	jr OuterBurstPatternLoop
@@ -136,7 +136,7 @@ Stars_AddBurstsLoop
 		ld l,a
 		inc a	;only run if two vals aren't the same!
 		call nz,Stars_AddBurstStart
-		;RstSix
+		;rst 6
 	pop hl
 
 	inc hl

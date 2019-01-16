@@ -2,7 +2,7 @@ F;Level fixes
 ; get rid of ORG statements
 ; apply new Init
 ;		call Akuyou_Interrupt_Init	instead of 	call Akuyou_RasterColors_Init
-; replace ldia 
+; replace ld i,a 
 ; Check NULL is in spectrum copied block
 
 ;replace background object definitions
@@ -1261,7 +1261,7 @@ EndLevel:
 
 ClearBadguys:
 	ld a,1
-	ldia
+	ld i,a
 	push hl
 	call Akuyou_DoSmartBombCall
 	pop hl
@@ -1665,7 +1665,7 @@ CustomMovePattern:		; B=X C=Y D=Move
 
 		call Akuyou_Timer_GetTimer
 		ld d,a
-		ldai	; Level time
+		ld a,i	; Level time
 		ld e,a
 
 
@@ -2035,7 +2035,7 @@ ret
 
 CustomProgram1:
 	call Akuyou_Timer_GetTimer
-	ldai	; Level time
+	ld a,i	; Level time
 	and %00000011
 	;rrca
 	add 16
@@ -2057,7 +2057,7 @@ CustomProgram1:
 
 CustomProgram2:
 	call Akuyou_Timer_GetTimer
-	ldai	; Level time
+	ld a,i	; Level time
 	bit 0,a
 	jr z,CustomProgram2_Fire2
 

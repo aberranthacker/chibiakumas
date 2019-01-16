@@ -2,7 +2,7 @@
 ; get rid of ORG statements
 ; apply new Init
 ;		call Akuyou_Interrupt_Init	instead of 	call Akuyou_RasterColors_Init
-;replace ldia 
+;replace ld i,a 
 
 nolist
 
@@ -1086,7 +1086,7 @@ ClearBadguys:
 	endif
 
 	ld a,1
-	ldia
+	ld i,a
 	push hl
 	call Akuyou_DoSmartBombCall
 	pop hl

@@ -5,7 +5,7 @@
 ;			 Super simple Disk reader
 
 ;***************************************************************************************************
-read "..\SrcAll\LZ48_decrunch.asm"
+read "..\SrcALL\LZ48_decrunch.asm"
 
 SectorFileName: 
 	db "T00-SC1 ."

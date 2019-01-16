@@ -2,7 +2,7 @@
 ; get rid of ORG statements
 ; apply new Init
 ;		call Akuyou_Interrupt_Init	instead of 	call Akuyou_RasterColors_Init
-; replace ldia 
+; replace ld i,a 
 ; Check NULL is in spectrum copied block
 
 ;replace background object definitions
@@ -683,7 +683,7 @@ defw	EndLevel
 
 ClearBadguys:
 	ld a,2
-	ldia
+	ld i,a
 	push hl
 	call Akuyou_DoSmartBombCall
 	pop hl
@@ -2002,7 +2002,7 @@ ShowBossText2:	;For Zombichu only
 	jp ShowBossText_StartText
 
 
-	read "..\SrcAll\Akuyou_Multiplatform_Level_ShowBossText.asm"
+	read "..\SrcALL\Akuyou_Multiplatform_Level_ShowBossText.asm"
 
 
 
@@ -2096,7 +2096,7 @@ CustomMovePattern:		; B=X C=Y D=Move
 
 		call Akuyou_Timer_GetTimer
 		ld d,a
-		ldai	; Level time
+		ld a,i	; Level time
 		ld e,a
 
 
@@ -2358,7 +2358,7 @@ ret
 
 CustomProgram1:
 	call Akuyou_Timer_GetTimer
-	ldai	; Level time
+	ld a,i	; Level time
 	and %00000011
 	;rrca
 	add 16
@@ -2380,7 +2380,7 @@ CustomProgram1:
 
 CustomProgram2:
 	call Akuyou_Timer_GetTimer
-	ldai	; Level time
+	ld a,i	; Level time
 	bit 0,a
 	jr z,CustomProgram2_Fire2
 
