@@ -2,7 +2,7 @@
 ; get rid of ORG statements
 ; apply new Init
 ;		call Akuyou_Interrupt_Init	instead of 	call Akuyou_RasterColors_Init
-; replace ldia 
+; replace ld i,a 
 ; Check NULL is in spectrum copied block
 
 ;replace background object definitions
@@ -1638,7 +1638,7 @@ endif
 ; 			Show Boss Text
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	read "..\SrcAll\Akuyou_Multiplatform_Level_ShowBossText.asm"
+	read "..\SrcALL\Akuyou_Multiplatform_Level_ShowBossText.asm"
 
 
 BossText: 

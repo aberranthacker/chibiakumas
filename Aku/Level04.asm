@@ -2,7 +2,7 @@
 ; get rid of ORG statements
 ; apply new Init
 ;		call Akuyou_Interrupt_Init	instead of 	call Akuyou_RasterColors_Init
-; replace ldia 
+; replace ld i,a 
 ; Check NULL is in spectrum copied block
 
 ;replace background object definitions
@@ -1821,13 +1821,13 @@ CustomMoveBouncer:
 		ld h,a
 
 		;shift the time
-		ldai
+		ld a,i
 		ld l,a
 
 		ld a,d
 		and %00001111
 		add a,l
-		ldia
+		ld i,a
 
 
 		bit 5,a
@@ -1851,7 +1851,7 @@ CustomMoveBouncer_DoJump
 		add c
 		ld c,a
 		
-		ldai
+		ld a,i
 		and %00011111
 		cp  %00001110
 		jp nz,CustomMoveBouncer_FireNormal
@@ -1953,7 +1953,7 @@ CustomMovePattern:		; B=X C=Y D=Move
 
 		call Akuyou_Timer_GetTimer
 		ld d,a
-		ldai	; Level time
+		ld a,i	; Level time
 		ld e,a
 
 
@@ -2087,7 +2087,7 @@ ShowBossText2:	;For Zombichu only
 	jp ShowBossText_StartText
 
 
-	read "..\SrcAll\Akuyou_Multiplatform_Level_ShowBossText.asm"
+	read "..\SrcALL\Akuyou_Multiplatform_Level_ShowBossText.asm"
 
 
 
@@ -2391,7 +2391,7 @@ CustomMoveYoYo:		; B=X C=Y D=Move
 
 
 		ld d,a
-		ldai	; Level time
+		ld a,i	; Level time
 		ld e,a
 
 

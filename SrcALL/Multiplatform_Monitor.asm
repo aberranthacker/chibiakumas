@@ -15,7 +15,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;include this somewhere
-;read "..\SrcAll\Multiplatform_ShowHex.asm"
+;read "..\SrcALL\Multiplatform_ShowHex.asm"
 
 ;Options
 ;Monitor_Full equ 1				;*** FULL monitor takes more ram, but shows all registers

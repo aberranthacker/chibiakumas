@@ -598,7 +598,7 @@ ObjectAnimator:
 	ifdef Debug
 		call Debug_NeedEXX
 	endif
-	exxdi	
+	di	
 	exx
 ObjectAnimatorAgain:
 		call getAnimatorMempos
@@ -701,7 +701,7 @@ ObjectAnimator_Update:
 		Call ObjectAnimator_IncreaseTick
 ObjectAnimator_Save:
 	exx
-	exxei 
+	ei 
 	ld (hl),a
 	ifdef Debug
 		call Debug_ReleaseEXX
@@ -720,7 +720,7 @@ ret
 
 ObjectAnimator_Done:
 	exx
-	exxei 
+	ei 
 	ifdef Debug
 		call Debug_ReleaseEXX
 	endif
@@ -1060,7 +1060,7 @@ Object_DecreaseLife:
 	ifdef Debug
 		call Debug_NeedEXX
 	endif
-	exxdi
+	di
 	exx
 	
 		ld d,a
@@ -1068,7 +1068,7 @@ Object_DecreaseLife:
 		and %11000000		; Keep the 1st 2 bytes, format is ;MMLLLLLL
 		or d			; MM = life mode, LLLLLL = life qty
 	exx
-	exxei
+	ei
 	ifdef Debug
 		call Debug_ReleaseEXX
 	endif

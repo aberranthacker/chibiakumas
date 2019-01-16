@@ -2,16 +2,16 @@ org &4000
 
 
 Call &5003
-ld b,0		;Yoffset
+ld b,0      ;Yoffset
 di
 
-exx 		;For Basic Compat
-push bc		;For Basic Compat
-exx		;For Basic Compat
+exx         ;For Basic Compat
+push bc     ;For Basic Compat
+exx     ;For Basic Compat
 call RLE_Draw
 
 
-exx 			;keep the firmware working!
+exx             ;keep the firmware working!
 pop bc
 exx
 
@@ -19,7 +19,7 @@ ret
 
 
 
-read "..\srcCPC\Akuyou_CPC_RLE.asm"
+read "..\SrcCPC\Akuyou_CPC_RLE.asm"
 
 
 org &5000
@@ -30,8 +30,8 @@ jp Sprite1_Setup
 Sprite0_Setup:
 ld hl,Sprite0_Start-1
 ld de,Sprite0_End-1
-ld ixh,32	;Width
-ld IXL,24+32	;X-Righthandside
+ld ixh,32   ;Width
+ld IXL,24+32    ;X-Righthandside
 ret
 Sprite0_Start:
 db &F,&9,&51,&F,&72,&51,&F,&30,&A1,&F,&2B,&51,&F,&27,&51,&F
@@ -165,8 +165,8 @@ Sprite0_End:
 Sprite1_Setup:
 ld hl,Sprite1_Start-1
 ld de,Sprite1_End-1
-ld ixh,32	;Width
-ld IXL,24+32	;X-Righthandside
+ld ixh,32   ;Width
+ld IXL,24+32    ;X-Righthandside
 ret
 Sprite1_Start:
 db &F,&FF,&7D,&FF,&13,&51,&F,&E,&FF,&13,&51,&F,&E,&FF,&13,&51

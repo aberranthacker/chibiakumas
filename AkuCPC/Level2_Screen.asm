@@ -2,7 +2,7 @@ org &4000
 FileBegin:
 
 call Sprite0_Setup
-read "..\srcCPC\Akuyou_CPC_RLE.asm"
+read "..\SrcCPC\Akuyou_CPC_RLE.asm"
 
 
 jp Sprite0_Setup
@@ -12,8 +12,8 @@ Sprite0_Setup:
 ld hl,Sprite0_Start-1
 ld de,Sprite0_End-1
 ld b,0   ;Y-Start
-ld ixh,32	;Width
-ld IXL,24+32	;X-Righthandside
+ld ixh,32   ;Width
+ld IXL,24+32    ;X-Righthandside
 ret
 Sprite0_Start:
 db &F,&4,&31,&40,&C,&9,&B,&8,&A,&30,&30,&E0,&FE,&41,&F,&17

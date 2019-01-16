@@ -70,7 +70,7 @@ ifdef buildMSX_V9K
 	nop
 	nop	:TimerShiftA_Plus2
 endif
-	ldia
+	ld i,a
 
 	ld a, 0:Timer_TicksOccured_Plus1
 ifdef buildMSX_V9K
