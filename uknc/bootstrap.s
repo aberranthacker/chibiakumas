@@ -1,20 +1,28 @@
-.equiv DiskMap1, 1
-.equiv DiskMap2, 2
-.equiv DiskMap3, 3
-.equiv DiskMap4, 4
+#.equiv DiskMap1, 1
+#.equiv DiskMap2, 2
+#.equiv DiskMap3, 3
+#.equiv DiskMap4, 4
 
-                org Akuyou_BootStrapStart
-START:
+                .TITLE Chibi Akumas loader
+                .GLOBAL start
 
-FileBeginBootStrap:
+                .include "./macros.s"
+                .include "./core_defs.s"
+
+                .=040; .word start   # program’s relative start address
+                .=042; .word SPReset # initial location of stack pointer
+                .=050; .word end - 2 # address of the program’s highest word
+
+                .=BootstrapStart
+start:
 Bootstrap_Launch:                       #     ld bc,&7f8D ; Reset the firmware to OFF
                                         #     out (c),c
                                         #     ld hl,RasterColors_InitColors
                                         #     call SetColors
-                                        # 
+                                        #
         CLR R3                          #     ld h,0
                                         #     ld l,0
-                                        # 
+                                        #
 Bootstrap_FromHL:                       #     ; HL is used as the bootstrap command
                                         #     ; H=1 means levels
                                         #     ; H=0 means system events (Menu etc)
@@ -29,7 +37,7 @@ RETURN                                  # ret
 Bootstrap_SystemEvent:
         MOV  R3,R0                      #     ld a,l
         TSTB R0                         #     cp 0
-        BEQ  BootsStrap_StartGame       #     jp z,BootsStrap_StartGame
+        BEQ  Bootstrap_StartGame        #     jp z,BootsStrap_StartGame
                                         #     cp 1
                                         #     jp z,BootsStrap_ContinueScreen
                                         #     cp 2
@@ -46,25 +54,26 @@ Bootstrap_SystemEvent:
                                         #     jp z,NewGame_EP2_2P
                                         #     cp 8
                                         #     jp z,NewGame_CheatStart
-                                        # ret
-BootsStrap_StartGame:
+RETURN                                  # ret
+Bootstrap_Level:
+Bootstrap_StartGame :
         .include "./bootstrap/start_game.s" #   read "..\AkuCPC\BootsStrap_StartGame_CPC.asm"
         JMP Bootstrap_Level_0           #     jp Bootstrap_Level_0    ; Start the menu
 #----------------------------------------------------------------------------}}}
 Bootstrap_Level_0:                      # main menu -------------------------{{{
                                         #     call StartANewGame
                                         #     call LevelReset0000
-                                        # 
+                                        #
                                         #     ld hl,DiskMap_MainMenu      ;T08-SC1.D01
                                         #     ld c,DiskMap_MainMenu_Disk
-                                        # 
+                                        #
                                         #     call Bootstrap_LoadEP2Music_Z
-                                        # 
+                                        #
                                         #     ld hl,DiskMap_MainMenu      ;T08-SC1.D01
                                         #     ld c,DiskMap_MainMenu_Disk
-                                        # 
+                                        #
                                         #     ;need to use Specail MSX version - no extra tilemaps
                                         #     jp Bootstrap_LoadEP2Level_1PartOnly;Bootstrap_LoadEP2Level_1Part;Z;_Zpartial
                                         # ret
 #----------------------------------------------------------------------------}}}
-
+end:    .end
