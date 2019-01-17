@@ -270,11 +270,11 @@ Player_Array:
     P1_P10: defb 100       ;10 - Burst Fire (Xfire)
     P1_P11: defb %00000100 ;11 - Fire Speed - PlayerShootSpeed_Plus1
     P1_P12: defb 0         ;12 - Player num (0=1, 1=2)
-    P1_P13: defb 0         ;13 Points to add to player 1 - used to make score 'roll up'
+    P1_P13: defb 0         ;13 - Points to add to player 1 - used to make score 'roll up'
     P1_P14: defb 0         ;14 - PlayerShootPower_Plus1
     P1_P15: defb &67       ;15 - FireDir
 
-Player_Array2:      ;Player 2 is 16 bytes after player 1
+Player_Array2:             ;Player 2 is 16 bytes after player 1
     P2_P00: defb 150;Y     ; 0
     P2_P01: defb 32 ;X     ; 1
     P2_P02: defb 0         ; 2 - Shoot delay
@@ -288,7 +288,7 @@ Player_Array2:      ;Player 2 is 16 bytes after player 1
     P2_P10: defb 0         ;10 - Burst Fire
     P2_P11: defb %00000100 ;11 - Fire speed
     P2_P12: defb 128       ;12 - Player num (0=1,1=2)
-    P2_P13:Player_ScoreAdd2: defb 0 ;13             ; Points to add to player 2 - used to make score 'roll up'
+    P2_P13: defb 0         ;13 - Points to add to player 2 - used to make score 'roll up'
     P2_P14: defb 0         ;14 - PlayerShootPower_Plus1
     P2_P15: defb &67       ;15 - FireDir
 
