@@ -29,7 +29,7 @@ start:
     .equiv ObjectArraySize, 60 # Must be under 64!
     .equiv PlayerStarArraySize, 128
 
-    .align 8, 0x00 # number of low-order zero bits the location counter must have after advancement
+    .balign 256, 0x00 # number of low-order zero bits the location counter must have after advancement
 StarArrayPointer:
     .space 256*3, 0x00
 ObjectArrayPointer: #first ObjectArraySize*2 of each 256 are used - rest (>128) are spare

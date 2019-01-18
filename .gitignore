@@ -1,4 +1,5 @@
 *.o
 *.SAV
 *.BIN
-
+default.vim
+default.vim.lock
