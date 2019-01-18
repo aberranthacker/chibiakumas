@@ -56,7 +56,8 @@ Bootstrap_SystemEvent:
                                         #     jp z,NewGame_CheatStart
 RETURN                                  # ret
 Bootstrap_Level:
-Bootstrap_StartGame :
+# some missing code...
+Bootstrap_StartGame:
         .include "./bootstrap/start_game.s" #   read "..\AkuCPC\BootsStrap_StartGame_CPC.asm"
         JMP Bootstrap_Level_0           #     jp Bootstrap_Level_0    ; Start the menu
 #----------------------------------------------------------------------------}}}
@@ -76,4 +77,4 @@ Bootstrap_Level_0:                      # main menu -------------------------{{{
                                         #     jp Bootstrap_LoadEP2Level_1PartOnly;Bootstrap_LoadEP2Level_1Part;Z;_Zpartial
                                         # ret
 #----------------------------------------------------------------------------}}}
-end:    .end
+end:            .end

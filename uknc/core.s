@@ -1,6 +1,8 @@
-                .include "core_defs.s"
 
+                .TITLE Chibi Akumas core module
                 .GLOBAL start
+
+                .include "core_defs.s"
 
         .equiv SprShow_X, SprShow_X_Plus1-1
         .equiv SprShow_Y, SprShow_Y_Plus1-1
