@@ -1,10 +1,4 @@
-                                       #    ld sp,&BFFF ; we are not returning, so reset the stack
-                                       #
-                                       #    ;Border To black
-                                       #    ld a,1
-                                       #    ld b,0
-                                       #    ld c,b
-                                       #    call &bc38  ; set border 0 to black
+        MOV  @$SPReset,SP # we are not returning, so reset the stack
                                        #
                                        ##   ifndef debug
                                        #        ld hl,RasterColors_ZeroColors
