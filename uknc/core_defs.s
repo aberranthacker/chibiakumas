@@ -1,3 +1,6 @@
+.equiv FB0, 768
+.equiv FB1, 16768
+
 .equiv SPReset, 0x2FE # Initial stack pointer
 
 .equiv BootstrapStart, 0x4180 # 16768
