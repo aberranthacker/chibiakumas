@@ -8,6 +8,7 @@ rm -f *.SAV
 echo "compiling..."
 $AS bootstrap.s -o bootstrap.o
 $AS core.s -o core.o
+$AS ppu.s -a -o ppu.o
 echo "linking..."
 $LD bootstrap.o -o aku.out
 $LD core.o -o core.out
