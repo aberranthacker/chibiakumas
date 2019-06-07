@@ -1,4 +1,7 @@
-As mentioned before, the 6th byte of the object array is the 'program', This defines what actions the object performs, such as whether it shoots, if it has special actions, and allows for special sprite animation, the possible programs are shown below:
+As mentioned before, the 6th byte of the object array is the 'program', This
+defines what actions the object performs, such as whether it shoots, if it has
+special actions, and allows for special sprite animation, the possible programs
+are shown below:
 
 %00000000	- Object with no program (also effectively Spritebank 0)
 %00000001	- Bitshift Sprite

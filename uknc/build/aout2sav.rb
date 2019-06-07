@@ -3,7 +3,7 @@ require 'optparse'
 
 options = Struct.new(:filename).new
 OptionParser.new do |opts|
-  opts.banner = "Usage: aout_info.rb FILENAME"
+  opts.banner = "Usage: ruby aout_info.rb FILENAME"
   options.filename = opts.default_argv[0]
 end
 exit unless options.filename
@@ -83,6 +83,6 @@ sav = text
 # 0 through 777; bit 6 of byte 360 corresponds to locations 1000 through 1777, and so
 # on. The monitor uses this information when it loads the program.
 #-------------------------------------------------------------------------------
-sav_name = "#{options.filename.split('.')[0]}.SAV"
+sav_name = "#{options.filename.split('.')[0].upcase}.SAV"
 File.binwrite(sav_name, sav)
 

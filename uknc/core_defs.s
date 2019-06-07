@@ -1,11 +1,14 @@
-.equiv FB0, 768
-.equiv FB1, 16768
+.equiv FB0,  0x300 #   768
+.equiv FB1, 0x4180 # 16768
 
 .equiv SPReset, 0x2FE # Initial stack pointer
 
-.equiv BootstrapStart, 0x4180 # 16768
-.equiv Akuyou_GameVars, 0x8000 # Need &700 bytes!
-.equiv Akuyou_CoreStart, (Akuyou_GameVars + 0x700)
+.equiv BootstrapStart,  0x4180 # 16768
+.equiv Akuyou_GameVars, 0x8000 # 32768
+.equiv Akuyou_CoreStart, (Akuyou_GameVars + 0x700) # Need &700 (1792) bytes!
+                                                   # 0x8700 (34560)
+# 0x5900 (22784) bytes of RAM the rest
+# 0xE000 (57344) end of ram
 
 # PlusSprite_ExtBank equ &C7
 # Akuyou_PlayerSpritePos equ &3800
@@ -103,7 +106,7 @@
 .equiv AkuYou_Player_ReadControls, Player_ReadControlsClassic # Read the key/joy input
 #-------------------------------------------------------------------------------
 .equiv AkuYou_Player_GetPlayerVars, Player_GetPlayerVars # Get the start of the player settings memory
-.equiv Akuyou_Player_GetHighscore, Player_GetHighscore # Get the current highscore
+.equiv Akuyou_Player_GetHighscore,  Player_GetHighscore # Get the current highscore
 #-------------------------------------------------------------------------------
 .equiv AkuYou_Player_Hit_Injure_1, Player_Hit_Injure_1 # Player 1 has been hurt (For omega array)
 .equiv AkuYou_Player_Hit_Injure_2, Player_Hit_Injure_2 # Player 2 has been hurt (for omega array)
@@ -165,4 +168,3 @@
 #-------------------------------------------------------------------------------
 # Special one off used for a cheap joke!
 .equiv ChibiAkumasEp2_Player2Start, Player2Start
-

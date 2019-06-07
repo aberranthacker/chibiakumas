@@ -1,41 +1,71 @@
-if you look at the filenames of the datafiles on ChibiAkumas, you will see they appear similar to those below:
-T15-SC9.D01
-T21-SC9.D00
-T08-SC9.Z01
+if you look at the filenames of the datafiles on ChibiAkumas, you will see they
+appear similar to those below:
 
-These may seem a little odd, so let me explain where these came from... During the early stages of ChibiAkumas on the CPC, I became aware that there was a serious problem with the memory used by the CPC DOS system... I needed that memory for the music of the 64k system, and an early solution I found was to access the disk directly, without AMSDOS via disk sector.
+    T15-SC9.D01
+    T21-SC9.D00
+    T08-SC9.Z01
 
-as this was my plan I structured all the level data by Track and Sector, and this is where the file format comes from... now in the end, I found a way to release all the AMSDOS memory, so I was able to use named files rather than disk sectors, which allows for compatibility with alternate DOS and Disk systems, however the File naming structure seemed quite convenient and neat, so I have kept it!
+These may seem a little odd, so let me explain where these came from... During
+the early stages of ChibiAkumas on the CPC, I became aware that there was a
+serious problem with the memory used by the CPC DOS system... I needed that
+memory for the music of the 64k system, and an early solution I found was to
+access the disk directly, without AMSDOS via disk sector.
 
-Here's the format of the file name, as it is used in the moden program
+as this was my plan I structured all the level data by Track and Sector, and
+this is where the file format comes from... now in the end, I found a way to
+release all the AMSDOS memory, so I was able to use named files rather than
+disk sectors, which allows for compatibility with alternate DOS and Disk
+systems, however the File naming structure seemed quite convenient and neat,
+so I have kept it!
+
+Here's the format of the file name, as it is used in the modern program
 
 T[xx]-SC[y].[c]0[d] 
 
-[xx]	Track number (00-99)  - REMEMBER, not an actual track number any more!
-[y]	Sector number (1-9)  - see above!
-[c]	(D/Z) this is D for a normal file (stands for disk)... if this is Z then the file is lz48 compressed
-[d]	Disk Number (1-9)... a file with disk number 0 is expected to be on all disks - if a file is requested that is not on the disk the system last accessed, the system will ask the user to insert the disk (does not happen for disk 0)
+[xx]    Track number (00-99)  - REMEMBER, not an actual track number any more!
+[y]     Sector number (1-9)  - see above!
+[c]     (D/Z) this is D for a normal file (stands for disk)... if this is Z then
+        the file is lz48 compressed
+[d]     Disk Number (1-9)... a file with disk number 0 is expected to be on all
+        disks - if a file is requested that is not on the disk the system last
+        accessed, the system will ask the user to insert the disk (does not
+        happen for disk 0)
 
 
 So, that's the naming converntion! lets take a look at a typical command:
 
-		ld a,&C7			;A=Memory Bank (platform dependant C0-C7 on 6128, 0-7 on ZX128, ignored on MSX)
-		ld hl,&24C1		;H=Track L=Sector
-		ld c,2			;C=Disk
-		ld de,&6200		;DE=Destination (when bank A is paged in)
-		ld ix,&6200+&450		;only used for LZ48 files... this is the last byte used by the LZ48, the file length is subtracted, and the data loaded... this is done so the file can be decompressed into (almost) the same memory as the compressed data... eg compressed level data is loaded in &(7FFF-filelength) to &7FFF ... and then decompressed to &4000-&7FF0, overwriting the compressed data as it goes!
+    ld a,&C7          ; A=Memory Bank (platform dependant C0-C7 on 6128, 0-7 on
+                      ; ZX128, ignored on MSX)
+    ld hl,&24C1       ; H=Track L=Sector
+    ld c,2            ; C=Disk
+    ld de,&6200       ; DE=Destination (when bank A is paged in)
+    ld ix,&6200+&450  ; only used for LZ48 files... this is the last byte used
+                      ; by the LZ48, the file length is subtracted, and the
+                      ; data loaded... this is done so the file can be
+                      ; decompressed into (almost) the same memory as the
+                      ; compressed data... eg compressed level data is loaded in
+                      ; &(7FFF-filelength) to &7FFF ... and then decompressed
+                      ; to &4000-&7FF0, overwriting the compressed data as it goes!
 
-		call Akuyou_LoadDiscSector	; Load an uncompressed file (Akuyou_LoadDiscSectorZ is the version that loads a compressed file)
+    call Akuyou_LoadDiscSector ; Load an uncompressed file
+                               ; (Akuyou_LoadDiscSectorZ is the version that
+                               ; loads a compressed file)
 
-Note, I typically use defined symbols to make it all a bit readable, but I've taken them out to show the actual data
+Note, I typically use defined symbols to make it all a bit readable, but I've
+taken them out to show the actual data
 
 
-The MSX has a special similar command, which loads an RLE bitmap straight into video memory! - it does not use any temporary memory (except a small 128 byte buffer which I use for all diskops)
+The MSX has a special similar command, which loads an RLE bitmap straight into
+video memory! - it does not use any temporary memory (except a small 128 byte
+buffer which I use for all diskops)
 
-	ld hl,DiskMap_Font			;H=Track L=Sector
-	ld c, DiskMap_Font_Disk		;C=Disk
-	ld ix,0				;Xpos in Vram
-	ld iy,Akuyou_FontPos_Y		;Ypos in Vram
-	call VDP_rleProcessor
+    ld hl,DiskMap_Font       ; H=Track L=Sector
+    ld c, DiskMap_Font_Disk  ; C=Disk
+    ld ix,0                  ; Xpos in Vram
+    ld iy,Akuyou_FontPos_Y   ; Ypos in Vram
+    call VDP_rleProcessor
 
-note, it is not possible to use RLE and LZ48 into ramunless you allocate enough system ram to decompress the file first, LZ48 copies previous data, which would make it hard to use in Vram, but my RLE decoder only goes forwards, so 'streaming' the data straight into memory was pretty easy.
+note, it is not possible to use RLE and LZ48 into ram unless you allocate enough
+system ram to decompress the file first, LZ48 copies previous data, which would
+make it hard to use in Vram, but my RLE decoder only goes forwards, so
+'streaming' the data straight into memory was pretty easy.

@@ -77,4 +77,23 @@ Bootstrap_Level_0:                      # main menu -------------------------{{{
                                         #     jp Bootstrap_LoadEP2Level_1PartOnly;Bootstrap_LoadEP2Level_1Part;Z;_Zpartial
                                         # ret
 #----------------------------------------------------------------------------}}}
+
+# .cas_out_open   equ &bc8c
+# .cas_out_direct equ &bc98
+# .cas_out_close  equ &bc8f
+# 
+# BootStrap_LoadDiskFile:
+#     # HL - pointer to disk file
+#     # DE - Destination to write to
+#     push de
+#     ld de,&C000 ; address of 2k buffer,
+#     ld b,12     ; 12 chars
+#     call cas_in_open
+# 
+#     pop hl
+#     jr nc, LoadGiveUp
+#     call cas_in_direct
+# LoadGiveUp:
+#     jp cas_in_close
+
 end:            .end
