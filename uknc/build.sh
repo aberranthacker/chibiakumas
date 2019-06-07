@@ -13,8 +13,8 @@ echo "linking..."
 $LD bootstrap.o -o aku.out
 $LD core.o -o core.out
 
-build/aout2sav.rb aku.out
-build/aout2sav.rb core.out
+ruby build/aout2sav.rb aku.out
+ruby build/aout2sav.rb core.out
 
 rm -f *.o
 rm -f *.out

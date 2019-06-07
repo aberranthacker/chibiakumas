@@ -1,8 +1,14 @@
-The Amstrad CPC screen hardware allows for Interrupts at 6 points down the screen, and if we change the colors at those points, we can simulate more colors on-screen.
+The Amstrad CPC screen hardware allows for Interrupts at 6 points down the
+screen, and if we change the colors at those points, we can simulate more colors
+on-screen.
 
-The first of these interrupts occurs in the 'Border area'... so is not shown in normal circumstances.. the second is also mostly offscreen, so we can realisticly use 4 interrupt based color changes.
+The first of these interrupts occurs in the 'Border area'... so is not shown in
+normal circumstances.. the second is also mostly offscreen, so we can
+realisticly use 4 interrupt based color changes.
 
-In Chibiakumas... Color 0 is a constant color, and the 3rd color is always White (this means 'White' enemies can cross the color boundaries without looking wierd!)... Color 2 is always brighter than Color 1, but Colors 1&2 can be anything!
+In Chibiakumas... Color 0 is a constant color, and the 3rd color is always White
+(this means 'White' enemies can cross the color boundaries without looking
+wierd!)... Color 2 is always brighter than Color 1, but Colors 1&2 can be anything!
 
 the color chagnges are defined by a 'color change block of 5 labels for each of the usable raster interrupts, eg:
 

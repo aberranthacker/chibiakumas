@@ -113,3 +113,5 @@
                                        #    call Akuyou_LoadDiscSector
                                        #    pop de
                                        #    call Akuyou_Sfx_Init;
+CoreBinRadix50:
+  .radix50 "DK CORE  BIN"
