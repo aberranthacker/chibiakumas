@@ -17,13 +17,11 @@ start:
 Chan2InIntHandler:
 
 FlipToFB0:
-        .list
         MOV $(FB0 >> 1),R2
         BR  FlipFB
 FlipToFB1:
         MOV $(FB1 >> 1),R2
         BR  FlipFB
-        .nolist
 FlipFB:
         MOV  $FBPointer,R0
         MOV  $200,R1

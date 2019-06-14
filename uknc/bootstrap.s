@@ -4,17 +4,21 @@
 #.equiv DiskMap4, 4
 
                 .TITLE Chibi Akumas loader
-                .GLOBAL start
+                .GLOBAL BootstrapStart
 
                 .include "./macros.s"
                 .include "./core_defs.s"
 
-                .=040; .word start   # program’s relative start address
+                .=040; .word BootstrapStart   # program’s relative start address
                 .=042; .word SPReset # initial location of stack pointer
-                .=050; .word end - 2 # address of the program’s highest word
+                .=050; .word BootstrapEnd - 2 # address of the program’s highest word
 
                 .=BootstrapStart
-start:
+
+        puts $TopStr
+        puts $TitleStr
+        puts $CreditsStr
+        puts $WebSiteStr
 Bootstrap_Launch:                       #     ld bc,&7f8D ; Reset the firmware to OFF
                                         #     out (c),c
                                         #     ld hl,RasterColors_InitColors
@@ -58,6 +62,7 @@ RETURN                                  # ret
 Bootstrap_Level:
 # some missing code...
 Bootstrap_StartGame:
+        exit
         .include "./bootstrap/start_game.s" #   read "..\AkuCPC\BootsStrap_StartGame_CPC.asm"
         JMP Bootstrap_Level_0           #     jp Bootstrap_Level_0    ; Start the menu
 #----------------------------------------------------------------------------}}}
@@ -96,4 +101,25 @@ Bootstrap_Level_0:                      # main menu -------------------------{{{
 # LoadGiveUp:
 #     jp cas_in_close
 
-end:            .end
+LoadDiskFile:
+RETURN
+
+LookupArea:         .BYTE   0,1    # chan, code(.LOOKUP)
+    LookupFileName: .WORD   CoreBinRadix50 # dblk
+
+ReadArea:           .BYTE   0,10   # chan, code(.READ/.READC/.READW)
+                    .WORD   0 # blk
+    ReadBuffer:     .WORD   FileBeginCore # buf
+    ReadWordsCount: .WORD   FileSizeCoreWords # wcnt
+                    .WORD   0 # end of area(.READW=0,.READ=1)
+CoreBinRadix50:
+    .byte 0xB8, 0x1A, 0x2A, 0x15, 0x40, 0x1F, 0xF6, 0x0D # .radix50 "DK CORE  BIN"
+LookupError:        .ASCIZ  "File lookup error."
+ReadError:          .ASCIZ  "File read error."
+
+TopStr:             .ASCIZ  "              _------------------_"
+TitleStr:           .ASCIZ  "            -= ChibiAkumas V1.666 =-"
+CreditsStr:         .ASCIZ  "-= conversion for the UKNC by aberrant.hacker =-"
+WebSiteStr:         .ASCIZ  "              -= chibiakumas.com =-"
+        .even
+BootstrapEnd:
