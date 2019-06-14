@@ -1,14 +1,24 @@
 #!/usr/bin/ruby
+require 'pry'
 require 'optparse'
 
-options = Struct.new(:filename).new
+options = Struct.new(:in_filename, :out_filename, :binary).new
 OptionParser.new do |opts|
   opts.banner = "Usage: ruby aout_info.rb FILENAME"
-  options.filename = opts.default_argv[0]
-end
-exit unless options.filename
+  options.in_filename = opts.default_argv[0]
 
-bin = File.binread(options.filename);
+  opts.on("-o NAME", "--out-file=NAME", "filename to store resulting binary") do |v|
+    options.out_filename = v
+  end
+
+  opts.on("-b", "--binary", "binary, pluck from entry point to end of text segment") do
+    options.binary = true
+  end
+end.parse!
+
+exit unless options.in_filename
+
+bin = File.binread(options.in_filename);
 
 # The size of the header is not included in any of the other sizes.
 header = bin[0,16].unpack('v*')
@@ -40,7 +50,11 @@ puts "not used:                   #{a_unused}"
 puts "relocation info stripped:   #{a_flag}"
 
 # the start of the text segment in the file is 20(8)
-text = bin[020, a_text]
+text = if options.binary
+         bin[020 + a_entry, a_text]
+       else
+         bin[020, a_text]
+       end
 # the start of the data segment is 20+St (the size of the text)
 _data = bin[020 + a_text, a_data]
 # the start of the relocation information is 20+St+Sd;
@@ -83,6 +97,11 @@ sav = text
 # 0 through 777; bit 6 of byte 360 corresponds to locations 1000 through 1777, and so
 # on. The monitor uses this information when it loads the program.
 #-------------------------------------------------------------------------------
-sav_name = "#{options.filename.split('.')[0].upcase}.SAV"
-File.binwrite(sav_name, sav)
+out_filename = if options.out_filename
+                 options.out_filename
+               else
+                 "#{options.in_filename.split('.')[0].upcase}.SAV"
+               end
+
+File.binwrite(out_filename, sav)
 

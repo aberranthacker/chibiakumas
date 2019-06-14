@@ -1,8 +1,10 @@
 
-        .nolist
                 .TITLE Chibi Akumas core module
-                .GLOBAL start
 
+                .GLOBAL FileBeginCore
+                .GLOBAL FileEndCore
+
+                .include "./macros.s"
                 .include "core_defs.s"
 
         .equiv SprShow_X, SprShow_X_Plus1-1
@@ -24,25 +26,24 @@
 #                   Main Project Code
 #***************************************************************************************************
                 .=Akuyou_GameVars # Need &700 bytes!
-start:
 
     .equiv StarArraySize, 255
     .equiv ObjectArraySize, 60 # Must be under 64!
     .equiv PlayerStarArraySize, 128
 
-    .balign 256, 0x00
+    .balign 256
 StarArrayPointer:
-    .space 256*3, 0x00
+    .space 256*3
 ObjectArrayPointer: #first ObjectArraySize*2 of each 256 are used - rest (>128) are spare
-    .space 256*4, 0x00
+    .space 256*4
     #First 128 are used by object array
     .equiv PlayerStarArrayPointer, (ObjectArrayPointer + 128)
     #Out the way of the Object array!??
-    .equiv Event_SavedSettings, (256*3+ObjectArrayPointer + 128)
+    .equiv Event_SavedSettings, (256 * 3 + ObjectArrayPointer + 128)
 
                 .=Akuyou_CoreStart
-
 FileBeginCore:
+        .asciz "01234567890start"
         # -Player 2's data starts XX bytes after player so you can use IY+XX+1 to get
         # a var from player 2 without changing IY
         .equiv Akuyou_PlayerSeparator, 16
@@ -409,4 +410,5 @@ KeyboardScanner_KeyPresses: .space 10 # Player1
                                         # FileEndCore:
                                         #     save direct "CORE    .AKU",Akuyou_CoreStart,&3000   ;address,size...}[,exec_address]
                                         # nolist
-                .end
+        .asciz "9876543210end"
+FileEndCore:      .end

@@ -10,6 +10,7 @@
 # 0x5900 (22784) bytes of RAM the rest
 # 0xE000 (57344) end of ram
 
+
 # PlusSprite_ExtBank equ &C7
 # Akuyou_PlayerSpritePos equ &3800
 # Akuyou_PlusSpritesPos  equ &3800

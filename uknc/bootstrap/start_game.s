@@ -1,4 +1,8 @@
         MOV  @$SPReset,SP # we are not returning, so reset the stack
+
+        # MOV  $CoreBinRadix50, @$LookupFileName # dblk
+        # MOV  $FileBeginCore, @$ReadBuffer # buf
+        # MOV  $<FileEndCore - FileBeginCore>, @$ReadWordsCount # wcnt
                                        #
                                        ##   ifndef debug
                                        #        ld hl,RasterColors_ZeroColors
@@ -113,5 +117,3 @@
                                        #    call Akuyou_LoadDiscSector
                                        #    pop de
                                        #    call Akuyou_Sfx_Init;
-CoreBinRadix50:
-  .radix50 "DK CORE  BIN"
