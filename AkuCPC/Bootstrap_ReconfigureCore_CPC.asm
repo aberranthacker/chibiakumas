@@ -16,7 +16,7 @@ ifdef SupportPlus
     and %00000001
     jp z,ResetCore_NotPlus
     ld b,RasterColors_4_Plus
-endif 
+endif
 
 ResetCore_NotPlus:
     ld a,b
@@ -31,10 +31,10 @@ ResetCore_NotPlus:
     ld hl,PLY_Play
     ld (MusicExec_PerFrame_Plus2-2),hl
 
-    ld hl, RasterColors_TickOverrideFirm 
+    ld hl, RasterColors_TickOverrideFirm
     ld (RasterColorInterruptHandler_Plus2-2),hl
 
-    ld hl,&CC33 
+    ld hl,&CC33
     ld (StarArrayColors_Plus2-2),hl
 
 

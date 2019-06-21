@@ -7,7 +7,7 @@
 ;***************************************************************************************************
 read "..\SrcALL\LZ48_decrunch.asm"
 
-SectorFileName: 
+SectorFileName:
 	db "T00-SC1 ."
 SectorFileNameDisk:	db "D"
 	db"00":DiskFilePos_Plus1
@@ -48,7 +48,7 @@ LoadDiscSectorZver_BankOk:
 			call LoadDiscSectorZver
 		pop de
 		; hl  compressed data adres
-		; de  output adress of dat	
+		; de  output adress of dat
 		ld hl,0000 :CompressedDataAddress_Plus2
 	pop af
 	call BankSwitch_C0	; switch to bank A
@@ -70,14 +70,14 @@ LoadDiscSectorZver:
 		ld (NewDestination_Plus2-2),hl
 		ld hl,DiscDestRelocate
 	jr LoadDiscSectorB
-LoadDiscSector:				; This was all structured assuming amsdos would be replaced with 
+LoadDiscSector:				; This was all structured assuming amsdos would be replaced with
 	; H = Track  (41)		; a sector based disk reader however with the success of M4
 	; L = Sector (C1)		; and C4CPC - and the fact KL_WALK_ROM seems to restore the
 	; I = Disk   (00)		; A600-BF00 block so well, it was never needed
 	; B = Size - size is not used at all , no need to pass it
 	; C = disk
 	;  A  = 128 k memory bank
-	;; DE = load address 
+	;; DE = load address
 
 
 	push af
@@ -117,16 +117,16 @@ LoadDiscSector_64kOk:
 	ld c,(hl)
 
 
-	
+
 
 	ld a,(SetDiskMessageDisk)
 	sub &80+48
 	cp c
 	ifdef SingleDisk
 		jr LoadDiscSector_NoDiskCheck	; The disk is still in
-	endif 
+	endif
 
-	jr z,LoadDiscSector_NoDiskCheck	; Disk Zero means file is assumed to be on 
+	jr z,LoadDiscSector_NoDiskCheck	; Disk Zero means file is assumed to be on
 	;ALL Disks
 
 		ld a,c
@@ -175,10 +175,10 @@ DiskZero: ;file common to all disks
 ;	jr LoadDiskFileFromHL
 DiskDriver_Load:
 LoadDiskFileFromHL:	; Load a file from HL memory loc
-	push hl	
+	push hl
 	push de
 		;push hl
-	
+
 		push hl
 			ld hl,&0A0F		; Move cursor so errors dont wrap I don't hide them
 			call txt_set_cursor	; so we can see if a problem happened
@@ -235,9 +235,9 @@ ShowDiskMessage:		;Show the error messages
 ;			push bc
 			call SpriteBank_Font2
 ;			pop bc
-			;ld hl,Font_RegularSizePos 			
+			;ld hl,Font_RegularSizePos
 ;			call ShowSprite_SetBankAddr
-		
+
 			ld hl,&160a :SetDiskMessagePos_Plus2
 			ld bc,SetDiskMessage
 			call DrawText_LocateAndPrintStringUnlimited
@@ -253,7 +253,7 @@ ret
 
 
 
-	
+
 
 
 

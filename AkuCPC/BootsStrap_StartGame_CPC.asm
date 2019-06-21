@@ -67,7 +67,7 @@ PlusInitLoop:
     ld hl,Plus_BankCopy
     ld de,&C000
     ldir
-    
+
 
         ld bc,4
         ld de,&FFD0;&2000
@@ -80,7 +80,7 @@ PlusInitLoop:
         out (c),c
 
 
-    ;test 2 bytes from &4000 - if the asic has paged in they will not match main mem 
+    ;test 2 bytes from &4000 - if the asic has paged in they will not match main mem
 
     ld hl,&FFD0;&2000
     ld de,&4000
@@ -95,7 +95,7 @@ PlusInitLoop:
     ld b,a
     ld a,(de)
     cp b
-    jp z,DetectedNonPlus ; 
+    jp z,DetectedNonPlus ;
 
     ld a,(CPCVer)
     or 1
@@ -118,7 +118,7 @@ DetectedNonPlus:
 
     ifndef AllowDisk2 ; {{{
         ld a,&C0
-        ld hl,DiskMap_LoadingScreen ; T38-SC1.D01 
+        ld hl,DiskMap_LoadingScreen ; T38-SC1.D01
         ld b,DiskMap_LoadingScreen_Size
         ld c,DiskMap_LoadingScreen_Disk
         ld de,&C000
@@ -136,7 +136,7 @@ ifdef Support128k ; {{{
     ld bc,4
     ld de,&FFD0;&2000
     ld hl,&4000
-    call Akuyou_BankSwitch_C0_BankCopy 
+    call Akuyou_BankSwitch_C0_BankCopy
 
     ld hl,&FFD0;&2000
     ld de,&4000
@@ -175,7 +175,7 @@ Detected128k:
         or 128
     else
         or 0
-    endif 
+    endif
     ld (CPCVer),a
 
 
@@ -188,7 +188,7 @@ Detected128k:
     ld bc,4
     ld de,&4000
     ld hl,&0000
-    call Akuyou_BankSwitch_C0_BankCopy 
+    call Akuyou_BankSwitch_C0_BankCopy
 
     ;copy 4 bytes from bank D7 - if this works we have 256k
 
@@ -196,7 +196,7 @@ Detected128k:
     ld bc,4
     ld hl,&4000
     ld de,&FFF0
-    call Akuyou_BankSwitch_C0_BankCopy 
+    call Akuyou_BankSwitch_C0_BankCopy
 
 
     ld hl,&FFF0;&2000
@@ -213,13 +213,13 @@ Detected128k:
     ld a,(de)
     cp b
     jr nz,No256k ; Data Not Stored
-    
+
     ; if we got here - the data was stored - now see if C7 and D7 are the same thing!?
     ld a,&C7
     ld bc,4
     ld hl,&4000
     ld de,&FFF8
-    call Akuyou_BankSwitch_C0_BankCopy 
+    call Akuyou_BankSwitch_C0_BankCopy
 
 
     ld hl,&FFF0
@@ -239,7 +239,7 @@ Detected128k:
     jr No256k
 Have256k:
     ld a,(CPCVer)
-        or 64 ;128+64 = 256k system 
+        or 64 ;128+64 = 256k system
     ld (CPCVer),a
 
 
@@ -279,7 +279,7 @@ ifdef SupportPlus ; {{{
 
     ifdef AllowDisk2    ;Plus sprites are on disk 1
         jp notaplus
-    endif 
+    endif
 
     call Blackout64k
 
@@ -301,7 +301,7 @@ ifdef SupportPlus ; {{{
 di
     call Plus_HideSprites
 ei
-    
+
 
 ;   call ScreenRestoreC000
 endif ; }}}
@@ -367,7 +367,7 @@ ifdef Support128k ; {{{
     ld a,&C5
     ld hl,&8000
     ld bc,&4000
-    ld de,&4000     
+    ld de,&4000
     call Akuyou_BankSwitch_C0_BankCopy
 BootstrapBackup_Not128k:
 endif ; }}}
