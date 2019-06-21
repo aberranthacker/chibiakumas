@@ -28,7 +28,6 @@ SECTIONS
 
 OUTPUT_FORMAT("a.out-pdp11")
 OUTPUT_ARCH(pdp11)
-SEARCH_DIR("/Users/oycymbalyuk/opt/binutils-pdp11/pdp11-dec-aout/lib");
 
 ENTRY(FileBeginCore)
 
