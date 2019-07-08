@@ -17,7 +17,6 @@
 
 org #9000
 
-
 ; CALL #9000,adresse,taille
 
 ; init
@@ -85,7 +84,6 @@ xor a
 ld (lz48_failed),a
 ld hl,0
 ld (literal),hl
-
 
 ;------------- inner compression loop ------
 crunch_data

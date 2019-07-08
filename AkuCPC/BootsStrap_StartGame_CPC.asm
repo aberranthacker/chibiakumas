@@ -16,13 +16,13 @@
     ld de,Akuyou_CoreStart
     call BootStrap_LoadDiskFile
 
-    call &BB57 ; VDU Disable
+    call &BB57 ; TXT VDU Disable
 
     ld hl,FileName_Settings
     ld de,SavedSettings
     call BootStrap_LoadDiskFile
 
-    call &BB54 ; VDU enable
+    call &BB54 ; TXT VDU enable
 
     ;wipe the CPC ver setting
     xor a
@@ -39,7 +39,7 @@
 
     di
     ld hl,(&bd37+1)             ;Get the Restore High Jumpblock command
-    ld (FirmJumpLoc_Plus2-2),hl     ; it's different on 464/6128 firmware!
+    ld (FirmJumpLoc_Plus2-2),hl ; it's different on 464/6128 firmware!
 
 ;test
 
@@ -261,7 +261,6 @@ endif ; }}}
 
     ld a,Font_Membank
     ld hl,DiskMap_Font      ;T07-SC1.D00
-;   ld b,DiskMap_Font_Size
     ld c,DiskMap_Font_Disk
     ld de,Font_RegularSizePos
     ld ix,Font_RegularSizePos-1+&1000
@@ -274,8 +273,6 @@ ifdef SupportPlus ; {{{
     ld a,(CPCVer)
     and 1
     jp z,notaplus
-
-
 
     ifdef AllowDisk2    ;Plus sprites are on disk 1
         jp notaplus
