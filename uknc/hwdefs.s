@@ -66,7 +66,7 @@
 .equiv PCHSOS, 0177076 # PPU channels 0/1 out - state register
 
 # PPU: keyboard registers
-.equiv KBINT,  0300
+.equiv KBINT,  0300    # keyboard interrupt
 .equiv KBSTAT, 0177700 # keyboard state register
 .equiv KBDATA, 0177702 # keyboard data register
 

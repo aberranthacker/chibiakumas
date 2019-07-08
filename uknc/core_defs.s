@@ -1,10 +1,10 @@
-.equiv FB0,  0x300 #   768
-.equiv FB1, 0x4180 # 16768
+.equiv FB0,  0x300 # 01400   768
+.equiv FB1, 0x4180 # 04060 16768
 
-.equiv SPReset, 0x2FE # Initial stack pointer
+.equiv SPReset, 0x2FE # 01376 766 Initial stack pointer
 
-.equiv BootstrapStart,  0x4180 # 16768
-.equiv Akuyou_GameVars, 0x8000 # 32768
+.equiv BootstrapStart,  FB1    #   04060 16768
+.equiv Akuyou_GameVars, 0x8000 # 0100000 32768
 .equiv Akuyou_CoreStart, (Akuyou_GameVars + 0x700) # Need &700 (1792) bytes!
                                                    # 0x8700 (34560)
 # 0x5900 (22784) bytes of RAM the rest

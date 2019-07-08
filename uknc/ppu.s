@@ -36,7 +36,7 @@ loop$:  BIT  $2,(R0)+
 RETURN
 
 # 0 data
-# 2 data 
+# 2 data
 # 4 address
 # 6 next element
 
