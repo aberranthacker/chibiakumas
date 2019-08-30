@@ -15,7 +15,7 @@ CORE.BIN : core.o
 bootstrap.o : bootstrap.s bootstrap/start_game.s core.o core_defs.s macros.s
 	ruby build_tools/preprocessor.rb -i bootstrap.s
 	$(AS) bootstrap.s -o bootstrap.o
-core.o : core.s core_defs.s macros.s
+core.o : core.s core_defs.s macros.s disk_driver.s player_driver.s
 	$(AS) core.s -o core.o
 clean :
 	rm -f *.o *.out *.SAV *.BIN

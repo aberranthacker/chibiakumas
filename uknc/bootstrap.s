@@ -4,18 +4,17 @@
 #.equiv DiskMap4, 4
 
                 .TITLE Chibi Akumas loader
-                .GLOBAL BootstrapStart
+                .GLOBAL BootstrapLaunch
 
                 .include "./macros.s"
                 .include "./core_defs.s"
 
                 .=040; .word BootstrapStart   # program’s relative start address
-                .=042; .word SPReset # initial location of stack pointer
+                .=042; .word SPReset          # initial location of stack pointer
                 .=050; .word BootstrapEnd - 2 # address of the program’s highest word
 
                 .=BootstrapStart
 
-        puts $TopStr
         puts $TitleStr
         puts $CreditsStr
         puts $WebSiteStr
@@ -63,11 +62,18 @@ Bootstrap_Level:
 # some missing code...
 Bootstrap_StartGame:
         exit
+        # loads core
+        # loads saved settings
+        # TODO: font load
+        # TODO: player sprites load
+        # TODO: Initialize the Sound Effects.
+        # ../AkuCPC/BootsStrap_StartGame_CPC.asm
         .include "./bootstrap/start_game.s" #   read "..\AkuCPC\BootsStrap_StartGame_CPC.asm"
         JMP Bootstrap_Level_0           #     jp Bootstrap_Level_0    ; Start the menu
 #----------------------------------------------------------------------------}}}
 Bootstrap_Level_0:                      # main menu -------------------------{{{
-                                        #     call StartANewGame
+        # ../Aku/BootStrap.asm:2271
+        call StartANewGame              #     call StartANewGame
                                         #     call LevelReset0000
                                         #
                                         #     ld hl,DiskMap_MainMenu      ;T08-SC1.D01
@@ -86,7 +92,7 @@ Bootstrap_Level_0:                      # main menu -------------------------{{{
 # .cas_out_open   equ &bc8c
 # .cas_out_direct equ &bc98
 # .cas_out_close  equ &bc8f
-# 
+#
 # BootStrap_LoadDiskFile:
 #     # HL - pointer to disk file
 #     # DE - Destination to write to
@@ -94,32 +100,51 @@ Bootstrap_Level_0:                      # main menu -------------------------{{{
 #     ld de,&C000 ; address of 2k buffer,
 #     ld b,12     ; 12 chars
 #     call cas_in_open
-# 
+#
 #     pop hl
 #     jr nc, LoadGiveUp
 #     call cas_in_direct
 # LoadGiveUp:
 #     jp cas_in_close
 
-LoadDiskFile:
+Bootstrap_LoadDiskFile:
+                #.LOOKUP $LkpArea        #.LOOKUP area,chan,dblk[,seqnum]
+                MOV     $LookupArea,R0
+                EMT     0375
+# TODO: carry the carry flag out of the procedure
+                BCS     1$
+                #.READW  $RdArea         #.READW  area,chan,buf,wcnt,blk[,BMODE=strg]
+                MOV     $ReadArea,R0
+                EMT     0375
+# TODO: carry the carry flag out of the procedure
+                BCS     1$
+1$:             #.Close  $0               #.CLOSE  chan
+                .equiv  CloseChan0, 0x0600 + 0 # operation code 6, channel 0
+                MOV     CloseChan0, R0
+                EMT     0374
 RETURN
 
-LookupArea:         .BYTE   0,1    # chan, code(.LOOKUP)
-    LookupFileName: .WORD   CoreBinRadix50 # dblk
+LookupArea:         .BYTE   0,01    # chan, code(.LOOKUP)
+    LookupFileName: .WORD   0 # dblk
 
-ReadArea:           .BYTE   0,10   # chan, code(.READ/.READC/.READW)
+ReadArea:           .BYTE   0,010   # chan, code(.READ/.READC/.READW)
                     .WORD   0 # blk
-    ReadBuffer:     .WORD   FileBeginCore # buf
-    ReadWordsCount: .WORD   FileSizeCoreWords # wcnt
+    ReadBuffer:     .WORD   0 # buf
+    ReadWordsCount: .WORD   0 # wcnt
                     .WORD   0 # end of area(.READW=0,.READ=1)
 CoreBinRadix50:
-    .byte 0xB8, 0x1A, 0x2A, 0x15, 0x40, 0x1F, 0xF6, 0x0D # .radix50 "DK CORE  BIN"
+    .byte 0xB8, 0x1A, 0x2A, 0x15, 0x40, 0x1F, 0xF6, 0x0D # .RAD50 "DK CORE  BIN"
+SavSetBinRadix50: # saved settings bin
+    .byte 0xB8, 0x1A, 0xFE, 0x76, 0x9C, 0x77, 0xF6, 0x0D # .RAD50 "DK SAVSETBIN"
+
 LookupError:        .ASCIZ  "File lookup error."
 ReadError:          .ASCIZ  "File read error."
 
-TopStr:             .ASCIZ  "              _------------------_"
-TitleStr:           .ASCIZ  "            -= ChibiAkumas V1.666 =-"
-CreditsStr:         .ASCIZ  "-= conversion for the UKNC by aberrant.hacker =-"
-WebSiteStr:         .ASCIZ  "              -= chibiakumas.com =-"
+TitleStr:           .ASCIZ  "         -= ChibiAkumas  V1.666 =-"
+CreditsStr:         .ASCIZ  "-= converted for the UKNC by aberranth =-"
+WebSiteStr:         .ASCIZ  "         -= www.chibiakumas.com =-"
         .even
+
+StartANewGame:
+                exit
 BootstrapEnd:

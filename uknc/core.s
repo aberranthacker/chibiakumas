@@ -1,8 +1,10 @@
 
                 .TITLE Chibi Akumas core module
 
-                .GLOBAL FileBeginCore
-                .GLOBAL FileEndCore
+                .global FileBeginCore
+                .global FileEndCore
+                .global SavedSettings
+                .global SavedSettings_Last
 
                 .include "./macros.s"
                 .include "core_defs.s"
@@ -22,9 +24,9 @@
 
         # ScreenBuffer2Pos equ &80
 
-#***************************************************************************************************
-#                   Main Project Code
-#***************************************************************************************************
+#******************************************************************************#
+#                              Main Project Code                               #
+#******************************************************************************#
                 .=Akuyou_GameVars # Need &700 bytes!
 
     .equiv StarArraySize, 255
@@ -56,107 +58,108 @@ FileBeginCore:
         .equiv Keymap_F2,    5
         .equiv Keymap_F3,    6
         .equiv Keymap_Pause, 7
-
         .equiv Keymap_AnyFire, 0b11001111
-# ;*******************************************************************************
-# ;                   Aligned Code
-# ;*******************************************************************************
-SavedSettings:   .byte 255          #pos -20 spare
-                 .byte   0          #pos -19 spare
-                 .byte   0          #pos -18 spare
-                 .byte   0          #pos -17 spare
-                 .byte   0b00000001 #pos -16 GameOptions (xxxxxxxS) Screen shake
-                 .byte   0          #pos -15 playmode 0 normal / 128 - 4D
-ContinueMode:    .byte   0          #pos -14 Continue Sharing (0/1)
-SmartbombsReset: .byte   3          #pos -13 SmartbombsReset
-ContinuesReset:  .byte  60          #pos -12 Continues Reset
-GameDifficulty:  .byte   0          #pos -11 Game difficulty
-                                    #        (enemy Fire Speed 0=normal, ;1=easy, 2=hard)
-                                    #        +128 = heaven mode , +64 = star Speedup
-                 .byte 0b00000000   #pos -10 Achievements (WPx54321) (W=Won P=Played)
-MultiplayConfig: .byte 0b00000000   #pos  -9 Joy Config   (xxxxxxFM)
-                                    #M=Multiplay
-                                    #F=Swap Fire 1/2
-TurboMode:       .byte 0b00000000       #pos -8 ------XX = Turbo mode [NoInsults/NoBackground/NoRaster/NoMusic]
-LivePlayers:     .byte 1                #pos -7 Number of players currently active in the game [2/1/0]
-TimerTicks:      .byte 0                #pos -6 ;used for benchmarking
-BlockHeavyPageFlippedColors: .byte 64   #pos -5 0/255=on  64=off
-BlockPageFlippedColors:      .byte 255  #pos -4 0/255=on  64=off
-ScreenBuffer_ActiveScreen:   .byte 0xC0 #pos -3
-ScreenBuffer_VisibleScreen:  .byte 0xC0 #pos -2
-CPCVer: .byte 00
-# ;CPC 0  =464 , 128=128 ; 129 = 128 plus ; 192 = 128 plus with 512k; 193 = 128 plus with 512k pos -1
-# ;MSX 1=V9990  4=turbo R
-# ;ZX  0=TAP 1=TRD 2=DSK   128= 128k ;192 = +3 or black +2
-#
-Player_Array:
-    P1_P00: .byte 100        # 0 - Y
-    P1_P01: .byte 32         # 1 - X
-    P1_P02: .byte 0          # 2 - shoot delay
-    P1_P03: .byte 2          # 3 - smartbombs
-    P1_P04: .byte 0          # 4 - drones (0/1/2)
-    P1_P05: .byte 60         # 5 - continues
-    P1_P06: .byte 0          # 6 - drone pos
-    P1_P07: .byte 0b00000111 # 7 - Invincibility
-    P1_P08: .byte 0          # 8 - Player SpriteNum
-    P1_P09: .byte 3          # 9 - Lives
-    P1_P10: .byte 100        #10 - Burst Fire (Xfire)
-    P1_P11: .byte 0b00000100 #11 - Fire Speed - PlayerShootSpeed_Plus1
-    P1_P12: .byte 0          #12 - Player num (0=1, 1=2)
-    P1_P13: .byte 0          #13 - Points to add to player 1 - used to make score 'roll up'
-    P1_P14: .byte 0          #14 - PlayerShootPower_Plus1
-    P1_P15: .byte 0x67       #15 - FireDir
 
-Player_Array2:             #Player 2 is 16 bytes after player 1
-    P2_P00: .byte 150        # 0 - Y
-    P2_P01: .byte 32         # 1 - X
-    P2_P02: .byte 0          # 2 - Shoot delay
-    P2_P03: .byte 2          # 3 - smartbombs
-    P2_P04: .byte 0          # 4 - Drones (0/1/2)
-    P2_P05: .byte 60         # 5 - continues
-    P2_P06: .byte 0          # 6 - Drone Pos
-    P2_P07: .byte 0b00000111 # 7 - Invincibility
-    P2_P08: .byte 0          # 8 - Player SpriteNum
-    P2_P09: .byte 0          # 9 - Lives
-    P2_P10: .byte 0          #10 - Burst Fire
-    P2_P11: .byte 0b00000100 #11 - Fire speed
-    P2_P12: .byte 128        #12 - Player num (0=1,1=2)
-    P2_P13: .byte 0          #13 - Points to add to player 2 - used to make score 'roll up'
-    P2_P14: .byte 0          #14 - PlayerShootPower_Plus1
-    P2_P15: .byte 0x67       #15 - FireDir
+################################################################################
+#                                 Aligned Code                                 #
+################################################################################
+SavedSettings: # {{{
+                     .byte 255          # pos -20 spare
+                     .byte   0          # pos -19 spare
+                     .byte   0          # pos -18 spare
+                     .byte   0          # pos -17 spare
+                     .byte   0b00000001 # pos -16 GameOptions (xxxxxxxS) Screen shake
+                     .byte   0          # pos -15 playmode 0 normal / 128 - 4D
+    ContinueMode:    .byte   0          # pos -14 Continue Sharing (0/1)
+    SmartbombsReset: .byte   3          # pos -13 SmartbombsReset
+    ContinuesReset:  .byte  60          # pos -12 Continues Reset
+    GameDifficulty:  .byte   0          # pos -11 Game difficulty
+                                        #         (enemy Fire Speed 0=normal, ;1=easy, 2=hard)
+                                        #         +128 = heaven mode , +64 = star Speedup
+                     .byte 0b00000000   # pos -10 Achievements (WPx54321) (W=Won P=Played)
+    MultiplayConfig: .byte 0b00000000   # pos  -9 Joy Config   (xxxxxxFM)
+                                        # M=Multiplay
+                                        # F=Swap Fire 1/2
+    TurboMode:       .byte 0b00000000       # pos -8 ------XX = Turbo mode [NoInsults/NoBackground/NoRaster/NoMusic]
+    LivePlayers:     .byte 1                # pos -7 Number of players currently active in the game [2/1/0]
+    TimerTicks:      .byte 0                # pos -6 used for benchmarking
+    BlockHeavyPageFlippedColors: .byte 64   # pos -5 0/255=on  64=off
+    BlockPageFlippedColors:      .byte 255  # pos -4 0/255=on  64=off
+    ScreenBuffer_ActiveScreen:   .byte 0xC0 # pos -3
+    ScreenBuffer_VisibleScreen:  .byte 0xC0 # pos -2
+    CPCVer: .byte 00
+    # ;CPC 0  =464 , 128=128 ; 129 = 128 plus ; 192 = 128 plus with 512k; 193 = 128 plus with 512k pos -1
+    # ;MSX 1=V9990  4=turbo R
+    # ;ZX  0=TAP 1=TRD 2=DSK   128= 128k ;192 = +3 or black +2
+    #
+    Player_Array:
+        P1_P00: .byte 100        # 0 - Y
+        P1_P01: .byte 32         # 1 - X
+        P1_P02: .byte 0          # 2 - shoot delay
+        P1_P03: .byte 2          # 3 - smartbombs
+        P1_P04: .byte 0          # 4 - drones (0/1/2)
+        P1_P05: .byte 60         # 5 - continues
+        P1_P06: .byte 0          # 6 - drone pos
+        P1_P07: .byte 0b00000111 # 7 - Invincibility
+        P1_P08: .byte 0          # 8 - Player SpriteNum
+        P1_P09: .byte 3          # 9 - Lives
+        P1_P10: .byte 100        #10 - Burst Fire (Xfire)
+        P1_P11: .byte 0b00000100 #11 - Fire Speed - PlayerShootSpeed_Plus1
+        P1_P12: .byte 0          #12 - Player num (0=1, 1=2)
+        P1_P13: .byte 0          #13 - Points to add to player 1 - used to make score 'roll up'
+        P1_P14: .byte 0          #14 - PlayerShootPower_Plus1
+        P1_P15: .byte 0x67       #15 - FireDir
 
-KeyMap2:
-    .byte 0xFF,       0x00 #Pause
-    .byte 0b01111111, 0x05 #Fire3
-    .byte 0b10111111, 0x06 #Fire2R
-    .byte 0b01111111, 0x06 #Fire1L
-    .byte 0b11011111, 0x07 #Right
-    .byte 0b11011111, 0x08 #Left
-    .byte 0b11101111, 0x07 #Down
-    .byte 0b11110111, 0x07 #Up
+    Player_Array2:             #Player 2 is 16 bytes after player 1
+        P2_P00: .byte 150        # 0 - Y
+        P2_P01: .byte 32         # 1 - X
+        P2_P02: .byte 0          # 2 - Shoot delay
+        P2_P03: .byte 2          # 3 - smartbombs
+        P2_P04: .byte 0          # 4 - Drones (0/1/2)
+        P2_P05: .byte 60         # 5 - continues
+        P2_P06: .byte 0          # 6 - Drone Pos
+        P2_P07: .byte 0b00000111 # 7 - Invincibility
+        P2_P08: .byte 0          # 8 - Player SpriteNum
+        P2_P09: .byte 0          # 9 - Lives
+        P2_P10: .byte 0          #10 - Burst Fire
+        P2_P11: .byte 0b00000100 #11 - Fire speed
+        P2_P12: .byte 128        #12 - Player num (0=1,1=2)
+        P2_P13: .byte 0          #13 - Points to add to player 2 - used to make score 'roll up'
+        P2_P14: .byte 0          #14 - PlayerShootPower_Plus1
+        P2_P15: .byte 0x67       #15 - FireDir
 
-KeyMap:
-    .byte 0xF7,       0x03 #Pause bit 20
-    .byte 0b11111011, 0x02 #Fire3     19
-    .byte 0b11111011, 0x04 #Fire2R    18
-    .byte 0b11110111, 0x04 #Fire1L    17
-    .byte 0xFD,       0x00 #Right     16
-    .byte 0xFE,       0x01 #Left      15
-    .byte 0xFB,       0x00 #Down      14
-    .byte 0xFE,       0x00 #Up        13
+    KeyMap2:
+        .byte 0xFF,       0x00 #Pause
+        .byte 0b01111111, 0x05 #Fire3
+        .byte 0b10111111, 0x06 #Fire2R
+        .byte 0b01111111, 0x06 #Fire1L
+        .byte 0b11011111, 0x07 #Right
+        .byte 0b11011111, 0x08 #Left
+        .byte 0b11101111, 0x07 #Down
+        .byte 0b11110111, 0x07 #Up
 
-KeyboardScanner_KeyPresses: .space 10 # Player1
-                                        #
-                                        # ;This is the raw keypress data
-                                        #
-                                        # align 8,0
-                                        # Player_ScoreBytes  defb &00,&00,&00,&00,&00,&00,&00,&00 ; Player 2 current score
-                                        # Player_ScoreBytes2 defb &00,&00,&00,&00,&00,&00,&00,&00 ; Player 1 current score
-                                        #             ;25
-                                        # HighScoreBytes defb    &00,&00,&00,&00,&00,&00,&00,&00  ; Highscore
-                                        #
-                                        # ;&80 bytes
-                                        # SavedSettings_Last:
+    KeyMap:
+        .byte 0xF7,       0x03 #Pause bit 20
+        .byte 0b11111011, 0x02 #Fire3     19
+        .byte 0b11111011, 0x04 #Fire2R    18
+        .byte 0b11110111, 0x04 #Fire1L    17
+        .byte 0xFD,       0x00 #Right     16
+        .byte 0xFE,       0x01 #Left      15
+        .byte 0xFB,       0x00 #Down      14
+        .byte 0xFE,       0x00 #Up        13
+
+    KeyboardScanner_KeyPresses: .space 10 # Player1
+                                            #
+                                            # ;This is the raw keypress data
+                                            #
+                                            # align 8,0
+                                            # Player_ScoreBytes  defb &00,&00,&00,&00,&00,&00,&00,&00 ; Player 2 current score
+                                            # Player_ScoreBytes2 defb &00,&00,&00,&00,&00,&00,&00,&00 ; Player 1 current score
+                                            #             ;25
+                                            # HighScoreBytes defb    &00,&00,&00,&00,&00,&00,&00,&00  ; Highscore
+                                            #
+                                            # ;&80 bytes
+SavedSettings_Last: # }}}
                                         #
                                         # ;X,X,Y,Y,S,[0,0,0] - [] not used
                                         # PlusSprites_Config1:
@@ -346,23 +349,24 @@ KeyboardScanner_KeyPresses: .space 10 # Player1
                                         #     defw Event_CoreReprogram               ;240
                                         #
                                         # read "..\SrcCPC\Akuyou_CPC_InterruptHandler.asm"
-                                        # ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-                                        # ; End of aligned code
-                                        # ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-                                        #
-                                        # PLY_FrequencyTable:
-                                        #     dw 3822, 3608, 3405, 3214, 3034, 2863, 2703, 2551, 2408, 2273, 2145, 2025
-                                        #     dw 1911, 1804, 1703, 1607, 1517, 1432, 1351, 1276, 1204, 1136, 1073, 1012
-                                        #     dw  956,  902,  851,  804,  758,  716,  676,  638,  602,  568,  536,  506
-                                        #     dw  478,  451,  426,  402,  379,  358,  338,  319,  301,  284,  268,  253
-                                        #     dw  239,  225,  213,  201,  190,  179,  169,  159,  150,  142,  134,  127
-                                        #     dw  119,  113,  106,  100,   95,   89,   84,   80,   75,   71,   67,   63
-                                        #     dw   60,   56,   53,   50,   47,   45,   42,   40,   38,   36,   34,   32
-                                        #     dw   30,   28,   27,   25,   24,   22,   21,   20,   19,   18,   17,   16
-                                        #     dw   15,   14,   13,   13,   12,   11,   11,   10,    9,    9,    8,    8
-                                        #     dw    7,    7,    7,    6,    6,    6,    5,    5,    5,    4,    4,    4
-                                        #     dw    4,    4,    3,    3,    3,    3,    3,    2,    2,    2,    2,    2
-                                        #     dw    2,    2,    2,    2,    1,    1,    1,    1,    1,    1,    1,    1
+
+################################################################################
+#                            End of aligned code                               #
+################################################################################
+
+# PLY_FrequencyTable:
+#     .word 3822, 3608, 3405, 3214, 3034, 2863, 2703, 2551, 2408, 2273, 2145, 2025
+#     .word 1911, 1804, 1703, 1607, 1517, 1432, 1351, 1276, 1204, 1136, 1073, 1012
+#     .word  956,  902,  851,  804,  758,  716,  676,  638,  602,  568,  536,  506
+#     .word  478,  451,  426,  402,  379,  358,  338,  319,  301,  284,  268,  253
+#     .word  239,  225,  213,  201,  190,  179,  169,  159,  150,  142,  134,  127
+#     .word  119,  113,  106,  100,   95,   89,   84,   80,   75,   71,   67,   63
+#     .word   60,   56,   53,   50,   47,   45,   42,   40,   38,   36,   34,   32
+#     .word   30,   28,   27,   25,   24,   22,   21,   20,   19,   18,   17,   16
+#     .word   15,   14,   13,   13,   12,   11,   11,   10,    9,    9,    8,    8
+#     .word    7,    7,    7,    6,    6,    6,    5,    5,    5,    4,    4,    4
+#     .word    4,    4,    3,    3,    3,    3,    3,    2,    2,    2,    2,    2
+#     .word    2,    2,    2,    2,    1,    1,    1,    1,    1,    1,    1,    1
                                         #
                                         # ifdef CPC320
                                         #     read "..\SrcCPC\Akuyou_CPC_VirtualScreenPos_320.asm"
@@ -378,7 +382,7 @@ KeyboardScanner_KeyPresses: .space 10 # Player1
                                         # ;;;;;;;;;;;;;;;;;;;;Input Driver;;;;;;;;;;;;;;;;;;;;;;;;
                                         # read "..\SrcCPC\Akuyou_CPC_KeyboardDriver.asm"
                                         # ;;;;;;;;;;;;;;;;;;;;Disk Driver;;;;;;;;;;;;;;;;;;;;;;;;
-                                        # read "..\SrcCPC\Akuyou_CPC_DiskDriver.asm"
+        .include "disk_driver.s"        # read "../SrcCPC/Akuyou_CPC_DiskDriver.asm"
                                         # read "..\SrcCPC\Akuyou_CPC_ExecuteBootstrap.asm"
                                         # read "..\SrcCPC\Akuyou_CPC_TextDriver.asm"
                                         #
@@ -387,7 +391,7 @@ KeyboardScanner_KeyPresses: .space 10 # Player1
                                         # read "..\SrcCPC\Akuyou_CPC_CompiledSpriteViewer.asm"    ;also includes CLS
                                         # read "..\SrcCPC\Akuyou_CPC_BankSwapper.asm"
                                         #
-                                        # read "..\SrcALL\Akuyou_Multiplatform_PlayerDriver.asm"
+        .include "player_driver.s"      # read "..\SrcALL\Akuyou_Multiplatform_PlayerDriver.asm"
                                         # read "..\SrcALL\Akuyou_Multiplatform_Timer.asm"
                                         #
                                         # read "..\SrcCPC\Akuyou_CPC_Gradient.asm"
