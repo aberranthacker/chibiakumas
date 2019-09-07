@@ -1,12 +1,9 @@
 
-
-; --------------------------------------------------------------------------------------------
-;***************************************************************************************************
-
-;            Text Driver
-
-;***************************************************************************************************
-;--------------------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+;|*****************************************************************************|
+;|*                               Text Driver                                 *|
+;|*****************************************************************************|
+;-------------------------------------------------------------------------------
 
 ;DrawText_SetPen equ &bb90 ;set pen to A
 ;DrawText_Locate equ &bb75 ; set location to X=L , Y=H
@@ -42,14 +39,10 @@ DrawText_PrintString:
     ret z
     ld i,a
     ld a,(bc)
-if BuildLang =''
     cp a,&80
     jr nc,DrawText_PrintLastChar
-else
-    cp a,255
-    ret z
-endif
-    Call DrawText_CharSpriteProtectBC
+
+    call DrawText_CharSpriteProtectBC
     inc bc
     jp DrawText_PrintString
 DrawText_PrintLastChar:
@@ -59,7 +52,6 @@ DrawText_CharSpriteProtectBC:
         call DrawText_CharSprite; draw char
     pop bc
     ret
-
 
 DrawText_Decimal:
     ld c,0
@@ -84,7 +76,6 @@ DrawText_DecimalLessThan100:
     ld b,a
     ld a,c
     or a
-;   jr z,SkipDigit100
     call nz,DrawText_CharSprite48
 SkipDigit100:
     ld a,b
@@ -123,20 +114,14 @@ DrawText_LocateSprite:  ; this mimics the way the firmare functions work  (DrawT
     add a
     add a
     add a
-;   add 24
     ld (SprShow_Y),a
     ld a,h
 ifndef CPC320
     sub TextScreen_MinX
 endif
     add a
-;   add 24
     ld (SprShow_X),a
-    ;xor a
-    ;ld hl,&C000
-    ;ld (SprShow_BankAddr),hl
 ret
-
 
 ; equiv of DrawText_PrintChar
 DrawText_CharSprite:        ; Must have already set the correct bank!
@@ -154,7 +139,6 @@ ifdef CPC320
 else
         cp 64
 endif
-
         ret nc
         ld (SprShow_TempX),a        ; move the cursor along for next char
         ld d,a
@@ -169,10 +153,8 @@ endif
     cp 192
     ret NC  ; Our font has no space! so dont draw anything below 32 (above 192)
 
-ifdef Support64k
   JR64K_1: add 0  ;faster than nop nop
   JR64K_From1:
-endif
     ld a,(BankSwitch_C0_CurrentB_Plus2-2)
     push af
         ld a,Font_Membank
@@ -181,8 +163,6 @@ endif
     pop af
     jp BankSwitch_C0_SetCurrent
 
-
-ifdef Support64k
 JR64K_To1:
 DrawText_CharFirmwareFont:
 
@@ -201,23 +181,17 @@ DrawText_CharFirmwareFont:
         rl d
         rl e
         rl d
-    ;   rlc e
-    ;   rl d
         add hl,de
         ld d,h
         ld e,l
     di
     exx
-    ;push de
-    ;push bc    ;for firmware safety@
         ld bc,DrawText_CharFirmwareFont_GetCharEnd-DrawText_CharFirmwareFont_GetChar+1
         ld hl,DrawText_CharFirmwareFont_GetChar
         ld de,&FFD0
         ldir
 
         ld bc,&7f00+%10001101  ;10AIRRMM ... A asic exclusive / RR UpperLower Rom (1= off) / MM screen mode
-    ;pop bc
-    ;pop de
     exx
 
     pop hl
@@ -233,9 +207,8 @@ DrawText_CharFirmwareFont:
     ld b,9
     ld de,&F7D0
     jr DrawText_DicharSprite_NextLine2B
+
 DrawText_DicharSprite_NextLineMini:
-
-
     ld a,(de)
     ld c,a
     xor a
@@ -280,8 +253,6 @@ DrawText_DicharSprite_NextLine:
     rrca
     ld (hl),a
 
-
-
 DrawText_DicharSprite_NextLine2:
     push de
         call GetNxtLin
@@ -290,11 +261,8 @@ DrawText_DicharSprite_NextLine2:
 DrawText_DicharSprite_NextLine2B:
     djnz DrawText_DicharSprite_NextLine :DrawText_DicharSprite_Font_Plus1
 
-
     ei
     ret
-
-endif
 
 DrawText_CharFirmwareFont_GetChar:
     ld bc,&7f00+%10001001  ;10AIRRMM ... A asic exclusive / RR UpperLower Rom (1= off) / MM screen mode

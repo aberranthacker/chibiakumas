@@ -160,7 +160,7 @@ Bootstrap_FromBasic:
     jp Bootstrap_FromHL
 
 ;*******************************************************************************
-;*                   Start Game
+;*                                Start Game                                   *
 ;*******************************************************************************
 Blackout64k: ;Blackout screen on 64k, do nothing on 128
 ifdef Support64k
@@ -2270,34 +2270,14 @@ templateFire2:  bit Keymap_F2,a
 
 StartANewGame:
     ;reset the core
-ifdef SupportPlus ; {{{
-    ld a,&C9 ;ret
-    ld (PlusToggle1),a
-endif ; }}}
     xor a
     ld (ShowContinueCounter_Plus1-1),a
 
-    ld hl,&00c6 ;add 0 - faster than nop nop
+    ld hl,&00c6 ; add 0 - faster than nop nop
     ld (JR64K_1),hl
     ld (JR64K_2),hl
-    ld a,(CPCVer)
-    and %00000001
-    jr z,StartANewGameNotPlus
-;;;;;;;;;;;;;;;; PLUS code ;;;;;;;;;;;;;;;;;;;;;;;;;;
-ifdef SupportPlus ; {{{
-        xor a
-        ld (PlusToggle1),a
-endif ; }}}
-    ld hl,EnablePlusPalette
-    ld (EnablePlusPalette_Plus2-2),hl
 
-StartANewGameNotPlus:
-;;;;;;;;;;;;;;;;64k code ;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ld a,(CPCVer)
-    and 128
-    jr nz,StartANewGameNot64k
-
-    ld l,&18
+    ld l,&18 ; JR d ; 18 d
     ld h,JR64K_To1-JR64K_From1
     ld (JR64K_1),hl
     ld h,JR64K_To2-JR64K_From2
@@ -2305,7 +2285,6 @@ StartANewGameNotPlus:
     ld h,JR64K_To3-JR64K_From3
     ld (JR64K_3),hl
 
-StartANewGameNot64k:
     ld bc,&3E0D     ;Split Continues
     ld de,&2ADD
     ld a,(ContinueMode)
@@ -2314,6 +2293,7 @@ StartANewGameNot64k:
 
     ld de,&21FD
     ld bc,&C90E     ;Shared Continues
+
 ContinueModeSet:
     ld a,b
     ld (ShowContinuesSelfMod),a
