@@ -21,7 +21,7 @@ SpendCheck:
     jr nz,NoSpend
 
     ld a, ixl ; read the keymap
-    or Keymap_AnyFire 
+    or Keymap_AnyFire
     inc a ; cp 255
     ret z
 
@@ -38,7 +38,7 @@ SpendCreditSelfMod: ld iy,Player_Array ; All credits are (currently) stored in p
     ld (ix+9),a
     ld a,(SmartbombsReset)
     ld (ix+3),a
-ret 
+ret
 
 Players_Dead:       ;Both players are dead, so pause the game and show the continue screen
     ld a,&3C
@@ -58,10 +58,6 @@ Player_Handler:
         ;Used to update the live player count
         xor a
 
-ifdef SupportPlus
-        ld (FlashPlusSprite_Plus1-1),a
-endif
-
 PlayerCounter:  inc a
         inc a
     ld (LivePlayers),a
@@ -69,7 +65,7 @@ PlayerCounter:  inc a
         jr z, Players_Dead
 
     ld hl,&0000     ;nop,nop
-    ld (PlayerCounter),hl   
+    ld (PlayerCounter),hl
 
     call KeyboardScanner_Read
 
@@ -100,7 +96,7 @@ Player1NotDead:
     jr z,ChibikoLeftRight
 
         ld h,&68
-        ld e,PlusSprite_ExtBank;&C7     
+        ld e,PlusSprite_ExtBank;&C7
 
         ld d,&C1
 
@@ -113,18 +109,8 @@ ChibikoLeftRight:
 Player2Start:
     call Player_ReadControls2
 
-ifdef SupportPlus ; {{{
-    ld hl,DronePlusSpriteA_Plus2-1
-    ld de,DronePlusSpriteB_Plus2-1
-    ld b,(hl)
-    ld a,(de)
-    ld (hl),a
-    ld a,b
-    ld (de),a
-endif ; }}}
-
     ld iy,Player_Array2
-    ld a,(P2_P09)   
+    ld a,(P2_P09)
     or a
     jp z,SpendCheck
 
@@ -139,22 +125,6 @@ ifdef DualChibikoHack
     jr Player2NotDead64kver
 endif
 
-JR64k_3: add 0
-
-JR64K_From3:
-    ld d,&C1
-    ld e,PlusSprite_ExtBank ; &C7
-
-    ld h,&78            ;Bochan Memory LR
-
-    ld a,(P2_P08)
-    and %10000000
-    jr z,BochanLeftRight
-
-    ld h,&70;&78        ;Bochan memory bank UD
-
-BochanLeftRight:
-JR64K_To3:
 Player2NotDead64kver:
     ld a,12
     ld b,16
@@ -163,18 +133,6 @@ Player2NotDead64kver:
     jp BankSwitch_C0_SetCurrentToC0
 Player_HandlerOne:
     ld (SprShow_BankAddr),hl
-
-ifdef SupportPlus ; {{{
-    ld (PlusSpriteNo_Plus1-1),a
-    ld (PlusSpriteNoC_Plus1-1),a
-
-    ld (PlayerSpriteOffset_Plus1-1),a
-    ld a,b
-    ld (PlusSpriteNoB_Plus1-1),a
-
-    ld a,d
-    ld (PlusSpriteBank_Plus1-1),a
-endif ; }}}
 
     ld a,e
     ld (PlayerSpriteBank_Plus1-1),a;    call Akuyou_BankSwitch_C0_SetCurrent
@@ -190,7 +148,7 @@ endif ; }}}
     ld hl,Timer_Pause_Plus1-1
 
     ld a,(hl)
-    cpl 
+    cpl
     ld (hl),a
     ld b,12
 
@@ -228,7 +186,7 @@ Player_Handler_DronePosOk:
     ld (iy+6),a ;D1 - shots and drones
     add a
     ld (Player_DroneOffset1_Plus1-1),a
-    
+
     ld c,(iy)   ;Y
     ld b,(iy+1) ;X
 
@@ -241,7 +199,7 @@ SelfModifyingFire2: bit Keymap_F2,a
     ;fire bullets
 SelfModifyingFire1: bit Keymap_F1,a
     jr nz,Player_Handler_NoFireX
-    
+
     call Player_Handler_FireX       ; Xfire is a secret feature planned for the sequel
     jr Player_Handler_KeyreadJoy1Up ; it activates when both fire buttons are pressed
 
@@ -259,30 +217,20 @@ SelfModifyingFire1B:    bit Keymap_F1,a
     jr nz,Player_Handler_KeyreadJoy1Up
 
     ;fire bullets
-
     call SetFireDir_LEFTsave    :Fire1Handler_Plus2
-
 
 ;Player_ShootSkip2
     ld e,2  :PlayerMoveSpeedSlow2_Plus1; Slow move speed as we're firing
 Player_Handler_KeyreadJoy1Up:
     ld a,e
-ifdef SupportPlus ; {{{
-    ld (PlayerMoveSpeed_Plus1-1),a
-endif ; }}}
     ld a,ixl
     bit Keymap_U,a
     jr nz,Player_Handler_KeyreadJoy1Down
     ld a,C
-ifdef CPC320
     cp 24+16                ;Check we're onscreen
-else
-    cp 24+16                ;Check we're onscreen
-endif
     jr C,Player_Handler_KeyreadJoy1DownPre
 
     sub e
-    ;add e
     ld C,a
 
     call null  :FireUpHandler_Plus2
@@ -354,7 +302,7 @@ Player_Handler_SmartBomb:           ;Check if we should fire the smarbomb
     ld a,(iy+3) ; see if we've got any smartbombs left
     sub 1
     jr c,Player_Handler_KeyreadDone
-    ld (iy+3),a 
+    ld (iy+3),a
 
     call DoSmartBomb
     ld a,3
@@ -366,10 +314,10 @@ Player_Handler_KeyreadDone:
     jr z,Player_Handler_NoSaveFire
 
     ld a,0 :PlayerThisSprite_Plus1
-    ld (iy+8),a     
+    ld (iy+8),a
 
     ld a,0 :PlayerThisShot_Plus1
-    ld (iy+15),a    
+    ld (iy+15),a
 
 Player_Handler_NoSaveFire:
     ld a,(iy+8)
@@ -379,11 +327,11 @@ Player_Handler_NoSaveFire:
 
     ld a,0 :PlayerDoFire_Plus1
     or a
-    call nz,Player_Fire4D   
+    call nz,Player_Fire4D
 
     push bc
         ld a,PlusSprite_ExtBank :PlayerSpriteBank_Plus1
-        call BankSwitch_C0_SetCurrent   
+        call BankSwitch_C0_SetCurrent
     pop bc
 
     ld (iy),c   ;Y
@@ -395,7 +343,7 @@ Player_Handler_NoSaveFire:
     jr z,Player_Handler_Frame1
     inc e
 
-Player_Handler_Frame1:  
+Player_Handler_Frame1:
     push de     ;save the frame no
     ld a,B  :DroneDirPos8_Plus1;    ld a,c;ld a,B
     sub 4;  sub 12;sub 4
@@ -407,7 +355,7 @@ Player_Handler_Frame1:
     push iy
     push bc
 
-    ld a,4 
+    ld a,4
 
         add e
         ld (SprShow_SprNum),a
@@ -418,16 +366,6 @@ Player_Handler_Frame1:
         ld a,-12
         sub 16:Player_DroneOffset1_Plus1
         call SetDronePos
-ifdef SupportPlus ; {{{
-        ld a,(CPCVer)
-        and %00000001
-        jr z,Drone2NoPlus
-    
-        ld de,&0409 :DronePlusSpriteA_Plus2
-        call ConvertSpriteCoords
-
-        jr Drone2Plus
-endif ; }}}
 
 Drone2NoPlus:
 
@@ -441,17 +379,6 @@ Player_Handler_OneDrone:
 Player_Handler_OneDroneSkip:
         ld a,(Player_DroneOffset1_Plus1-1);16Player_DroneOffset2_Plus1
         call SetDronePos
-
-ifdef SupportPlus ; {{{
-        ld a,(CPCVer)
-        and %00000001
-        jr z,Drone1NoPlus
-    
-        ld de,&0509 :DronePlusSpriteB_Plus2
-
-        call ConvertSpriteCoords
-        jr Drone1PlusRet
-endif ; }}}
 
 Drone1NoPlus:
         call ShowSprite
@@ -469,37 +396,20 @@ pop de  ;get back the frame num
     ld a,(iy+7) ;invincibility
 
     or a
-    jr z,Player_NotInvincible   
+    jr z,Player_NotInvincible
     ld a,(Timer_TicksOccured)
     bit 1,a
     jr z,Player_NotInvincible   ;invincible flash
 
     bit 2,a
-    jr z,Player_SpriteSkip  
+    jr z,Player_SpriteSkip
 
     dec (iy+7)  ;invincibility
 
 Player_SpriteSkip:
-ifdef SupportPlus ; {{{
-    ld a,(CPCVer)
-    and %00000001
-    ret z
-    ld b,200
-    ld de,&0400 :PlusSpriteNoB_Plus1
-
-    di
-Player_SpriteSkip_More:
-        dec d
-        call    Plus_SetSprite
-        ld a,0 :PlusSpriteNoC_Plus1
-        cp d
-        jr nz,Player_SpriteSkip_More
-
-    ei
-endif ; }}}
 ret
 
-Player_NotInvincible:   
+Player_NotInvincible:
 
 push bc
     ;draw the player
@@ -507,80 +417,6 @@ push bc
     and %00001111
     add e
     ld (SprShow_SprNum),a
-
-ifdef SupportPlus ; {{{
-    ld a,(CPCVer)
-    and %00000001
-    jr z,ShowPlayer_NoPlus
-
-;We flash the player when moving slowly, so the player can see bullets in the background as sprites are always at the top
-    ld a,0:PlayerMoveSpeed_Plus1
-    cp 2
-    jp nz,PlayerPlusNoFlash
-
-    ld a,(BlockPageFlippedColors)
-    cp 64
-    jr z,PlayerPlusNoFlash
-    ld a,1
-    ld (PlusSpriteSwapFrameSkipper_Plus1-1),a
-    ld (FlashPlusSprite_Plus1-1),a
-PlayerPlusNoFlash:
-    ld a,(SprShow_SprNum)
-    add a
-    add a
-    ld (PlusSpriteOffsetB_Plus1-1),a
-        ld a,c
-        sub 24+18
-        ld c,a
-
-        ld a,b
-        sub 24+8
-        ld b,a
-
-    ld a,(P1_P07)
-    ld d,a
-    ld a,(P2_P07)
-    or d
-    jp z,Player_HandlerOne_NoInvincibility
-    ld a,1
-    ld (PlusSpriteSwapFrameSkipper_Plus1-1),a
-
-Player_HandlerOne_NoInvincibility:
-        ld de,&0009:PlusSpriteNo_Plus1
-        di
-            call    Plus_SetSprite
-            ld a,b
-            add &08
-            ld b,a
-            inc d;ld d,&01
-            call    Plus_SetSprite
-        ei
-            ld a,b
-            sub &08
-            ld b,a
-
-            ld a,c
-            add &10
-            ld c,a
-
-            inc d;  ld d,&02
-        di
-            call    Plus_SetSprite
-
-            ld a,b
-            add &08
-            ld b,a
-            inc d;ld d,&03
-            call    Plus_SetSprite
-        ei
-            ld a,2 :PlusSpriteSwapFrameSkipper_Plus1
-            dec a
-            call z,CoreExt_PlusSpriteSwapB
-            ld (PlusSpriteSwapFrameSkipper_Plus1-1),a
-
-    pop bc  
-ret
-endif ; }}}
 
 ShowPlayer_NoPlus:
     ld a,c
@@ -615,7 +451,7 @@ Player_Handler_FireX:
     ld (iy+2),255   ;Set player can't fire
 
     call Stars_AddToPlayer
-    
+
     ld a,(iy+10)    ;Burst Fire counter
     sub 1
     ret c
@@ -636,7 +472,7 @@ NotSmallBurst:
 
     pop iy
 
-    ld e,2  
+    ld e,2
     jr FireSfx
 
 Xfire:
@@ -667,7 +503,7 @@ Player_Fire:    ; Fire bullets!
 
     Player_Handler_KeyreadJoy1Fire2_DroneLimit:
         ld (iy+6),a ;D1
-    
+
     pop de
     pop bc
     ld a,(iy+2) ;D1
@@ -675,7 +511,7 @@ Player_Fire:    ; Fire bullets!
     ret nz
     or %10000000
     ld (iy+2),a ;D1
-    
+
     push bc
 
         call Stars_AddToPlayer
@@ -716,7 +552,7 @@ FireSfx:
 dodrone:
     push bc
         ld d,b
-        
+
         add d :DroneFlipFirePos3_Plus1
 
         ld d,a  :DroneFlipFirePos2_Plus1;ld c,a ;Flip for X
@@ -855,17 +691,17 @@ MemoryFlushLDIR:
 ;;                               Smart Bomb                                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-DoSmartBomb:    
+DoSmartBomb:
     push de
     push bc
 
-    ld a,StarArraySize-1;(StarArraySize_Enemy) 
-    ld hl,StarArrayPointer;(StarArrayMemloc_Enemy)   
+    ld a,StarArraySize-1;(StarArraySize_Enemy)
+    ld hl,StarArrayPointer;(StarArrayMemloc_Enemy)
 
     call MemoryFlushLDIR
 
     call null :SmartBombSpecial_Plus2 ; We can hack in our own smartbomb handler
-                                      ; this is needed to wipe omega array for 
+                                      ; this is needed to wipe omega array for
                                       ; final boss as it's not handled by
                                       ; normal core code
     ld b,ObjectArraySize;a
@@ -883,17 +719,17 @@ Player_Handler_SmartBombObjLoop: ; we need special code because we don't want to
         ;s
         set 6,l ;inc h
         ld a,(hl)   ;life (0 is background)
-        or a 
+        or a
 
         jr z,Player_Handler_SmartBombObjMoveNext
         inc a;      cp 255
         jr z,Player_Handler_SmartBombObjMoveNext
-          
+
         dec h;inc h
 
         call null : CustomSmartBombEnemy_Plus2
 
-        ld a,(hl)   
+        ld a,(hl)
         or a
         jr z,SmartBombKill
 
@@ -909,19 +745,19 @@ SmartBombKill
         inc h ;X
 
         ld (hl),%10001011 ; %10010011
-    
-        inc h   
+
+        inc h
         ld (hl),128+16  :PointsSpriteB_Plus1; Sprite
-    
-        set 6,l;        inc h   
+
+        set 6,l;        inc h
         ld (hl),64+63   ; Life ; must "hurt" player for hit to be detected
-        dec h;inc h 
+        dec h;inc h
         ld (hl),3   ; Program
         dec h
         dec h
         ld (hl),0
 
-Player_Handler_SmartBombObjMoveNext:    
+Player_Handler_SmartBombObjMoveNext:
     pop hl
     inc l
     djnz Player_Handler_SmartBombObjLoop
@@ -932,17 +768,17 @@ Player_Handler_SmartBombObjMoveNext:
 ret
 
 DoSmartBombFX:
-    push af;    
-    
+    push af;
+
     or a
-    ret z 
+    ret z
 
     ld a,5
     ld(SmartBomb_Plus1-1),a
 
-    pop af ; ld a,i  
+    pop af ; ld a,i
     dec a  ; cp 1
-    ret z 
+    ret z
 
     ld a,5
     jp SFX_QueueSFX_GenericHighPri
@@ -972,7 +808,7 @@ Player_Hit:
         ld c,b
         ld d,b
 
-        ld a,iyh    
+        ld a,iyh
         cp 128+38   :DroneSprite_Plus1
         jr z,Player_Hit_PowerupDrone
         cp 128+39   :ShootSpeedSprite_Plus1
@@ -1004,23 +840,22 @@ Player_Hit_Points:
 
         ret
 
-Player_Hit_PowerupShootSpeed:       
+Player_Hit_PowerupShootSpeed:
         push iy
             ld iy,(PlayerHitMempointer_Plus2-2)
             ld a,(iy+11)
 
-            srl a   
+            srl a
             or a
             jr nz,Player_Hit_PowerupShootSpeedNZ
                 inc a ;dont let a=0
-Player_Hit_PowerupShootSpeedNZ:             
+Player_Hit_PowerupShootSpeedNZ:
             ld (iy+11),a
-            ;ld (PlayerShootSpeed_Plus1-1),a
 
         pop iy
         jr PowerupPlaySfx
-Player_Hit_PowerupDrone:
 
+Player_Hit_PowerupDrone:
         push iy
             ld iy,(PlayerHitMempointer_Plus2-2)
             ld a,(iy+4)
@@ -1029,7 +864,7 @@ Player_Hit_PowerupDrone:
             inc a
             ld (iy+4),a
 Player_Hit_PowerupDroneFull:
-            pop iy 
+            pop iy
         jr PowerupPlaySfx
 Player_Hit_PowerupShootPower:
         ld a,&96;6f
@@ -1057,25 +892,23 @@ Player_Hit_Injure_1
 Player_Hit_Injure_X
             ld (PlayerHitMempointer_Plus2-2),hl
         pop hl
-Player_Hit_Injure:  
+Player_Hit_Injure:
     push iy
     ld iy,Player_Array :PlayerHitMempointer_Plus2
 
     ld a,(iy+7) ;invincibility
-    or a;and %11100000  
+    or a;and %11100000
     jr nz,Player_Hit_Done       ;>0 if player invincible
 
-        ;ld a,(iy+4)    ;invincibility
-;       or 
         ld (iy+7),%00000111     ;invincibility
 
-        ld a,(iy+9) 
-        sub 1   
+        ld a,(iy+9)
+        sub 1
         jr c,Player_Hit_Done    ; We are below zero!
-        ld (iy+9),a 
+        ld (iy+9),a
 
         jr z,PlayerKilled
-        ld a,4      
+        ld a,4
         call SFX_QueueSFX_GenericHighPri
 Player_Hit_Done:
     pop iy
@@ -1088,51 +921,16 @@ PlayerKilled:
     pop iy
         ld a,20
         ld (SpendTimeout_Plus1-1),a
-    
+
         ld a,100
         ld (ShowContinueCounter_Plus1-1),a
-ifdef SupportPlus
-        ld (PlayerJustKilled_Plus1-1),a     ;Tell PlayerUI to hide everything
-endif
-        ret
-
 ret
 
 ;******************************************************************************;
 ;*                                  Player UI                                 *;
 ;******************************************************************************;
 
-ifdef SupportPlus ; {{{
-Plus_SetSprite_IfANonzero: ; or <h
-    or a
-    ld de,4
-    ld c,9
-    ld b,3
-    Plus_SetSprite_IfANonzeroMore:
-    jr nz,Plus_SetSprite_IfANonzeroNotZero
-    ld c,a
-    Plus_SetSprite_IfANonzeroNotZero:
-    ld (hl),c
-    add hl,de
-    dec a
-    djnz Plus_SetSprite_IfANonzeroMore
-    ret
-
-
-Player_DrawUI_PlusVer:
-    di
-        ld a,(iy+9) ;lifes
-        ld hl,4*3+PlusSprites_Config1+4 :PlusIcons_Bank1_Plus2
-        call Plus_SetSprite_IfANonzero
-
-        ld a,(iy+3) ;smartbombs
-        ld hl,PlusSprites_Config2+4    :PlusIcons_Bank2_Plus2
-        call Plus_SetSprite_IfANonzero
-    ei
-    ret
-endif ; }}}
-
-Player_DrawUI_IconLoop:     ; Used for Health and Smartbomb icons 
+Player_DrawUI_IconLoop:     ; Used for Health and Smartbomb icons
     ld a,b
     or a
     ret z
@@ -1146,7 +944,7 @@ Player_DrawUI_IconLoop:     ; Used for Health and Smartbomb icons
     push bc
         call ShowSpriteDirect
     pop bc
-    dec b   
+    dec b
     ld a,c
     add a,4 :Player_DrawUI_IconLoop_MoveSize_Plus1
     ld c,a
@@ -1166,47 +964,6 @@ Player2DoContinue:
 Player_DrawUI: ; We put PLus sprite anims here, as they
                ; have to be run after the playerhandler
                ; and mess up practically ALL registers
-
-ifdef SupportPlus ; {{{
-        ld a,(CPCVer)
-        and %00000001
-        jr z,TwoDronesOnscreen
-
-        ld a,0:PlayerJustKilled_Plus1
-        or a
-        jr z,PlayerNotJustKilled
-        di
-        call Plus_HideSprites
-        ei
-        ld iy,Player_Array2
-        call Player2DrawUI
-        ld iy,Player_Array
-        call Player1DrawUI
-
-        xor a
-        ld (PlayerJustKilled_Plus1-1),a
-PlayerNotJustKilled:
-
-        ld a,(P2_P04)           ;see if between them the two players have two drones
-;       and %00011000
-        ld b,a
-        ld a,(P1_P04)
-;       and %00011000
-        add b
-        cp 2
-        jr NC,TwoDronesOnscreen
-        dec b 
-        ld a,(DronePlusSpriteA_Plus2-1)
-        jr z,Player2_1Drone
-
-        xor 1   ;Flip between 4 and 5 (The drone sprites)
-Player2_1Drone:
-        ld c,219                ; hide the second drone if we only have one onscreen
-        ld d,a
-        ld e,0
-        call    Plus_SetSpriteInterruptsafe
-
-endif ; }}}
 
 TwoDronesOnscreen:
     ld iy,Player_Array
@@ -1229,10 +986,6 @@ Player2_DeadUI:
     cp 2
     ret nc
     ;1 player or less!
-ifdef SupportPlus
-    ld a,1
-    ld (PlusSpriteSwapFrameSkipper_Plus1-1),a
-endif   
     ld a,(ShowContinueCounter_Plus1-1)
     or a
     ret z
@@ -1242,16 +995,16 @@ endif
 ShowContinues:
     ld h,&0E    :ContinuesScreenpos_Plus1
     ld bc,txtCreditsMsg2
-    call DrawText_LocateAndPrintStringUnlimited 
+    call DrawText_LocateAndPrintStringUnlimited
 
-    ld a,(P1_P05)   
-    call DrawText_Decimal       
+    ld a,(P1_P05)
+    call DrawText_Decimal
 
 ShowContinuesSelfMod:   ld a,"/"
     call Akuyou_DrawText_CharSprite
 
-    ld a,(P2_P05)   
-    jp DrawText_Decimal     
+    ld a,(P2_P05)
+    jp DrawText_Decimal
 
 Player2Continue:
 ifdef CPC320
@@ -1267,7 +1020,7 @@ else
     ld hl,&0501;14              ; show how many credits are left
 endif
 Player1ContinueB:
-    push hl 
+    push hl
         ld hl,ShowContinueCounter_Plus1-1
         dec (hl)
 ;       ld a,(ShowContinueCounter_Plus1-1)
@@ -1277,34 +1030,25 @@ Player1ContinueB:
         call SpriteBank_Font2
     pop hl
     ld bc,txtPressButtonMsg2
-    jp DrawText_LocateAndPrintStringUnlimited   
+    jp DrawText_LocateAndPrintStringUnlimited
     txtCreditsMsg2:
         db "Credits",":"+&80
     txtPressButtonMsg2:
         db "Continue","?"+&80
 
-Player_DrawUIDual:  
+Player_DrawUIDual:
     ld (Player_DrawUI_IconLoop_MoveSize_Plus1-1),a
     ld a,b
     ld (Player_DrawUI_IconLoop_XPos_Plus1-1),a
-
-ifdef SupportPlus
-    ld (PlusIcons_Bank1_Plus2-2),de
-    ld (PlusIcons_Bank2_Plus2-2),hl
-
-    ld a,(CPCVer)
-    and %00000001
-    jp nz,Player_DrawUI_PlusVer
-endif
 
     ld hl,Akuyou_PlayerSpritePos
     ld (SprShow_BankAddr),hl
 
     xor a
-    ld (SprShow_Xoff),a 
+    ld (SprShow_Xoff),a
 
     ld b,(iy+9) ;LIves
-    
+
     ld a,7
 
     ld (SprShow_SprNum),a
@@ -1320,7 +1064,7 @@ endif
 
         ld a,6
         ld (SprShow_SprNum),a
-    
+
     ifdef CPC320
         ld a,180
     else
@@ -1343,13 +1087,13 @@ Player1DrawUI:
     call Player_DrawUIDual
 ifdef CPC320
     ld a,7
-    ld hl,&0003 
+    ld hl,&0003
 else
     ld a,7+4
     ld hl,&0403     ;Burst postition
 endif
     ld iy,Player_Array
-    ld de, Player_ScoreBytes    
+    ld de, Player_ScoreBytes
 
     jr Player_DrawUI_PlusAsWell
 
@@ -1362,16 +1106,16 @@ Player2DrawUI:
         ld b,64-4
     endif
 
-    ld de,3*4+PlusSprites_Config2+3 
+    ld de,3*4+PlusSprites_Config2+3
     ld hl,PlusSprites_Config1+3
 
     call Player_DrawUIDual
 
 ifdef CPC320
-    ld hl,&2503 
+    ld hl,&2503
     ld a,40-1
 else
-    ld hl,&2103 ;Burst postition 
+    ld hl,&2103 ;Burst postition
     ld a,36-1
 endif
     ld iy,Player_Array2
@@ -1394,9 +1138,9 @@ Player_DrawUI_PlusAsWell:
 Player_DrawUI_NextDigit:
     push hl
 
-        ld a,(hl)       
+        ld a,(hl)
         add 48 ; Move to the correct digit (first 32 are not in font)
-        ;add 8 
+        ;add 8
 
         ld b,-2 ; we are drawing backwards!
 
@@ -1415,17 +1159,17 @@ ScoreAddRepeat:             ;This does our rolling up effect on the score!
     push hl
         call Player_UpdateScore
     pop hl
-    ld a,(iy+13)    
+    ld a,(iy+13)
     cp 30               ; if waiting score goes over 30, add faster
     jr nc,ScoreAddRepeat        ; this is for the 'coffee time' effect at the
-                    ; end of level 9  
+                    ; end of level 9
 
     ;Show the remaining 'burst fire' power
     ld hl,&0003 : BurstDrawPos_Plus2
-    call DrawText_LocateSprite  
-    ld a,(iy+10)    
+    call DrawText_LocateSprite
+    ld a,(iy+10)
     or a
-    call nz,DrawText_Decimal    
+    call nz,DrawText_Decimal
 
     ret: CheatMode_Plus1
 
@@ -1458,7 +1202,7 @@ Player_UpdateScore:         ;Add score to the first digit
     ld a,(hl)
     inc a
     ld (hl),a
-    cp 10 
+    cp 10
     ret C   ; return if nothing to carry
     inc c   ; We've rolled into another digit.
 

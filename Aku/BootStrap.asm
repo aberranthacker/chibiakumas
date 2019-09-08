@@ -2273,18 +2273,6 @@ StartANewGame:
     xor a
     ld (ShowContinueCounter_Plus1-1),a
 
-    ld hl,&00c6 ; add 0 - faster than nop nop
-    ld (JR64K_1),hl
-    ld (JR64K_2),hl
-
-    ld l,&18 ; JR d ; 18 d
-    ld h,JR64K_To1-JR64K_From1
-    ld (JR64K_1),hl
-    ld h,JR64K_To2-JR64K_From2
-    ld (JR64K_2),hl
-    ld h,JR64K_To3-JR64K_From3
-    ld (JR64K_3),hl
-
     ld bc,&3E0D     ;Split Continues
     ld de,&2ADD
     ld a,(ContinueMode)

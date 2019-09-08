@@ -14,20 +14,14 @@ DrawText_LocateAndPrintStringUnlimited:
     call DrawText_LocateSprite
 DrawText_PrintStringUnlimited:
     ld a,(bc)
-if BuildLang =''
     cp a,&80
     jr nc,DrawText_PrintLastChar
-else
-    cp a,255
-    ret z
-endif
     push bc
         call DrawText_CharSprite; draw char
     pop bc
 
     inc bc
     jp DrawText_PrintStringUnlimited
-
 
 ;DrawText_LocateAndPrintString
 ;   call DrawText_LocateSprite
@@ -102,7 +96,6 @@ ret
 ;end of drawtext decimal
 
 
-
 DrawText_CarriageReturnSprite:
 ld hl,&0000 :DrawText_CarriageReturnSpritePos_Plus2
 inc l
@@ -153,19 +146,7 @@ endif
     cp 192
     ret NC  ; Our font has no space! so dont draw anything below 32 (above 192)
 
-  JR64K_1: add 0  ;faster than nop nop
-  JR64K_From1:
-    ld a,(BankSwitch_C0_CurrentB_Plus2-2)
-    push af
-        ld a,Font_Membank
-        call BankSwitch_C0_SetCurrent
-        call ShowSpriteDirect
-    pop af
-    jp BankSwitch_C0_SetCurrent
-
-JR64K_To1:
 DrawText_CharFirmwareFont:
-
     ld b,d
     push de
         call GetMemPos
@@ -279,4 +260,3 @@ DrawText_CharFirmwareFont_GetChar:
     out (c),a
 DrawText_CharFirmwareFont_GetCharEnd:
 ret
-
