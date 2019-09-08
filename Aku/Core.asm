@@ -181,7 +181,7 @@ FileBeginCore:
     jp Timer_UpdateTimer        ;8084
     jp null;Player_CheatMode    ;8087
     jp Timer_GetTimer           ;808A
-    jp ObjectProgram_SpriteBankSwitch ;808D
+    jp null                     ;808D
     jp SpriteBank_Font          ;8090
     jp ObjectProgram_HyperFire  ;8093
     jp Player_GetPlayerVars     ;8096
