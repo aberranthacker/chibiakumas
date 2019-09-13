@@ -84,23 +84,9 @@ Player1NotDead:
     ld a,&3C    ;inc a
     ld (PlayerCounter),a
 
-    ld hl,Akuyou_PlayerSpritePos    ;ChibikoPlayerSpriteBank_Plus2
+    ld hl,Akuyou_PlayerSpritePos
     ld de,&C0C0
 
-    ld a,(P1_P08)
-    and %10000000
-    jr z,ChibikoLeftRight
-
-    ld a,(CPCVer)
-    and 128
-    jr z,ChibikoLeftRight
-
-        ld h,&68
-        ld e,PlusSprite_ExtBank;&C7
-
-        ld d,&C1
-
-ChibikoLeftRight:
     xor a
     ld b,4
     call Player_HandlerOne
