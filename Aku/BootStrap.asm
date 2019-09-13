@@ -39,11 +39,7 @@ FileBeginBootStrap:
 jp Bootstrap_Launch    ; &4000
 jp Bootstrap_FromBasic ; &4003
 jp Bootstrap_FromHL    ; &4006
-ifdef SupportPlus
-    jp Bootstrap_ReloadPlusSprites ; &400C
-else
-    jp null
-endif
+jp null                ; &400C
 
 Bootstrap_Launch:
     ld bc,&7f8D ; Reset the firmware to OFF
@@ -168,11 +164,6 @@ ifdef Support64k
         ret
     endif
 
-    ifdef Support128k
-        ld a,(CPCVer)
-        and 128
-        ret nz
-    endif
     ifndef debug
         ld e,1
         ld hl,RasterColors_Black
@@ -622,12 +613,6 @@ Bootstrap_Stage_20:
 Stage20No256k:
     jp Bootstrap_LoadEP2Level_2PartZ
 endif ; }}}
-
-load256k: ; {{{
-;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
-;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-db 2, "Please Wait, Loading 256K Sprites..","."+&80
-db 0 ; }}}
 
 LoadDiscSector_WithPushes:
         push bc
@@ -1401,23 +1386,6 @@ BootsStrap_RestoreColors_Dosetb:
 
     jp RasterColors_SetPointers
 
-ifdef SupportPlus ; {{{
-Plus_BankCopy:
-    push bc
-        ld bc,&7fb8
-        out (c),c
-        ld c,&8D
-        out (c),c
-    pop bc
-
-    ldir
-    ld bc,&7fA8
-    out (c),c
-    ld c,&8D    ; Reset the firmware to OFF
-    out (c),c
-ret
-endif ; }}}
-
 BootsStrap_ContinueMsg:
 ;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
 ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
@@ -1456,19 +1424,17 @@ BootsStrap_ContinueScreen:
     ld a,CSprite_Continue       ;Loading
     call Akuyou_ShowCompiledSprite
 
-    ifdef Support64k
     ;simpler compiled sprite for 64k
-        ld a,(CPCVer)
-        and 128
-        jr nz,Skip64kcompiled
+    ld a,(CPCVer)
+    and 128
+    jr nz,Skip64kcompiled
 
-        ld l,1
-        call Akuyou_DrawText_LocateSprite
-        ld bc,BootsStrap_ContinueMsg
-        call ShowTextLines
+    ld l,1
+    call Akuyou_DrawText_LocateSprite
+    ld bc,BootsStrap_ContinueMsg
+    call ShowTextLines
 
-        call CompiledSpriteContinue
-    endif
+    call CompiledSpriteContinue
 
 Skip64kcompiled:
     ld a,2
@@ -2279,8 +2245,8 @@ StartANewGame:
     or a
     jr nz,ContinueModeSet
 
-    ld de,&21FD
     ld bc,&C90E     ;Shared Continues
+    ld de,&21FD
 
 ContinueModeSet:
     ld a,b
@@ -2955,13 +2921,11 @@ ret
 
 ;Mini continue compiles sprite for 64k
 CompiledSpriteContinue:
-    ifdef Support64k
-        ifdef CompileEP1
-            read "ContinueCompiled64k.asm"
-        endif
-        ifdef CompileEP2
-            read "ContinueCompiled64k_Ep2.asm"
-        endif
+    ifdef CompileEP1
+        read "ContinueCompiled64k.asm"
+    endif
+    ifdef CompileEP2
+        read "ContinueCompiled64k_Ep2.asm"
     endif
 
 list
