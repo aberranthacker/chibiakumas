@@ -22,7 +22,7 @@ SpendCheck:
 
     ld a, ixl ; read the keymap
     or Keymap_AnyFire
-    inc a ; cp 255
+    inc a
     ret z
 
 SpendCredit:
@@ -81,7 +81,7 @@ PlayerCounter:  inc a
     jr Player2Start
 
 Player1NotDead:
-    ld a,&3C    ;inc a
+    ld a,&3C
     ld (PlayerCounter),a
 
     ld hl,Akuyou_PlayerSpritePos
@@ -166,7 +166,7 @@ Player_Handler_Start:
     inc a
     cp 16
     jr c,Player_Handler_DronePosOk
-    dec a;  ld a,15
+    dec a
 
 Player_Handler_DronePosOk:
     ld (iy+6),a ;D1 - shots and drones
@@ -332,7 +332,7 @@ Player_Handler_NoSaveFire:
 Player_Handler_Frame1:
     push de     ;save the frame no
     ld a,B  :DroneDirPos8_Plus1;    ld a,c;ld a,B
-    sub 4;  sub 12;sub 4
+    sub 4
     ld (SprShow_X),a    :DroneDirPos1_Plus2;    ld (SprShow_Y),a;ld (SprShow_X),a
     ld a,(iy+4)
     or a
@@ -354,8 +354,8 @@ Player_Handler_Frame1:
         call SetDronePos
 
 Drone2NoPlus:
-
         call ShowSprite
+
 Drone2Plus:
         pop bc
         push bc
@@ -415,9 +415,9 @@ ret
 
 SetDronePos:
     nop
-    nop :DroneDirPos5_Plus2;        sra a
-    add c:DroneDirPos2_Plus1;       add b
-    ld (SprShow_Y),a :DroneDirPos6_Plus2;       ld (SprShow_X),a;ld (SprShow_Y),a
+    nop              :DroneDirPos5_Plus2 ; sra a
+    add c            :DroneDirPos2_Plus1 ; add b
+    ld (SprShow_Y),a :DroneDirPos6_Plus2 ; ld (SprShow_X),a;ld (SprShow_Y),a
 ret
 
 Player_Fire_OneBurst:
@@ -434,15 +434,15 @@ Player_Handler_FireX:
     ld a,(iy+2) ;D1
     or a;   bit 7,a ; check if player is allowed to fire
     ret nz
-    ld (iy+2),255   ;Set player can't fire
+    ld (iy+2),255   ; Set player can't fire
 
     call Stars_AddToPlayer
 
-    ld a,(iy+10)    ;Burst Fire counter
+    ld a,(iy+10) ; Burst Fire counter
     sub 1
     ret c
 
-    ld (iy+10),a    ;Burst Fire counter
+    ld (iy+10),a ; Burst Fire counter
     ld hl,Xfire
     cp 50
     jr NC,NotSmallBurst
@@ -549,14 +549,14 @@ ret
 DroneFlipFire:
     ld (DroneFlipFireCurrent_Plus1-1),a
     push de
-    or a ; and %10000000
-    ld a,&82 ; add d
+    or a
+    ld a,&82
     jr z,DroneFlipFire_HorizontalMove
 
-        ld de,&570F  ;ld d,a   rrca
+        ld de,&570F
         jr DroneFlipFireApply
 DroneFlipFire_HorizontalMove:
-        dec a ; ld a,&81  ; add c
+        dec a
         ld de,&4F00  ; ld c,a nop
 DroneFlipFireApply:
     ld (DroneFlipFirePos3_Plus1-1),a
@@ -575,19 +575,19 @@ DroneFlip:
 
     LD DE,SprShow_X
     LD HL,SprShow_Y
-    or a;and %10000000
-    LD A,&80 ; ADD B
-    ld ixl,&79;Ld A,C
+    or a
+    LD A,&80
+    ld ixl,&79
 
     jr z,DroneFlip_HorizontalMove
 
-    LD BC,&2FCB ;sra a
+    ld bc,&2FCB
     jp DroneFlip_Apply
     DroneFlip_HorizontalMove:
         ex hl,de
-        dec ixl;ld ixl,&78;Ld A,B
-        inc a ;LD A,&81 ; ADD C
-        LD BC,&0000 ;sra a
+        dec ixl
+        inc a
+        ld bc,&0000
     DroneFlip_Apply:
     ld (DroneDirPos1_Plus2-2),hl
     ld (DroneDirPos2_Plus1-1),a
@@ -690,8 +690,8 @@ DoSmartBomb:
                                       ; this is needed to wipe omega array for
                                       ; final boss as it's not handled by
                                       ; normal core code
-    ld b,ObjectArraySize;a
-    ld hl, ObjectArrayPointer;&6969ObjectArrayAddress_Plus2
+    ld b,ObjectArraySize
+    ld hl,ObjectArrayPointer
 
 Player_Handler_SmartBombObjLoop: ; we need special code because we don't want to wipe
                                  ; bg objects and boss sprites
@@ -703,15 +703,15 @@ Player_Handler_SmartBombObjLoop: ; we need special code because we don't want to
         ;m
         inc h
         ;s
-        set 6,l ;inc h
+        set 6,l
         ld a,(hl)   ;life (0 is background)
         or a
 
         jr z,Player_Handler_SmartBombObjMoveNext
-        inc a;      cp 255
+        inc a
         jr z,Player_Handler_SmartBombObjMoveNext
 
-        dec h;inc h
+        dec h
 
         call null : CustomSmartBombEnemy_Plus2
 
@@ -730,14 +730,14 @@ SmartBombKill
         inc h ;y
         inc h ;X
 
-        ld (hl),%10001011 ; %10010011
+        ld (hl),%10001011
 
         inc h
         ld (hl),128+16  :PointsSpriteB_Plus1; Sprite
 
-        set 6,l;        inc h
+        set 6,l
         ld (hl),64+63   ; Life ; must "hurt" player for hit to be detected
-        dec h;inc h
+        dec h
         ld (hl),3   ; Program
         dec h
         dec h
@@ -762,8 +762,8 @@ DoSmartBombFX:
     ld a,5
     ld(SmartBomb_Plus1-1),a
 
-    pop af ; ld a,i
-    dec a  ; cp 1
+    pop af
+    dec a
     ret z
 
     ld a,5
@@ -853,10 +853,10 @@ Player_Hit_PowerupDroneFull:
             pop iy
         jr PowerupPlaySfx
 Player_Hit_PowerupShootPower:
-        ld a,&96;6f
+        ld a,&96
         ld (PlayerStarColor_Plus1-1),a
 
-        ld a, 1 ;(Dec A)
+        ld a, 1
 ;       power up both players
         ld (P2_P14),a
         ld (P1_P14),a
@@ -883,7 +883,7 @@ Player_Hit_Injure:
     ld iy,Player_Array :PlayerHitMempointer_Plus2
 
     ld a,(iy+7) ;invincibility
-    or a;and %11100000
+    or a
     jr nz,Player_Hit_Done       ;>0 if player invincible
 
         ld (iy+7),%00000111     ;invincibility
@@ -986,7 +986,8 @@ ShowContinues:
     ld a,(P1_P05)
     call DrawText_Decimal
 
-ShowContinuesSelfMod:   ld a,"/"
+ShowContinuesSelfMod:
+    ld a,"/"
     call Akuyou_DrawText_CharSprite
 
     ld a,(P2_P05)
@@ -999,20 +1000,18 @@ else
     ld hl,&1a01;14              ; show how many credits are left
 endif
     jr Player1ContinueB
+
 Player1Continue:
 ifdef CPC320
     ld hl,&0101;14              ; show how many credits are left
 else
     ld hl,&0501;14              ; show how many credits are left
 endif
+
 Player1ContinueB:
     push hl
         ld hl,ShowContinueCounter_Plus1-1
         dec (hl)
-;       ld a,(ShowContinueCounter_Plus1-1)
-;       dec a
-;       ld (ShowContinueCounter_Plus1-1),a
-
         call SpriteBank_Font2
     pop hl
     ld bc,txtPressButtonMsg2
@@ -1058,7 +1057,7 @@ Player_DrawUIDual:
     endif
         ld (SprShow_Y),a
 
-    pop bc;ld c,0
+    pop bc
     ;smart bombs
 
     ld b,(iy+3) ;D1
@@ -1126,7 +1125,6 @@ Player_DrawUI_NextDigit:
 
         ld a,(hl)
         add 48 ; Move to the correct digit (first 32 are not in font)
-        ;add 8
 
         ld b,-2 ; we are drawing backwards!
 
@@ -1202,7 +1200,7 @@ Player_AddScore_NextDigit:
     inc a
     cp 10
     jp C,Player_AddScore_Inc
-    xor a;ld a,0
+    xor a
     inc c
 
 Player_AddScore_Inc:
