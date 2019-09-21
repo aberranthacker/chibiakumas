@@ -40,7 +40,7 @@ LoadDiscSectorZver_BankOk:
             call LoadDiscSectorZver
         pop de
         ; hl  compressed data adres
-        ; de  output adress of dat  
+        ; de  output adress of dat
         ld hl,0000 :CompressedDataAddress_Plus2
     pop af
     di
@@ -60,14 +60,14 @@ LoadDiscSectorZver:
         ld hl,DiscDestRelocate
     jr LoadDiscSectorB
 
-LoadDiscSector:       ; This was all structured assuming amsdos would be replaced with 
+LoadDiscSector:       ; This was all structured assuming amsdos would be replaced with
     ; H = Track  (41) ; a sector based disk reader however with the success of M4
     ; L = Sector (C1) ; and C4CPC - and the fact KL_WALK_ROM seems to restore the
     ; I = Disk   (00) ; A600-BF00 block so well, it was never needed
     ; B = Size - size is not used at all , no need to pass it
     ; C = disk
     ;  A  = 128 k memory bank
-    ;; DE = load address 
+    ;; DE = load address
     push af
     ld a,'D'
     push hl
@@ -105,13 +105,13 @@ LoadDiscSector_64kOk:
     cp c
     ifdef SingleDisk
         jr LoadDiscSector_NoDiskCheck   ; The disk is still in
-    endif 
+    endif
 
-    jr z,LoadDiscSector_NoDiskCheck ; Disk Zero means file is assumed to be on 
+    jr z,LoadDiscSector_NoDiskCheck ; Disk Zero means file is assumed to be on
     ;ALL Disks
         ld a,c
         or a
-        
+
         jr z,DiskZero
         add 48+&80
         ld (SetDiskMessageDisk),a
@@ -148,11 +148,11 @@ DiskZero: ;file common to all disks
     jr LoadDiskFileFromHL
 
 LoadDiskFileFromHL: ; Load a file from HL memory loc
-    push hl 
+    push hl
         call DiskDriver_Load    ; carry true if sucess
         ld h,d
         ld l,e
-        
+
         jr nc,DiskError1
     pop hl  ; speccy only
     ret
