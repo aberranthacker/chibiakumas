@@ -1,5 +1,4 @@
 ;*******************************************************************************
-;*                                                                             *
 ;*                              Object Driver                                  *
 ;*                                                                             *
 ;*******************************************************************************
@@ -470,13 +469,11 @@ ObjectAnimator_Program:
         jr ObjectAnimator_Update
 
 ObjectAnimator_Call:
-    ;   push de
             ld e,(hl)
             inc hl
             ld d,(hl)
             inc hl
             call CallDE
-;       pop de
         jr ObjectAnimator_Update
 
 ObjectAnimator_Animator:
@@ -746,7 +743,6 @@ ObjectProgram_HyperFire:
 ;   ld a,b
 ;   add 3       ;ObjectFirePosX_Plus1
     ld d,a
-
 
     ld a,iyl
     and %00011111
