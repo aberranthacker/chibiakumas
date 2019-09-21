@@ -13,7 +13,8 @@ LdAFromHLIncHL:
 ret
 
 DoMovesBackground_ScrollUp:
-    ld bc,&790D ;Move Up ; DEC C  (OD)      LD a,C (79) 
+    ; Move Up 
+    ld bc,&790D ; DEC C  (OD)      LD a,C (79) 
     ld de,&F7FE ; CP (FE) F7 (199+24+24=247)
     push de
     ld de,&7A57
@@ -23,28 +24,27 @@ DoMovesBackground_ScrollUp:
     cp 3
     jr nz, DoMovesBackground_SetScroll2
 DoMovesBackground_ScrollDown:
-    ld c,&0C    ;INC C
+    ld c,&0C
     jr DoMovesBackground_SetScroll2_V2
 DoMovesBackground_SetScroll:    ;A=Direction 0-Left 1-Right 2-Up 3-Down
     push hl
     push ix
-
         cp 2
         jr nc,DoMovesBackground_ScrollUp
-
-        ld bc,&7805 ;Move Left ; INC B  (05)      LD a,B (78)   
+        ; Move Left 
+        ld bc,&7805 ; INC B  (05)      LD a,B (78)   
         ld de,&D0FE ; CP (FE)  D0 (160+24+24=208)
         push de
     
-        ld de,&794F     ;ld a,c // ld c,a
+        ld de,&794F
 
-        ld ixl,&4F  ;ld C,a
-        ld hl,&B816 ;ld D,160+24
+        ld ixl,&4F
+        ld hl,&B816
 
         or a
         jr z,DoMovesBackground_SetScroll2
-    
-        ld c,&04    ;Move Right
+        ;Move Right
+        ld c,&04
 DoMovesBackground_SetScroll2_V2:
         ld h,&12    ;Start far left
 
@@ -107,8 +107,6 @@ Event_Stream:
     and %00000100:Event_LevelSpeed_Plus1    ; how often ticks occur
     ret z       ; no ticks occured
 Event_Stream_ForceNow:
-;   call StarArrayWarp
-
     ld a,&0 :Event_LevelTime_Plus1
     inc a
     ld (Event_LevelTime),a
@@ -137,7 +135,7 @@ Event_GetEventsNow:
     rrca
     rrca
     rrca
-    push hl         ;
+    push hl
     ld hl,Event_VectorArray
     jp VectorJump_PushHlFirst
 
@@ -147,13 +145,11 @@ Event_StarBust:
     ld C,(hl)   ;Y
     inc hl
     push hl
-;   call Stars_AddToDefault
     push iy
         call Stars_AddObjectBatchDefault;Stars_AddObjectBatch
     pop iy
     pop hl
-    ret ;jp Event_LoadNextEvt
-
+    ret
 
 ;By default each time can only have ONE event, but we can use this commend to declare
 ;XX events will occur at this time to save memory!
@@ -182,7 +178,7 @@ Event_MoveSwitch_0011:              ;Set the next move
     jr Event_CoreReprogram_ByteCopy
 
 
-Event_ProgramMoveLifeSwitch_0100:       ;Set Prog,MoveLife
+Event_ProgramMoveLifeSwitch_0100:   ;Set Prog,MoveLife
     rst 6
     ;ld a,(hl)  ;Program Type
     ld (EventObjectProgramToAdd_Plus1-1),a
@@ -197,11 +193,10 @@ Event_LifeSwitch_0010:
     ld de,EventObjectLifeToAdd_Plus1-1
 
 Event_CoreReprogram_ByteCopy:           
-    rst 6;rst 6 ; Jp (IY)           
+    rst 6
     ;ld a,(hl)  ;read in a byte
     ld (de),a       ; put it at DE
-    ;inc hl
-    ret;jp Event_LoadNextEvt
+    ret
 
 ; Reconfigure the core for custom actions this level
 Event_CoreReprogram:    ;1111????
@@ -216,25 +211,17 @@ Event_CoreReprogram:    ;1111????
 ;Powerup objects are defined by their sprite, which changes each level
 ; OK so I didn't think this through very well!
 Event_CoreReprogram_PowerupSprites:
-    rst 6;  rst 6   ; Jp (IY)
-    ;ld a,(hl)
+    rst 6
     ld (DroneSprite_Plus1-1),a
-    ;inc hl
-    ;ld a,(hl)
-    rst 6;  rst 6   ; Jp (IY)
+    rst 6
     ld (ShootSpeedSprite_Plus1-1),a
-    ;inc hl
-    ;ld a,(hl)
-    rst 6;  rst 6   ; Jp (IY)
+    rst 6
     ld (ShootPowerSprite_Plus1-1),a
-    ;inc hl
-    ;ld a,(hl)
-    rst 6;  rst 6   ; Jp (IY)
+    rst 6
     ld (PointsSprite_Plus1-1),a
     ld (PointsSpriteB_Plus1-1),a
     ld (PointsSpriteC_Plus1-1),a
-    ;inc hl
-    ret;jp Event_LoadNextEvt
+    ret
 
 Event_ReprogramObjectBurstPosition:
     ld de,BurstPosition_Plus2-2
@@ -301,10 +288,8 @@ Event_CoreReprogram_ObjectHitHandler:
 ; it's best to copy existing ones from levels and modify them
     
 Event_CoreReprogram_Palette:
-    ;push bc
-    ;push de
-
     ld de,RasterColors_ColorArray1 :RasterColors_ColorArray1PointerB_Plus2
+
 Event_CoreReprogram_DataCopy:
     ;reads in Offset then Bytecount from (HL) and dumps to destination DE
     xor a
@@ -329,8 +314,6 @@ Event_CoreReprogram_DataCopy:
 
 Event_MoveSwitch:
     ld a,b
-;   cp 15
-;   ret nc;jp nc,Event_LoadNextEvt  ; our array only has 6 entries
 
     push hl
     ld hl,Event_MoveVector
@@ -353,7 +336,7 @@ Event_LoadLastAddedObjectToAddress_1010:
         inc hl
         ld (hl),b   
     pop hl
-    ret;jp Event_LoadNextEvt
+    ret
 
 ; call a function - be very careful what you do, as registers must be pretty
 ; much untouched otherwise a crash will occur on return. it's best to set a flag
@@ -364,20 +347,17 @@ Event_Call_1001:
     ld b,(hl)
     inc hl
     call CallBC
-    ret;jp Event_LoadNextEvt
-
+    ret
 
 Event_ClearPowerups:        ; used at the start of each level to take the users powerups
     call ResetPowerup
-    ret;jp Event_LoadNextEvt
+    ret
 CallBC:
     push bc
     ret
     
 ; alter stream time 
 Event_ChangeStreamTime_1000:
-    ;push bc
-
     ld c,(hl)
     inc hl
     ld b,(hl)
@@ -396,8 +376,6 @@ Event_ChangeStreamTime_1000:
 Event_AddFront_0110:    
     ld a,1
     jr Event_AddXX
-    ;ld (Event_AddObject_StartOfLoop_Plus1-1),a
-    ;ret;jp Event_LoadNextEvt
 
 ; Add to the background (bottom of the object array)
 Event_AddBack_0111:
@@ -405,14 +383,14 @@ Event_AddBack_0111:
 
 Event_AddXX:
     ld (ObjectAddToForeBack_Plus1-1),a
-    ret;jp Event_LoadNextEvt
+    ret
 
 ; Change time between events, used on water level when waterlevel changes - it was
 ; too slow by default
 Event_ChangeStreamSpeed_1100:
-    rst 6;  rst 6   ; Jp (IY)
+    rst 6
     ld (Event_LevelSpeed_Plus1-1),a
-    ret;jp Event_LoadNextEvt
+    ret
 
 ; we don't have a tile array - this does spikes in stage 7 and 8 - this can work
 ; horiz or vert depending on scroll
@@ -425,9 +403,7 @@ Event_ObjStrip:
     inc hl
     ;fall into next event
 Event_ObjStrip_Next:
-    rst 6;  rst 6   ; Jp (IY)
-    ;ld a,(hl)  ; sprnum
-    ;inc hl
+    rst 6
     ld (EventObjectSpriteToAdd_Plus1-1),a
     
     push bc
@@ -441,17 +417,14 @@ Event_ObjStrip_Next:
     ld c,a
     
     djnz Event_ObjStrip_Next
-    ret;jp Event_LoadNextEvt
+    ret
 
-;
 Event_ObjColumn:
     ld d,(hl)   ;X
     ld e,b
     inc hl
     Event_ObjColumn_Next:
-    rst 6;  rst 6   ; Jp (IY)
-    ;ld a,(hl)  ; sprnum
-    ;inc hl
+    rst 6
     ld (EventObjectSpriteToAdd_Plus1-1),a
 
     push de
@@ -459,14 +432,14 @@ Event_ObjColumn:
     pop de
     dec e
     jr nz,Event_ObjColumn_Next
-    ret;jp Event_LoadNextEvt
+    ret
 
 Event_MultiObj:     ; Type 16 - multiple objects
     push bc
     call EventoneObject
     pop bc
     djnz Event_MultiObj
-    ret;jp Event_LoadNextEvt
+    ret
 
 Event_OneObj:       ; Type 0 - one Obj
     ld a,b  
@@ -480,7 +453,6 @@ Event_OneObj:       ; Type 0 - one Obj
     jr EventoneObject
 Event_OneObjectBurst:
 ;Burst Object
-    ;ld a,b
     ld bc,&0000 :BurstPosition_Plus2
     ld d,b
     jr EventoneObjectStrip
@@ -568,20 +540,16 @@ Event_Objectloop:
     ld a,c
     and %11111000
     ld (hl),a
-    ;align Y to 8 pixel block to avoid color problems
-;   ld c,d
-    ;ld de,0000ObjectArray_Size_Plus2
-    ;add hl,de
     inc h;
     ld (hl),d   ;X
 
     
-    inc h;  add hl,de
+    inc h
     ld (hl),&0      :EventObjectMoveToAdd_Plus1 ;Move
-    inc h;  add hl,de
+    inc h
     ld (hl),&0  :EventObjectSpriteToAdd_Plus1   ;sprite
 
-    set 6,l ;inc h; add hl,de
+    set 6,l
 
     ld a,&0 :EventObjectLifeToAdd_Plus1 ; life
     push af
@@ -608,11 +576,11 @@ AddObjectOnePlayer:
     pop af
 AddObjectTwoPlayer:
     ld (hl),a
-    dec h;inc h;    add hl,de
+    dec h
     ld (hl),&0  :EventObjectProgramToAdd_Plus1 ; Program code
-    dec h;inc h;    add hl,de
+    dec h
     ld (hl),&0  :EventObjectSpriteSizeToAdd_Plus1 ; Sprite size for collisions
-    dec h;inc h;    add hl,de
+    dec h
     ld (hl),&0  :EventObjectAnimatorToAdd_Plus1 ; Animator
     ret
 Event_ObjectLoopNext:
@@ -636,9 +604,7 @@ Event_CoreSaveLoadSettingsStart: ;     1001XXXX Save/Load object settings XXXX b
     and %00001111   ; bank no
     cp  %00001111
     jr nz,Event_CoreSaveLoadSettings_Load1  ;15 means save
-    rst 6;  rst 6   ; Jp (IY)
-    ;ld a,(hl)  ;Bank no is next byte when saving
-    ;inc hl
+    rst 6
     jr Event_CoreSaveLoadSettings_Part2
 Event_CoreSaveLoadSettings_Load1:
     ld d,b
@@ -649,7 +615,6 @@ Event_CoreSaveLoadSettings_Part2:
         jr nz,Event_CoreSaveLoadSettings_Save ;----1--- = save
 Event_CoreSaveLoadSettings_Load:
         Call DoSettingsLoad
-        ;inc hl
         jr Event_CoreSaveLoadSettings_Done
 SettingsGetLocation:
         add a
@@ -661,19 +626,19 @@ SettingsGetLocation:
 ret
 
 DoSettingsLoad:
-    rst 6;      rst 6   ; Jp (IY)
+    rst 6
         ld (EventObjectProgramToAdd_Plus1-1),a
-    rst 6;      rst 6   ; Jp (IY)
+    rst 6
         ld (EventObjectMoveToAdd_Plus1-1),a
-    rst 6;      rst 6   ; Jp (IY)
+    rst 6
         ld (EventObjectLifeToAdd_Plus1-1),a
-    rst 6;      rst 6   ; Jp (IY)
+    rst 6
         ld (EventObjectSpriteToAdd_Plus1-1),a
-    rst 6;      rst 6   ; Jp (IY)
+    rst 6
         ld (EventObjectSpriteSizeToAdd_Plus1-1),a
-    rst 6;      rst 6   ; Jp (IY)
+    rst 6
         ld (EventObjectAnimatorToAdd_Plus1-1),a
-    rst 6;      rst 6   ; Jp (IY)
+    rst 6
         ld (ObjectAddToForeBack_Plus1-1),a
 ret
 
@@ -707,12 +672,12 @@ Event_CoreSaveLoadSettings_Save:
 
 Event_CoreSaveLoadSettings_Done:
     pop hl  ;reload the stream pointer
-    ret;jp Event_LoadNextEvt
+    ret
 
 ; --------------------------------------------------
 ;                 Reset Powerup
 ; --------------------------------------------------
-ResetPowerup:               ; used by levelcode to take our bonuses 
+ResetPowerup: ; used by levelcode to take our bonuses 
     push iy
         ld iy,Player_Array
         call ResetPlayerPowerup
