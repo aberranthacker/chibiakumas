@@ -132,13 +132,13 @@ FileBeginCore:
     jp StarArray_Redraw ;8009
     jp SetLevelTime ;   ;800C
     jp Player_Handler   ;800F
-    
+
     jp DoMovesBackground_SetScroll ;8012
-    
+
     jp objectArray_Redraw      ;8015
     jp Event_Stream            ;8018
     jp Player_StarArray_Redraw ;801B
-    
+
     jp PLY_Init     ;801E
     jp PLY_Stop     ;8021
     jp PLY_Play     ;8024
@@ -168,7 +168,7 @@ FileBeginCore:
     jp DrawText_LocateSprite  ;8060
     jp DrawText_CharSprite    ;8063
     jp BankSwitch_C0_BankCopy ;8066
-    
+
     jp DrawText_PrintString     ;8069
     jp ShowSprite_SetBankAddr   ;806C
     jp Player_ReadControlsClassic ;806F

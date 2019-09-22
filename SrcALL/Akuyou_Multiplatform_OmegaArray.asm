@@ -6,22 +6,22 @@ OmegaArray_Redraw:
     ret z
 
     call OmegaArray_Init
-    
+
     ld hl,OmegaArrayPointer1
     call OmegaArray_RedrawChunk
-    
+
     ld hl,OmegaArrayPointer2
     call OmegaArray_RedrawChunk
-    
+
     ld hl,OmegaArrayPointer3
     call OmegaArray_RedrawChunk
-    
+
     ld hl,OmegaArrayPointer4
     call OmegaArray_RedrawChunk
 ret
 
 OmegaArray_Init:
-    call Akuyou_ScreenBuffer_GetActiveScreen 
+    call Akuyou_ScreenBuffer_GetActiveScreen
     ld (GetMemPos_ScreenOffset_Plus1-1),a
 
     call AkuYou_Player_GetPlayerVars
@@ -30,19 +30,19 @@ OmegaArray_Init:
     ld hl,Player_Hit_Injure_1
 
     ld a,(iy+4) ;invincibility
-    and %11100000   
+    and %11100000
     jp z,StarArray_PlayerVunrable
 
     ; player invincible
     ld hl,StarLoopP1Skip
 StarArray_PlayerVunrable:
     ; load player 1 location - do it in advance to save time during the loop
-    ld a,(iy+1) 
+    ld a,(iy+1)
     sub 2
     ld (Player1LocX_Plus1-1),a
     add 4
     ld (Player1LocXB_Plus1-1),a
-    ld a,(iy+0) 
+    ld a,(iy+0)
     sub 2
     ld (Player1LocY_Plus1-1),a
     add 4
@@ -54,8 +54,8 @@ StarArray_PlayerVunrable:
     ;configure the loop for the enemy star array
     ld hl,Player_Hit_Injure_2
     ld a,(iy+4+Akuyou_PlayerSeparator)
-    
-    and %11100000   
+
+    and %11100000
     jp z,StarArray_PlayerVunrable2
 
     ; player invincible
@@ -88,7 +88,7 @@ Starloop2:
     ld a,(hl)   ; MX
     or a
     jp Z,StarArray_Turbo
-    
+
     ld (Hlrestore_Plus2-2),hl
     inc h
 
@@ -97,7 +97,7 @@ Starloop2:
     ld B,(hl) ; X
     inc h
     ld C,(hl) ; Y
-    
+
 Starloop_NotZero:
 
 PlayerCollisions:
@@ -113,7 +113,7 @@ PlayerCollisions:
     cp 0:Player1LocYB_Plus1
 
     jp C,AkuYou_Player_Hit_Injure_1 :CurrentStarArrayCollisionsB2_Plus2
-        
+
 StarLoopP1Skip:
     ld a,c
     cp 0:Player2LocY_Plus1
@@ -127,7 +127,7 @@ StarLoopP1Skip:
     cp 0:Player2LocXB_Plus1
 
     jp C,Player_Hit_Injure_2 :CurrentStarArrayCollisions2B2_Plus2
-        
+
 StarLoopP2Skip:
 StarCollisionsDone:
     ld de,(MoveArray1) :MovePointer_Plus2
@@ -137,7 +137,7 @@ OmegaMoves: nop
     nop
     ld (hl),c
     dec h
-    ld (hl),b 
+    ld (hl),b
 
 read "..\SrcCPC\Akuyou_CPC_OmegaArray_Draw.asm"
 
@@ -198,7 +198,7 @@ MoveArray1:
     inc b   ;R
 
     inc c   ;DR
-    inc b   ;DR 
+    inc b   ;DR
 
     inc c   ;D
     nop ;D
@@ -209,7 +209,7 @@ MoveArray1:
 MoveArray4:
     inc c   ;DL
     dec b   ;DL
-    
+
     nop ;L
     dec b   ;L
 
@@ -226,7 +226,7 @@ MoveArray4:
     inc b   ;R
 
     inc c   ;DR
-    inc b   ;DR 
+    inc b   ;DR
 
     inc c   ;D
     nop ;D
@@ -246,7 +246,7 @@ MoveArray6:
     inc b   ;R
 
     inc c   ;DR
-    inc b   ;DR 
+    inc b   ;DR
 
     inc c   ;D
     nop ;D
@@ -270,8 +270,8 @@ MoveArrayLR:
     inc b   ;R
     inc b   ;R
 
-    inc b   ;DR 
-    inc b   ;DR 
+    inc b   ;DR
+    inc b   ;DR
 
     nop
     inc b
@@ -324,7 +324,7 @@ MoveArray2:
     inc b   ;R
 
     inc c   ;DR
-    inc b   ;DR 
+    inc b   ;DR
 
     inc c   ;D
     nop ;D
@@ -351,7 +351,7 @@ MoveArray7:
     inc b   ;R
 
     inc c   ;DR
-    inc b   ;DR 
+    inc b   ;DR
 
     inc c   ;D
     nop ;D
@@ -370,7 +370,7 @@ MoveArray8:
     inc b   ;R
 
     inc c   ;DR
-    inc b   ;DR 
+    inc b   ;DR
 
     inc c   ;D
     nop ;D
