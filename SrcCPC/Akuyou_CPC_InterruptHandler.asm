@@ -1,6 +1,7 @@
 RasterColors_DefaultSafe:
     ld hl,RasterColors_Safe
     jr RasterColors_Blackoutb
+
 RasterColors_Blackout:
     ld hl,RasterColors_Black
 RasterColors_Blackoutb:
@@ -12,7 +13,7 @@ align 256,&00
 RasterColors_Tick:
     jp RasterColors_1 :RasterColors_TickJump_Plus2
 RasterColors_TopOfScreen:
-    ld a,RasterColors_1 
+    ld a,RasterColors_1
     ld (RasterColors_TickJump_Plus2-2),a
     ret
 RasterColors_2:
@@ -76,57 +77,7 @@ InterruptPlaySound:
     pop af
     exx
     ex af,af'
-
-ifdef SupportPlus
-    ; {{{
-PlusToggle1:    ret ;self modifying
-
-;Swap our UI sprite locations
-    ld hl,PlusSprites_Config1
-    ld bc,&7fb8 ;turn Plus Asic on
-    out (c),c
-    ld de,&6030
-
-    ld b,6
-PlusSpriteBank1MoreBytes:
-    ldi
-    ldi
-    ldi
-    inc e
-    ldi
-    inc e
-    inc e
-    inc e
-    djnz PlusSpriteBank1MoreBytes
-    ld bc,&7fa0 ;turn asic off
-    out (c),c
-    ;Swap our UI sprite locations - END
-
-    ; The code after this point is only used on the CPC plus
-    ld a,0 :FlashPlusSprite_Plus1
-    or a
-    ret z
-
-    ld hl,BlockPageFlippedColors
-    ld a,(hl)
-    cpl
-    ld (hl),a
-
-    ld e,9
-    ld d,0
-    or a
-    jr z,FlashPlayer_On
-    ld e,d
-FlashPlayer_On:
-    ld h,6
-    Call Plus_ShowHide
-    ld d,12
-    ld h,4
-    jp Plus_ShowHide
-    ; }}}
-else
-    ret
-endif
+ret
 
 RasterColors_1:
     ld a,RasterColors_2
@@ -134,9 +85,9 @@ RasterColors_1:
 
     jp RasterColors_All
 
-;***************************************************************************************************
-;                   Plus Raster Palette
-;***************************************************************************************************
+;*******************************************************************************
+;*                           Plus Raster Palette                               *
+;*******************************************************************************
 EnablePlusPalette:
     ;set a=1 to turn on! not coded yet, but required!
     ld hl,PlusInterruptHandler
@@ -146,7 +97,7 @@ ret
 PlusInterruptHandler:
 
 ifdef AdvancedInterrupts
-    exx 
+    exx
     pop hl
     ld (InterruptPlusSPRestore_Plus2-2),sp
     ld (InterruptReturn_Plus2-2),hl
@@ -192,7 +143,7 @@ PlusRasterSaveSetting:
     jr z,InterruptPlaySoundB;PlusRasterFinish
 
     ld d,&64    ;Palette port at &6400
-    
+
     ldi
     ldi
     ldi
@@ -210,7 +161,7 @@ PlusRasterSaveSetting:
 
 InterruptPlaySoundB:
     ld a,32
-    ld (PlusRasterMidPoint_Plus1-1),a   
+    ld (PlusRasterMidPoint_Plus1-1),a
 
     ld bc,&7fa0
     out (c),c
@@ -234,22 +185,22 @@ PlusSpriteBank1MoreBytes4v2:
     inc e
     djnz PlusSpriteBank1MoreBytes4v2
     ld a,255
-    ld (PlusRasterMidPoint_Plus1-1),a   
+    ld (PlusRasterMidPoint_Plus1-1),a
 
 pop hl
 jp InterruptMidScreenContinue
 
 
-RasterColors_SetPointers:           ; Pass A, a=0 means reset to defaults
-    or a                    ; A=1 means set to custom mem locations
-                        ; but use a custom Frame event handler
+RasterColors_SetPointers: ; Pass A, a=0 means reset to defaults
+    or a                  ; A=1 means set to custom mem locations
+                          ; but use a custom Frame event handler
     jr nz,RasterColors_SetPointersCustom
 RasterColors_SetPointersCustom2:
     ld bc,RasterColors_ColorArray1
     ld de,RasterColors_ColorArray2
     ld hl,RasterColors_ColorArray3
     ld ix,RasterColors_ColorArray4
- 
+
 RasterColors_SetPointersCustom:
     ld (RasterColors_ColorArray1Pointer_Plus2-2),bc
     ld (RasterColors_ColorArray1PointerB_Plus2-2),bc
@@ -294,7 +245,7 @@ ret
 RasterColors_TickOverrideFirm:
 
 ifdef AdvancedInterrupts
-    exx 
+    exx
     pop hl
     ld (InterruptPlusSPRestore_Plus2-2),sp
     ld (InterruptReturn_Plus2-2),hl
@@ -315,7 +266,7 @@ endif
     ;; test VSYNC state
     ld      b,&f5
     in      a,(c)
-    rra     
+    rra
 
     call c,RasterColors_TopOfScreen
 
@@ -346,17 +297,17 @@ endif
 
 RasterColors_All:   ; Our color handler
     ld (RasterColors_TickJump_Plus2-2),a
-    ld e,(hl)            
+    ld e,(hl)
     ld a,e
     or a
     ret z;jr z,RasterColors_Done
     inc l
 
 RasterColors_MoreColors:
-    ld b,(hl)            
+    ld b,(hl)
     inc l
     ld a,b
-    or a    
+    or a
     jr z, RasterColors_NoDelay
 RasterColors_Delay1:
     push af             ;Simple delay routine
@@ -364,9 +315,8 @@ RasterColors_Delay1:
     djnz RasterColors_Delay1
 RasterColors_NoDelay:
 ;; get colour byte from table
-
     ld bc,&7f00               ;; [3]
-    
+
     out (c),c                 ;; [4]
     outi
     inc b           ;Get B back to the way it was before outi messed!
@@ -386,5 +336,5 @@ RasterColors_NoDelay:
     outi
 
     dec e               ;Loop if there are more colors
-    ret z               
+    ret z
     jp RasterColors_MoreColors

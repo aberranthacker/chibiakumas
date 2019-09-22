@@ -1,4 +1,4 @@
-;***************************************************************************************************
+;*******************************************************************************
 ; Virtual Screen pos
 
     ; Input     B=VitrualX ;C=VirtualY
@@ -6,9 +6,10 @@
     ; output    B=ScreenByteX ;C=ScreenY    Y=255 if ofscreen
     ;       H X bytes to skip   L   X bytes to remove
     ;       D Y lines to skip   E   Y lines to remove
-;***************************************************************************************************
+;*******************************************************************************
 ; The virtual screen has a resolution of 160x200, with a 24 pixel border, which is used for clipping
 ; Y=0 is used by the code to denote a 'dead' object which will be deleted from the list
+
 VirtualPosToScreenByte:
     ld HL,&0000
     ld D,h
@@ -18,7 +19,7 @@ VirtualPosToScreenByte:
     ; X width  is 208 (160 onscreen - 2 per byte)
     ; Y height is 248 (200 onscreen - 1 per line)
 
-    ; this is to allow for partially onscreen sprites   
+    ; this is to allow for partially onscreen sprites
     ; and to keep co-ords in 1 byte
     ; X<24 or x>=184 is not drawn
     ; Y<24 or Y>=224 is not drawn
@@ -53,7 +54,7 @@ VirtualPos_2:
     ld a,B  ;Check X
     sub 24 :SpriteSizeConfig24C_Plus1
     RRA ; halve the result, as we have 80 bytes, but 160 x co-ords
-    ld B,a  
+    ld B,a
 ;-------------------------------------------------------------------------
     ld a,C  ;Check Y
     cp 24 :SpriteSizeConfig24D_Plus1
@@ -77,12 +78,12 @@ VirtualPos_4:
     ld a,C  ;Check Y
     sub 24 :SpriteSizeConfig24G_Plus1
     ld C,a
-    ret 
+    ret
 ShowSpriteReconfigureEnableDisable:
     ld hl,null
     or a
     jr z,ShowSpriteReconfigureEnableDisableB
-    ld hl,ShowSpriteReconfigure 
+    ld hl,ShowSpriteReconfigure
 ShowSpriteReconfigureEnableDisableB:
     ld (ShowSpriteReconfigureCommand_Plus2-2),hl
     jr ShowSpriteReconfigure_24px
