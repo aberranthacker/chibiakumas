@@ -1374,10 +1374,10 @@ BootsStrap_BasicColors:
     jr BootsStrap_RestoreColors_Doset
 BootsStrap_RestoreColors:
     ld bc,&0000 :BootsStrap_RestoreColors_BC_Plus2
-    ld de,&0000:BootsStrap_RestoreColors_De_Plus2
-    ld hl,&0000:BootsStrap_RestoreColors_HL_Plus2
-    ld ix,&0000:BootsStrap_RestoreColors_IX_Plus2
-    ld iy,&0000:BootsStrap_RestoreColors_IY_Plus2
+    ld de,&0000 :BootsStrap_RestoreColors_DE_Plus2
+    ld hl,&0000 :BootsStrap_RestoreColors_HL_Plus2
+    ld ix,&0000 :BootsStrap_RestoreColors_IX_Plus2
+    ld iy,&0000 :BootsStrap_RestoreColors_IY_Plus2
     jr BootsStrap_RestoreColors_Dosetb
 BootsStrap_RestoreColors_Doset:
     ld iy,null
@@ -1394,17 +1394,6 @@ BootsStrap_ContinueMsg:
     db 0
 TurnOffPlusRaster:
     di
-        ld a,(CPCVer)
-        and %00000001
-        ret z
-
-        ;turn of the midframe raster colors
-        ld bc,&7fb8 ;TurnPlus on
-        out (c),c
-        xor a
-        ld (&6800),a
-        ld bc,&7fa0 ;TurnPluss Off
-        out (c),c
     ret
 
 BootsStrap_ContinueScreen:
