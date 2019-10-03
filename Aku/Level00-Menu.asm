@@ -1,6 +1,7 @@
 nolist
 
-BuildLevel equ 1    ;We're building a level!
+BuildLevel equ 1 ; We're building a level!
+
 Read "..\Aku\Build.asm"
 
 NoPaletteDest equ 1
@@ -49,49 +50,49 @@ EventStreamArray_EP2:
     defb &54,&47,&4A,&4B
 
 defb 4
-    defb 136                ; Jump to a different level point
-    defw PauseLoop              ; pointer
-    defb 60                 ; new time
+    defb 136        ; Jump to a different level point
+    defw PauseLoop  ; pointer
+    defb 60         ; new time
 endif ; }}}
 
 EventStreamArray_EP1:
     ; Load Palette
-    defb 0,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 0,%01110000+4     ; 4 Commands
+    defb 240,0,6           ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&55,&4C,&4B
 
-    defb 240,26*0+6,5*2+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,5*2+1  ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 2  ; Switches
     defb 0  ;delay
     defb &54,&55,&4C,&4B
     defb 64+16;delay
     defb &54,&58,&5F,&4B
 
-    defb 240,26*1+6,5*1+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,5*1+1  ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1
     defb 48
     defb &54,&56,&5B,&4B
 
-    defb 240,26*2+6,5*3+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
-    defb 3 ; no of switches
-    defb 0  ;delays
+    defb 240,26*2+6,5*3+1  ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 3   ; no of switches
+    defb 0   ; delays
     defb &54,&56,&5B,&4B
-    defb 255    ;delays
+    defb 255 ; delays
     defb &54,&4C,&4D,&4B
-    defb 36 ;delays
+    defb 36  ; delays
     defb &54,&56,&5B,&4B
 
 defb 4
-    defb 136                ; Jump to a different level point
-    defw PauseLoop          ; pointer
-    defb 60                 ; new time
+    defb 136        ; Jump to a different level point
+    defw PauseLoop  ; pointer
+    defb 60         ; new time
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;           CPC Raster Pallete
-;   The core is full, so this is now stored in the level block
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                          CPC Raster Pallete                                ;;
+;;        The core is full, so this is now stored in the level block          ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 PaletteInit:        ;The palette when the level starts (black) {{{
          ;0GRB
     defb 15
@@ -192,9 +193,9 @@ RasterColors_ColorArray1Alt:
     defb &54,&55,&4C,&4B
 RasterColors_ColorArray2Alt:
     defb 2  ; Switches
-    defb 32 ;delay
+    defb 32 ; delay
     defb &54,&58,&5C,&4B
-    defb 64+16-32;delay
+    defb 64+16-32 ; delay
     defb &54,&5D,&53,&4B
 RasterColors_ColorArray3Alt:
     defb 2
@@ -203,12 +204,12 @@ RasterColors_ColorArray3Alt:
     defb 128
     defb &54,&46,&5a,&4B
 RasterColors_ColorArray4Alt:
-    defb 3 ; no of switches
-    defb 0  ;delays
+    defb 3  ; no of switches
+    defb 0  ; delays
     defb &54,&46,&5A,&4B
     defb 255    ;delays
     defb &54,&4C,&4D,&4B
-    defb 36 ;delays
+    defb 36 ; delays
     defb &54,&46,&5A,&4B
 ; }}}
 
@@ -241,67 +242,62 @@ ifdef CompileEP1 ; {{{
         defb 0,evtCallAddress
         defw SetFaderEP1Menu
 
-
-
-    ;We will use 4 Paralax layers
-    ; ---------()- (sky)        %11001000
-    ; ------------ (Far)        %11000100
-    ; -----X---X-- (mid)        %11000010   Bank 1
-    ; []=====[]=== (foreground)     %11000001   Bank 0
-
+    ; We will use 4 Paralax layers
+    ;  ---------()- (sky)        %11001000
+    ;  ------------ (Far)        %11000100
+    ;  -----X---X-- (mid)        %11000010   Bank 1
+    ;  []=====[]=== (foreground) %11000001   Bank 0
 
     ; Background L
-    defb 0,128+4,1,%11000001,0          ; Program - Bitshift Sprite... Move - dir Left Slow ... Life - immortal
-    defb 0,%10010000+15,0               ; Save Object settings to Bank 0
+    defb 0,128+4,1,%11000001,0 ; Program - Bitshift Sprite... Move - dir Left Slow ... Life - immortal
+    defb 0,%10010000+15,0      ; Save Object settings to Bank 0
 
-    defb 0,128+4,1,%11000010,0          ; Program - Bitshift Sprite... Move - dir Left Slow ... Life - immortal
-    defb 0,%10010000+15,1               ; Save Object settings to Bank 1
+    defb 0,128+4,1,%11000010,0 ; Program - Bitshift Sprite... Move - dir Left Slow ... Life - immortal
+    defb 0,%10010000+15,1      ; Save Object settings to Bank 1
 
-    defb 0,128+4,0,&24,0                ; Static object
-    defb 0,%10010000+15,2               ; Save Object settings to Bank 2
-
-
+    defb 0,128+4,0,&24,0       ; Static object
+    defb 0,%10010000+15,2      ; Save Object settings to Bank 2
 
     ;Title
     defb 0,%01110000+7          ; 3 commands at the same timepoint
-    defb    %10010000+0+2               ; Load Settings from bank 2
-    defb    0,12,12*0+ 24+44,24+16  ;   ; Single Object sprite 11 (animated)
-    defb    0,13,12*1+ 24+44,24+16  ;   ; Single Object sprite 11 (animated)
-    defb    0,14,12*2+ 24+44,24+16  ;   ; Single Object sprite 11 (animated)
-    defb    0,15,12*3+ 24+44,24+16  ;   ; Single Object sprite 11 (animated)
-    defb    0,16,12*4+ 24+44,24+16  ;   ; Single Object sprite 11 (animated)
-    defb    0,17,12*5+ 24+44,24+16  ;   ; Single Object sprite 11 (animated)
+    defb %10010000+0+2          ; Load Settings from bank 2
+    defb 0,12,12*0+ 24+44,24+16 ; Single Object sprite 11 (animated)
+    defb 0,13,12*1+ 24+44,24+16 ; Single Object sprite 11 (animated)
+    defb 0,14,12*2+ 24+44,24+16 ; Single Object sprite 11 (animated)
+    defb 0,15,12*3+ 24+44,24+16 ; Single Object sprite 11 (animated)
+    defb 0,16,12*4+ 24+44,24+16 ; Single Object sprite 11 (animated)
+    defb 0,17,12*5+ 24+44,24+16 ; Single Object sprite 11 (animated)
 
     ;Chibiko
-    defb 0,%01110000+3          ; 3 commands at the same timepoint
-    defb    %10010000+0+2               ; Load Settings from bank 2
-    defb    0,0,12*0+ 24,24+64  ;   ; Single Object sprite 11 (animated)
-    defb    0,1,12*1+ 24,24+64  ;   ; Single Object sprite 11 (animated)
+    defb 0,%01110000+3      ; 3 commands at the same timepoint
+    defb %10010000+0+2      ; Load Settings from bank 2
+    defb 0,0,12*0+ 24,24+64 ; Single Object sprite 11 (animated)
+    defb 0,1,12*1+ 24,24+64 ; Single Object sprite 11 (animated)
 
     ;Bochan!
-    defb 0,%01110000+3          ; 3 commands at the same timepoint
-    defb    %10010000+0+2               ; Load Settings from bank 2
-    defb    0,2,12*0+ 24+160-24,24+200-64   ;   ; Single Object sprite 11 (animated)
-    defb    0,3,12*1+ 24+160-24,24+200-64   ;   ; Single Object sprite 11 (animated)
+    defb 0,%01110000+3                 ; 3 commands at the same timepoint
+    defb %10010000+0+2                 ; Load Settings from bank 2
+    defb 0,2,12*0+ 24+160-24,24+200-64 ; Single Object sprite 11 (animated)
+    defb 0,3,12*1+ 24+160-24,24+200-64 ; Single Object sprite 11 (animated)
 
     ;Palette Change
-    defb 1,%01110000+4          ; 4 Commands
-        defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 1,%01110000+4      ; 4 Commands
+        defb 240,0,6        ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
         defb 1
         defb 1
         defb &54,&54,&44,&40
 
-        defb 240,26*0+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+        defb 240,26*0+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
         defb 1
         defb 1
         defb &54,&54,&44,&40
 
-        defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+        defb 240,26*1+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
         defb 0
         defb 1
         defb &54,&54,&44,&40
 
-        defb 240,26*2+6,6               ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+        defb 240,26*2+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
         defb 1
         defb 1
         defb &54,&54,&44,&40
@@ -309,106 +305,106 @@ endif ; }}}
 ifdef CompileEP2 ; {{{
 YumiYume_Menu_EP2:
 
-;defb 1,128,&24,128+64+60       ; Move Static
-
-defb 0,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+defb 0,%01110000+4      ; 4 Commands
+    defb 240,0,6        ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&54,&54
 
-    defb 240,26*0+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1
     defb 1
     defb &54,&54,&54,&54
 
-    defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 1
     defb &54,&54,&54,&54
 
-    defb 240,26*2+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,26*2+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&54,&54
 
 
-;We will use 4 Paralax layers
-; ---------()- (sky)        %11001000
-; ------------ (Far)        %11000100
-; -----X---X-- (mid)        %11000010   Bank 1
-; []=====[]=== (foreground)     %11000001   Bank 0
+; We will use 4 Paralax layers
+;  ---------()- (sky)        %11001000
+;  ------------ (Far)        %11000100
+;  -----X---X-- (mid)        %11000010   Bank 1
+;  []=====[]=== (foreground) %11000001   Bank 0
 
 ; Background L
 defb 0,evtMultipleCommands+5
-defb evtSetProgMoveLife,PrgBitShift,mveBackground+%00000001,0           ; Program - Bitshift Sprite... Move - dir Left Slow ... Life - immortal
+; Program - Bitshift Sprite... Move - dir Left Slow ... Life - immortal
+defb evtSetProgMoveLife,PrgBitShift,mveBackground+%00000001,0
 defb evtSetObjectSize,0
 defb evtSetAnimator,0
 defb evtAddToBackground
 defb evtSettingsBank_Save,0
-                                ; Save Object settings to Bank 0
-defb 0,evtMultipleCommands+5
-defb evtSetProgMoveLife,PrgBitShift,mveBackground+%00000010,0           ; Program - Bitshift Sprite... Move - dir Left Slow ... Life - immortal
+
+defb 0,evtMultipleCommands+5 ; Save Object settings to Bank 0
+; Program - Bitshift Sprite... Move - dir Left Slow ... Life - immortal
+defb evtSetProgMoveLife,PrgBitShift,mveBackground+%00000010,0
 defb evtSetObjectSize,0
 defb evtSetAnimator,0
 defb evtAddToBackground
-defb evtSettingsBank_Save,1             ; Save Object settings to Bank 1
+defb evtSettingsBank_Save,1  ; Save Object settings to Bank 1
 
-defb 0,128+4,0,&24,0                ; Static object
-defb 0,%10010000+15,2               ; Save Object settings to Bank 2
+defb 0,128+4,0,&24,0         ; Static object
+defb 0,%10010000+15,2        ; Save Object settings to Bank 2
 
 ;Title
-defb 0,%01110000+7          ; 3 commands at the same timepoint
-defb    %10010000+0+2               ; Load Settings from bank 2
-defb    0,6+12,12*0+ 24+44,24+16    ;   ; Single Object sprite 11 (animated)
-defb    0,6+13,12*1+ 24+44,24+16    ;   ; Single Object sprite 11 (animated)
-defb    0,6+14,12*2+ 24+44,24+16    ;   ; Single Object sprite 11 (animated)
-defb    0,6+15,12*3+ 24+44,24+16    ;   ; Single Object sprite 11 (animated)
-defb    0,6+16,12*4+ 24+44,24+16    ;   ; Single Object sprite 11 (animated)
-defb    0,6+17,12*5+ 24+44,24+16    ;   ; Single Object sprite 11 (animated)
+defb 0,%01110000+7 ; 3 commands at the same timepoint
+defb %10010000+0+2 ; Load Settings from bank 2
+defb 0,6+12,12*0+ 24+44,24+16 ; Single Object sprite 11 (animated)
+defb 0,6+13,12*1+ 24+44,24+16 ; Single Object sprite 11 (animated)
+defb 0,6+14,12*2+ 24+44,24+16 ; Single Object sprite 11 (animated)
+defb 0,6+15,12*3+ 24+44,24+16 ; Single Object sprite 11 (animated)
+defb 0,6+16,12*4+ 24+44,24+16 ; Single Object sprite 11 (animated)
+defb 0,6+17,12*5+ 24+44,24+16 ; Single Object sprite 11 (animated)
 
 ;Yumi
-defb 0,%01110000+3          ; 3 commands at the same timepoint
-defb    %10010000+0+2               ; Load Settings from bank 2
-defb    0,4,12*0+ 24,24+64+8    ;   ; Single Object sprite 11 (animated)
-defb    0,5,12*1+ 24,24+64+8    ;   ; Single Object sprite 11 (animated)
+defb 0,%01110000+3 ; 3 commands at the same timepoint
+defb %10010000+0+2 ; Load Settings from bank 2
+defb 0,4,12*0+ 24,24+64+8 ; Single Object sprite 11 (animated)
+defb 0,5,12*1+ 24,24+64+8 ; Single Object sprite 11 (animated)
 
 ;Yume
-defb 0,%01110000+3          ; 3 commands at the same timepoint
-defb    %10010000+0+2               ; Load Settings from bank 2
-defb    0,6,12*0+ 24+160-24,24+200-64   ;   ; Single Object sprite 11 (animated)
-defb    0,7,12*1+ 24+160-24,24+200-64   ;   ; Single Object sprite 11 (animated)
+defb 0,%01110000+3 ; 3 commands at the same timepoint
+defb %10010000+0+2 ; Load Settings from bank 2
+defb 0,6,12*0+ 24+160-24,24+200-64 ; Single Object sprite 11 (animated)
+defb 0,7,12*1+ 24+160-24,24+200-64 ; Single Object sprite 11 (animated)
 
 ;Palette Change
-defb 1,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+defb 1,%01110000+4      ; 4 Commands
+    defb 240,0,6        ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&44,&40
 
-    defb 240,26*0+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1
     defb 1
     defb &54,&54,&44,&40
 
-    defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 1
     defb &54,&54,&44,&40
 
-    defb 240,26*2+6,6               ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,26*2+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&44,&40
 
     ; Load Palette
-    defb 2,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 2,%01110000+4   ; 4 Commands
+    defb 240,0,6         ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
-    defb &54,&43,&47,&4B        ;Black,DkBlue,LtYellow,White
+    defb &54,&43,&47,&4B ;Black,DkBlue,LtYellow,White
 
-    defb 240,26*0+6,5*4+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,5*4+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 4  ; Switches
     defb 16 ;delay
     defb &54,&4A,&4F,&4B
@@ -419,55 +415,53 @@ defb 1,%01110000+4          ; 4 Commands
     defb 100;delay
     defb &54,&47,&5F,&4B
 
-    defb 240,26*1+6,5*2+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,5*2+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 2
     defb 32;delay
     defb &54,&47,&5F,&4B
     defb 245
     defb &54,&47,&4D,&4B
 
-    defb 240,26*2+6,5*1+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*2+6,5*1+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0 ; no of switches
     defb 0  ;delays
     defb &54,&47,&4D,&4B
 
 defb 4
-    defb 136                ; Jump to a different level point
-    defw PauseLoop              ; pointer
+    defb 136              ; Jump to a different level point
+    defw PauseLoop        ; pointer
     defb 60
 
 
 EventStreamArray_Menu_EP2:
 
-;defb 1,128,&24,128+64+60       ; Move Static
-
-defb 0,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+defb 0,%01110000+4        ; 4 Commands
+    defb 240,0,6          ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&54,&54
 
-    defb 240,26*0+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,6     ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1
     defb 1
     defb &54,&54,&54,&54
 
-    defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,6     ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 1
     defb &54,&54,&54,&54
 
-    defb 240,26*2+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,26*2+6,6     ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&54,&54
 
 
-;We will use 4 Paralax layers
-; ---------()- (sky)        %11001000
-; ------------ (Far)        %11000100
-; -----X---X-- (mid)        %11000010   Bank 1
-; []=====[]=== (foreground)     %11000001   Bank 0
+; We will use 4 Paralax layers
+;  ---------()- (sky)        %11001000
+;  ------------ (Far)        %11000100
+;  -----X---X-- (mid)        %11000010   Bank 1
+;  []=====[]=== (foreground)     %11000001   Bank 0
 
 ; Background L
 defb 0,128+4,1,%11000001,0          ; Program - Bitshift Sprite... Move - dir Left Slow ... Life - immortal
@@ -480,57 +474,57 @@ defb 0,128+4,0,&24,0                ; Static object
 defb 0,%10010000+15,2               ; Save Object settings to Bank 2
 
 ;Title
-defb 0,%01110000+7          ; 3 commands at the same timepoint
-defb    %10010000+0+2               ; Load Settings from bank 2
-defb    0,6+12,12*0+ 24+44,24+16    ;   ; Single Object sprite 11 (animated)
-defb    0,6+13,12*1+ 24+44,24+16    ;   ; Single Object sprite 11 (animated)
-defb    0,6+14,12*2+ 24+44,24+16    ;   ; Single Object sprite 11 (animated)
-defb    0,6+15,12*3+ 24+44,24+16    ;   ; Single Object sprite 11 (animated)
-defb    0,6+16,12*4+ 24+44,24+16    ;   ; Single Object sprite 11 (animated)
-defb    0,6+17,12*5+ 24+44,24+16    ;   ; Single Object sprite 11 (animated)
+defb 0,%01110000+7 ; 3 commands at the same timepoint
+defb %10010000+0+2 ; Load Settings from bank 2
+defb 0,6+12,12*0+ 24+44,24+16 ; Single Object sprite 11 (animated)
+defb 0,6+13,12*1+ 24+44,24+16 ; Single Object sprite 11 (animated)
+defb 0,6+14,12*2+ 24+44,24+16 ; Single Object sprite 11 (animated)
+defb 0,6+15,12*3+ 24+44,24+16 ; Single Object sprite 11 (animated)
+defb 0,6+16,12*4+ 24+44,24+16 ; Single Object sprite 11 (animated)
+defb 0,6+17,12*5+ 24+44,24+16 ; Single Object sprite 11 (animated)
 
 ;Chibiko
-defb 0,%01110000+3          ; 3 commands at the same timepoint
-defb    %10010000+0+2               ; Load Settings from bank 2
-defb    0,0,12*0+ 24+12,24+65   ;   ; Single Object sprite 11 (animated)
-defb    0,1,12*1+ 24+12,24+65   ;   ; Single Object sprite 11 (animated)
+defb 0,%01110000+3 ; 3 commands at the same timepoint
+defb %10010000+0+2 ; Load Settings from bank 2
+defb 0,0,12*0+ 24+12,24+65 ; Single Object sprite 11 (animated)
+defb 0,1,12*1+ 24+12,24+65 ; Single Object sprite 11 (animated)
 
 ;Bochan!
-defb 0,%01110000+3          ; 3 commands at the same timepoint
-defb    %10010000+0+2               ; Load Settings from bank 2
-defb    0,2,12*0+ 24+160-24-12,24+200-64    ;   ; Single Object sprite 11 (animated)
-defb    0,3,12*1+ 24+160-24-12,24+200-64    ;   ; Single Object sprite 11 (animated)
+defb 0,%01110000+3 ; 3 commands at the same timepoint
+defb %10010000+0+2 ; Load Settings from bank 2
+defb 0,2,12*0+ 24+160-24-12,24+200-64 ; Single Object sprite 11 (animated)
+defb 0,3,12*1+ 24+160-24-12,24+200-64 ; Single Object sprite 11 (animated)
 
 ;Palette Change
-defb 1,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+defb 1,%01110000+4      ; 4 Commands
+    defb 240,0,6        ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&44,&40
 
-    defb 240,26*0+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1
     defb 1
     defb &54,&54,&44,&40
 
-    defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 1
     defb &54,&54,&44,&40
 
-    defb 240,26*2+6,6               ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,26*2+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&44,&40
 
 ; Load Palette
-    defb 2,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 2,%01110000+4  ; 4 Commands
+    defb 240,0,6        ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
-    defb &54,&43,&47,&4B        ;Black,DkBlue,LtYellow,White
+    defb &54,&43,&47,&4B ;Black,DkBlue,LtYellow,White
 
-    defb 240,26*0+6,5*4+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,5*4+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 4  ; Switches
     defb 16 ;delay
     defb &54,&4A,&4F,&4B
@@ -541,7 +535,7 @@ defb 1,%01110000+4          ; 4 Commands
     defb 110;140;delayw
     defb &54,&58,&5B,&4B
 
-    defb 240,26*1+6,5*4+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,5*4+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 4
     defb 18
     defb &54,&58,&5B,&4B
@@ -550,42 +544,42 @@ defb 1,%01110000+4          ; 4 Commands
     defb 60
     defb &54,&40,&5F,&4B
     defb 70
-    defb &54,&40,&47,&59        ;Black,Red,Grey,White
+    defb &54,&40,&47,&59  ;Black,Red,Grey,White
 
-    defb 240,26*2+6,5*3+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*2+6,5*3+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 3 ; no of switches
     defb 0  ;delays
-    defb &54,&40,&47,&59        ;Black,Red,Grey,White
+    defb &54,&40,&47,&59  ;Black,Red,Grey,White
     defb 255
     defb &54,&40,&47,&59
     defb 32
-    defb &54,&40,&4E,&4A    ;defb &54,&4C,&4E,&49
+    defb &54,&40,&4E,&4A  ;defb &54,&4C,&4E,&49
 
 defb 4
-    defb 136                ; Jump to a different level point
-    defw PauseLoop              ; pointer
+    defb 136              ; Jump to a different level point
+    defw PauseLoop        ; pointer
     defb 60
 endif ; ifdef CompileEP2 }}}
 
 ; Load Palette
-    defb 2,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 2,%01110000+4    ; 4 Commands
+    defb 240,0,6          ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
-    defb &54,&4D,&4A,&4B        ;Black,DkBlue,LtYellow,White
+    defb &54,&4D,&4A,&4B  ; Black, DkBlue, LtYellow, White
 
-    defb 240,26*0+6,5*4+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
-    defb 4  ; Switches
-    defb 16 ;delay
+    defb 240,26*0+6,5*4+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 4   ; Switches
+    defb 16  ; delay
     defb &54,&4C,&5B,&4B
-    defb 128;delay
+    defb 128 ; delay
     defb &54,&5C,&5B,&4B
-    defb 32;delay
+    defb 32  ; delay
     defb &54,&58,&4C,&4B
-    defb 100;delay
+    defb 100 ; delay
     defb &54,&58,&5B,&4B
 
-    defb 240,26*1+6,5*3+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,5*3+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 3
     defb 18
     defb &54,&58,&5B,&4B
@@ -594,38 +588,38 @@ endif ; ifdef CompileEP2 }}}
     defb 60
     defb &54,&40,&5F,&4B
 
-    defb 240,26*2+6,5*3+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
-    defb 3 ; no of switches
-    defb 0  ;delays
-    defb &54,&40,&47,&59        ;Black,Red,Grey,White
+    defb 240,26*2+6,5*3+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 3                ; no of switches
+    defb 0                ; delays
+    defb &54,&40,&47,&59  ; Black,Red,Grey,White
     defb 255
     defb &54,&40,&47,&59
     defb 32
-    defb &54,&40,&4E,&4A    ;defb &54,&4C,&4E,&49
+    defb &54,&40,&4E,&4A
 
 defb 4
-    defb 136                ; Jump to a different level point
-    defw PauseLoop              ; pointer
-    defb 60                 ; new time
+    defb 136       ; Jump to a different level point
+    defw PauseLoop ; pointer
+    defb 60        ; new time
 
 Safepalette:
-defb 1,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+defb 1,%01110000+4      ; 4 Commands
+    defb 240,0,6        ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&54,&54
 
-    defb 240,26*0+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1
     defb 1
     defb &54,&54,&54,&54
 
-    defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 1
     defb &54,&54,&54,&54
 
-    defb 240,26*2+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,26*2+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&54,&54
@@ -634,80 +628,80 @@ defb 1,%01110000+4          ; 4 Commands
     defw SetFaderRegular
 
 ;Palette Change
-defb 2,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+defb 2,%01110000+4      ; 4 Commands
+    defb 240,0,6        ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&44,&40
 
-    defb 240,26*0+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1
     defb 1
     defb &54,&54,&44,&40
 
-    defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 1
     defb &54,&54,&44,&40
 
-    defb 240,26*2+6,6               ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,26*2+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&44,&40
 
-defb 3,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+defb 3,%01110000+4       ; 4 Commands
+    defb 240,0,6         ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&5D,&5B,&4B
 
-    defb 240,26*0+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,6    ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1
     defb 1
     defb &54,&5D,&5B,&4B
 
-    defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,6    ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 1
     defb &54,&5D,&5B,&4B
 
-    defb 240,26*2+6,6               ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,26*2+6,6    ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&5D,&5B,&4B
 
 defb 4
-    defb 136                ; Jump to a different level point
-    defw PauseLoop              ; pointer
-    defb 60                 ; new time
+    defb 136       ; Jump to a different level point
+    defw PauseLoop ; pointer
+    defb 60        ; new time
 
 
 PauseLoop:
 defb 4
-    defb 136                ; Jump to a different level point
-    defw PauseLoop              ; pointer
-    defb 60                 ; new time
+    defb 136       ; Jump to a different level point
+    defw PauseLoop ; pointer
+    defb 60        ; new time
 
 EventStreamFadeOut:
 
 ;Palette Change
-defb 1,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+defb 1,%01110000+4      ; 4 Commands
+    defb 240,0,6        ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&44,&40
 
-    defb 240,26*0+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1
     defb 1
     defb &54,&54,&44,&40
 
-    defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 1
     defb &54,&54,&44,&40
 
-    defb 240,26*2+6,6               ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,26*2+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&44,&40
@@ -715,23 +709,23 @@ defb 1,%01110000+4          ; 4 Commands
     defb 1,evtCallAddress
     defw SetFaderBlack
 
-defb 2,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+defb 2,%01110000+4      ; 4 Commands
+    defb 240,0,6        ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&54,&54
 
-    defb 240,26*0+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1
     defb 1
     defb &54,&54,&54,&54
 
-    defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 1
     defb &54,&54,&54,&54
 
-    defb 240,26*2+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,26*2+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&54,&54
@@ -757,44 +751,44 @@ ResetEventStream:
 ret
 
 EventStreamArray_ContentWarning:
-defb 0,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+defb 0,%01110000+4      ; 4 Commands
+    defb 240,0,6        ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&54,&54
 
-    defb 240,26*0+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1
     defb 1
     defb &54,&54,&54,&54
 
-    defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 1
     defb &54,&54,&54,&54
 
-    defb 240,26*2+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,26*2+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&54,&54
 
-defb 1,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+defb 1,%01110000+4      ; 4 Commands
+    defb 240,0,6        ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&44,&40
 
-    defb 240,26*0+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1
     defb 1
     defb &54,&54,&44,&40
 
-    defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 1
     defb &54,&54,&44,&40
 
-    defb 240,26*2+6,6               ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,26*2+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&44,&40
@@ -802,30 +796,30 @@ defb 1,%01110000+4          ; 4 Commands
     defb 1,evtCallAddress
     defw SetFaderBlack
 
-defb 2,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+defb 2,%01110000+4      ; 4 Commands
+    defb 240,0,6        ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&47,&4D,&4B
 
-    defb 240,26*0+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1
     defb 1
     defb &54,&47,&4D,&4B
 
-    defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1
     defb 64
     defb &54,&55,&5F,&4B
 
-    defb 240,26*2+6,6               ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,26*2+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&55,&5F,&4B
 
 defb 4
-    defb 136                ; Jump to a different level point
-    defw PauseLoop              ; pointer
+    defb 136       ; Jump to a different level point
+    defw PauseLoop ; pointer
     defb 60
 
 ifdef CompileEP2 ; {{{
@@ -1028,7 +1022,7 @@ ifdef CompileEP2 ; {{{
 
         ld a,ixl
         and ixh
-        or Keymap_AnyFire;%11110001
+        or Keymap_AnyFire ; %11001111
         cp 255
         jp nz,ContentWarningAgain
 
@@ -1057,16 +1051,16 @@ ld a,2
 call Akuyou_SpriteBank_Font
 
 ifdef CompileEP2
-    ld hl,EventStreamArray_Ep2      ;Event Stream
+    ld hl,EventStreamArray_Ep2 ; Event Stream
 else
-    ld hl,EventStreamArray_Ep1      ;Event Stream
+    ld hl,EventStreamArray_Ep1 ; Event Stream
 endif
-    ld de,Event_SavedSettings   ;Saved Settings
+    ld de,Event_SavedSettings  ; Saved Settings
     call AkuYou_Event_StreamInit
 
     call Akuyou_Music_Restart
     call Akuyou_ScreenBuffer_Reset
-    call Akuyou_Interrupt_Init  ;   call Akuyou_RasterColors_Init
+    call Akuyou_Interrupt_Init
 
 jp ShowTitlePic
 
@@ -1075,21 +1069,6 @@ LevelInit_Old:
 
     ;load player setting for color flipping
     call AkuYou_Player_GetPlayerVars
-
-ifdef CompileEP2
-        ld a,(iy-1) ;cpcver
-        and 128
-        jr z,systemis64k
-        ld a,&C4
-        ld (EyeCatchBankA_Plus1-1),a
-        ld (EyeCatchBankB_Plus1-1),a
-        ld hl,&4000
-        ld (EyeCatchMemA_Plus2-2),hl
-        ld (EyeCatchMemB_Plus2-2),hl
-        ld hl,&4000+&3F00
-        ld (EyeCatchMem2A_Plus2-2),hl
-    systemis64k:
-endif
 
     ld a,1
     ld (PaletteNo_Plus1-1),a
@@ -1100,11 +1079,11 @@ ShowTitlePic:
     call RasterColorsStartPalleteFlip
 
 ifdef CompileEP2
-    ld hl,EventStreamArray_Ep2      ;Event Stream
+    ld hl,EventStreamArray_Ep2 ; Event Stream
 else
-    ld hl,EventStreamArray_Ep1      ;Event Stream
+    ld hl,EventStreamArray_Ep1 ; Event Stream
 endif
-    ld de,Event_SavedSettings   ;Saved Settings
+    ld de,Event_SavedSettings  ; Saved Settings
     call ResetEventStream
 
     ld a,2
@@ -1113,7 +1092,6 @@ endif
     ld a,255
     ld i,a        ; show up to 255 chars
 
-;ep1    ld l,&17
 ifdef CompileEP2
     ld l,&18    ;ep2
 else
@@ -1136,14 +1114,14 @@ ShowTitlePic_Loop:
     call AkuYou_Player_ReadControls
 
     ld a,ixl
-    or Keymap_AnyFire ;%11110001
+    or Keymap_AnyFire ; %11001111
     cp 255
-    jr nz,ShowMenu      ; Check for any of the 3 fires being pressed (1UP)
+    jr nz,ShowMenu    ; Check for any of the 3 fires being pressed (1UP)
 
     ld a,ixh
-    or Keymap_AnyFire ;%11110001
+    or Keymap_AnyFire ; %11001111
     cp 255
-    jr nz,ShowMenu      ; Check for any of the 3 fires being pressed (2UP)
+    jr nz,ShowMenu    ; Check for any of the 3 fires being pressed (2UP)
 
     call CallFade
 
@@ -1161,8 +1139,8 @@ endif
     call PlusPaletteSet
 
     call Akuyou_RasterColors_Init
-
-    ld a,1          ;Turn on Plus raster switch
+     ;Turn on Plus raster switch
+    ld a,1
     call Akuyou_CPCGPU_CommandNum
 
     ld a,64
@@ -1170,9 +1148,9 @@ endif
 
     call Keys_WaitForRelease
 ifdef CompileEP2
-    ld hl,EventStreamArray_Menu_EP2     ;Event Stream
+    ld hl,EventStreamArray_Menu_EP2 ; Event Stream
 else
-    ld hl,EventStreamArray_Menu_EP1     ;Event Stream
+    ld hl,EventStreamArray_Menu_EP1 ; Event Stream
 endif
     call ResetEventStream
 
@@ -1198,24 +1176,17 @@ endif
         ld b,8
         call MenuScore_NextDigit
 
-
     call Akuyou_Timer_UpdateTimer
     call Akuyou_EventStream_Process
     call Akuyou_ObjectArray_Redraw
 
-
-;   ld hl,&0010 ;hl = startpos
-;   ld bc,&0003 ;bc = movespeed
-;   ld ix,&2604 ;ix = MinX,MaxX
-;   ld iy,&1610 ;iy = MinY,MaxY
-
-    ld hl,&090C
-    ld bc,&0001
-    ld ix,&2602
+    ld hl,&090C ; hl = startpos
+    ld bc,&0001 ; bc = movespeed
+    ld ix,&2602 ; ix = MinX,MaxX
 ifdef CompileEP2
-    ld iy,&120C
+    ld iy,&120C ; iy = MinY,MaxY
 else
-    ld iy,&110C
+    ld iy,&110C ; iy = MinY,MaxY
 endif
     call OnscreenCursorDefine
 ShowMenu_Loop:
@@ -1228,7 +1199,8 @@ ShowMenu_Loop:
 
     ld a,ixl
     and ixh
-    or Keymap_AnyFire;%11110001
+    or Keymap_AnyFire ; %11001111
+%11110001
     cp 255
     jp nz,MainMenuSelection
 
@@ -1281,87 +1253,87 @@ ret
 
 PlusPalette_Black:
         defb 30
-    defw &0000;1  -GRB
-    defw &0000;5  -GRB
-    defw &0000;6  -GRB
-    defw &0000;4  -GRB
+    defw &0000 ; 1  -GRB
+    defw &0000 ; 5  -GRB
+    defw &0000 ; 6  -GRB
+    defw &0000 ; 4  -GRB
         defb 50
-    defw &0000;1  -GRB
-    defw &0000;5  -GRB
-    defw &0000;6  -GRB
-    defw &0000;4  -GRB
+    defw &0000 ; 1  -GRB
+    defw &0000 ; 5  -GRB
+    defw &0000 ; 6  -GRB
+    defw &0000 ; 4  -GRB
         defb 65
-    defw &0000;1  -GRB
-    defw &0000;5  -GRB
-    defw &0000;6  -GRB
-    defw &0000;4  -GRB
+    defw &0000 ; 1  -GRB
+    defw &0000 ; 5  -GRB
+    defw &0000 ; 6  -GRB
+    defw &0000 ; 4  -GRB
         defb 85
-    defw &0000;1  -GRB
-    defw &0000;5  -GRB
-    defw &0000;6  -GRB
-    defw &0000;4  -GRB
+    defw &0000 ; 1  -GRB
+    defw &0000 ; 5  -GRB
+    defw &0000 ; 6  -GRB
+    defw &0000 ; 4  -GRB
         defb 132
-    defw &0000;1  -GRB
-    defw &0000;5  -GRB
-    defw &0000;6  -GRB
-    defw &0000;4  -GRB
+    defw &0000 ; 1  -GRB
+    defw &0000 ; 5  -GRB
+    defw &0000 ; 6  -GRB
+    defw &0000 ; 4  -GRB
         defb 160
-    defw &0000;1  -GRB
-    defw &0000;5  -GRB
-    defw &0000;6  -GRB
-    defw &0000;4  -GRB
+    defw &0000 ; 1  -GRB
+    defw &0000 ; 5  -GRB
+    defw &0000 ; 6  -GRB
+    defw &0000 ; 4  -GRB
         defb 200-8-3
-    defw &0000;1  -GRB
-    defw &0000;5  -GRB
-    defw &0000;6  -GRB
-    defw &0000;4  -GRB
+    defw &0000 ; 1  -GRB
+    defw &0000 ; 5  -GRB
+    defw &0000 ; 6  -GRB
+    defw &0000 ; 4  -GRB
         defb 200
-    defw &0000;1  -GRB
-    defw &0000;5  -GRB
-    defw &0000;6  -GRB
-    defw &0000;4  -GRB
+    defw &0000 ; 1  -GRB
+    defw &0000 ; 5  -GRB
+    defw &0000 ; 6  -GRB
+    defw &0000 ; 4  -GRB
 
 PlusPalette_Regular:
         defb 25
-    defw &0000;1  -GRB
-    defw &0088;5  -GRB
-    defw &0F8F;6  -GRB
-    defw &0FFF;4  -GRB
+    defw &0000 ; 1  -GRB
+    defw &0088 ; 5  -GRB
+    defw &0F8F ; 6  -GRB
+    defw &0FFF ; 4  -GRB
         defb 50
-    defw &0000;1  -GRB
-    defw &0088;5  -GRB
-    defw &0F8F;6  -GRB
-    defw &0FFF;4  -GRB
+    defw &0000 ; 1  -GRB
+    defw &0088 ; 5  -GRB
+    defw &0F8F ; 6  -GRB
+    defw &0FFF ; 4  -GRB
         defb 75
-    defw &0000;1  -GRB
-    defw &0088;5  -GRB
-    defw &0F8F;6  -GRB
-    defw &0FFF;4  -GRB
+    defw &0000 ; 1  -GRB
+    defw &0088 ; 5  -GRB
+    defw &0F8F ; 6  -GRB
+    defw &0FFF ; 4  -GRB
         defb 100
-    defw &0000;1  -GRB
-    defw &0088;5  -GRB
-    defw &0F8F;6  -GRB
-    defw &0FFF;4  -GRB
+    defw &0000 ; 1  -GRB
+    defw &0088 ; 5  -GRB
+    defw &0F8F ; 6  -GRB
+    defw &0FFF ; 4  -GRB
         defb 125
-    defw &0000;1  -GRB
-    defw &0088;5  -GRB
-    defw &0F8F;6  -GRB
-    defw &0FFF;4  -GRB
+    defw &0000 ; 1  -GRB
+    defw &0088 ; 5  -GRB
+    defw &0F8F ; 6  -GRB
+    defw &0FFF ; 4  -GRB
         defb 150
-    defw &0000;1  -GRB
-    defw &0088;5  -GRB
-    defw &0F8F;6  -GRB
-    defw &0FFF;4  -GRB
+    defw &0000 ; 1  -GRB
+    defw &0088 ; 5  -GRB
+    defw &0F8F ; 6  -GRB
+    defw &0FFF ; 4  -GRB
         defb 175
-    defw &0000;1  -GRB
-    defw &0088;5  -GRB
-    defw &0F8F;6  -GRB
-    defw &0FFF;4  -GRB
+    defw &0000 ; 1  -GRB
+    defw &0088 ; 5  -GRB
+    defw &0F8F ; 6  -GRB
+    defw &0FFF ; 4  -GRB
         defb 200
-    defw &0000;1  -GRB
-    defw &0088;5  -GRB
-    defw &0F8F;6  -GRB
-    defw &0FFF;4  -GRB
+    defw &0000 ; 1  -GRB
+    defw &0088 ; 5  -GRB
+    defw &0F8F ; 6  -GRB
+    defw &0FFF ; 4  -GRB
 
 PlusPalette_EP1Menu:
     defb 30
@@ -1447,23 +1419,18 @@ OnscreenCursorDefineTest:
     ld ix,&2602
     ld iy,&1802
 OnscreenCursorDefine:
-        ;hl = startpos
-        ;bc = movespeed
-        ;ix = MinX,MaxX
-        ;iy = MinY,MaxY
-        ld (CursorCurrentPosXY_Plus2-2),hl
-        ld (CursorMoveSpeedXY_Plus2-2),bc
-
+        ld (CursorCurrentPosXY_Plus2-2),hl ; hl = startpos
+        ld (CursorMoveSpeedXY_Plus2-2),bc  ; bc = movespeed
         ld a,ixl
-        ld (CursorMinX_Plus1-1),a
+        ld (CursorMinX_Plus1-1),a          ; ixl = MinX
         ld a,ixh
-        ld (CursorMaxX_Plus1-1),a
-
+        ld (CursorMaxX_Plus1-1),a          ; ixh = MaxX
         ld a,iyl
-        ld (CursorMinY_Plus1-1),a
+        ld (CursorMinY_Plus1-1),a          ; iyl = MinY
         ld a,iyh
-        ld (CursorMaxY_Plus1-1),a
+        ld (CursorMaxY_Plus1-1),a          ; iy = MaxY
     ret
+
 OnscreenCursor:
         ld hl,&0101 :CursorCurrentPosXY_Plus2   ;current pos
         push hl
@@ -1475,7 +1442,6 @@ OnscreenCursor:
         ld a,ixh
         and ixl
         ld e,a
-
 
         bit Keymap_D,e
         jr nz,OnscreenCursorNotDown
@@ -1826,7 +1792,7 @@ ToggleFromLookupFound:
     inc hl
     ld b,(hl)
     inc hl
-zzxpxc; jp z,DrawTextReset
+zzxpxc
     ld a,b
     ret
 
@@ -1875,15 +1841,10 @@ ResetFlickerColors:
     ld hl,Safepalette
     call ResetEventStream
 
-;   ld hl,&0010 ;hl = startpos
-;   ld bc,&0003 ;bc = movespeed
-;   ld ix,&2604 ;ix = MinX,MaxX
-;   ld iy,&1610 ;iy = MinY,MaxY
-
-    ld bc,&0002
-    ld ix,&2602
-    ld hl,&0305
-    ld iy,&1705
+    ld hl,&0305 ; hl = startpos
+    ld bc,&0002 ; bc = movespeed
+    ld ix,&2602 ; ix = MinX,MaxX
+    ld iy,&1705 ; iy = MinY,MaxY
 
     call OnscreenCursorDefine;test
 
@@ -1895,7 +1856,7 @@ GameplaySettingsRedraw:
     call Akuyou_SpriteBank_Font
 
     ld a,255
-    ld i,a        ; show up to 255 chars
+    ld i,a      ; show up to 255 chars
 
     ;Smartbombs
     ld hl,&0A00+posConfigTitle
@@ -2049,7 +2010,7 @@ GameplaySettings_Loop:
     call AkuYou_Player_ReadControls
     ld a,ixl
     and ixh
-    or Keymap_AnyFire;%11110001
+    or Keymap_AnyFire ; %11001111
     cp 255
     jp nz,GameplaySettings_Apply
 
@@ -2094,7 +2055,7 @@ GameplaySettings_ShowMenu:
     jp SaveShowMenu
 GameplaySettings_ApplyGameMode:
     ld a,(iy-10)
-    and            %10000000
+    and %10000000
     jr nz,GameplaySettings_ApplyGameModeComplete
 
     ld a,(IY-15)
@@ -2165,20 +2126,20 @@ GameplaySettings_ApplyContinuesZero:
     ld (IY-12),a
     jp GameplaySettingsRedraw
 
-BlankMsg: db  4,""," "+&80,0
+BlankMsg: db 4,""," "+&80,0
 
 StartGame_1UP:
     call Akuyou_CLS
-    ld hl,  &0005;7;5               ;load level 11 (Episode 2 start)
+    ld hl,  &0005;7;5           ; load level 11 (Episode 2 start)
     jp  Akuyou_ExecuteBootStrap ; Start the game, no return
 StartGame_2UP:
     call Akuyou_CLS
-    ld hl,  &0006               ;load level 11 (Episode 2 start)
+    ld hl,  &0006               ; load level 11 (Episode 2 start)
     jp  Akuyou_ExecuteBootStrap ; Start the game, no return
 
 StartGame_2P:
     call Akuyou_CLS
-    ld hl,  &0007               ;load level 11 (Episode 2 start)
+    ld hl,  &0007               ; load level 11 (Episode 2 start)
     jp  Akuyou_ExecuteBootStrap ; Start the game, no return
 
 ShowCredits:
@@ -2217,7 +2178,7 @@ endif
     call AkuYou_Player_ReadControls
     ld a,ixl
     and ixh
-    or Keymap_AnyFire;%11110001
+    or Keymap_AnyFire ; %11001111
     cp 255
     jp nz,ShowMenu
 
@@ -2227,28 +2188,28 @@ endif
 
     ld a,(CheatsOn)
     cp 0
-    jr z,cheatStage0    ; cheating isnt armed
+    jr z,cheatStage0 ; cheating isnt armed
     cp 1
-    jr z,cheatStage1    ; cheating isnt armed
+    jr z,cheatStage1 ; cheating isnt armed
     cp 2
-    jr z,cheatStage2    ; cheating isnt armed
+    jr z,cheatStage2 ; cheating isnt armed
     cp 3
-    jp z,ShowCheats     ; Cheat!
+    jp z,ShowCheats  ; Cheat!
 
- ;EP keyboard matrix &B5
+; EP keyboard matrix &B5
 
- ;        b7    b6    b5    b4    b3    b2    b1    b0
- ;Row    80H   40H   20H   10H   08H   04H   02H   01H
- ; 0   L.SH.     Z     X     V     C     B     \     N
- ; 1    CTRL     A     S     F     D     G  LOCK     H
- ; 2     TAB     W     E     T     R     Y     Q     U
- ; 3     ESC     2     3     5     4     6     1     7
- ; 4      F1    F2    F7    F5    F6    F3    F8    F4
- ; 5         ERASE     ^     0     -     9           8
- ; 6             ]     colon L     ;     K           J
- ; 7     ALT ENTER   LEFT  HOLD   UP   RIGHT DOWN  STOP
- ; 8     INS SPACE R.SH.     .     /     ,   DEL     M
- ; 9                   [     P     @     0           I
+;         b7     b6     b5    b4     b3     b2     b1     b0
+; Row    80H    40H    20H   10H    08H    04H    02H    01H
+;  0   L.SH.      Z      X     V      C      B      \      N
+;  1    CTRL      A      S     F      D      G   LOCK      H
+;  2     TAB      W      E     T      R      Y      Q      U
+;  3     ESC      2      3     5      4      6      1      7
+;  4      F1     F2     F7    F5     F6     F3     F8     F4
+;  5          ERASE      ^     0      -      9             8
+;  6              ]  colon     L      ;      K             J
+;  7     ALT  ENTER   LEFT   HOLD    UP    RIGHT  DOWN   STOP
+;  8     INS  SPACE  R.SH.     .      /      ,    DEL      M
+;  9                     [     P      @      0             I
 
 cheatStage0:
     ld a,(ix+0)
@@ -2441,13 +2402,13 @@ lstCheats:
 
 intJumpToLevel: db 0
 
-posLevelJump equ 7
+posLevelJump  equ 7
 posPlayersNum equ 9
-posCheats equ 11
-posLevelJumpApply equ 13
-posGameEngineMode equ 15
+posCheats     equ 11
+posLevelJumpApply  equ 13
+posGameEngineMode  equ 15
 posGameEngineApply equ 17
-posCheatMainMenu equ 19
+posCheatMainMenu   equ 19
 
 lstLevelJump:
     defb 0
@@ -2509,15 +2470,15 @@ ifdef CompileEP2
     defw txtLevel242
 endif
 
-    defb 0  ;First one again - this is the loop
-    defw 00 ;Command to show end of list
+    defb 0  ; First one again - this is the loop
+    defw 00 ; Command to show end of list
     defw lstLevelJump
 
 ShowCheats:
-    ld hl,&0407     ;hl = startpos
-    ld bc,&0002     ;bc = movespeed
-    ld ix,&2602     ;ix = MinX,MaxX
-    ld iy,&1206     ;iy = MinY,MaxY
+    ld hl,&0407 ; hl = startpos
+    ld bc,&0002 ; bc = movespeed
+    ld ix,&2602 ; ix = MinX,MaxX
+    ld iy,&1206 ; iy = MinY,MaxY
     call OnscreenCursorDefine;test
 
 ShowCheatsAgain:
@@ -2628,7 +2589,7 @@ ShowCheats2:
 
     ld a,ixl
     and ixh
-    or Keymap_AnyFire;%11110001
+    or Keymap_AnyFire ; %11001111
     cp 255
     jp nz,Cheats_Apply
 
@@ -2733,7 +2694,7 @@ ShowText_MoreText:
     cp 254
     call z,SetFont1
     cp 253
-    call z,ZeroPos ;bugfix!
+    call z,ZeroPos ; bugfix!
 
     ld h,a
     inc bc
@@ -2885,7 +2846,7 @@ ifdef CompileEP2 ; {{{
 
         ld a,ixl
         and ixh
-        or Keymap_AnyFire;%11110001
+        or Keymap_AnyFire ; %11001111
         cp 255
         jp nz,EyeCatches_Selection
         call OnscreenCursor
@@ -3024,32 +2985,32 @@ endif ; }}}
 read "..\SrcCPC\Akuyou_CPC_Level_GenericRasterSwitcher.asm"
 
 ConfigureControls:
-    ld hl,  &0002               ;Set Controls
-    call    Akuyou_ExecuteBootStrap ; Start the game, no return
+    ld hl,  &0002                ; Set Controls
+    call Akuyou_ExecuteBootStrap ; Start the game, no return
 SaveShowMenu:
     call Akuyou_CLS
-    ld hl,  &0003               ;Save Settings
-    call    Akuyou_ExecuteBootStrap ; Start the game, no return
+    ld hl,  &0003                ; Save Settings
+    call Akuyou_ExecuteBootStrap ; Start the game, no return
     jp ShowMenu
 
 TimeColorsYumi:
-    defb 1,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 1,%01110000+4    ; 4 Commands
+    defb 240,0,6          ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 0
     defb &54,&47,&5F,&4B
 
-    defb 240,26*0+6,5*1+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,5*1+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 0
     defb &54,&54,&54,&54
 
-    defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,6     ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 0
     defb &54,&54,&54,&54
 
-    defb 240,26*2+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,26*2+6,6     ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 0
     defb 0
     defb &54,&54,&54,&54
@@ -3060,23 +3021,23 @@ defw PauseLoop
 defb 100
 
 TimeColorsSakuya:
-    defb 1,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 1,%01110000+4    ; 4 Commands
+    defb 240,0,6          ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 0
     defb &54,&5F,&59,&4B
 
-    defb 240,26*0+6,5*1+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,5*1+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 0
     defb &54,&54,&54,&54
 
-    defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,6     ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 0
     defb &54,&54,&54,&54
 
-    defb 240,26*2+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,26*2+6,6     ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 0
     defb 0
     defb &54,&54,&54,&54
@@ -3087,23 +3048,23 @@ defw PauseLoop
 defb 100
 
 TimeColorsYume:
-    defb 1,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 1,%01110000+4    ; 4 Commands
+    defb 240,0,6          ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 0
     defb &54,&47,&4D,&4B
 
-    defb 240,26*0+6,5*1+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,5*1+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 0
     defb &54,&54,&54,&54
 
-    defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,6     ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 0
     defb &54,&54,&54,&54
 
-    defb 240,26*2+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,26*2+6,6     ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 0
     defb 0
     defb &54,&54,&54,&54
@@ -3114,23 +3075,23 @@ defw PauseLoop
 defb 100
 
 TimeColorsChibiko:
-    defb 1,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 1,%01110000+4    ; 4 Commands
+    defb 240,0,6          ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 0
     defb &54,&58,&5F,&4B
 
-    defb 240,26*0+6,5*1+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,5*1+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 0
     defb &54,&54,&54,&54
 
-    defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,6     ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 0
     defb &54,&54,&54,&54
 
-    defb 240,26*2+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,26*2+6,6     ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 0
     defb 0
     defb &54,&54,&54,&54
@@ -3141,23 +3102,23 @@ defw PauseLoop
 defb 100
 
 TimeColorsBochan:
-    defb 1,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 1,%01110000+4    ; 4 Commands
+    defb 240,0,6          ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 0
     defb &54,&47,&52,&40
 
-    defb 240,26*0+6,5*1+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,5*1+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 0
     defb &54,&54,&54,&54
 
-    defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,6     ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 0
     defb &54,&54,&54,&54
 
-    defb 240,26*2+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,26*2+6,6     ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 0
     defb 0
     defb &54,&54,&54,&54
@@ -3168,23 +3129,23 @@ defw PauseLoop
 defb 100
 
 TimeColorsEyeCatches:
-    defb 1,%01110000+4          ; 4 Commands
-    defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 1,%01110000+4    ; 4 Commands
+    defb 240,0,6          ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 0
     defb &54,&57,&5B,&4B
 
-    defb 240,26*0+6,5*1+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,5*1+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 0
     defb &54,&54,&54,&54
 
-    defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,6     ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 0
     defb &54,&54,&54,&54
 
-    defb 240,26*2+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,26*2+6,6     ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 0
     defb 0
     defb &54,&54,&54,&54
@@ -3199,8 +3160,8 @@ null:ret
 LevelJumpBlock:
     defs FileBeginLevel+&3FF0-LevelJumpBlock
 
-    jp LevelInit; - Level Start &3ff0
-    jp LevelLoop; - Level loop &3ff3
+    jp LevelInit ; - Level start
+    jp LevelLoop ; - Level loop
 
 FileEndLevel:
     limit &FFFF
