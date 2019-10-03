@@ -1,5 +1,8 @@
 *.o
 *.SAV
 *.BIN
+*.out
 default.vim
 default.vim.lock
+RelCPC/disk1_1.dsk
+

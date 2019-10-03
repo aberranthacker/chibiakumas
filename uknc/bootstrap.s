@@ -3,8 +3,9 @@
 #.equiv DiskMap3, 3
 #.equiv DiskMap4, 4
 
-                .TITLE Chibi Akumas loader
+                .TITLE BootstrapChibi Akumas loader
                 .GLOBAL BootstrapLaunch
+                .global Bootstrap_Launch
 
                 .include "./macros.s"
                 .include "./core_defs.s"
@@ -15,9 +16,9 @@
 
                 .=BootstrapStart
 
-        puts $TitleStr
-        puts $CreditsStr
-        puts $WebSiteStr
+        .cout $TitleStr
+        .cout $WebSiteStr
+        .cout $CreditsStr
 Bootstrap_Launch:                       #     ld bc,&7f8D ; Reset the firmware to OFF
                                         #     out (c),c
                                         #     ld hl,RasterColors_InitColors
@@ -64,11 +65,11 @@ Bootstrap_StartGame:
         exit
         # loads core
         # loads saved settings
+        # TODO: display loading screen
         # TODO: font load
         # TODO: player sprites load
         # TODO: Initialize the Sound Effects.
-        # ../AkuCPC/BootsStrap_StartGame_CPC.asm
-        .include "./bootstrap/start_game.s" #   read "..\AkuCPC\BootsStrap_StartGame_CPC.asm"
+        .include "./bootstrap/start_game.s" # read "../AkuCPC/BootsStrap_StartGame_CPC.asm"
         JMP Bootstrap_Level_0           #     jp Bootstrap_Level_0    ; Start the menu
 #----------------------------------------------------------------------------}}}
 Bootstrap_Level_0:                      # main menu -------------------------{{{
@@ -118,16 +119,15 @@ Bootstrap_LoadDiskFile:
                 EMT     0375
 # TODO: carry the carry flag out of the procedure
                 BCS     1$
-1$:             #.Close  $0               #.CLOSE  chan
-                .equiv  CloseChan0, 0x0600 + 0 # operation code 6, channel 0
-                MOV     CloseChan0, R0
+1$:             #.Close  $0              #.CLOSE  chan
+                MOV     $0x0600,R0 # operation code 6, channel 0
                 EMT     0374
 RETURN
 
-LookupArea:         .BYTE   0,01    # chan, code(.LOOKUP)
+LookupArea:         .BYTE   0,01  # chan, code(.LOOKUP)
     LookupFileName: .WORD   0 # dblk
 
-ReadArea:           .BYTE   0,010   # chan, code(.READ/.READC/.READW)
+ReadArea:           .BYTE   0,010 # chan, code(.READ/.READC/.READW)
                     .WORD   0 # blk
     ReadBuffer:     .WORD   0 # buf
     ReadWordsCount: .WORD   0 # wcnt
@@ -141,10 +141,12 @@ LookupError:        .ASCIZ  "File lookup error."
 ReadError:          .ASCIZ  "File read error."
 
 TitleStr:           .ASCIZ  "         -= ChibiAkumas  V1.666 =-"
-CreditsStr:         .ASCIZ  "-= converted for the UKNC by aberranth =-"
 WebSiteStr:         .ASCIZ  "         -= www.chibiakumas.com =-"
+CreditsStr:         .ASCIZ  "-= converted for the UKNC by aberranth =-"
+
         .even
 
 StartANewGame:
-                exit
+
+        exit
 BootstrapEnd:
