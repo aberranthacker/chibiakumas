@@ -3,7 +3,7 @@
                     EMT 0350
                 .endm
 
-                .macro puts addr
+                .macro .cout addr
                     MOV \addr,R0
                     EMT 0351
                 .endm

@@ -25,7 +25,7 @@
         # ScreenBuffer2Pos equ &80
 
 #******************************************************************************#
-#                              Main Project Code                               #
+#*                             Main Project Code                              *#
 #******************************************************************************#
                 .=Akuyou_GameVars # Need &700 bytes!
 
@@ -93,60 +93,60 @@ SavedSettings: # {{{
     # ;ZX  0=TAP 1=TRD 2=DSK   128= 128k ;192 = +3 or black +2
     #
     Player_Array:
-        P1_P00: .byte 100        # 0 - Y
-        P1_P01: .byte 32         # 1 - X
-        P1_P02: .byte 0          # 2 - shoot delay
-        P1_P03: .byte 2          # 3 - smartbombs
-        P1_P04: .byte 0          # 4 - drones (0/1/2)
-        P1_P05: .byte 60         # 5 - continues
-        P1_P06: .byte 0          # 6 - drone pos
-        P1_P07: .byte 0b00000111 # 7 - Invincibility
-        P1_P08: .byte 0          # 8 - Player SpriteNum
-        P1_P09: .byte 3          # 9 - Lives
-        P1_P10: .byte 100        #10 - Burst Fire (Xfire)
-        P1_P11: .byte 0b00000100 #11 - Fire Speed - PlayerShootSpeed_Plus1
-        P1_P12: .byte 0          #12 - Player num (0=1, 1=2)
-        P1_P13: .byte 0          #13 - Points to add to player 1 - used to make score 'roll up'
-        P1_P14: .byte 0          #14 - PlayerShootPower_Plus1
-        P1_P15: .byte 0x67       #15 - FireDir
+        P1_P00: .byte 100        #  0 - Y
+        P1_P01: .byte 32         #  1 - X
+        P1_P02: .byte 0          #  2 - shoot delay
+        P1_P03: .byte 2          #  3 - smartbombs
+        P1_P04: .byte 0          #  4 - drones (0/1/2)
+        P1_P05: .byte 60         #  5 - continues
+        P1_P06: .byte 0          #  6 - drone pos
+        P1_P07: .byte 0b00000111 #  7 - Invincibility
+        P1_P08: .byte 0          #  8 - Player SpriteNum
+        P1_P09: .byte 3          #  9 - Lives
+        P1_P10: .byte 100        # 10 - Burst Fire (Xfire)
+        P1_P11: .byte 0b00000100 # 11 - Fire Speed - PlayerShootSpeed_Plus1
+        P1_P12: .byte 0          # 12 - Player num (0=1, 1=2)
+        P1_P13: .byte 0          # 13 - Points to add to player 1 - used to make score 'roll up'
+        P1_P14: .byte 0          # 14 - PlayerShootPower_Plus1
+        P1_P15: .byte 0x67       # 15 - FireDir
 
     Player_Array2:             #Player 2 is 16 bytes after player 1
-        P2_P00: .byte 150        # 0 - Y
-        P2_P01: .byte 32         # 1 - X
-        P2_P02: .byte 0          # 2 - Shoot delay
-        P2_P03: .byte 2          # 3 - smartbombs
-        P2_P04: .byte 0          # 4 - Drones (0/1/2)
-        P2_P05: .byte 60         # 5 - continues
-        P2_P06: .byte 0          # 6 - Drone Pos
-        P2_P07: .byte 0b00000111 # 7 - Invincibility
-        P2_P08: .byte 0          # 8 - Player SpriteNum
-        P2_P09: .byte 0          # 9 - Lives
-        P2_P10: .byte 0          #10 - Burst Fire
-        P2_P11: .byte 0b00000100 #11 - Fire speed
-        P2_P12: .byte 128        #12 - Player num (0=1,1=2)
-        P2_P13: .byte 0          #13 - Points to add to player 2 - used to make score 'roll up'
-        P2_P14: .byte 0          #14 - PlayerShootPower_Plus1
-        P2_P15: .byte 0x67       #15 - FireDir
+        P2_P00: .byte 150        #  0 - Y
+        P2_P01: .byte 32         #  1 - X
+        P2_P02: .byte 0          #  2 - Shoot delay
+        P2_P03: .byte 2          #  3 - smartbombs
+        P2_P04: .byte 0          #  4 - Drones (0/1/2)
+        P2_P05: .byte 60         #  5 - continues
+        P2_P06: .byte 0          #  6 - Drone Pos
+        P2_P07: .byte 0b00000111 #  7 - Invincibility
+        P2_P08: .byte 0          #  8 - Player SpriteNum
+        P2_P09: .byte 0          #  9 - Lives
+        P2_P10: .byte 0          # 10 - Burst Fire
+        P2_P11: .byte 0b00000100 # 11 - Fire speed
+        P2_P12: .byte 128        # 12 - Player num (0=1,1=2)
+        P2_P13: .byte 0          # 13 - Points to add to player 2 - used to make score 'roll up'
+        P2_P14: .byte 0          # 14 - PlayerShootPower_Plus1
+        P2_P15: .byte 0x67       # 15 - FireDir
 
     KeyMap2:
-        .byte 0xFF,       0x00 #Pause
-        .byte 0b01111111, 0x05 #Fire3
-        .byte 0b10111111, 0x06 #Fire2R
-        .byte 0b01111111, 0x06 #Fire1L
-        .byte 0b11011111, 0x07 #Right
-        .byte 0b11011111, 0x08 #Left
-        .byte 0b11101111, 0x07 #Down
-        .byte 0b11110111, 0x07 #Up
+        .byte 0xFF,       0x00 # Pause
+        .byte 0b01111111, 0x05 # Fire3
+        .byte 0b10111111, 0x06 # Fire2R
+        .byte 0b01111111, 0x06 # Fire1L
+        .byte 0b11011111, 0x07 # Right
+        .byte 0b11011111, 0x08 # Left
+        .byte 0b11101111, 0x07 # Down
+        .byte 0b11110111, 0x07 # Up
 
     KeyMap:
-        .byte 0xF7,       0x03 #Pause bit 20
-        .byte 0b11111011, 0x02 #Fire3     19
-        .byte 0b11111011, 0x04 #Fire2R    18
-        .byte 0b11110111, 0x04 #Fire1L    17
-        .byte 0xFD,       0x00 #Right     16
-        .byte 0xFE,       0x01 #Left      15
-        .byte 0xFB,       0x00 #Down      14
-        .byte 0xFE,       0x00 #Up        13
+        .byte 0xF7,       0x03 # Pause bit 20
+        .byte 0b11111011, 0x02 # Fire3     19
+        .byte 0b11111011, 0x04 # Fire2R    18
+        .byte 0b11110111, 0x04 # Fire1L    17
+        .byte 0xFD,       0x00 # Right     16
+        .byte 0xFE,       0x01 # Left      15
+        .byte 0xFB,       0x00 # Down      14
+        .byte 0xFE,       0x00 # Up        13
 
     KeyboardScanner_KeyPresses: .space 10 # Player1
                                             #
