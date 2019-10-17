@@ -1,9 +1,13 @@
+.equiv PPU_UserRamStart, 0x27B6     # 023666 10166
+.equiv PPU_UserRamSize, 0x5844      # 054104 22596 
+.equiv PPU_UserRamSizeWords, 0x2C22 # 026042 11298
+
 .equiv FB0,  0x300 # 01400   768
 .equiv FB1, 0x4180 # 04060 16768
 
 .equiv SPReset, 0x2FE # 01376 766 Initial stack pointer
 
-.equiv BootstrapStart,  FB1    #   04060 16768
+.equiv BootstrapStart,  FB0    #   04060 16768
 .equiv Akuyou_GameVars, 0x8000 # 0100000 32768
 .equiv Akuyou_CoreStart, (Akuyou_GameVars + 0x700) # Need &700 (1792) bytes!
                                                    # 0x8700 (34560)

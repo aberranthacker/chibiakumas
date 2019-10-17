@@ -36,11 +36,11 @@
     .balign 256
 StarArrayPointer:
     .space 256*3
-ObjectArrayPointer: #first ObjectArraySize*2 of each 256 are used - rest (>128) are spare
+ObjectArrayPointer: # first ObjectArraySize*2 of each 256 are used - rest (>128) are spare
     .space 256*4
-    #First 128 are used by object array
+    # First 128 are used by object array
     .equiv PlayerStarArrayPointer, (ObjectArrayPointer + 128)
-    #Out the way of the Object array!??
+    # Out the way of the Object array!??
     .equiv Event_SavedSettings, (256 * 3 + ObjectArrayPointer + 128)
 
                 .=Akuyou_CoreStart
@@ -87,11 +87,11 @@ SavedSettings: # {{{
     BlockPageFlippedColors:      .byte 255  # pos -4 0/255=on  64=off
     ScreenBuffer_ActiveScreen:   .byte 0xC0 # pos -3
     ScreenBuffer_VisibleScreen:  .byte 0xC0 # pos -2
-    CPCVer: .byte 00
     # ;CPC 0  =464 , 128=128 ; 129 = 128 plus ; 192 = 128 plus with 512k; 193 = 128 plus with 512k pos -1
     # ;MSX 1=V9990  4=turbo R
     # ;ZX  0=TAP 1=TRD 2=DSK   128= 128k ;192 = +3 or black +2
-    #
+    CPCVer: .byte 00
+
     Player_Array:
         P1_P00: .byte 100        #  0 - Y
         P1_P01: .byte 32         #  1 - X
@@ -369,44 +369,44 @@ SavedSettings_Last: # }}}
 #     .word    2,    2,    2,    2,    1,    1,    1,    1,    1,    1,    1,    1
                                         #
                                         # ifdef CPC320
-                                        #     read "..\SrcCPC\Akuyou_CPC_VirtualScreenPos_320.asm"
+                                        #     read "../SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm"
                                         # else
-                                        #     read "..\SrcCPC\Akuyou_CPC_VirtualScreenPos_256.asm"
+                                        #     read "../SrcCPC/Akuyou_CPC_VirtualScreenPos_256.asm"
                                         # endif
-                                        # read "..\SrcCPC\Akuyou_CPC_ShowSprite.asm"
+                                        # read "../SrcCPC/Akuyou_CPC_ShowSprite.asm"
                                         #
-                                        # read "..\SrcALL\Akuyou_Multiplatform_Stararray.asm"
-                                        # read "..\SrcALL\Akuyou_Multiplatform_Stararray_Add.asm"
-                                        # read "..\SrcALL\Akuyou_Multiplatform_DoMoves.asm"
+                                        # read "../SrcALL/Akuyou_Multiplatform_Stararray.asm"
+                                        # read "../SrcALL/Akuyou_Multiplatform_Stararray_Add.asm"
+                                        # read "../SrcALL/Akuyou_Multiplatform_DoMoves.asm"
                                         #
                                         # ;;;;;;;;;;;;;;;;;;;;Input Driver;;;;;;;;;;;;;;;;;;;;;;;;
-                                        # read "..\SrcCPC\Akuyou_CPC_KeyboardDriver.asm"
+                                        # read "../SrcCPC/Akuyou_CPC_KeyboardDriver.asm"
                                         # ;;;;;;;;;;;;;;;;;;;;Disk Driver;;;;;;;;;;;;;;;;;;;;;;;;
         .include "disk_driver.s"        # read "../SrcCPC/Akuyou_CPC_DiskDriver.asm"
-                                        # read "..\SrcCPC\Akuyou_CPC_ExecuteBootstrap.asm"
-                                        # read "..\SrcCPC\Akuyou_CPC_TextDriver.asm"
+                                        # read "../SrcCPC/Akuyou_CPC_ExecuteBootstrap.asm"
+                                        # read "../SrcCPC/Akuyou_CPC_TextDriver.asm"
                                         #
-                                        # read "..\SrcALL\Akuyou_Multiplatform_SFX.asm"
+                                        # read "../SrcALL/Akuyou_Multiplatform_SFX.asm"
                                         #
-                                        # read "..\SrcCPC\Akuyou_CPC_CompiledSpriteViewer.asm"    ;also includes CLS
-                                        # read "..\SrcCPC\Akuyou_CPC_BankSwapper.asm"
+                                        # read "../SrcCPC/Akuyou_CPC_CompiledSpriteViewer.asm"    ;also includes CLS
+                                        # read "../SrcCPC/Akuyou_CPC_BankSwapper.asm"
                                         #
-        .include "player_driver.s"      # read "..\SrcALL\Akuyou_Multiplatform_PlayerDriver.asm"
-                                        # read "..\SrcALL\Akuyou_Multiplatform_Timer.asm"
+        .include "player_driver.s"      # read "../SrcALL/Akuyou_Multiplatform_PlayerDriver.asm"
+                                        # read "../SrcALL/Akuyou_Multiplatform_Timer.asm"
                                         #
-                                        # read "..\SrcCPC\Akuyou_CPC_Gradient.asm"
+                                        # read "../SrcCPC/Akuyou_CPC_Gradient.asm"
                                         #
-                                        # read "..\SrcALL\Akuyou_Multiplatform_ObjectDriver.asm"
-                                        # read "..\SrcALL\Akuyou_Multiplatform_EventStream.asm"
-                                        # read "..\SrcCPC\Akuyou_CPC_CpcPlus.asm"
-                                        # read "..\SrcALL\Akuyou_Multiplatform_ArkosTrackerLite.asm"
-                                        # read "..\SrcCPC\Akuyou_CPC_ScreenMemory.asm"
-                                        # read "..\SrcALL\Akuyou_Multiplatform_AkuCommandVectorArray.asm"
+                                        # read "../SrcALL/Akuyou_Multiplatform_ObjectDriver.asm"
+                                        # read "../SrcALL/Akuyou_Multiplatform_EventStream.asm"
+                                        # read "../SrcCPC/Akuyou_CPC_CpcPlus.asm"
+                                        # read "../SrcALL/Akuyou_Multiplatform_ArkosTrackerLite.asm"
+                                        # read "../SrcCPC/Akuyou_CPC_ScreenMemory.asm"
+                                        # read "../SrcALL/Akuyou_Multiplatform_AkuCommandVectorArray.asm"
                                         #
                                         # ifdef Debug_Monitor
-                                        # ;   read "..\SrcALL\Multiplatform_Monitor.asm"
-                                        # ;   read "..\SrcALL\Multiplatform_MonitorMemdump.asm"
-                                        # ;   read "..\SrcALL\Multiplatform_MonitorSimple.asm"
+                                        # ;   read "../SrcALL/Multiplatform_Monitor.asm"
+                                        # ;   read "../SrcALL/Multiplatform_MonitorMemdump.asm"
+                                        # ;   read "../SrcALL/Multiplatform_MonitorSimple.asm"
                                         # endif
                                         #
                                         # list
