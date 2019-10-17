@@ -110,19 +110,19 @@ ShowSpriteReconfigure:
     jr z,ShowSpriteReconfigure_16px
 ret
 
-ShowSpriteReconfigure_128px:            ;Not actually used!
+ShowSpriteReconfigure_128px:     ;Not actually used!
     ld a,184-64
     ld b,224-24
     jr ShowSpriteReconfigure_all
-ShowSpriteReconfigure_104px:            ;Not actually used!
+ShowSpriteReconfigure_104px:     ;Not actually used!
     ld a,184-52
     ld b,224-96
     jr ShowSpriteReconfigure_all
-ShowSpriteReconfigure_96px:         ;Used by Boss 1
+ShowSpriteReconfigure_96px:      ;Used by Boss 1
     ld a,184-48
     ld b,224-24
     jr ShowSpriteReconfigure_all
-ShowSpriteReconfigure_80px:         ;Not actually used!
+ShowSpriteReconfigure_80px:      ;Not actually used!
     ld a,184-40
     ld b,224-80
     jr ShowSpriteReconfigure_all
@@ -134,7 +134,7 @@ ShowSpriteReconfigure_32px:
     ld a,184-16
     ld b,224-32
     jr ShowSpriteReconfigure_all
-ShowSpriteReconfigure_64px:         ;not actually used
+ShowSpriteReconfigure_64px:      ;not actually used
     ld a,184-32
     ld b,224-64
     jr ShowSpriteReconfigure_all

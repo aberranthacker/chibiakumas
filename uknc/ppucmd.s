@@ -1,59 +1,46 @@
 
 PPEXEC:         #------------------------------------------------------------{{{
-        MOV  R1,-(SP)
-        MOV  R2,-(SP)
-        MOV  R3,-(SP)
-            MOV  2(R5),PS.A2     # Arg 2 - memory size, words
-            MOVB $01,PS.Request  # 01 - allocate memory
-            CALL PPUOut          # => Send request to PPU
-            BNE  MAError         # If error, --> Memory allocation error
-            CALL Info            # 
-            MOV  @$PS.A1,PPUMBeg # Arg 1 - addr of mem block in PPUs RAM
-                                 #         set by malloc command
-            MOV  (R5)+,PS.A2     # Arg 2 - addr of mem block in CPUs RAM
-            MOV  (R5)+,PS.A3     # Arg 3 - size of mem block, words
-            MOVB $020,PS.Request # 020 - CPU to PPU memory copy
-            CALL PPUOut          # => Send request to PPU
-            BNE  MCpError        # If error, --> Memory copy error
-            CALL Info            # 
-                                 # 
-            MOVB $030,PS.Request # 030 - Execute programm
-            CALL PPUOut          # => Send request to PPU
-            BNE  ExError         # IF error, --> Execution error
-        MOV  (SP)+,R3
-        MOV  (SP)+,R2
-        MOV  (SP)+,R1
+        MOV  2(R5),PS.A2     # Arg 2 - memory size, words
+        MOVB $01,PS.Request  # 01 - allocate memory
+        CALL PPUOut          # => Send request to PPU
+        BNE  MAError         # If error, --> Memory allocation error
+        CALL Info            # 
+        MOV  @$PS.A1,PPU_MemoryStart # Arg 1 - addr of allocated memory in PPU RAM
+        MOV  (R5)+,PS.A2     # Arg 2 - addr of mem block in CPUs RAM
+        MOV  (R5)+,PS.A3     # Arg 3 - size of mem block, words
+        MOVB $020,PS.Request # 020 - CPU to PPU memory copy
+        CALL PPUOut          # => Send request to PPU
+        BNE  MCpError        # If error, --> Memory copy error
+        CALL Info            # 
+                             # 
+        MOVB $030,PS.Request # 030 - Execute programm
+        CALL PPUOut          # => Send request to PPU
+        BNE  ExError         # IF error, --> Execution error
         RTS  R5
 #----------------------------------------------------------------------------}}}
 PPFREE:         #------------------------------------------------------------{{{
-        MOV  R1,-(SP)
-        MOV  R2,-(SP)
-        MOV  R3,-(SP)
-            MOV  (R5)+,PS.A1    # Arg 1 - address of memory block
-            MOV  (R5)+,PS.A2    # Arg 2 - size of the memory block, words
-            MOVB $02,PS.Request # 02 - free memory
-            CALL PPUOut         # => Send request to PPU
-            BNE  MFrError       # If error, --> Memory freeing error
-        MOV  (SP)+,R3
-        MOV  (SP)+,R2
-        MOV  (SP)+,R1
+        MOV  (R5)+,PS.A1    # Arg 1 - address of memory block
+        MOV  (R5)+,PS.A2    # Arg 2 - size of the memory block, words
+        MOVB $02,PS.Request # 02 - free memory
+        CALL PPUOut         # => Send request to PPU
+        BNE  MFrError       # If error, --> Memory freeing error
         RTS     R5
 #----------------------------------------------------------------------------}}}
                 #Error messages ---------------------------------------------{{{
 MAError:
-        cout $sMAError
+        .cout $sMAError
         CALL Info
         JMP  Finish
 MCpError:
-        cout $sMCpError
+        .cout $sMCpError
         CALL Info
         JMP  Finish
 ExError:
-        cout $sExError
+        .cout $sExError
         CALL Info
         JMP  Finish
 MFrError:
-        cout $sMFrError
+        .cout $sMFrError
         CALL Info
         JMP  Finish
 
@@ -94,18 +81,18 @@ PS.A3:      .word  0       # Argument 3
         .Even
 #----------------------------------------------------------------------------}}}
 Info:           #------------------------------------------------------------{{{
-        MOV  $<Arg1+7>,R1
+        MOV  $Arg1+7, R1
         MOV  @$PS.A1,R3
         CALL InsDecStr
-        cout $Arg1
-        MOV  $<Arg2+7>,R1
+        .cout $Arg1
+        MOV  $Arg2+7, R1
         MOV  @$PS.A2,R3
         CALL InsDecStr
-        cout $Arg2
-        MOV  $<Arg3+7>,R1
+        .cout $Arg2
+        MOV  $Arg3+7, R1
         MOV  @$PS.A3,R3
         CALL InsDecStr
-        cout $Arg3
+        .cout $Arg3
         RETURN
                 #0         1         2         3         4         5         6         7
                 #01234567890123456789012345678901234567890123456789012345678901234567890123456789

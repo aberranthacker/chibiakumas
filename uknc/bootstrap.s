@@ -4,9 +4,9 @@
 #.equiv DiskMap4, 4
 
                 .TITLE BootstrapChibi Akumas loader
-                .GLOBAL BootstrapLaunch
                 .global Bootstrap_Launch
 
+                .include "./hwdefs.s"
                 .include "./macros.s"
                 .include "./core_defs.s"
 
@@ -62,7 +62,12 @@ RETURN                                  # ret
 Bootstrap_Level:
 # some missing code...
 Bootstrap_StartGame:
-        exit
+# Prepare screen-lines table to display cover art ---------------------------{{{
+        JSR  R5,PPEXEC
+        .WORD 0x0000 # addr of mem block in CPUs RAM
+        .WORD 11298 # number of words to allocate 11298 words (22596 bytes)
+#----------------------------------------------------------------------------}}}
+Finish: exit
         # loads core
         # loads saved settings
         # TODO: display loading screen
@@ -70,11 +75,11 @@ Bootstrap_StartGame:
         # TODO: player sprites load
         # TODO: Initialize the Sound Effects.
         .include "./bootstrap/start_game.s" # read "../AkuCPC/BootsStrap_StartGame_CPC.asm"
-        JMP Bootstrap_Level_0           #     jp Bootstrap_Level_0    ; Start the menu
+        JMP  Bootstrap_Level_0           #     jp Bootstrap_Level_0    ; Start the menu
 #----------------------------------------------------------------------------}}}
 Bootstrap_Level_0:                      # main menu -------------------------{{{
         # ../Aku/BootStrap.asm:2271
-        call StartANewGame              #     call StartANewGame
+        CALL StartANewGame              #     call StartANewGame
                                         #     call LevelReset0000
                                         #
                                         #     ld hl,DiskMap_MainMenu      ;T08-SC1.D01
@@ -123,6 +128,9 @@ Bootstrap_LoadDiskFile:
                 MOV     $0x0600,R0 # operation code 6, channel 0
                 EMT     0374
 RETURN
+
+        .include "./ppucmd.s"
+PPU_MemoryStart:    .WORD   0 # Placeholder to store start address of allocated memory block
 
 LookupArea:         .BYTE   0,01  # chan, code(.LOOKUP)
     LookupFileName: .WORD   0 # dblk
