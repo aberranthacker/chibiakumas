@@ -11,15 +11,11 @@ DiskMap_PlayerSprite        equ &06C1 ;T06-SC1.D00      ;Speccy/MSX char sprites
 DiskMap_PlayerSprite_Size   equ 4
 DiskMap_PlayerSprite_Disk   equ 0
 
-
 DiskMap_PlayerSpriteRLE      equ &06C2 ;T06-SC2.D00      ;Speccy/MSX char sprites
 DiskMap_PlayerSpriteRLE_Disk equ 0
 
-
 DiskMap_PlayerSpriteBo      equ &06C2 ;T06-SC2.D00
 DiskMap_PlayerSpriteBo_Disk equ 0
-
-
 
 DiskMap_PlusSprites      equ &21C1   ;T33-SC1.D00    ;MSX Icons
 DiskMap_PlusSprites_Size equ 10
@@ -27,8 +23,6 @@ DiskMap_PlusSprites_Disk equ 0
 
 DiskMap_PlusSpritesRLE      equ &21C2   ;T33-SC2.D00    ;MSX Icons RLE
 DiskMap_PlusSpritesRLE_Disk equ 0
-
-
 
 DiskMap_PlusSpritesChibiko      equ &21C2   ;T33-SC2.D00
 DiskMap_PlusSpritesChibiko_Disk equ 0
@@ -39,7 +33,6 @@ DiskMap_PlusSpritesBo_Disk equ 0
 ;DiskMap_PlayerSpriteUD         equ &06C3 ;T06-SC3.D00
 
 ;DiskMap_PlayerSpriteBoUD   equ &06C4 ;T06-SC4.D00
-
 
 DiskMap_Sfx      equ &06C8 ;T06-SC8.D00
 DiskMap_Sfx_Size equ 2
@@ -69,7 +62,6 @@ DiskMap_Level2_C        equ &0EC3   ;14 T14-SC3.D01
 DiskMap_Level2_D        equ &0EC4   ;14 T14-SC4.D01
 DiskMap_Level2_Disk     equ DiskMap1
 
-
 DiskMap_Level3          equ &14C1   ;20 T20-SC1.D01
 DiskMap_Level3_Size     equ 16
 DiskMap_Level3_128      equ &16C1   ;22 T22-SC1.D01
@@ -95,17 +87,14 @@ DiskMap_GameOver        equ &22C2   ;T34-SC2.D01
 DiskMap_GameOver_Size   equ 16
 DiskMap_GameOver_Disk   equ DiskMap1
 
-
 ;Note, we are loading this before the CORE, so we load by filename
 DiskMap_LoadingScreen      equ &26C1 ; T38-SC1.D01
 DiskMap_LoadingScreen_Size equ 32
 DiskMap_LoadingScreen_Disk equ DiskMap1
 
-
 DiskMap_LevelLoadScreens34      equ &03C1   ;T03-SC1.D01
 DiskMap_LevelLoadScreens34_Size equ 12
 DiskMap_LevelLoadScreens34_Disk equ DiskMap2
-
 
 DiskMap_Level5          equ &0AC1   ;10
 DiskMap_Level5_Size     equ 16
@@ -113,13 +102,11 @@ DiskMap_Level5_128      equ &0CC1   ;12 T12-SC1.D02
 DiskMap_Level5_128_Size equ 16  ; &2000
 DiskMap_Level5_Disk     equ DiskMap2
 
-
 DiskMap_Level6          equ &0EC1   ;14
 DiskMap_Level6_Size     equ 20
 DiskMap_Level6_128      equ &11C1   ;17  T17-SC1.D02
 DiskMap_Level6_128_Size equ 20  ;&2500 - 3 tracks
 DiskMap_Level6_Disk     equ DiskMap2
-
 
 DiskMap_Level7          equ &14C1   ;20
 DiskMap_Level7_Size     equ 20
@@ -127,13 +114,11 @@ DiskMap_Level7_128      equ &17C1   ;23 T23-SC1.D02
 DiskMap_Level7_128_Size equ 16
 DiskMap_Level7_Disk     equ DiskMap2
 
-
 DiskMap_Level8          equ &19C1   ;2 T25-SC1.D02
 DiskMap_Level8_Size     equ 16
 DiskMap_Level8_Disk     equ DiskMap2
 DiskMap_Level8_128      equ &1BC1   ;27  T27-SC1.D02
 DiskMap_Level8_128_Size equ 16
-
 
 DiskMap_Level9          equ &1DC1   ;29 T29-SC1.D02
 DiskMap_Level9_Size     equ 16
