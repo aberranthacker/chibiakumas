@@ -1,6 +1,6 @@
 .equiv PPU_UserRamStart, 0x27B6     # 023666 10166
 .equiv PPU_UserRamSize, 0x5844      # 054104 22596
-.equiv PPU_UserRamSizeWords, 0x2C22 # 026042 11298
+.equiv PPU_UserRamSizeWords, PPU_UserRamSize >> 1 # 0x2C22 026042 11298
 
 .equiv SPReset,       0x2FA  # 01372   762 Initial stack pointer
 .equiv PPUCommand,    0x2FC  # 01374   764 command for PPU code

@@ -6,7 +6,7 @@
                 .include "./hwdefs.s"
                 .include "./core_defs.s"
 
-                .equiv  PPU_ModuleSizeWords, (end - start)
+                .equiv  PPU_ModuleSizeWords, (end - start) >> 1
                 .global PPU_ModuleSizeWords
 
                 .=PPU_UserRamStart
@@ -78,8 +78,8 @@ start:
                 BIS     $0b110,R1       # next element is 4 words, color settings
                 MOV     R1,(R0)+        #--pointer to element 64
 #--------------------------------------- main screen
-                MOV     $FB1 >> 1,R2    # address of bitplane 0
-                MOV     $200,R3         # height of main RAM located framebuffer
+                MOV     $FB1 >> 1,R2    # address of second frame-buffer
+                MOV     $200,R3         # number of lines on main screen area
                 MOV     R0,@$FBSLTAB    #
 3$:             MOV     $0xCC00,(R0)+   # colors  011  010  001  000 (YRGB)
                 MOV     $0xAA99,(R0)+   # colors  111  110  101  100 (YRGB)
@@ -116,51 +116,31 @@ start:
                 RETURN                   # Завершить эту подпрограмму
 
 PGM:            MOV     R0, -(SP)        # save R0 in order for the process manager to function correctly
-
                 MOV     $PPUCommand >> 1, @$PBPADR
-                CMP     @$PBP12D, $0xFFFF
-                BEQ     PrepareToBeRemoved
+                CMP     @$PBP12D, $-1
+                BEQ     PrepareForRemoval
 
                 MOV     $PGM, @$07124   # Поставить в очередь процессов
                 MOV     $1, @$07100     # Потребовать обслуживания
                 MOV     (SP)+ ,R0       # Восстановить
                 JMP     @$0174170       # Перейти к диспетчеру процессов (63608; 0xF878)
-PrepareToBeRemoved:
+PrepareForRemoval:
+                CLR     @$07100         # do not run PGM anymore
                 MOV     @$SYS272, @$0272 # restore pointer to system SLTAB (186; 0xBA)
                 CLR     @$PBP12D
                 RETURN
 
-# FlipToFB0:
-#         MOV $(FB0 >> 1),R2
-#         BR  FlipFB
-# FlipToFB1:
-#         MOV $(FB1 >> 1),R2
-#         BR  FlipFB
-# FlipFB:
-#         MOV  $FBPointer,R0
-#         MOV  $200,R1
-# loop$:  BIT  $2,(R0)+
-#         BNE  2$
-# 4$: # next is 4 words
-#         ADD  $4,R0
-# 2$: # next is 2 words
-#         MOV  R2,(R0)+
-#         ADD  $40,R2
-#         SOB  R1,loop$
-# RETURN
-#
-# # 0 data
-# # 2 data
-# # 4 address
-# # 6 next element
-#
-# # 0 address
-# # 2 next element
+# 0 data
+# 2 data
+# 4 address
+# 6 next element
+
+# 0 address
+# 2 next element
 
 SYS272:  .WORD     # pointer to systems scanlines table
 FBSLTAB: .WORD     # adrress of main screen SLTAB
          .balign 8 # align at 8 bytes or the new SLTAB will be invalid
-SLTAB:   # .SPACE 288 * 2 * 4 # space for a 288 four-words entries
-         .WORD 0   # expecting that next ~2.5KB of RAM is unused
+SLTAB:   .SPACE 288 * 2 * 4 # space for a 288 four-words entries
 
 end:
