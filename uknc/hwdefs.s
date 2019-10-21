@@ -58,7 +58,7 @@
 .equiv Ch2In2Ready,    0b00100000 # channel 2 ready
 .equiv IntOnRESET_CPU, 0b01000000 # interrupt on RESET on CPU bus
 .equiv RSTINT, 0314    # RESET on CPU bus interrupt
-     
+
 .equiv PCH0OI, 0324    # PPU channel 0 out  data interrupt
 .equiv PCH0OD, 0177070 # PPU channel 0 out  data register
 .equiv PCH1OI, 0334    # PPU channel 1 out  data interrupt

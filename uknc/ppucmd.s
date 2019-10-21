@@ -1,29 +1,31 @@
 
 PPEXEC:         #------------------------------------------------------------{{{
-        MOV  2(R5),PS.A2     # Arg 2 - memory size, words
-        MOVB $01,PS.Request  # 01 - allocate memory
-        CALL PPUOut          # => Send request to PPU
-        BNE  MAError         # If error, --> Memory allocation error
-        CALL Info            # 
-        MOV  @$PS.A1,PPU_MemoryStart # Arg 1 - addr of allocated memory in PPU RAM
-        MOV  (R5)+,PS.A2     # Arg 2 - addr of mem block in CPUs RAM
-        MOV  (R5)+,PS.A3     # Arg 3 - size of mem block, words
-        MOVB $020,PS.Request # 020 - CPU to PPU memory copy
-        CALL PPUOut          # => Send request to PPU
-        BNE  MCpError        # If error, --> Memory copy error
-        CALL Info            # 
-                             # 
-        MOVB $030,PS.Request # 030 - Execute programm
-        CALL PPUOut          # => Send request to PPU
-        BNE  ExError         # IF error, --> Execution error
+        MOV  2(R5),@$PS.A2      # Arg 2 - memory size, words
+        MOVB $01,  @$PS.Request # 01 - allocate memory
+        CALL PPUOut             # => Send request to PPU
+        BNE  MAError            # If error, --> Memory allocation error
+        CALL Info               #
+        CMP  @$PS.A1, $PPU_UserRamStart
+        BNE  MAError
+                                # PS.A1 contains address of allocated area
+        MOV  (R5)+,@$PS.A2      # Arg 2 - addr of mem block in CPUs RAM
+        MOV  (R5)+,@$PS.A3      # Arg 3 - size of mem block, words
+        MOVB $020, @$PS.Request # 020 - CPU to PPU memory copy
+        CALL PPUOut             # => Send request to PPU
+        BNE  MCpError           # If error, --> Memory copy error
+        # CALL Info             #
+                                #
+        MOVB $030,@$PS.Request  # 030 - Execute programm
+        CALL PPUOut             # => Send request to PPU
+        BNE  ExError            # IF error, --> Execution error
         RTS  R5
 #----------------------------------------------------------------------------}}}
 PPFREE:         #------------------------------------------------------------{{{
-        MOV  (R5)+,PS.A1    # Arg 1 - address of memory block
-        MOV  (R5)+,PS.A2    # Arg 2 - size of the memory block, words
-        MOVB $02,PS.Request # 02 - free memory
-        CALL PPUOut         # => Send request to PPU
-        BNE  MFrError       # If error, --> Memory freeing error
+        MOV  (R5)+,@$PS.A1      # Arg 1 - address of memory block
+        MOV  (R5)+,@$PS.A2      # Arg 2 - size of the memory block, words
+        MOVB $02,  @$PS.Request # 02 - free memory
+        CALL PPUOut             # => Send request to PPU
+        BNE  MFrError           # If error, --> Memory freeing error
         RTS     R5
 #----------------------------------------------------------------------------}}}
                 #Error messages ---------------------------------------------{{{
@@ -55,7 +57,7 @@ PPUOut:         #------------------------------------------------------------{{{
         MOV  $AMP,R0        # R0 - pointer to channel's init sequence array
         MOV  $8,R1          # R1 - size of the array, 8 bytes
 1$:     MOVB (R0)+,@$CCH2OD # Send a byte to channel 2
-2$:         TSTB @$CCH2OS   # 
+2$:         TSTB @$CCH2OS   #
             BPL  2$         # Wait until channel is ready
         SOB  R1,1$          # Next byte
 

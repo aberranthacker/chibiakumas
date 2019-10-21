@@ -1,29 +1,35 @@
 AS=~/opt/binutils-pdp11/pdp11-dec-aout/bin/as
 LD=~/opt/binutils-pdp11/pdp11-dec-aout/bin/ld
 
+.SUFFIXES:
+.SUFFIXES: .s .o
+
 # --just-symbols= -R include only symbols from the file
 # --print-map -M
 # --strip-all -s
 
-AKU.SAV : bootstrap.o core.o CORE.BIN PPU.BIN
-	$(LD) -T linker_scripts/bootstrap.cmd -R core.o -s
-	chmod -x AKU.SAV
-	ruby build_tools/add_CCB.rb AKU.SAV
-bootstrap.o : bootstrap.s bootstrap/start_game.s core.o hwdefs.s core_defs.s macros.s ppucmd.s
+common = hwdefs.s core_defs.s macros.s
+
+build/AKU.SAV : build/bootstrap.o build/core.o build/CORE.BIN build/PPU.BIN build/LOADIN.SCR
+	$(LD) -T linker_scripts/bootstrap.cmd -R build/core.o -R build/ppu.o -s
+	chmod -x build/AKU.SAV
+	ruby build_tools/add_CCB.rb build/AKU.SAV
+build/CORE.BIN : build/core.o
+	$(LD) build/core.o -o build/core.out -s
+	ruby build_tools/aout2sav.rb build/core.out -b -o build/CORE.BIN
+build/PPU.BIN : build/ppu.o
+	$(LD) build/ppu.o -o build/ppu.out -s
+	ruby build_tools/aout2sav.rb build/ppu.out -b -o build/PPU.BIN
+build/LOADIN.SCR : ../ResCPC/Old/T38-SC1.D01
+	ruby build_tools/convert_bitmap.rb
+
+build/bootstrap.o : bootstrap.s bootstrap/start_game.s ppucmd.s $(common)
 	ruby build_tools/preprocessor.rb -i bootstrap.s
-	$(AS) bootstrap.s -o bootstrap.o
-
-CORE.BIN : core.o
-	$(LD) core.o -o core.out -T linker_scripts/core.cmd -s
-	ruby build_tools/aout2sav.rb core.out -b -o CORE.BIN
-core.o : core.s core_defs.s macros.s disk_driver.s player_driver.s
-	$(AS) core.s -o core.o
-
-PPU.BIN : ppu.o
-	$(LD) ppu.o -o ppu.out -s
-	ruby build_tools/aout2sav.rb ppu.out -b -o PPU.BIN
-ppu.o : ppu.s macros.s hwdefs.s core_defs.s
-	$(AS) ppu.s -o ppu.o
+	$(AS) bootstrap.s -o build/bootstrap.o
+build/core.o : core.s disk_driver.s player_driver.s $(common)
+	$(AS) core.s -o build/core.o
+build/ppu.o : ppu.s $(common)
+	$(AS) ppu.s -o build/ppu.o
 
 clean :
-	rm -f *.o *.out *.SAV *.BIN
+	rm -f build/*.o build/*.out build/*.SAV build/*.BIN
