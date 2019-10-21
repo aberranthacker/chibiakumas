@@ -68,7 +68,7 @@ DetectedNonPlus:
         ld c, DiskMap_LoadingScreen_Disk
         ld de,&C000
         ld ix,&C000+&4000-1;-8523
-        call Akuyou_LoadDiscSectorZ
+        call Akuyou_LoadDiscSectorZ ; ../SrcCPC/Akuyou_CPC_DiskDriver.asm:27
     endif
 
     ld hl,RasterColors_InitColors
