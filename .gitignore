@@ -1,6 +1,7 @@
 *.o
 *.SAV
 *.BIN
+*.SCR
 *.out
 default.vim
 default.vim.lock

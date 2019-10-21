@@ -62,12 +62,44 @@ RETURN                                  # ret
 Bootstrap_Level:
 # some missing code...
 Bootstrap_StartGame:
+        CLR  PPUCommand
 # Prepare screen-lines table to display cover art ---------------------------{{{
+        MOV  $PPUBIN, @$LookupFileName
+        MOV  $FB1, @$ReadBuffer
+        MOV  $PPU_ModuleSizeWords, @$ReadWordsCount
+        CALL Bootstrap_LoadDiskFile
+
         JSR  R5,PPEXEC
-        .WORD 0x0000 # addr of mem block in CPUs RAM
-        .WORD 11298 # number of words to allocate 11298 words (22596 bytes)
+        .WORD FB1
+        .WORD PPU_ModuleSizeWords
 #----------------------------------------------------------------------------}}}
-Finish: exit
+
+        MOV  $8000, R0
+        MOV  $FB1, R1
+        CLR  R3
+1$:     MOV  R3, (R1)+
+        SOB  R0, 1$
+
+        MOV  $LoadingSCR, @$LookupFileName # ../AkuCPC/BootsStrap_StartGame_CPC.asm:64
+        MOV  $FB1, @$ReadBuffer
+        MOV  $8000, @$ReadWordsCount
+        CALL Bootstrap_LoadDiskFile
+
+        CLR     @$CCH0IS
+WTKEY:  TSTB    @$CCH0IS
+        BPL     WTKEY
+
+        MOV     $0xFFFF, @$PPUCommand
+1$:     TST     PPUCommand # wait until PPU finishes command
+        BNE     1$
+
+        JSR     R5,PPFREE
+        .WORD   PPU_UserRamStart
+        .WORD   PPU_ModuleSizeWords
+        .exit
+
+       CALL Bootstrap_LoadDiskFile
+Finish: .exit
         # loads core
         # loads saved settings
         # TODO: display loading screen
@@ -75,7 +107,7 @@ Finish: exit
         # TODO: player sprites load
         # TODO: Initialize the Sound Effects.
         .include "./bootstrap/start_game.s" # read "../AkuCPC/BootsStrap_StartGame_CPC.asm"
-        JMP  Bootstrap_Level_0           #     jp Bootstrap_Level_0    ; Start the menu
+        JMP  Bootstrap_Level_0              #     jp Bootstrap_Level_0    ; Start the menu
 #----------------------------------------------------------------------------}}}
 Bootstrap_Level_0:                      # main menu -------------------------{{{
         # ../Aku/BootStrap.asm:2271
@@ -130,7 +162,6 @@ Bootstrap_LoadDiskFile:
 RETURN
 
         .include "./ppucmd.s"
-PPU_MemoryStart:    .WORD   0 # Placeholder to store start address of allocated memory block
 
 LookupArea:         .BYTE   0,01  # chan, code(.LOOKUP)
     LookupFileName: .WORD   0 # dblk
@@ -144,6 +175,10 @@ CoreBinRadix50:
     .byte 0xB8, 0x1A, 0x2A, 0x15, 0x40, 0x1F, 0xF6, 0x0D # .RAD50 "DK CORE  BIN"
 SavSetBinRadix50: # saved settings bin
     .byte 0xB8, 0x1A, 0xFE, 0x76, 0x9C, 0x77, 0xF6, 0x0D # .RAD50 "DK SAVSETBIN"
+PPUBIN:
+    .byte 0xB8, 0x1A, 0x95, 0x66, 0x00, 0x00, 0xF6, 0x0D # .RAD50 "DK PPU   BIN"
+LoadingSCR:
+     .byte 0xB8, 0x1A, 0x59, 0x4D, 0x76, 0x1A, 0x4A, 0x77 # .RAD50 "DK LOADINSCR"
 
 LookupError:        .ASCIZ  "File lookup error."
 ReadError:          .ASCIZ  "File read error."
@@ -156,5 +191,5 @@ CreditsStr:         .ASCIZ  "-= converted for the UKNC by aberranth =-"
 
 StartANewGame:
 
-        exit
+        .exit
 BootstrapEnd:

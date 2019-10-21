@@ -1,5 +1,5 @@
 # vim: set fileformat=unix filetype=gas tabstop=8 expandtab shiftwidth=4 autoindent :
-                .macro exit
+                .macro .exit
                     EMT 0350
                 .endm
 
