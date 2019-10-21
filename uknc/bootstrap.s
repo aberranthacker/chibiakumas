@@ -74,22 +74,22 @@ Bootstrap_StartGame:
         .WORD PPU_ModuleSizeWords
 #----------------------------------------------------------------------------}}}
 
-        MOV  $8000, R0
-        MOV  $FB1, R1
-        CLR  R3
-1$:     MOV  R3, (R1)+
-        SOB  R0, 1$
+        MOV     $8000, R0
+        MOV     $FB1, R1
+        CLR     R3
+1$:     MOV     R3, (R1)+
+        SOB     R0, 1$
 
-        MOV  $LoadingSCR, @$LookupFileName # ../AkuCPC/BootsStrap_StartGame_CPC.asm:64
-        MOV  $FB1, @$ReadBuffer
-        MOV  $8000, @$ReadWordsCount
-        CALL Bootstrap_LoadDiskFile
+        MOV     $LoadingSCR, @$LookupFileName # ../AkuCPC/BootsStrap_StartGame_CPC.asm:64
+        MOV     $FB1, @$ReadBuffer
+        MOV     $8000, @$ReadWordsCount
+        CALL    Bootstrap_LoadDiskFile
 
         CLR     @$CCH0IS
-WTKEY:  TSTB    @$CCH0IS
-        BPL     WTKEY
+WtKey:  TSTB    @$CCH0IS
+        BPL     WtKey
 
-        MOV     $0xFFFF, @$PPUCommand
+        MOV     $-1, @$PPUCommand
 1$:     TST     PPUCommand # wait until PPU finishes command
         BNE     1$
 
