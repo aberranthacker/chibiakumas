@@ -82,7 +82,7 @@ start:
                 MOV     $200,R3         # number of lines on main screen area
                 MOV     R0,@$FBSLTAB    #
 3$:             MOV     $0xCC00,(R0)+   # colors  011  010  001  000 (YRGB)
-                MOV     $0xAA99,(R0)+   # colors  111  110  101  100 (YRGB)
+                MOV     $0x99AB,(R0)+   # colors  111  110  101  100 (YRGB)
                 MOV     R2,(R0)+        #--main RAM address of a scanline
                 ADD     $8,R1           # calc address of next element of SLTAB
                 MOV     R1,(R0)+        #--pointer to the next element of SLTAB
@@ -126,8 +126,9 @@ PGM:            MOV     R0, -(SP)        # save R0 in order for the process mana
                 JMP     @$0174170       # Перейти к диспетчеру процессов (63608; 0xF878)
 PrepareForRemoval:
                 CLR     @$07100         # do not run PGM anymore
+                MOV     $PPUCommand >> 1, @$PBPADR
                 MOV     @$SYS272, @$0272 # restore pointer to system SLTAB (186; 0xBA)
-                CLR     @$PBP12D
+                CLR     @$PBP12D        # inform CPU program that we are done
                 RETURN
 
 # 0 data
@@ -142,5 +143,6 @@ SYS272:  .WORD     # pointer to systems scanlines table
 FBSLTAB: .WORD     # adrress of main screen SLTAB
          .balign 8 # align at 8 bytes or the new SLTAB will be invalid
 SLTAB:   .SPACE 288 * 2 * 4 # space for a 288 four-words entries
+         .SPACE 10 * 2 * 2  # reserve some more space for invisible scanlines
 
 end:

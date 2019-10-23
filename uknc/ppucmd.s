@@ -5,7 +5,7 @@ PPEXEC:         #------------------------------------------------------------{{{
         CALL PPUOut             # => Send request to PPU
         BNE  MAError            # If error, --> Memory allocation error
         CALL Info               #
-        CMP  @$PS.A1, $PPU_UserRamStart
+        CMP  @$PS.A1, $PPU_UserRamStart # check if allocated area begins where we wanted
         BNE  MAError
                                 # PS.A1 contains address of allocated area
         MOV  (R5)+,@$PS.A2      # Arg 2 - addr of mem block in CPUs RAM
@@ -28,7 +28,7 @@ PPFREE:         #------------------------------------------------------------{{{
         BNE  MFrError           # If error, --> Memory freeing error
         RTS     R5
 #----------------------------------------------------------------------------}}}
-                #Error messages ---------------------------------------------{{{
+# Error messages ------------------------------------------------------------{{{
 MAError:
         .cout $sMAError
         CALL Info
@@ -67,18 +67,19 @@ PPUOut:         #------------------------------------------------------------{{{
 AMP:        .byte  0, 0, 0, 0xFF # init sequence
             .word  PStruct       # address of parameters struct
             .byte  0xFF, 0xFF    # two termination bytes 0xff, 0xff
-PStruct:    #Parameters struct
-PS.Reply:   .byte  0       # operation status code
-PS.Request: .byte  1       # 01 - allocate memory
+PStruct:    # Parameters struct (PS)
+    PS.Reply:   .byte  0   # operation status code
+    PS.Request: .byte  1   # request code
+                           # 01 - allocate memory
                            # 02 - free memory
                            # 010 - mem copy PPU -> CPU
                            # 020 - mem copy CPU -> PPU
                            # 030 - execute
-PS.Type:    .byte  032     # device type - PPUs RAM
-PS.No:      .byte  0       # device number
-PS.A1:      .word  0       # Argument 1
-PS.A2:      .word  0       # Argument 2
-PS.A3:      .word  0       # Argument 3
+    PS.Type:    .byte  032 # device type - PPU RAM
+    PS.No:      .byte  0   # device number
+    PS.A1:      .word  0   # Argument 1
+    PS.A2:      .word  0   # Argument 2
+    PS.A3:      .word  0   # Argument 3
 
         .Even
 #----------------------------------------------------------------------------}}}
