@@ -11,20 +11,48 @@
 # 23 - 184   48 - 185  73 - 186       198 - 191
 # 24 - 192   49 - 193  74 - 194       199 - 199
 
+REV_TABLE = [
+  0b0000, # 0b0000
+  0b1000, # 0b0001
+  0b0100, # 0b0010
+  0b1100, # 0b0011
+  0b0010, # 0b0100
+  0b1010, # 0b0101
+  0b0110, # 0b0110
+  0b1110, # 0b0111
+  0b0001, # 0b1000
+  0b1001, # 0b1001
+  0b0101, # 0b1010
+  0b1101, # 0b1011
+  0b0011, # 0b1100
+  0b1011, # 0b1101
+  0b0111, # 0b1110
+  0b1111  # 0b1111
+]
+
 def reverse(int)
-  int.to_s(2).reverse.to_i(2)
+  REV_TABLE[int]
 end
 
-cpc_bmp = File.binread('../ResCPC/Old/T38-SC1.D01').unpack('v*')[64, 8000]
+cpc_bmp = File.binread('../ResCPC/Old/T38-SC1.D01').unpack('v*')
 uknc_bmp = []
-# d = []
+
+# take 1000 words, skip 24 words
+cpc_bmp = cpc_bmp[   0, 1000] +
+          cpc_bmp[1024, 1000] +
+          cpc_bmp[2048, 1000] +
+          cpc_bmp[3072, 1000] +
+          cpc_bmp[4096, 1000] +
+          cpc_bmp[5120, 1000] +
+          cpc_bmp[6144, 1000] +
+          cpc_bmp[7168, 1000]
 
 cpc_bmp.each.with_index do |cpc_word, i|
-  q1 = reverse(cpc_word & 0b1111)
-  q2 = reverse(cpc_word & 0b1111_0000)
-  q3 = reverse(cpc_word & 0b1111_0000_0000)
-  q4 = reverse(cpc_word & 0b1111_0000_0000_0000)
-  uknc_word = q1 | q3 << 4 | q2 << 8 | q4 << 12
+  q1 = reverse( cpc_word & 0b1111)
+  q2 = reverse((cpc_word & 0b1111_0000) >> 4)
+  q3 = reverse((cpc_word & 0b1111_0000_0000) >> 8)
+  q4 = reverse((cpc_word & 0b1111_0000_0000_0000) >> 12)
+  uknc_word = q1 | q2 << 8 | q3 << 4 | q4 << 12
 
   line_idx = i / 40 # 40 words per line
   word_idx_within_a_line = i % 40
@@ -34,32 +62,6 @@ cpc_bmp.each.with_index do |cpc_word, i|
   uknc_word_idx = uknc_line_idx * 40 + word_idx_within_a_line
 
   uknc_bmp[uknc_word_idx] = uknc_word
-
-  # d << {
-  #   i: i,
-  #   line_idx: line_idx,
-  #   word_idx_within_a_line: word_idx_within_a_line,
-  #   line: line,
-  #   row: row,
-  #   uknc_line_idx: uknc_line_idx,
-  #   uknc_word_idx: uknc_word_idx
-  # }
 end
-
-# d = d.uniq { |h| h[:line_idx] }
-
-# File.open('foobar.txt', 'w') do |file|
-# #word_idx_within_a_line: #{tuple[:word_idx_within_a_line].to_s.rjust(4, ' ')} \
-#   d.each do |tuple|
-#     file.puts "\
-# i: #{tuple[:i].to_s.rjust(4, ' ')} \
-# #{(((tuple[:line_idx] / 8) * 80) + ((tuple[:line_idx] % 8) * 2048)).to_s.rjust(5, ' ') } \
-# line_idx: #{tuple[:line_idx].to_s.rjust(3, ' ')} \
-# line: #{tuple[:line].to_s.rjust(3, ' ')} \
-# row: #{tuple[:row].to_s.rjust(3, ' ')} \
-# uknc_line_idx: #{tuple[:uknc_line_idx].to_s.rjust(3, ' ')} \
-# uknc_word_idx: #{tuple[:uknc_word_idx].to_s.rjust(3, ' ')}"
-#   end
-# end
 
 File.binwrite('build/LOADIN.SCR', uknc_bmp.pack('v*'))

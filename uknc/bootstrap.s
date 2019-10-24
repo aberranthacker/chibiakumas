@@ -70,8 +70,8 @@ Bootstrap_StartGame:
         CALL Bootstrap_LoadDiskFile
 
         JSR  R5,PPEXEC
-        .WORD FB1
-        .WORD PPU_ModuleSizeWords
+        .WORD FB1 # PPU module location
+        .WORD PPU_ModuleSizeWords 
 #----------------------------------------------------------------------------}}}
 
         MOV     $8000, R0
@@ -163,7 +163,7 @@ RETURN
 
         .include "./ppucmd.s"
 
-LookupArea:         .BYTE   0,01  # chan, code(.LOOKUP)
+LookupArea:         .BYTE   0,01 # chan, code(.LOOKUP)
     LookupFileName: .WORD   0 # dblk
 
 ReadArea:           .BYTE   0,010 # chan, code(.READ/.READC/.READW)
@@ -171,14 +171,23 @@ ReadArea:           .BYTE   0,010 # chan, code(.READ/.READC/.READW)
     ReadBuffer:     .WORD   0 # buf
     ReadWordsCount: .WORD   0 # wcnt
                     .WORD   0 # end of area(.READW=0,.READ=1)
-CoreBinRadix50:
+CoreBinRad50:
     .byte 0xB8, 0x1A, 0x2A, 0x15, 0x40, 0x1F, 0xF6, 0x0D # .RAD50 "DK CORE  BIN"
-SavSetBinRadix50: # saved settings bin
+SavSetBinRad50: # saved settings bin
     .byte 0xB8, 0x1A, 0xFE, 0x76, 0x9C, 0x77, 0xF6, 0x0D # .RAD50 "DK SAVSETBIN"
 PPUBIN:
     .byte 0xB8, 0x1A, 0x95, 0x66, 0x00, 0x00, 0xF6, 0x0D # .RAD50 "DK PPU   BIN"
 LoadingSCR:
-     .byte 0xB8, 0x1A, 0x59, 0x4D, 0x76, 0x1A, 0x4A, 0x77 # .RAD50 "DK LOADINSCR"
+    .byte 0xB8, 0x1A, 0x59, 0x4D, 0x76, 0x1A, 0x4A, 0x77 # .RAD50 "DK LOADINSCR"
+LoadingScreenPalette:
+    .word -1,       # line number
+    .word  0,       # 0 - cursor/scale/palette
+    .word  0b10000, # graphical cursor
+    .word  0b10111, # 320 dots per line, pallete 7
+    .word  0,       # line number
+    .word  1,       # color settings
+    .word  0xCC00,  # colors  011  010  001  000 (YRGB)
+    .word  0xFF99,  # colors  111  110  101  100 (YRGB)
 
 LookupError:        .ASCIZ  "File lookup error."
 ReadError:          .ASCIZ  "File read error."

@@ -20,7 +20,7 @@ build/CORE.BIN : build/core.o
 build/PPU.BIN : build/ppu.o
 	$(LD) build/ppu.o -o build/ppu.out -s
 	ruby build_tools/aout2sav.rb build/ppu.out -b -o build/PPU.BIN
-build/LOADIN.SCR : ../ResCPC/Old/T38-SC1.D01
+build/LOADIN.SCR : ../ResCPC/Old/T38-SC1.D01 build_tools/convert_bitmap.rb
 	ruby build_tools/convert_bitmap.rb
 
 build/bootstrap.o : bootstrap.s bootstrap/start_game.s ppucmd.s $(common)
