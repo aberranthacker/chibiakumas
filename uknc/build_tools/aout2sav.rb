@@ -105,3 +105,4 @@ out_filename = if options.out_filename
 
 File.binwrite(out_filename, sav)
 
+puts

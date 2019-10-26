@@ -10,7 +10,12 @@ LD=~/opt/binutils-pdp11/pdp11-dec-aout/bin/ld
 
 common = hwdefs.s core_defs.s macros.s
 
-build/AKU.SAV : build/bootstrap.o build/core.o build/CORE.BIN build/PPU.BIN build/LOADIN.SCR
+build/AKU.SAV : build/bootstrap.o \
+		build/core.o \
+		build/CORE.BIN \
+		build/PPU.BIN \
+		build/LOADIN.SCR \
+		linker_scripts/bootstrap.cmd
 	$(LD) -T linker_scripts/bootstrap.cmd -R build/core.o -R build/ppu.o -s
 	chmod -x build/AKU.SAV
 	ruby build_tools/add_CCB.rb build/AKU.SAV

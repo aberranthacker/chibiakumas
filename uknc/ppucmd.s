@@ -4,7 +4,7 @@ PPEXEC:         #------------------------------------------------------------{{{
         MOVB $01,  @$PS.Request # 01 - allocate memory
         CALL PPUOut             # => Send request to PPU
         BNE  MAError            # If error, --> Memory allocation error
-        CALL Info               #
+        # CALL Info               #
         CMP  @$PS.A1, $PPU_UserRamStart # check if allocated area begins where we wanted
         BNE  MAError
                                 # PS.A1 contains address of allocated area

@@ -5,6 +5,7 @@
 
                 .TITLE BootstrapChibi Akumas loader
                 .global Bootstrap_Launch
+                .global LoadingScreenPalette
 
                 .include "./hwdefs.s"
                 .include "./macros.s"
@@ -16,9 +17,6 @@
 
                 .=BootstrapStart
 
-        .cout $TitleStr
-        .cout $WebSiteStr
-        .cout $CreditsStr
 Bootstrap_Launch:                       #     ld bc,&7f8D ; Reset the firmware to OFF
                                         #     out (c),c
                                         #     ld hl,RasterColors_InitColors
@@ -62,16 +60,17 @@ RETURN                                  # ret
 Bootstrap_Level:
 # some missing code...
 Bootstrap_StartGame:
-        CLR  PPUCommand
-# Prepare screen-lines table to display cover art ---------------------------{{{
+# Prepare screen-lines table to display loading screen ----------------------{{{
         MOV  $PPUBIN, @$LookupFileName
         MOV  $FB1, @$ReadBuffer
         MOV  $PPU_ModuleSizeWords, @$ReadWordsCount
         CALL Bootstrap_LoadDiskFile
 
+        CLR  PPUCommand
+
         JSR  R5,PPEXEC
         .WORD FB1 # PPU module location
-        .WORD PPU_ModuleSizeWords 
+        .WORD PPU_ModuleSizeWords
 #----------------------------------------------------------------------------}}}
 
         MOV     $8000, R0
@@ -85,20 +84,22 @@ Bootstrap_StartGame:
         MOV     $8000, @$ReadWordsCount
         CALL    Bootstrap_LoadDiskFile
 
-        CLR     @$CCH0IS
-WtKey:  TSTB    @$CCH0IS
-        BPL     WtKey
+        MOV     $PPU_SetPalette, @$PPUCommand
+        MOV     $PPU_LoadingScreenPalette, @$PPUCommandArg
 
-        MOV     $-1, @$PPUCommand
-1$:     TST     PPUCommand # wait until PPU finishes command
-        BNE     1$
+
+        CALL    WaitKey
+        MOV     $PPU_Finalize, @$PPUCommand
+2$:     TST     PPUCommand # wait until PPU finishes command
+        BNE     2$
 
         JSR     R5,PPFREE
         .WORD   PPU_UserRamStart
         .WORD   PPU_ModuleSizeWords
-        .exit
 
-       CALL Bootstrap_LoadDiskFile
+        .cout $TitleStr
+        .cout $WebSiteStr
+        .cout $CreditsStr
 Finish: .exit
         # loads core
         # loads saved settings
@@ -127,6 +128,7 @@ Bootstrap_Level_0:                      # main menu -------------------------{{{
                                         # ret
 #----------------------------------------------------------------------------}}}
 
+Bootstrap_LoadDiskFile: #----------------------------------------------------{{{
 # .cas_out_open   equ &bc8c
 # .cas_out_direct equ &bc98
 # .cas_out_close  equ &bc8f
@@ -145,7 +147,6 @@ Bootstrap_Level_0:                      # main menu -------------------------{{{
 # LoadGiveUp:
 #     jp cas_in_close
 
-Bootstrap_LoadDiskFile:
                 #.LOOKUP $LkpArea        #.LOOKUP area,chan,dblk[,seqnum]
                 MOV     $LookupArea,R0
                 EMT     0375
@@ -160,6 +161,15 @@ Bootstrap_LoadDiskFile:
                 MOV     $0x0600,R0 # operation code 6, channel 0
                 EMT     0374
 RETURN
+#----------------------------------------------------------------------------}}}
+
+WaitKey:
+        CLR  @$CCH0IS
+1$:     TSTB @$CCH0IS
+        BPL  1$
+        CLR  @$CCH0IS
+        RETURN
+
 
         .include "./ppucmd.s"
 
@@ -179,15 +189,33 @@ PPUBIN:
     .byte 0xB8, 0x1A, 0x95, 0x66, 0x00, 0x00, 0xF6, 0x0D # .RAD50 "DK PPU   BIN"
 LoadingSCR:
     .byte 0xB8, 0x1A, 0x59, 0x4D, 0x76, 0x1A, 0x4A, 0x77 # .RAD50 "DK LOADINSCR"
-LoadingScreenPalette:
-    .word -1,       # line number
-    .word  0,       # 0 - cursor/scale/palette
-    .word  0b10000, # graphical cursor
-    .word  0b10111, # 320 dots per line, pallete 7
-    .word  0,       # line number
-    .word  1,       # color settings
-    .word  0xCC00,  # colors  011  010  001  000 (YRGB)
-    .word  0xFF99,  # colors  111  110  101  100 (YRGB)
+LoadingScreenPalette: #------------------------------------------------------{{{
+    .word  0       #--line number, last line of the top screen area, *required!*
+    .word  0       #  0 - set cursor/scale/palette, *ignored for the first record*
+    .word  0b10000 #  graphical cursor
+    .word  0b10111 #  320 dots per line, pallete 7
+    .word  1       #--line number, first line of the main screen area, *required!*
+    .word  1       #  set colors
+    .word  0xCC00  #  colors  011  010  001  000 (YRGB) | br.red   | black   |
+    .word  0xFF99  #  colors  111  110  101  100 (YRGB) | br.white | br.blue |
+    .word  49      #--line number (201 if there is no more parameters)
+    .word  1       #  set colors
+    .word  0x1100  #  | blue     | black   |
+    .word  0xFF55  #  | br.white | magenta |
+    .word  63      #--line number
+    .word  1       #  set colors
+    .word  0x9900  #  | br.blue  | black   |
+    .word  0xFF55  #  | br.white | magenta |
+    .word  97      #--line number
+    .word  1       #  set colors
+    .word  0xBB00  #  | br.cyan  | black   |
+    .word  0xFF22  #  | br.white | green   |
+    .word  195     #--line number
+    .word  1       #  set colors
+    .word  0xCC00  #  | br.red   | black   |
+    .word  0xFF22  #  | br.white | green   |
+    .word  201     #--line number, 201 - end of the main screen params
+#----------------------------------------------------------------------------}}}
 
 LookupError:        .ASCIZ  "File lookup error."
 ReadError:          .ASCIZ  "File read error."

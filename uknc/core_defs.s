@@ -5,8 +5,13 @@
 .equiv SPReset,       0x2FA  # 01372   762 Initial stack pointer
 .equiv PPUCommand,    0x2FC  # 01374   764 command for PPU code
 .equiv PPUCommandArg, 0x2FE  # 01376   766 command for PPU argument
+.equiv PPU_PPUCommand,    PPUCommand >> 1
+.equiv PPU_PPUCommandArg, PPUCommandArg >> 1
 .equiv FB0,           0x300  # 01400   768
 .equiv FB1,           0x4180 # 04060 16768
+
+.equiv PPU_SetPalette, 1
+.equiv PPU_Finalize, -1
 
 .equiv BootstrapStart,  FB0
 .equiv Akuyou_GameVars, 0x8000 # 0100000 32768
