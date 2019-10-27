@@ -1,2 +1,0 @@
-subst z: .
-start z:\
