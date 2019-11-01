@@ -31,7 +31,7 @@ build/LOADIN.SCR : ../ResCPC/Old/T38-SC1.D01 build_tools/convert_bitmap.rb
 build/bootstrap.o : bootstrap.s bootstrap/start_game.s ppucmd.s $(common)
 	ruby build_tools/preprocessor.rb -i bootstrap.s
 	$(AS) bootstrap.s -o build/bootstrap.o
-build/core.o : core.s disk_driver.s player_driver.s $(common)
+build/core.o : core.s disk_driver.s player_driver.s player_driver.h.s $(common)
 	$(AS) core.s -o build/core.o
 build/ppu.o : ppu.s $(common)
 	$(AS) ppu.s -o build/ppu.o

@@ -16,3 +16,10 @@
                     RTS PC
                 .endm
 
+                .macro push reg
+                    MOV  \reg,-(SP)
+                .endm
+
+                .macro pop reg
+                    MOV  (SP)+,\reg
+                .endm

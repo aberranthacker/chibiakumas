@@ -5,6 +5,9 @@
                 .global FileEndCore
                 .global SavedSettings
                 .global SavedSettings_Last
+                .global ContinueMode
+                .global NULL
+                .global Player_Array
 
                 .include "./macros.s"
                 .include "core_defs.s"
@@ -45,7 +48,6 @@ ObjectArrayPointer: # first ObjectArraySize*2 of each 256 are used - rest (>128)
 
                 .=Akuyou_CoreStart
 FileBeginCore:
-        .asciz "01234567890start"
         # -Player 2's data starts XX bytes after player so you can use IY+XX+1 to get
         # a var from player 2 without changing IY
         .equiv Akuyou_PlayerSeparator, 16
@@ -367,6 +369,7 @@ SavedSettings_Last: # }}}
 #     .word    7,    7,    7,    6,    6,    6,    5,    5,    5,    4,    4,    4
 #     .word    4,    4,    3,    3,    3,    3,    3,    2,    2,    2,    2,    2
 #     .word    2,    2,    2,    2,    1,    1,    1,    1,    1,    1,    1,    1
+NULL:   RETURN
                                         #
                                         # ifdef CPC320
                                         #     read "../SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm"

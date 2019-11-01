@@ -1,4 +1,3 @@
-require 'pry'
 require 'optparse'
 require_relative './preprocessor/str_to_radix50.rb'
 
