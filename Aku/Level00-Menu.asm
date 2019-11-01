@@ -2297,7 +2297,7 @@ ret
 ;                   Cheat For Victory!
 ;-------------------------------------------------------------------------------
 
-CheatsText: db  6,"Tools for Cheating Bastards","!"+&80
+CheatsText: db 6,"Tools for Cheating Bastards","!"+&80
 intCheat:   db 0
 txtCheat:   db "Cheat","s"+&80
 txtCheat1:  db "O","n"+&80

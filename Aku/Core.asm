@@ -123,7 +123,7 @@ Timer_TicksOccured equ Timer_TicksOccured_Plus1-1
 ;***************************************************************************************************
 ;                   Main Project Code
 ;***************************************************************************************************
-org Akuyou_CoreStart ;&450
+org Akuyou_CoreStart    ;&450
 
 FileBeginCore:
     jp ShowSprite       ;8000
@@ -216,13 +216,9 @@ FileBeginCore:
     jp GetMemPos                ;00DE
     jp DrawText_Decimal         ;00E1
     jp GetSpriteXY              ;00E4
-    ifdef SupportPlus
-        jp Plus_HideSprites     ;00E7
-    else
-        jp null                 ;00E7
-    endif
+    jp null                     ;00E7
     jp SetStarArrayPalette      ;00EA
-    jp Aku_CommandNum           ;equ &00ED
+    jp Aku_CommandNum           ;00ED
 ;*******************************************************************************
 ;                   Aligned Code
 ;*******************************************************************************

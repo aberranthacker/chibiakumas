@@ -1222,81 +1222,6 @@ Bootstrap_Level_EndOutro: ; {{{
     jp Bootstrap_LoadEP2Level_2PartBegin
 ; }}}
 
-ifdef SupportPlus ; {{{
-Bootstrap_ReloadPlusSprites:
-    ld a,&C0
-    ld hl,DiskMap_PlusSprites
-    ld b,DiskMap_PlusSprites_Size
-    ld c,DiskMap_PlusSprites_Disk
-    ld de,Akuyou_PlusSpritesPos
-    ld ix,Akuyou_PlusSpritesPos+&800-1
-    call Akuyou_LoadDiscSectorz
-
-    ld a,&C0
-    call BankSwitch_C0_SetCurrent
-        di
-        ld b,4
-        ld a,2
-        ld hl,Akuyou_PlusSpritesPos+&0FF
-        call Plus_CopySpriteCompressed
-
-        ld b,5
-        ld a,2
-        ld hl,Akuyou_PlusSpritesPos+&07F
-        call Plus_CopySpriteCompressed
-
-        ld b,6
-        ld a,2
-        ld hl,Akuyou_PlusSpritesPos+&17F
-        push hl
-        call Plus_CopySpriteCompressed
-
-        ld b,7
-        ld a,2
-        pop hl
-        push hl
-        call Plus_CopySpriteCompressed
-
-        ld b,8
-        ld a,2
-        pop hl
-        call Plus_CopySpriteCompressed
-
-        ld b,9
-        ld a,2
-        ld hl,Akuyou_PlusSpritesPos+&1FF
-        push hl
-        call Plus_CopySpriteCompressed
-
-        ld b,10
-        ld a,2
-        pop hl
-        push hl
-        call Plus_CopySpriteCompressed
-
-        ld b,11
-        ld a,2
-        pop hl
-        call Plus_CopySpriteCompressed
-
-        ei
-
-    ld a,&C0
-    ld hl,DiskMap_PlusSpritesChibiko
-    ld c,DiskMap_PlusSpritesChibiko_Disk
-    ld de,Akuyou_PlayerSpritePos
-    call Akuyou_LoadDiscSector
-
-    ld a,&C1
-    ld hl,DiskMap_PlusSpritesBo;DiskMap_PlusSpritesChibikoUD
-    ld c,DiskMap_PlusSpritesChibiko_Disk;0
-    ld de,&E800
-    ld ix,&E800;+&1800
-    call Akuyou_LoadDiscSectorz
-
-    ret
-endif ; }}}
-
 ; File Locations in virtual Track-Sector
 ; The game was originally intended to use a direct disk reader - however as I managed
 ; to get Firware restore working, and the popularity of C4CPC and M4 disk emulators
@@ -2228,14 +2153,14 @@ StartANewGame:
     xor a
     ld (ShowContinueCounter_Plus1-1),a
 
-    ld bc,&3E0D     ;Split Continues
-    ld de,&2ADD
+    ld bc,&3E0D ; Split Continues ; 3E n = LD A,n
+    ld de,&2ADD ; LD IX, (addr) = DD 2A dr ad
     ld a,(ContinueMode)
     or a
     jr nz,ContinueModeSet
 
-    ld bc,&C90E     ;Shared Continues
-    ld de,&21FD
+    ld bc,&C90E ; Shared Continues ; C9 = RET
+    ld de,&21FD ; LD IY, hilo   = FD 21 lo hi
 
 ContinueModeSet:
     ld a,b
@@ -2258,7 +2183,7 @@ ContinueModeSet:
     ld (iy-7),a ;live players
 
     ;multiplay support
-    ld hl,&003E ;ld a,0
+    ld hl,&003E
     ld a,(MultiplayConfig)
     bit 0,a
     jr z,StartANewGame_NoMultiplay
@@ -2266,7 +2191,7 @@ ContinueModeSet:
     in a,(c)        ;Test if the multiplay is really there!
     inc a
     jr z,StartANewGame_NoMultiplay
-    ld hl,&78ED ;in (c),a
+    ld hl,&78ED
 StartANewGame_NoMultiplay:
     ld (multiplaysupport_Plus2-2),hl
 
@@ -2369,12 +2294,12 @@ Difficulty_Hard:
     jr Difficulty_Generic
 Difficulty_Generic:
     ld (FireFrequencyA_Plus1-1),a
-    rrca;ld a,%00000100
+    rrca
     ld (FireFrequencyB_Plus1-1),a
     ld (FireFrequencyC_Plus1-1),a
-    rrca;   ld a,%00000010;
+    rrca
     ld (FireFrequencyD_Plus1-1),a
-    rrca;ld a,%00000001;
+    rrca
     ld (FireFrequencyE_Plus1-1),a
 ret
 
@@ -2436,7 +2361,7 @@ endif
 
     xor a
     ld (Sfx_CurrentPriority_Plus1-1),a  ; clear the to-do
-    ld (Sfx_Sound_Plus1-1),a    ; clear the note
+    ld (Sfx_Sound_Plus1-1),a            ; clear the note
 
     call DoMovesBackground_SetScroll
 

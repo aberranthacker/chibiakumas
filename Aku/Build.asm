@@ -33,9 +33,7 @@ BuildLang equ ''    ;english language
 AdvancedInterrupts equ 0 ;Enable shadow stack so stack abuse can occur during interrupts!
 
 Support64k equ 1  ; enable code only needed by 64k
-;Support128k equ 1 ; enable code only needed by 128k+ (keep enabled for 256/512k etc)
-;SupportPlus equ 1
-CPC320 equ 1     ;CPC Screen width=320 (otherwise 256)
+CPC320     equ 1  ;CPC Screen width=320 (otherwise 256)
 
 chrHeart equ 122+5
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
