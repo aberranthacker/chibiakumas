@@ -1,5 +1,6 @@
 AS=~/opt/binutils-pdp11/pdp11-dec-aout/bin/as
 LD=~/opt/binutils-pdp11/pdp11-dec-aout/bin/ld
+# 2.31.1
 
 .SUFFIXES:
 .SUFFIXES: .s .o
@@ -19,21 +20,35 @@ build/AKU.SAV : build/bootstrap.o \
 	$(LD) -T linker_scripts/bootstrap.cmd -R build/core.o -R build/ppu.o -s
 	chmod -x build/AKU.SAV
 	ruby build_tools/add_CCB.rb build/AKU.SAV
+
 build/CORE.BIN : build/core.o
 	$(LD) build/core.o -o build/core.out -s
 	ruby build_tools/aout2sav.rb build/core.out -b -o build/CORE.BIN
-build/PPU.BIN : build/ppu.o
-	$(LD) build/ppu.o -o build/ppu.out -s
+
+build/PPU.BIN : build/ppu.o \
+		build/core.o
+	$(LD) -T linker_scripts/ppu.cmd -R build/core.o -s
 	ruby build_tools/aout2sav.rb build/ppu.out -b -o build/PPU.BIN
-build/LOADIN.SCR : ../ResCPC/Old/T38-SC1.D01 build_tools/convert_bitmap.rb
+
+build/LOADIN.SCR : ../ResCPC/Old/T38-SC1.D01 \
+		   build_tools/convert_bitmap.rb
 	ruby build_tools/convert_bitmap.rb
 
-build/bootstrap.o : bootstrap.s bootstrap/start_game.s ppucmd.s $(common)
+build/bootstrap.o : bootstrap.s \
+		    ppucmd.s $(common)
 	ruby build_tools/preprocessor.rb -i bootstrap.s
 	$(AS) bootstrap.s -o build/bootstrap.o
-build/core.o : core.s disk_driver.s player_driver.s player_driver.h.s $(common)
+
+build/core.o : core.s \
+	       disk_driver.s \
+	       player_driver.h.s \
+	       player_driver.s \
+	       $(common)
 	$(AS) core.s -o build/core.o
-build/ppu.o : ppu.s $(common)
+
+build/ppu.o : ppu.s \
+	      cga8x8b.raw \
+	      $(common)
 	$(AS) ppu.s -o build/ppu.o
 
 clean :

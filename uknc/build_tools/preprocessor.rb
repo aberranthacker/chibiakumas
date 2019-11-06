@@ -21,7 +21,7 @@ def process_file(filename)
   processed_data = ''
   data.each_line do |line|
     processed_line = if (match = /^(\s*)\.RAD50\s+"([ A-Z$.0-9]+)".*/i.match(line))
-                       "#{match[1]}.byte #{StrToRadix50.call(match[2]).join(', ')} # #{match[0].strip}\n"
+                       "#{match[1]}.word #{StrToRadix50.call(match[2]).join(', ')} # #{match[0].strip}\n"
                      else
                        line
                      end

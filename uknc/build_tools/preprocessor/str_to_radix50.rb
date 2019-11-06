@@ -17,12 +17,12 @@ class StrToRadix50
         end
       end
 
-      words_to_bytes_str(words)
+      words_to_str(words)
     end
 
     def test
       str = 'DK SRAM  BIN'
-      expected = %w[B8 1A 91 79 40 51 F6 0D].map { |h| "0x#{h}" }
+      expected = %w[1AB8 7991 5140 0DF6].map { |h| "0x#{h}" }
       actual = call(str)
 
       if actual == expected
@@ -37,9 +37,9 @@ class StrToRadix50
 
     private
 
-    def words_to_bytes_str(words)
-      words.pack('v*').each_char.map do |char|
-        "0x#{char.ord.to_s(16).rjust(2, '0').upcase}"
+    def words_to_str(words)
+      words.map do |word|
+        "0x#{word.to_s(16).rjust(4, '0').upcase}"
       end
     end
   end

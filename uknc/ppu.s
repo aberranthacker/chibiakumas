@@ -1,6 +1,6 @@
 
                 .TITLE Chibi Akumas PPU module
-                .GLOBAL start
+                .GLOBAL start # make entry point available to linker
 
                 .include "./macros.s"
                 .include "./hwdefs.s"
@@ -52,7 +52,6 @@ start:
 1-st bit: 0 - next is 2-word record
           1 - next is 4-word record
 */
-
                 MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
                 MOV  R0,R1           # R0 address of current record (2)
 
@@ -111,7 +110,7 @@ start:
                 SUB  $2,@$FBSLTAB    #
 
                 MOV  $0b10000,(R0)+  #--cursor settings: graphical cursor
-                MOV  $0b10000,(R0)+  #  320 dots per line, pallete 0
+                MOV  $0b10111,(R0)+  #  320 dots per line, pallete 7
                 MOV  R2,(R0)+        #--address of a screenline
                 ADD  $8,R1           #  calc address of next record of SLTAB
                 BIS  $0b110,R1       #  next record is 4-word, color settings
@@ -119,8 +118,8 @@ start:
 #------------------------------------- main screen area
                 MOV  $FB1 >> 1,R2    # address of second frame-buffer
                 MOV  $200,R3         # number of lines on main screen area
-3$:             MOV  $0x4400,(R0)+   #  colors  011  010  001  000 (YRGB)
-                MOV  $0x7711,(R0)+   #  colors  111  110  101  100 (YRGB)
+3$:             MOV  $0xCC00,(R0)+   #  colors  011  010  001  000 (YRGB)
+                MOV  $0xFF99,(R0)+   #  colors  111  110  101  100 (YRGB)
                 MOV  R2,(R0)+        #--main RAM address of a scanline
                 ADD  $8,R1           #  calc address of next record of SLTAB
                 MOV  R1,(R0)+        #--pointer to the next record of SLTAB
@@ -146,23 +145,57 @@ start:
                 CLR  (R0)+           #--address of line 308
                 MOV  R1,(R0)         #--pointer back to record 308
 #----------------------------------------------------------------------------}}}
+CpFont:         #------------------------------------------------------------{{{
+                MOV  $PBP0DT,R3
+                MOV  $PBPADR,R4
+                MOV  $0x8000,(R4)
+                MOV  $CGAFont,R5
+                MOV  $32,R0          # 32 lines
+2$:             MOV  $32,R1          # 256 dots = 32 bytes
+1$:             MOVB (R5)+,(R3)
+                INC  (R4)
+                SOB  R1,1$
+
+                ADD  $8,(R4)
+                SOB  R0,2$
+#----------------------------------------------------------------------------}}}
+Setup:          #------------------------------------------------------------{{{
+                MOV  @$0100, @$SYS100
+                MOV  $VblankIntHandler,@$0100
+
+                MOV  @$0300, @$SYS300
+                MOV  $KeyboardIntHadler,@$0300
+
                 MOV  @$0272, @$SYS272 # store address of system SLTAB (186; 0xBA)
                 MOV  $SLTAB, @$0272   # use our SLTAB
 
                 MOV  $PGM, @$07124    # add PGM to PPU's processes table
                 MOV  $1, @$07100      # add PGM to PPU's processes execution table
                 RETURN                # end of the init subroutine
-
-PGM:            MOV  R0, -(SP)        # store R0 in order for the process manager to function correctly
+#----------------------------------------------------------------------------}}}
+Teardown:       #------------------------------------------------------------{{{
+                CLR  @$07100          # do not run the PGM anymore
+                MOV  @$SYS100, @$0100 # restore Vblank interrupt handler
+                MOV  @$SYS272, @$0272 # restore pointer to system SLTAB (186; 0xBA)
+                MOV  @$SYS300, @$0300 # restore keyboard interrupt handler
+                MOV  $PPU_PPUCommand, @$PBPADR
+                CLR  @$PBP12D         # inform CPU program that we are done
+                # MOV  $start,R1        #
+                # JMP  @$0176300        # free allocatem memory and exit
+                RETURN
+#----------------------------------------------------------------------------}}}
+PGM:            #------------------------------------------------------------{{{
+                MOV  R0, -(SP)        # store R0 in order for the process manager to function correctly
                 MOV  $PPU_PPUCommand, @$PBPADR
                 MOV  @$PBP12D,R0
                 CMP  R0, $PPU_SetPalette
                 BEQ  SetPalette
                 CMP  R0, $PPU_Finalize
-                BEQ  PrepareForRemoval
-
-Done:           MOV  $PPU_PPUCommand, @$PBPADR
-                CLR  @$PBP12D        # inform CPU program that we are done
+                BEQ  Teardown
+#----------------------------------------------------------------------------}}}
+CommandExecuted: #-----------------------------------------------------------{{{
+                MOV  $PPU_PPUCommand, @$PBPADR
+                CLR  @$PBP12D        # inform CPU's program that we are done
                 MOV  $PGM, @$07124   # add to processes table
                 MOV  $1, @$07100     # require execution
                 MOV  (SP)+, R0       #
@@ -209,21 +242,37 @@ SetData$:       MOV  R0,(R5)+
 
                 CMP  R4,$201
                 BNE  NextRecord$
-                BR   Done
+                JMP  CommandExecuted
 #----------------------------------------------------------------------------}}}
-PrepareForRemoval:
-                CLR  @$07100          # do not run the PGM anymore
-                MOV  $PPU_PPUCommand, @$PBPADR
-                MOV  @$SYS272, @$0272 # restore pointer to system SLTAB (186; 0xBA)
-                CLR  @$PBP12D         # inform CPU program that we are done
-                # MOV  $start,R1        #
-                # JMP  @$0176300        # free allocatem memory and exit
-                RETURN
 
-SYS272:  .WORD 0  # address of system scanlines table
-FBSLTAB: .WORD 0  # adrress of main screen SLTAB
+VblankIntHandler: #----------------------------------------------------------{{{
+        # we don't need ROM's interrupt handler except this small procedure
+        TST  @$07130         # is floppy drive spindle rotating?
+        BEQ  1$              # no
+        DEC  @$07130         # decrease spindle rotation counter
+        BNE  1$              # continue rotation
+        CALL @07132          # stop floppy drive spindle
+
+1$:
+        
+        RTI
+#----------------------------------------------------------------------------}}}
+KeyboardIntHadler: #---------------------------------------------------------{{{
+        MOV  $PPU_KeyboardScanner_KeyPresses,@$PBPADR
+        MOVB @$KBDATA,@$PBP12D
+        INC  @$PBPADR
+        MOV  $1,PBP12D
+        RTI
+#----------------------------------------------------------------------------}}}
+
+CGAFont: .incbin "cga8x8b.raw"
+SYS100:  .word 0174612 # address of 50Hz timer interrupt handler
+SYS272:  .word 02270   # address of default scanlines table
+SYS300:  .word 0175412 # keyboard interrupt hadler
+FBSLTAB: .word 0  # adrress of main screen SLTAB
+
          .balign 8 # align at 8 bytes or the new SLTAB will be invalid
-SLTAB:   .SPACE 288 * 2 * 4 # space for a 288 four-words entries
-         .SPACE 10 * 2 * 2  # reserve some more space for invisible scanlines
+SLTAB:   .space 288 * 2 * 4 # space for a 288 four-words entries
+         .space 10 * 2 * 2  # reserve some more space for invisible scanlines
 
 end:

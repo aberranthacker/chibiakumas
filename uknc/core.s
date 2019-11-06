@@ -1,5 +1,6 @@
 
                 .TITLE Chibi Akumas core module
+                .GLOBAL start # make entry point available to linker
 
                 .global FileBeginCore
                 .global FileEndCore
@@ -8,46 +9,40 @@
                 .global ContinueMode
                 .global NULL
                 .global Player_Array
+                .global Player_Array2
+                .global SmartBombsReset
+                .global ContinuesReset
+                .global MultiplayConfig
+                .global KeyboardScanner_KeyPresses
 
                 .include "./macros.s"
                 .include "core_defs.s"
-
-        .equiv SprShow_X, SprShow_X_Plus1-1
-        .equiv SprShow_Y, SprShow_Y_Plus1-1
-        .equiv SprShow_BankAddr, SprShow_BankAddr_Plus2-2
-        .equiv SprShow_SprNum,   SprShow_SprNum_Plus1-1
-        .equiv Timer_TicksOccured, Timer_TicksOccured_Plus1-1
-
-        # Arkos_VarsDefined equ 1
 
         .equiv TextScreen_MaxX, 39
         .equiv TextScreen_MinX, 0
         .equiv TextScreen_MaxY, 24
         .equiv TextScreen_MinY, 0
 
-        # ScreenBuffer2Pos equ &80
-
 #******************************************************************************#
 #*                             Main Project Code                              *#
 #******************************************************************************#
                 .=Akuyou_GameVars # Need &700 bytes!
 
-    .equiv StarArraySize, 255
-    .equiv ObjectArraySize, 60 # Must be under 64!
-    .equiv PlayerStarArraySize, 128
+        .equiv StarArraySize, 255
+        .equiv ObjectArraySize, 60 # Must be under 64!
+        .equiv PlayerStarArraySize, 128
 
-    .balign 256
+        .balign 256
 StarArrayPointer:
-    .space 256*3
-ObjectArrayPointer: # first ObjectArraySize*2 of each 256 are used - rest (>128) are spare
-    .space 256*4
-    # First 128 are used by object array
-    .equiv PlayerStarArrayPointer, (ObjectArrayPointer + 128)
-    # Out the way of the Object array!??
-    .equiv Event_SavedSettings, (256 * 3 + ObjectArrayPointer + 128)
+        .space 256*3
 
-                .=Akuyou_CoreStart
-FileBeginCore:
+ObjectArrayPointer: # first ObjectArraySize*2 of each 256 are used - rest (>128) are spare
+        .space 256*4
+        # First 128 are used by object array
+        .equiv PlayerStarArrayPointer, (ObjectArrayPointer + 128)
+        # Out the way of the Object array!??
+        .equiv Event_SavedSettings, (256 * 3 + ObjectArrayPointer + 128)
+
         # -Player 2's data starts XX bytes after player so you can use IY+XX+1 to get
         # a var from player 2 without changing IY
         .equiv Akuyou_PlayerSeparator, 16
@@ -65,15 +60,16 @@ FileBeginCore:
 ################################################################################
 #                                 Aligned Code                                 #
 ################################################################################
+start: FileBeginCore:
 SavedSettings: # {{{
                      .byte 255          # pos -20 spare
                      .byte   0          # pos -19 spare
                      .byte   0          # pos -18 spare
                      .byte   0          # pos -17 spare
-                     .byte   0b00000001 # pos -16 GameOptions (xxxxxxxS) Screen shake
+                     .byte 0b00000001   # pos -16 GameOptions (xxxxxxxS) Screen shake
                      .byte   0          # pos -15 playmode 0 normal / 128 - 4D
     ContinueMode:    .byte   0          # pos -14 Continue Sharing (0/1)
-    SmartbombsReset: .byte   3          # pos -13 SmartbombsReset
+    SmartBombsReset: .byte   3          # pos -13 SmartbombsReset
     ContinuesReset:  .byte  60          # pos -12 Continues Reset
     GameDifficulty:  .byte   0          # pos -11 Game difficulty
                                         #         (enemy Fire Speed 0=normal, ;1=easy, 2=hard)
@@ -82,9 +78,9 @@ SavedSettings: # {{{
     MultiplayConfig: .byte 0b00000000   # pos  -9 Joy Config   (xxxxxxFM)
                                         # M=Multiplay
                                         # F=Swap Fire 1/2
-    TurboMode:       .byte 0b00000000       # pos -8 ------XX = Turbo mode [NoInsults/NoBackground/NoRaster/NoMusic]
-    LivePlayers:     .byte 1                # pos -7 Number of players currently active in the game [2/1/0]
-    TimerTicks:      .byte 0                # pos -6 used for benchmarking
+    TurboMode:       .byte 0b00000000   # pos -8 ------XX = Turbo mode [NoInsults/NoBackground/NoRaster/NoMusic]
+    LivePlayers:     .byte 1            # pos -7 Number of players currently active in the game [2/1/0]
+    TimerTicks:      .byte 0            # pos -6 used for benchmarking
     BlockHeavyPageFlippedColors: .byte 64   # pos -5 0/255=on  64=off
     BlockPageFlippedColors:      .byte 255  # pos -4 0/255=on  64=off
     ScreenBuffer_ActiveScreen:   .byte 0xC0 # pos -3
@@ -92,7 +88,7 @@ SavedSettings: # {{{
     # ;CPC 0  =464 , 128=128 ; 129 = 128 plus ; 192 = 128 plus with 512k; 193 = 128 plus with 512k pos -1
     # ;MSX 1=V9990  4=turbo R
     # ;ZX  0=TAP 1=TRD 2=DSK   128= 128k ;192 = +3 or black +2
-    CPCVer: .byte 00
+    CPCVer: .byte 00                    # pos  -1
 
     Player_Array:
         P1_P00: .byte 100        #  0 - Y
@@ -150,18 +146,14 @@ SavedSettings: # {{{
         .byte 0xFB,       0x00 # Down      14
         .byte 0xFE,       0x00 # Up        13
 
-    KeyboardScanner_KeyPresses: .space 10 # Player1
-                                            #
-                                            # ;This is the raw keypress data
-                                            #
-                                            # align 8,0
-                                            # Player_ScoreBytes  defb &00,&00,&00,&00,&00,&00,&00,&00 ; Player 2 current score
-                                            # Player_ScoreBytes2 defb &00,&00,&00,&00,&00,&00,&00,&00 ; Player 1 current score
-                                            #             ;25
-                                            # HighScoreBytes defb    &00,&00,&00,&00,&00,&00,&00,&00  ; Highscore
-                                            #
-                                            # ;&80 bytes
-SavedSettings_Last: # }}}
+    KeyboardScanner_KeyPresses: .space 10,0 # This is the raw keypress data
+
+        .balign 8,0
+    Player_ScoreBytes:  .space 8,0 # Player 2 current score
+    Player_ScoreBytes2: .space 8,0 # Player 1 current score
+    # 25
+    HighScoreBytes:     .space 8,0 # Highscore
+SavedSettings_Last: # 0x80 bytes --------------------------------------------}}}
                                         #
                                         # ;X,X,Y,Y,S,[0,0,0] - [] not used
                                         # PlusSprites_Config1:
@@ -415,7 +407,7 @@ NULL:   RETURN
                                         # list
                                         # Null:ret
                                         # FileEndCore:
-                                        #     save direct "CORE    .AKU",Akuyou_CoreStart,&3000   ;address,size...}[,exec_address]
+                                        #     save direct "CORE    .AKU",Akuyou_CoreStart,&3001   ;address,size...}[,exec_address]
                                         # nolist
         .asciz "9876543210end"
-FileEndCore:      .end
+end: FileEndCore:

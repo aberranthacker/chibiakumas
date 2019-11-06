@@ -2183,17 +2183,17 @@ ContinueModeSet:
     ld (iy-7),a ;live players
 
     ;multiplay support
-    ld hl,&003E
+    ld hl,&003E ; 3E n = LD A, n
     ld a,(MultiplayConfig)
     bit 0,a
     jr z,StartANewGame_NoMultiplay
     ld bc,&F990
-    in a,(c)        ;Test if the multiplay is really there!
+    in a,(c)    ; Test if the multiplay is really there!
     inc a
     jr z,StartANewGame_NoMultiplay
-    ld hl,&78ED
+    ld hl,&78ED ; ED 78 = IN A,(C)
 StartANewGame_NoMultiplay:
-    ld (multiplaysupport_Plus2-2),hl
+    ld (multiplaysupport_Plus2-2),hl ;; ../SrcCPC/Akuyou_CPC_KeyboardDriver.asm:99
 
     ; we can swap Fire 1 and 2 for Multiplay joysticks - as redefine doesn't work
     ld hl,(templateFire1)

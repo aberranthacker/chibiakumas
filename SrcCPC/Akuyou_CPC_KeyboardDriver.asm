@@ -78,7 +78,6 @@ Player_ReadControlsClassic: ;if either player presses anything act on it - used 
     ; ixl = Keypress bitmap Player 1
     ; ixh = Keypress bitmap Player 2
     ; HL Direct pointer to the keymap
-
     call KeyboardScanner_Read
     call Player_ReadControls2
     ld ixh,a
@@ -96,7 +95,7 @@ Player_ReadControls:
     ld bc,&F990
 
 Player_ReadControlsB:
-    ld a,0 :multiplaysupport_Plus2;in a,(c) ;
+    ld a,0 :multiplaysupport_Plus2 ; 3E n = LD A, n ; ED 78 = IN A,(C)
     cpl
 push af
     ld c,0

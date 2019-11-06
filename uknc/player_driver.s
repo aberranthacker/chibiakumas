@@ -11,15 +11,13 @@
 Player_GetPlayerVars:                                       # Player_GetPlayerVars:
         MOV  $Player_Array,R5                               #     ld iy,Player_Array
         RETURN                                              # ret
-                                                            #
                                                             #     ; iy = Pointer to player vars
 NoSpend:                                                    # NoSpend:
         MOV  R0,@$srcSpendTimeout                           #     ld (SpendTimeout_Plus1-1),a
         RETURN                                              # ret
                                                             #
 SpendCheck:                                                 # SpendCheck:
-        MOV  $1,R0                                          #     ld a,1:SpendTimeout_Plus1   ;Dont let player continue right away!
-        SpendTimeout_Plus2:
+        MOV  $1,R0; SpendTimeout_Plus2:                     #     ld a,1:SpendTimeout_Plus1   ;Dont let player continue right away!
         DEC  R0                                             #     dec a
         BNE  NoSpend                                        #     jr nz,NoSpend
                                                             #
@@ -32,17 +30,16 @@ SpendCredit:                                                # SpendCredit:
          PUSH R5                                            #     push iy
          SpendCreditSelfMod:
              MOV  $Player_Array,R5                          # SpendCreditSelfMod: ld iy,Player_Array ; All credits are (currently) stored in player 1's var!
-                                                            #         ld a,(iy+5)
-                                                            #         sub 1
+         MOVB 5(R5),R0                                      #         ld a,(iy+5)
+         DECB R0                                            #         sub 1
          POP  R4                                            #     pop ix
-         DECB 5(R5)
-         BCS  1$                                            #     ret c ;no credits left!
-                                                            #     ld (iy+5),a
+         BMI  1$                                            #     ret c ;no credits left!
+         MOVB R0,5(R5)                                      #     ld (iy+5),a
                                                             #
                                                             #     ld a,3
          MOVB $3,9(R4) # lives                              #     ld (ix+9),a
                                                             #     ld a,(SmartbombsReset)
-         MOVB @$SmartbombsReset,3(R4)                       #     ld (ix+3),a
+         MOVB @$SmartBombsReset,3(R4)                       #     ld (ix+3),a
 1$:      RETURN                                             # ret
                                                             #
 Players_Dead:                                               # Players_Dead:       ;Both players are dead, so pause the game and show the continue screen
@@ -300,27 +297,27 @@ Players_Dead:                                               # Players_Dead:     
                                                             #     call DoSmartBombFX
                                                             #
 Player_Handler_KeyreadDone:                                 # Player_Handler_KeyreadDone:
-        MOV  $0,R0; PlayerSaveShot_Plus2:                   #     ld a,0 :PlayerSaveShot_Plus1
+        TST  $0; PlayerSaveShot_Plus2:                      #     ld a,0 :PlayerSaveShot_Plus1
         BEQ  Player_Handler_NoSaveFire                      #     or a
                                                             #     jr z,Player_Handler_NoSaveFire
                                                             #
-        MOV  $0,R0; PlayerThisSprite_Plus2:                 #     ld a,0 :PlayerThisSprite_Plus1
-        MOVB R0,8(R5)                                       #     ld (iy+8),a
+                                                            #     ld a,0 :PlayerThisSprite_Plus1
+        MOVB $0,8(R5); PlayerThisSprite_Plus4:              #     ld (iy+8),a
                                                             #
-        MOV  $0,R0; PlayerThisShot_Plus2:                   #     ld a,0 :PlayerThisShot_Plus1
-        MOVB R0,15(R5)                                      #     ld (iy+15),a
+                                                            #     ld a,0 :PlayerThisShot_Plus1
+        MOVB $0,15(R5); PlayerThisShot_Plus4:               #     ld (iy+15),a
                                                             #
 Player_Handler_NoSaveFire:                                  # Player_Handler_NoSaveFire:
-        MOV  8(R5),R0                                       #     ld a,(iy+8)
+        MOVB 8(R5),R0                                       #     ld a,(iy+8)
 
-        BITB 0b100000000,8(R5)                              #     and %10000000
+        BIC  $!0x80,R0                                      #     and %10000000
                                                             #     cp 1 :DroneFlipCurrent_Plus1
                                                             #     call nz,DroneFlip
                                                             #
-                                                            #     ld a,0 :PlayerDoFire_Plus1
-                                                            #     or a
-                                                            #     call nz,Player_Fire4D
-                                                            #
+        TST  @$0; PlayerDoFire_Plus2:                       #     ld a,0 :PlayerDoFire_Plus1
+        BEQ  1$                                             #     or a
+        CALL Player_Fire4D                                  #     call nz,Player_Fire4D
+1$:                                                         #
                                                             #     push bc
                                                             #         ld a,PlusSprite_ExtBank :PlayerSpriteBank_Plus1
                                                             #         call BankSwitch_C0_SetCurrent
@@ -472,13 +469,13 @@ Player_Handler_NoSaveFire:                                  # Player_Handler_NoS
                                                             # XfireSml:
                                                             #     defb &49,&4F,&79,&7F,0
                                                             #
-                                                            # Player_Fire4D:  ; Fire bullets!
+Player_Fire4D:                                              # Player_Fire4D:  ; Fire bullets!
         MOVB 8(R5),R0                                       #     ld a,(iy+8)
-        BIC  $!0b10000000,R0                                #     and %10000000
+        BIC  $!0x80,R0                                      #     and %10000000
         CMP  R0,$0; DroneFlipFireCurrent_Plus2:             #     cp 0 :DroneFlipFireCurrent_Plus1
-                                                            #     call nz,DroneFlipFire
-                                                            #
-                                                            #     ld a,(iy+15)
+        BEQ  1$                                             #     call nz,DroneFlipFire
+        CALL DroneFlipFire                                  #
+1$:                                                         #     ld a,(iy+15)
                                                             # Player_Fire:    ; Fire bullets!
                                                             #     push bc
                                                             #     push de
@@ -552,9 +549,9 @@ Player_Handler_NoSaveFire:                                  # Player_Handler_NoS
                                                             #     pop bc
                                                             # ret
                                                             #
-                                                            # DroneFlipFire:
-                                                            #     ld (DroneFlipFireCurrent_Plus1-1),a
-                                                            #     push de
+DroneFlipFire:                                              # DroneFlipFire:
+        #MOV  R0,dstDroneFlipFireCurrent                     #     ld (DroneFlipFireCurrent_Plus1-1),a
+        #MOV  R2,-(SP)                                       #     push de
                                                             #     or a
                                                             #     ld a,&82
                                                             #     jr z,DroneFlipFire_HorizontalMove
@@ -570,7 +567,7 @@ Player_Handler_NoSaveFire:                                  # Player_Handler_NoS
                                                             #     ld (DroneFlipFirePos2_Plus1-1),a
                                                             #     ld a,e
                                                             #     ld (DroneFlipFirePos5_Plus1-1),a
-                                                            # jr DroneFlipFinish
+#BR DroneFlipFinish                                          # jr DroneFlipFinish
                                                             #
                                                             # DroneFlip:
                                                             #     ld (DroneFlipCurrent_Plus1-1),a
@@ -608,56 +605,54 @@ Player_Handler_NoSaveFire:                                  # Player_Handler_NoS
                                                             #     pop hl
                                                             # DroneFlipFinish:
                                                             #     pop de
-                                                            # ret
+        RETURN                                              # ret
                                                             #
-                                                            # SetFireDir_UP:
-                                                            #     push bc
-                                                            #     ld bc,&4C82
-                                                            #     jr SetFireDir_Any
+SetFireDir_UP:                                              # SetFireDir_UP:
+        MOV  R1,-(SP)                                       #     push bc
+        MOV  0x4C82,R1                                      #     ld bc,&4C82
+        BR   SetFireDir_Any                                 #     jr SetFireDir_Any
                                                             #
-                                                            # SetFireDir_DOWN:
+ SetFireDir_DOWN:                                           # SetFireDir_DOWN:
                                                             #     push bc
                                                             #     ld bc,&7C80
                                                             #     jr SetFireDir_Any
                                                             #
 SetFireDir_LEFTsave:                                        # SetFireDir_LEFTsave:
         call SetFireDir_FireAndSave                         #     call SetFireDir_FireAndSave
-                                                            # SetFireDir_LEFT:
-                                                            #     push bc
-                                                            #     ld bc,&6102
-                                                            #     jr SetFireDir_Any
+SetFireDir_LEFT:                                            # SetFireDir_LEFT:
+        MOV  R1,-(SP)                                       #     push bc
+        MOV  $0x6102,R1                                     #     ld bc,&6102
+        BR   SetFireDir_Any                                 #     jr SetFireDir_Any
                                                             #
 SetFireDir_RIGHTsave:                                       # SetFireDir_RIGHTsave:
         CALL SetFireDir_FireAndSave                         #     call SetFireDir_FireAndSave
                                                             #
-                                                            # SetFireDir_RIGHT:
-                                                            #     push bc
-                                                            #     ld bc,&6700
+SetFireDir_RIGHT:                                           # SetFireDir_RIGHT:
+        MOV  R1,-(SP)                                       #     push bc
+        MOV  0x6700,R1                                      #     ld bc,&6700
                                                             #
-                                                            # SetFireDir_Any:
+SetFireDir_Any:                                             # SetFireDir_Any:
                                                             #     ld a,b
-                                                            #     ld (PlayerThisShot_Plus1-1),a
+        MOVB R1,@$srcPlayerThisSprite                       #     ld (PlayerThisShot_Plus1-1),a
+        SWAB R1                                             #     ld a,c
+        MOVB R1,@$srcPlayerThisShot                         #     ld (PlayerThisSprite_Plus1-1),a
+        MOV  (SP)+,R1                                       #     pop bc
+        RETURN                                              # ret
                                                             #
-                                                            #     ld a,c
-                                                            #
-                                                            #     ld (PlayerThisSprite_Plus1-1),a
-                                                            #     pop bc
-                                                            # ret
-                                                            #
-                                                            # SetFireDir_FireAndSaveRestore:
+SetFireDir_FireAndSaveRestore:                              # SetFireDir_FireAndSaveRestore:
                                                             #     ld a,(iy+8)
-                                                            #     ld (PlayerThisSprite_Plus1-1),a
+        MOVB 8(R5), @$srcPlayerThisSprite                   #     ld (PlayerThisSprite_Plus1-1),a
                                                             #
-                                                            #     ld a,(iy+15)
+        MOVB 15(R5),@$srcPlayerThisShot                     #     ld a,(iy+15)
                                                             #     ld (PlayerThisShot_Plus1-1),a
                                                             #
 SetFireDir_FireAndSave:                                     # SetFireDir_FireAndSave:
         MOV  $0x67,R0                                       #     ld a,&67
         MOV  R0,@$srcPlayerSaveShot                         #     ld (PlayerSaveShot_Plus1-1),a
                                                             #
-                                                            # SetFireDir_Fire:
-                                                            #     ld (PlayerDoFire_Plus1-1),a
-                                                            # ret
+SetFireDir_Fire:                                            # SetFireDir_Fire:
+        MOV  R0,@$dstPlayerDoFire                           #     ld (PlayerDoFire_Plus1-1),a
+RETURN                                                      # ret
                                                             #
                                                             # DoSmartBombCall:
                                                             #     ; a=2 All FX

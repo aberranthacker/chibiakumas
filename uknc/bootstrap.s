@@ -14,27 +14,21 @@
 
                 .=BootstrapStart
 
+        .cout $TextInit
         .cout $TitleStr
         .cout $WebSiteStr
         .cout $CreditsStr
-Bootstrap_Launch:                       #     ld bc,&7f8D ; Reset the firmware to OFF
-                                        #     out (c),c
-                                        #     ld hl,RasterColors_InitColors
-                                        #     call SetColors
-                                        #
-        CLR R3                          #     ld h,0
-                                        #     ld l,0
-                                        #
-Bootstrap_FromHL:                       #     ; HL is used as the bootstrap command
-                                        #     ; H=1 means levels
-                                        #     ; H=0 means system events (Menu etc)
-        MOV  R3,R0                      #     ld a,h
-        SWAB R0
-        TSTB R0                         #     or a
-        BEQ  Bootstrap_SystemEvent      #     jr z,Bootstrap_SystemEvent
-        CMPB R3,$1                      #     cp 1
-        BEQ  Bootstrap_Level            #     jr z,Bootstrap_Level
-RETURN                                  # ret
+Bootstrap_Launch:
+        CLR R3
+
+Bootstrap_FromHL:                  # HL is used as the bootstrap command
+        MOV  R3,R0                 # H=1 means levels
+        SWAB R0                    # H=0 means system events (Menu etc)
+                                   # SWAB sets Z flag if low-order byte of result = 0
+        BEQ  Bootstrap_SystemEvent
+        CMPB R3,$1
+        BEQ  Bootstrap_Level
+RETURN
 
 Bootstrap_SystemEvent:
         MOV  R3,R0                      #     ld a,l
@@ -81,17 +75,14 @@ Bootstrap_StartGame:
         SOB  R0, 1$
 #----------------------------------------------------------------------------}}}
 # load loading screen -------------------------------------------------------{{{
+        MOV  $PPU_SetPalette, @$PPUCommand
+        MOV  $PPU_LoadingScreenPalette, @$PPUCommandArg
+
         MOV  $LoadingSCR, @$LookupFileName # ../AkuCPC/BootsStrap_StartGame_CPC.asm:64
         MOV  $FB1, @$ReadBuffer
         MOV  $8000, @$ReadWordsCount
         CALL Bootstrap_LoadDiskFile
-
-        MOV  $PPU_SetPalette, @$PPUCommand
-        MOV  $PPU_LoadingScreenPalette, @$PPUCommandArg
 #----------------------------------------------------------------------------}}}
-
-        MOV  @$SPReset,SP # we are not returning, so reset the stack
-
         # Load the game core - this is always in memory
         MOV  $CoreBin, @$LookupFileName
         MOV  $FileBeginCore, @$ReadBuffer
@@ -106,11 +97,10 @@ Bootstrap_StartGame:
         # TODO: font load
         # TODO: player sprites load
         # TODO: Initialize the Sound Effects.
-            .include "./bootstrap/start_game.s" # read "../AkuCPC/BootsStrap_StartGame_CPC.asm"
-        JMP  Bootstrap_Level_0 # Start the menu
 #----------------------------------------------------------------------------}}}
 Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------{{{
-        CALL StartANewGame              # call StartANewGame
+        MOV  $SPReset,SP # we are not returning, so reset the stack # 01600
+        CALL StartANewGame              # call StartANewGame # 01664
                                         # call LevelReset0000
                                         #
                                         # ld hl,DiskMap_MainMenu      ;T08-SC1.D01
@@ -141,13 +131,13 @@ FireMode_Normal: # ../Aku/BootStrap.asm:2116
         BR   FireMode_Both
 
 FireMode_4D: # ../Aku/BootStrap.asm:2128
-    MOV  $SetFireDir_UP,   @$dstFireUpHandler
-    MOV  $SetFireDir_DOWN, @$dstFireDownHandler
-    MOV  $SetFireDir_LEFT, @$dstFireLeftHandler
-    MOV  $SetFireDir_RIGHT,@$dstFireRightHandler
+        MOV  $SetFireDir_UP,   @$dstFireUpHandler
+        MOV  $SetFireDir_DOWN, @$dstFireDownHandler
+        MOV  $SetFireDir_LEFT, @$dstFireLeftHandler
+        MOV  $SetFireDir_RIGHT,@$dstFireRightHandler
 
-    MOV  $SetFireDir_Fire, @$dstFire1Handler
-    MOV  $SetFireDir_FireAndSaveRestore,@$dstFire2Handler 
+        MOV  $SetFireDir_Fire, @$dstFire1Handler
+        MOV  $SetFireDir_FireAndSaveRestore,@$dstFire2Handler
 
 FireMode_Both: # ../Aku/BootStrap.asm:2143
         MOV $255,@$dstDroneFlipFireCurrent
@@ -159,7 +149,7 @@ StartANewGame: # ../Aku/BootStrap.asm:2151
 
         MOV  $0012700,R0 # MOV (PC)+,R0  # ld bc,&3E0D ;Split Continues ; 3E n = LD A,n
         MOV  $0x0D,R1
-        MOV  $0012704,R2 # MOV @(PC)+,R4 # ld de,&2ADD ; LD IX, (addr) = DD 2A dr ad
+        MOV  $0013704,R2 # MOV @(PC)+,R4 # ld de,&2ADD ; LD IX, (addr) = DD 2A dr ad
                                          # ld a,(ContinueMode)
         TSTB @$ContinueMode              # or a
         BNE  ContinueModeSet             # jr nz,ContinueModeSet
@@ -175,30 +165,61 @@ ContinueModeSet: # ../Aku/BootStrap.asm:2165
         MOV  R2,@$SpendCreditSelfMod2
 
         CALL FireMode_Normal # set our standard Left-Right Firemode
-        #reset all the scores n stuff
-        CALL AkuYou_Player_GetPlayerVars
+        # reset all the scores n stuff
+        CALL AkuYou_Player_GetPlayerVars # $Player_Array -> R5
                                                             #     ld a,(iy-15)
         BITB $0x80,-15(R5)                                  #     and %10000000
         BEQ  1$                                             #     call nz,FireMode_4D
         CALL FireMode_4D                                    #
                                                             #     ld a,1
- 1$:    MOVB $1,-7(R5)                                      #     ld (iy-7),a ;live players
+1$:     MOVB $1,-7(R5)                                      #     ld (iy-7),a ;live players
                                                             #
                                                             #     ;multiplay support
-                                                            #     ld hl,&003E ;ld a,0
+        MOV  $0x003E,R3                                     #     ld hl,&003E
                                                             #     ld a,(MultiplayConfig)
         BITB $0,@$MultiplayConfig                           #     bit 0,a
-        #BEQ  StartANewGame_NoMultiplay                      #     jr z,StartANewGame_NoMultiplay
+        BEQ  StartANewGame_NoMultiplay                      #     jr z,StartANewGame_NoMultiplay
                                                             #     ld bc,&F990
                                                             #     in a,(c) ;Test if the multiplay is really there!
                                                             #     inc a
                                                             #     jr z,StartANewGame_NoMultiplay
                                                             #     ld hl,&78ED
 
+StartANewGame_NoMultiplay: # ../Aku/BootStrap.asm:2195
+StartANewGame_NoControlFlip: # ../Aku/BootStrap.asm:2206
+        MOV  $Player_Array, R5
+        CALL StartANewGamePlayer
+        MOV  $Player_Array2,R5
+        CALL StartANewGamePlayer
+                                          # ld hl,Player_ScoreBytes
+                                          # ld b,8*2
+                                          # xor a
+        JMP  WaitKeyThenExit
+
+StartANewGamePlayer: # ../Aku/BootStrap.asm:2256 ;player fire directions
+        ADD  $2,R5
+        CLR  R0
+        MOVB R0,   (R5)+  #  2 Fire Delay
+        MOVB @$SmartBombsReset,(R5)+ # 3 smartbombs
+        MOVB R0,   (R5)+  #  4 drones
+        MOVB @$ContinuesReset, (R5)+ # 5 continues
+        MOVB $16,  (R5)+  #  6 drone pos
+        MOVB $7,   (R5)+  #  7 invincibility 0b00000111
+        MOVB R0,   (R5)+  #  8 spritenum
+        MOVB R0,   (R5)+  #  9 Player Lives (default both players to dead)
+        MOVB R0,   (R5)+  # 10 burst fire xfire
+        MOVB $4,   (R5)+  # 11 Fire Speed    0b00000100
+        INC  R5
+        MOVB R0,   (R5)+  # 13 Points to add
+        MOVB R0,   (R5)+  # 14 player shoot power
+        MOVB $0x67,(R5)+  # 15 Fire dir
+RETURN
+
+WaitKeyThenExit:
         CALL WaitKey
         MOV  $PPU_Finalize, @$PPUCommand
-2$:     TST  PPUCommand # wait until PPU finishes command
-        BNE  2$
+1$:     TST  @$PPUCommand # wait until PPU finishes command
+        BNE  1$
 
         JSR  R5,PPFREE
         .WORD PPU_UserRamStart
@@ -227,25 +248,24 @@ Bootstrap_LoadDiskFile: #----------------------------------------------------{{{
 
         #.LOOKUP $LkpArea  #.LOOKUP area,chan,dblk[,seqnum]
         MOV  $LookupArea,R0
-        EMT     0375
-        # TODO: carry the carry flag out of the procedure
-        BCS  1$
+        EMT  0375
+        BCS  1$ # TODO: carry the carry flag out of the procedure
+
         #.READW  $RdArea   #.READW  area,chan,buf,wcnt,blk[,BMODE=strg]
         MOV  $ReadArea,R0
         EMT  0375
-        # TODO: carry the carry flag out of the procedure
-        BCS  1$
-1$:     #.Close  $0        #.CLOSE  chan
+
+        #.Close  $0      #.CLOSE  chan
         MOV  $0x0600,R0 # operation code 6, channel 0
         EMT  0374       # close channel
-RETURN
+
+1$:     RETURN
 #----------------------------------------------------------------------------}}}
 
 WaitKey:
-        CLR  @$CCH0IS
-1$:     TSTB @$CCH0IS
-        BPL  1$
-        CLR  @$CCH0IS
+1$:     TST  @$KeyboardScanner_KeyPresses + 2
+        BEQ  1$
+        CLR  @$KeyboardScanner_KeyPresses + 2
         RETURN
 
             .include "./ppucmd.s"
@@ -260,13 +280,13 @@ ReadArea:           .BYTE  0,010 # chan, code(.READ/.READC/.READW)
     ReadWordsCount: .WORD  0 # wcnt
                     .WORD  0 # end of area(.READW=0,.READ=1)
 CoreBin:
-    .BYTE 0xB8, 0x1A, 0x2A, 0x15, 0x40, 0x1F, 0xF6, 0x0D # .RAD50 "DK CORE  BIN"
+    .word 0x1AB8, 0x152A, 0x1F40, 0x0DF6 # .RAD50 "DK CORE  BIN"
 SavSetBin: # saved settings bin
-    .BYTE 0xB8, 0x1A, 0xFE, 0x76, 0x9C, 0x77, 0xF6, 0x0D # .RAD50 "DK SAVSETBIN"
+    .word 0x1AB8, 0x76FE, 0x779C, 0x0DF6 # .RAD50 "DK SAVSETBIN"
 PPUBIN:
-    .BYTE 0xB8, 0x1A, 0x95, 0x66, 0x00, 0x00, 0xF6, 0x0D # .RAD50 "DK PPU   BIN"
+    .word 0x1AB8, 0x6695, 0x0000, 0x0DF6 # .RAD50 "DK PPU   BIN"
 LoadingSCR:
-    .BYTE 0xB8, 0x1A, 0x59, 0x4D, 0x76, 0x1A, 0x4A, 0x77 # .RAD50 "DK LOADINSCR"
+    .word 0x1AB8, 0x4D59, 0x1A76, 0x774A # .RAD50 "DK LOADINSCR"
 
 LookupError: .ASCIZ "File lookup error."
 ReadError:   .ASCIZ "File read error."
@@ -278,15 +298,15 @@ LoadingScreenPalette: #------------------------------------------------------{{{
     .WORD 0b10101 #  320 dots per line, pallete 5
     .WORD 1       #--line number, first line of the main screen area, *required!*
     .WORD 1       #  set colors
-    .WORD 0xCC00  #  colors  011  010  001  000 (YRGB) | br.red   | black   |
-    .WORD 0xFF99  #  colors  111  110  101  100 (YRGB) | br.white | br.blue |
+    .WORD 0xCC00  #  colors 011 010 001 000 (YRGB) | br.red   | black   |
+    .WORD 0xFF99  #  colors 111 110 101 100 (YRGB) | br.white | br.blue |
     .WORD 49      #--line number (201 if there is no more parameters)
     .WORD 1       #  set colors
     .WORD 0x1100  #  | blue     | black   |
     .WORD 0xFF55  #  | br.white | magenta |
     .WORD 63      #--line number
     .WORD 1       #  set colors
-    .WORD 0x9900  #  | br.blue  | black   |
+    .WORD 0xAA00  #  | br.green | black   |
     .WORD 0xFF55  #  | br.white | magenta |
     .WORD 95      #--line number
     .WORD 1       #  set colors
@@ -299,9 +319,15 @@ LoadingScreenPalette: #------------------------------------------------------{{{
     .WORD 201     #--line number, 201 - end of the main screen params
 #----------------------------------------------------------------------------}}}
 
-TitleStr:    .ASCIZ "         -= ChibiAkumas  V1.666 =-"
-WebSiteStr:  .ASCIZ "         -= www.chibiakumas.com =-"
-CreditsStr:  .ASCIZ "-= converted for the UKNC by aberranth =-"
+TextInit:    .byte  0033, 0240, '2 # symbol color
+             .byte  0033, 0241, '0 # symbol background color
+             .byte  0033, 0242, '0 # screen color
+             .byte  0033, 0045, 0041, 0061             # order screenlines and
+             .byte  0033, 0133, 0060, 0075, 0060, 0162 # clear screen
+             .byte  0
+TitleStr:    .asciz "      -= ChibiAkumas  V1.666 =-"
+WebSiteStr:  .asciz "      -= www.chibiakumas.com =-"
+CreditsStr:  .asciz "-= UKNC version by aberrant.hacker =-"
 
         .even
 BootstrapEnd:

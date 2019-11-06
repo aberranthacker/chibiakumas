@@ -22,8 +22,14 @@
         .equiv  dstFireRightHandler, FireRightHandler_Plus2 - 2
         .global dstFireRightHandler
 
-        .global SetFireDir_RIGHTsave
+        .global SetFireDir_UP
+        .global SetFireDir_DOWN
         .global SetFireDir_LEFTsave
+        .global SetFireDir_LEFT
+        .global SetFireDir_RIGHTsave
+        .global SetFireDir_RIGHT
+        .global SetFireDir_Fire
+        .global SetFireDir_FireAndSaveRestore
 
         .equiv  dstFire2Handler, Fire2Handler_Plus2 - 2
         .global dstFire2Handler
@@ -36,4 +42,10 @@
 
         .equiv  dstDroneFlipFireCurrent, DroneFlipFireCurrent_Plus2 - 2
         .global dstDroneFlipFireCurrent
+
+        .equiv  srcPlayerThisSprite, PlayerThisSprite_Plus4 - 4
+        .equiv  srcPlayerThisShot,   PlayerThisShot_Plus4 - 4
+
+        .equiv  dstPlayerDoFire, PlayerDoFire_Plus2 - 2
+
 
