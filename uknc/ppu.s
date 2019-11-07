@@ -145,18 +145,25 @@ start:
                 CLR  (R0)+           #--address of line 308
                 MOV  R1,(R0)         #--pointer back to record 308
 #----------------------------------------------------------------------------}}}
-CpFont:         #------------------------------------------------------------{{{
-                MOV  $PBP0DT,R3
-                MOV  $PBPADR,R4
-                MOV  $0x8000,(R4)
-                MOV  $CGAFont,R5
-                MOV  $32,R0          # 32 lines
-2$:             MOV  $32,R1          # 256 dots = 32 bytes
-1$:             MOVB (R5)+,(R3)
-                INC  (R4)
+DisplayFont:    #------------------------------------------------------------{{{
+                MOV  $40, R2       # line length
+                MOV  $CGAFont,R3
+                MOV  $PBP0DT,R4
+                MOV  $PBPADR,R5
+
+                MOV  $4,R0
+2$:             MOV  $40,R1
+
+1$:             MOV  $0x8000,(R5)
+                .rept 8
+                MOVB (R3)+,(R4)
+                ADD  R2,(R5)
+                .endr
+
+                INC  @$1$+2
                 SOB  R1,1$
 
-                ADD  $8,(R4)
+                ADD  $40*7,@$1$+2
                 SOB  R0,2$
 #----------------------------------------------------------------------------}}}
 Setup:          #------------------------------------------------------------{{{
@@ -246,13 +253,13 @@ SetData$:       MOV  R0,(R5)+
 #----------------------------------------------------------------------------}}}
 
 VblankIntHandler: #----------------------------------------------------------{{{
-        # we don't need ROM's interrupt handler except this small procedure
-        TST  @$07130         # is floppy drive spindle rotating?
-        BEQ  1$              # no
-        DEC  @$07130         # decrease spindle rotation counter
-        BNE  1$              # continue rotation
-        CALL @07132          # stop floppy drive spindle
-
+        # we do not need firmware interrupt handler except for this small
+        # procedure
+        TST  @$07130 # is floppy drive spindle rotating?
+        BEQ  1$      # no
+        DEC  @$07130 # decrease spindle rotation counter
+        BNE  1$      # continue rotation if the counter is not zero
+        CALL @07132  # stop floppy drive spindle
 1$:
         
         RTI
@@ -261,15 +268,15 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         MOV  $PPU_KeyboardScanner_KeyPresses,@$PBPADR
         MOVB @$KBDATA,@$PBP12D
         INC  @$PBPADR
-        MOV  $1,PBP12D
+        MOV  $1,@$PBP12D
         RTI
 #----------------------------------------------------------------------------}}}
 
 CGAFont: .incbin "cga8x8b.raw"
-SYS100:  .word 0174612 # address of 50Hz timer interrupt handler
+SYS100:  .word 0174612 # default vertical blank interrupt handler
 SYS272:  .word 02270   # address of default scanlines table
-SYS300:  .word 0175412 # keyboard interrupt hadler
-FBSLTAB: .word 0  # adrress of main screen SLTAB
+SYS300:  .word 0175412 # default keyboard interrupt hadler
+FBSLTAB: .word 0       # adrress of main screen SLTAB
 
          .balign 8 # align at 8 bytes or the new SLTAB will be invalid
 SLTAB:   .space 288 * 2 * 4 # space for a 288 four-words entries

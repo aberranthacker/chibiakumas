@@ -11,24 +11,7 @@
 # 23 - 184   48 - 185  73 - 186       198 - 191
 # 24 - 192   49 - 193  74 - 194       199 - 199
 
-REV_TABLE = [
-  0b0000, # 0b0000
-  0b1000, # 0b0001
-  0b0100, # 0b0010
-  0b1100, # 0b0011
-  0b0010, # 0b0100
-  0b1010, # 0b0101
-  0b0110, # 0b0110
-  0b1110, # 0b0111
-  0b0001, # 0b1000
-  0b1001, # 0b1001
-  0b0101, # 0b1010
-  0b1101, # 0b1011
-  0b0011, # 0b1100
-  0b1011, # 0b1101
-  0b0111, # 0b1110
-  0b1111  # 0b1111
-]
+require_relative 'reverse_tables'
 
 cpc_bmp = File.binread('../ResCPC/Old/T38-SC1.D01').unpack('v*')
 uknc_bmp = []
@@ -44,10 +27,10 @@ cpc_bmp = cpc_bmp[   0, 1000] +
           cpc_bmp[7168, 1000]
 
 cpc_bmp.each.with_index do |cpc_word, i|
-  q1 = REV_TABLE[(cpc_word & 0b1111)]
-  q2 = REV_TABLE[(cpc_word & 0b1111_0000) >> 4]
-  q3 = REV_TABLE[(cpc_word & 0b1111_0000_0000) >> 8]
-  q4 = REV_TABLE[(cpc_word & 0b1111_0000_0000_0000) >> 12]
+  q1 = REVERSE_TABLE_4BIT[(cpc_word & 0b1111)]
+  q2 = REVERSE_TABLE_4BIT[(cpc_word & 0b1111_0000) >> 4]
+  q3 = REVERSE_TABLE_4BIT[(cpc_word & 0b1111_0000_0000) >> 8]
+  q4 = REVERSE_TABLE_4BIT[(cpc_word & 0b1111_0000_0000_0000) >> 12]
   uknc_word = q1 | q2 << 8 | q3 << 4 | q4 << 12
 
   line_idx = i / 40 # 40 words per line

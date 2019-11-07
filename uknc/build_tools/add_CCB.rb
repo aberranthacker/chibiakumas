@@ -3,9 +3,9 @@ sav = File.binread(ARGV[0])
 entry = sav[040, 2].unpack('v')[0]
 eof = sav[050, 2].unpack('v')[0] + 2
 
-puts "Entry point #{entry}"
-puts "Code size #{eof - entry} bytes"
-puts "End of code block #{eof}"
+puts "Entry point: #{entry}"
+puts "Code size: #{eof - entry} bytes"
+puts "End of code block: #{eof}"
 
 body = (eof + 511) / 512
 tail = (0x10000 - (body * 512)) / 512
