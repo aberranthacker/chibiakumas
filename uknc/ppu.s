@@ -62,9 +62,10 @@ start:
                 SOB  R2,1$
 
                 # we are switching from 2-word records to 4-word records
-                # so we have to align at 8 bytes
+                # so we have to align at 4 words (8 bytes)
                 CLR  (R0)+           #--address of line 17
                 ADD  $0b1000,R1      #  align
+
                 BIS  $0b0010,R1      #  next record is 4-word
                 BIC  $0b0100,R1      #  set cursor/scale/palette
                 MOV  R1,(R0)+        #--address of the record 18
@@ -100,7 +101,6 @@ start:
                 BIC  $0b0100,R1      #  display settings
                 ADD  $0b1000,R1      #  calc address of next record of SLTAB
                                      #  taking alignment into account
-
                 MOV  R1,(R0)+        #--pointer to record 63
                 ADD  $0b100,R0       #  correct R0
                 BIC  $0b100,R0       #  due to alignment
@@ -156,8 +156,8 @@ DisplayFont:    #------------------------------------------------------------{{{
 
 1$:             MOV  $0x8000,(R5)
                 .rept 8
-                MOVB (R3)+,(R4)
-                ADD  R2,(R5)
+                MOVB (R3)+,(R4)    #
+                ADD  R2,(R5)       # set address reg to next line of the char
                 .endr
 
                 INC  @$1$+2
@@ -261,7 +261,7 @@ VblankIntHandler: #----------------------------------------------------------{{{
         BNE  1$      # continue rotation if the counter is not zero
         CALL @07132  # stop floppy drive spindle
 1$:
-        
+
         RTI
 #----------------------------------------------------------------------------}}}
 KeyboardIntHadler: #---------------------------------------------------------{{{
