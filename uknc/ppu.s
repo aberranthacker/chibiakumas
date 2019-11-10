@@ -29,7 +29,8 @@ start:
                 MOV  $44*40>>1, R0
                 CALL 5$              # clear bottom screen area
 #----------------------------------------------------------------------------}}}
-/* initialize our scanlines parameters table (SLTAB): -----------------------{{{
+# initialize our scanlines parameters table (SLTAB): ------------------------{{{
+/*
 312 (1..312) lines is SECAM half-frame
 309 (1..309) SLTAB records in total (lines 4..312 of SECAM's half-frame)
   scanlines   1..19  are not visible due to the vertical blanking interval
@@ -37,20 +38,95 @@ start:
   scanlines 308..309 are not visible due to the vertical blanking interval
 
 | 2-word records | 4-word records |
-| 0 address      | 0 data         |
-| 2 next record  | 2 data         |
-|                | 4 address      |
-|                | 6 next record  |
+| 0 address      | 0 data         | data - words that will be loaded into
+| 2 next record  | 2 data         |        control registers
+|                | 4 address      | address - address of the line to display
+|                | 6 next record  | next record - address of the next record of
+                                                  the SLTAB
+--------------------------------------------------------------------------------
+"next record" word description: ---------------------------------------------{{{
 
++--+--+--+--+--+--+--+--+--+--+--+--+--+-----+-----+------+
 |15|14|13|12|11|10| 9| 8| 7| 6| 5| 4| 3|   2 |   1 |    0 |
-|     address of the next record       |rec  |2W/4W|cursor|
++--+--+--+--+--+--+--+--+--+--+--+--+--+-----+-----+------+
+|     address of the next record       | sel |2W/4W|cursor|
++--+--+--+--+--+--+--+--+--+--+--+--+--+-----+-----+------+
 
-2-nd bit: 1) 2-word record - bit 2
-          2) 4-word record
-             0 - cursor, pallete and horizontal scale
-             1 - colors
-1-st bit: 0 - next is 2-word record
-          1 - next is 4-word record
+bit 0: cursor switching control
+       1 - switch cursor state (on/off)
+       0 - save cursor state
+       Hardware draws cursor in range of sequential lines.
+       It has to be switched "on" on the first line of the sequence,
+       saved in between, and turned "off" on the last line of the sequence.
+
+bit 1: size of the next record
+       1 - next is 4-word record
+       0 - next is 2-word record
+
+bit 2: 1) for 2-word record - bit 2 of address of the next element of the table
+       2) for 4-word record - selects register where data will be loaded:
+          0 - cursor, pallete and horizontal scale control registe
+          1 - colors control register
+-----------------------------------------------------------------------------}}}
+cursor, pallete and horizontal scale control registers desription: ----------{{{
+
+1st word
++----+----+----+----+----+----+----+----+----+----+----+----+---+---+---+---+
+| 15 | 14 | 13 | 12 | 11 | 10 |  9 |  8 |  7 |  6 |  5 |  4 | 3 | 2 | 1 | 0 |
++----+----+----+----+----+----+----+----+----+----+----+----+---+---+---+---+
+| X  | cursor position within a line    |graph curs pos|type| Y | R | G | B |
++----+----+----+----+----+----+----+----+----+----+----+----+---+---+---+---+
+
+bits 0-3:  cursor color and brightness
+bit 4:     cursor type
+           1 - graphic cursor
+           0 - character cursor
+bits 5-7:  graphic cursor position within pixels octet
+           0 - least significant bit (on the left side of the octet)
+           7 - most significant bit (on the right side of the octet)
+bits 8-14: cursor position within a text line
+           from 0 to 79
+
+2nd word
++----+----+----+----+----+----+---+---+---+---+---+---+---+----+----+----+
+| 15 | 14 | 13 | 12 | 11 | 10 | 9 | 8 | 7 | 6 | 5 | 4 | 3 |  2 |  1 |  0 |
++----+----+----+----+----+----+---+---+---+---+---+---+---+----+----+----+
+|                     unused                  | scale | X | PB | PG | PR |
++----+----+----+----+----+----+---+---+---+---+---+---+---+----+----+----+
+
+bits 0-2:  brightness of RGB components on the whole line
+           1 - full brightness
+           0 - 50% of the full brightness
+bit 3:     unused
+bits 4,5:  horizontal scale
+           | 5 | 4 | width px | width chars | last char pos |
+           +---+---+----------+-------------+---------------+
+           | 0 | 0 |   640    |     80      |     0117      |
+           | 0 | 1 |   320    |     40      |      047      |
+           | 1 | 0 |   640    |     20      |      023      |
+           | 1 | 1 |   640    |     10      |      011      |
+bits 6-15: unused
+-----------------------------------------------------------------------------}}}
+colors control registers description:----------------------------------------{{{
+
+1st word
+           +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+           |15 |14 |13 |12 |11 |10 | 9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+           +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+           | Y | R | G | B | Y | R | G | B | Y | R | G | B | Y | R | G | B |
+           +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+bitplanes  |      011      |      010      |      001      |      000      |
+0,1,2 bits
+
+2nd word
+           +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+           |15 |14 |13 |12 |11 |10 | 9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+           +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+           | Y | R | G | B | Y | R | G | B | Y | R | G | B | Y | R | G | B |
+           +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+bitplanes  |      111      |      110      |      101      |      100      |
+0,1,2 bits
+-----------------------------------------------------------------------------}}}
 */
                 MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
                 MOV  R0,R1           # R0 address of current record (2)

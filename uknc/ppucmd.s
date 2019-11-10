@@ -57,8 +57,10 @@ PPUOut:         #------------------------------------------------------------{{{
         MOV  $AMP,R0        # R0 - pointer to channel's init sequence array
         MOV  $8,R1          # R1 - size of the array, 8 bytes
 1$:     MOVB (R0)+,@$CCH2OD # Send a byte to channel 2
-2$:         TSTB @$CCH2OS   #
-            BPL  2$         # Wait until channel is ready
+
+2$:     TSTB @$CCH2OS       #
+        BPL  2$             # Wait until channel is ready
+
         SOB  R1,1$          # Next byte
 
         TSTB PS.Reply       # Test PPU's operation status code
@@ -67,6 +69,7 @@ PPUOut:         #------------------------------------------------------------{{{
 AMP:        .byte  0, 0, 0, 0xFF # init sequence
             .word  PStruct       # address of parameters struct
             .byte  0xFF, 0xFF    # two termination bytes 0xff, 0xff
+
 PStruct:    # Parameters struct (PS)
     PS.Reply:   .byte  0   # operation status code
     PS.Request: .byte  1   # request code

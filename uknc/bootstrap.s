@@ -222,8 +222,8 @@ WaitKeyThenExit:
         BNE  1$
 
         JSR  R5,PPFREE
-        .WORD PPU_UserRamStart
-        .WORD PPU_ModuleSizeWords
+        .word PPU_UserRamStart
+        .word PPU_ModuleSizeWords
 
 Finish: .exit
 
@@ -271,14 +271,14 @@ WaitKey:
             .include "./ppucmd.s"
 
 # files related data --------------------------------------------------------{{{
-LookupArea:         .BYTE  0,01 # chan, code(.LOOKUP)
-    LookupFileName: .WORD  0 # dblk
+LookupArea:         .byte  0,01 # chan, code(.LOOKUP)
+    LookupFileName: .word  0 # dblk
 
-ReadArea:           .BYTE  0,010 # chan, code(.READ/.READC/.READW)
-                    .WORD  0 # blk
-    ReadBuffer:     .WORD  0 # buf
-    ReadWordsCount: .WORD  0 # wcnt
-                    .WORD  0 # end of area(.READW=0,.READ=1)
+ReadArea:           .byte  0,010 # chan, code(.READ/.READC/.READW)
+                    .word  0 # blk
+    ReadBuffer:     .word  0 # buf
+    ReadWordsCount: .word  0 # wcnt
+                    .word  0 # end of area(.READW=0,.READ=1)
 CoreBin:
     .word 0x1AB8, 0x152A, 0x1F40, 0x0DF6 # .RAD50 "DK CORE  BIN"
 SavSetBin: # saved settings bin
@@ -288,35 +288,35 @@ PPUBIN:
 LoadingSCR:
     .word 0x1AB8, 0x4D59, 0x1A76, 0x774A # .RAD50 "DK LOADINSCR"
 
-LookupError: .ASCIZ "File lookup error."
-ReadError:   .ASCIZ "File read error."
+LookupError: .asciz "File lookup error."
+ReadError:   .asciz "File read error."
 #----------------------------------------------------------------------------}}}
 LoadingScreenPalette: #------------------------------------------------------{{{
-    .WORD 0       #--line number, last line of the top screen area, *required!*
-    .WORD 0       #  0 - set cursor/scale/palette, *ignored for the first record*
-    .WORD 0b10000 #  graphical cursor
-    .WORD 0b10101 #  320 dots per line, pallete 5
-    .WORD 1       #--line number, first line of the main screen area, *required!*
-    .WORD 1       #  set colors
-    .WORD 0xCC00  #  colors 011 010 001 000 (YRGB) | br.red   | black   |
-    .WORD 0xFF99  #  colors 111 110 101 100 (YRGB) | br.white | br.blue |
-    .WORD 49      #--line number (201 if there is no more parameters)
-    .WORD 1       #  set colors
-    .WORD 0x1100  #  | blue     | black   |
-    .WORD 0xFF55  #  | br.white | magenta |
-    .WORD 63      #--line number
-    .WORD 1       #  set colors
-    .WORD 0xAA00  #  | br.green | black   |
-    .WORD 0xFF55  #  | br.white | magenta |
-    .WORD 95      #--line number
-    .WORD 1       #  set colors
-    .WORD 0xBB00  #  | br.cyan  | black   |
-    .WORD 0xFF22  #  | br.white | green   |
-    .WORD 195     #--line number
-    .WORD 1       #  set colors
-    .WORD 0xCC00  #  | br.red   | black   |
-    .WORD 0xFF22  #  | br.white | green   |
-    .WORD 201     #--line number, 201 - end of the main screen params
+    .word 0       #--line number, last line of the top screen area, *required!*
+    .word 0       #  0 - set cursor/scale/palette, *ignored for the first record*
+    .word 0b10000 #  graphical cursor
+    .word 0b10101 #  320 dots per line, pallete 5
+    .word 1       #--line number, first line of the main screen area, *required!*
+    .word 1       #  set colors
+    .word 0xCC00  #  colors 011 010 001 000 (YRGB) | br.red   | black   |
+    .word 0xFF99  #  colors 111 110 101 100 (YRGB) | br.white | br.blue |
+    .word 49      #--line number (201 if there is no more parameters)
+    .word 1       #  set colors
+    .word 0x1100  #  | blue     | black   |
+    .word 0xFF55  #  | br.white | magenta |
+    .word 63      #--line number
+    .word 1       #  set colors
+    .word 0xAA00  #  | br.green | black   |
+    .word 0xFF55  #  | br.white | magenta |
+    .word 95      #--line number
+    .word 1       #  set colors
+    .word 0xBB00  #  | br.cyan  | black   |
+    .word 0xFF22  #  | br.white | green   |
+    .word 195     #--line number
+    .word 1       #  set colors
+    .word 0xCC00  #  | br.red   | black   |
+    .word 0xFF22  #  | br.white | green   |
+    .word 201     #--line number, 201 - end of the main screen params
 #----------------------------------------------------------------------------}}}
 
 TextInit:    .byte  0033, 0240, '2 # symbol color
