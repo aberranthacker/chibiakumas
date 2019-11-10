@@ -43,6 +43,8 @@ start:
 |                | 4 address      | address - address of the line to display
 |                | 6 next record  | next record - address of the next record of
                                                   the SLTAB
+
+Very first record of the table is 2-word and has fixed address 0270
 --------------------------------------------------------------------------------
 "next record" word description: ---------------------------------------------{{{
 
@@ -103,8 +105,8 @@ bits 4,5:  horizontal scale
            +---+---+----------+-------------+---------------+
            | 0 | 0 |   640    |     80      |     0117      |
            | 0 | 1 |   320    |     40      |      047      |
-           | 1 | 0 |   640    |     20      |      023      |
-           | 1 | 1 |   640    |     10      |      011      |
+           | 1 | 0 |   160    |     20      |      023      |
+           | 1 | 1 |    80    |     10      |      011      |
 bits 6-15: unused
 -----------------------------------------------------------------------------}}}
 colors control registers description:----------------------------------------{{{
