@@ -8,6 +8,14 @@
                     EMT 0351
                 .endm
 
+                .macro .putstr str_addr
+                  TST  @$PPUCommand
+                  NOP
+                  BNE  .-6
+                  MOV  $PPU_Print,@$PPUCommand
+                  MOV  \str_addr, @$PPUCommandArg
+                .endm
+
                 .macro call addr
                     JSR PC,\addr
                 .endm

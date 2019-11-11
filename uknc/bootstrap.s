@@ -194,7 +194,23 @@ StartANewGame_NoControlFlip: # ../Aku/BootStrap.asm:2206
                                           # ld hl,Player_ScoreBytes
                                           # ld b,8*2
                                           # xor a
+        .putstr $YahooStr
+        .putstr $LongStr
+        .putstr $YahooStr
+        .putstr $YahooStr
+        .putstr $YahooStr
+        .putstr $LongStr
+        .putstr $YahooStr
+        .putstr $YahooStr
+
         JMP  WaitKeyThenExit
+
+                 #0         1         2         3         4         5         6         7
+                 #01234567890123456789012345678901234567890123456789012345678901234567890123456789
+YahooStr: .asciz "Yippee! Whoopee! Woo-hoo! Yay! Hurrah!\n"
+LongStr:  .asciz "This is a very very very very very very very very very very very long string.\n"
+
+        .even
 
 StartANewGamePlayer: # ../Aku/BootStrap.asm:2256 ;player fire directions
         ADD  $2,R5
@@ -218,8 +234,8 @@ RETURN
 WaitKeyThenExit:
         CALL WaitKey
         MOV  $PPU_Finalize, @$PPUCommand
-1$:     TST  @$PPUCommand # wait until PPU finishes command
-        BNE  1$
+        TST  @$PPUCommand # wait until PPU finishes command
+        BNE  .-4
 
         JSR  R5,PPFREE
         .word PPU_UserRamStart
@@ -263,8 +279,8 @@ Bootstrap_LoadDiskFile: #----------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 
 WaitKey:
-1$:     TST  @$KeyboardScanner_KeyPresses + 2
-        BEQ  1$
+        TST  @$KeyboardScanner_KeyPresses + 2
+        BEQ  .-4
         CLR  @$KeyboardScanner_KeyPresses + 2
         RETURN
 

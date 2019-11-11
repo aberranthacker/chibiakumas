@@ -10,6 +10,7 @@
 .equiv FB0,           0x300  # 01400   768
 .equiv FB1,           0x4180 # 04060 16768
 
+.equiv PPU_Print, 2
 .equiv PPU_SetPalette, 1
 .equiv PPU_Finalize, -1
 

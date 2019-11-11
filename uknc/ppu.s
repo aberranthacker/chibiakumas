@@ -12,7 +12,7 @@
                 .=PPU_UserRamStart
 
 start:
-# clear top and bottom screen areas ------------------------------------------{{{
+# clear top and bottom screen areas -----------------------------------------{{{
                 BR   6$
 5$:             MOV  R1,@$PBP0DT
                 INC  @$PBPADR
@@ -67,7 +67,7 @@ bit 1: size of the next record
 
 bit 2: 1) for 2-word record - bit 2 of address of the next element of the table
        2) for 4-word record - selects register where data will be loaded:
-          0 - cursor, pallete and horizontal scale control registe
+          0 - cursor, pallete and horizontal scale control register
           1 - colors control register
 -----------------------------------------------------------------------------}}}
 cursor, pallete and horizontal scale control registers desription: ----------{{{
@@ -118,7 +118,7 @@ colors control registers description:----------------------------------------{{{
            | Y | R | G | B | Y | R | G | B | Y | R | G | B | Y | R | G | B |
            +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 bitplanes  |      011      |      010      |      001      |      000      |
-0,1,2 bits
+bit 2,1,0
 
 2nd word
            +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -127,7 +127,7 @@ bitplanes  |      011      |      010      |      001      |      000      |
            | Y | R | G | B | Y | R | G | B | Y | R | G | B | Y | R | G | B |
            +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 bitplanes  |      111      |      110      |      101      |      100      |
-0,1,2 bits
+bits 2,1,0
 -----------------------------------------------------------------------------}}}
 */
                 MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
@@ -165,7 +165,7 @@ bitplanes  |      111      |      110      |      101      |      100      |
                 MOV  R1,(R0)+        #--pointer to the record 20
 #------------------------------------- top region, header
                 MOV  $0100000,R2     # scanlines 20..307 are visible
-                MOV  $42,R3          #
+                MOV  $43,R3          #
 2$:             MOV  R2,(R0)+        #--address of screenline
                 ADD  $4,R1           #  calc address of next record of SLTAB
                 MOV  R1,(R0)+        #--set address of next record of SLTAB
@@ -206,14 +206,14 @@ bitplanes  |      111      |      110      |      101      |      100      |
 #------------------------------------- bottom region, footer
                 MOV  $0x2020,(R0)+   # colors  011  010  001  000 (YRGB)
                 MOV  $0x2020,(R0)+   # colors  111  110  101  100 (YRGB)
-                MOV  $0103340,R2     #
+                MOV  $0103340+40,R2  #
                 MOV  R2,(R0)+        #
                 ADD  $40,R2          # calculate address of next screenline
                 ADD  $8,R1           # calculate pointer to next record
                 BIC  $0b110,R1       # next record consists of 2 words
                 MOV  R1,(R0)+        #--set address of record 265
 
-                MOV  $43,R3          #
+                MOV  $42,R3          #
 4$:             MOV  R2,(R0)+        #--address of a screenline
                 ADD  $4,R1           #  calc address of next record of SLTAB
                 MOV  R1,(R0)+        #--pointer to the next record of SLTAB
@@ -222,27 +222,6 @@ bitplanes  |      111      |      110      |      101      |      100      |
                                      #
                 CLR  (R0)+           #--address of line 308
                 MOV  R1,(R0)         #--pointer back to record 308
-#----------------------------------------------------------------------------}}}
-DisplayFont:    #------------------------------------------------------------{{{
-                MOV  $40, R2       # line length
-                MOV  $CGAFont,R3
-                MOV  $PBP0DT,R4
-                MOV  $PBPADR,R5
-
-                MOV  $4,R0
-2$:             MOV  $40,R1
-
-1$:             MOV  $0x8000,(R5)
-                .rept 8
-                MOVB (R3)+,(R4)    #
-                ADD  R2,(R5)       # set address reg to next line of the char
-                .endr
-
-                INC  @$1$+2
-                SOB  R1,1$
-
-                ADD  $40*7,@$1$+2
-                SOB  R0,2$
 #----------------------------------------------------------------------------}}}
 Setup:          #------------------------------------------------------------{{{
                 MOV  @$0100, @$SYS100
@@ -269,21 +248,29 @@ Teardown:       #------------------------------------------------------------{{{
                 # JMP  @$0176300        # free allocatem memory and exit
                 RETURN
 #----------------------------------------------------------------------------}}}
-PGM:            #------------------------------------------------------------{{{
-                MOV  R0, -(SP)        # store R0 in order for the process manager to function correctly
+PGM:            #---------------------------------------------------------------
+                MOV  R0, -(SP) # store R0 in order for the process manager to function correctly
                 MOV  $PPU_PPUCommand, @$PBPADR
                 MOV  @$PBP12D,R0
+                CMP  R0, $PPU_Print
+                BEQ  JMPPrint
                 CMP  R0, $PPU_SetPalette
-                BEQ  SetPalette
+                BEQ  JMPSetPalette
                 CMP  R0, $PPU_Finalize
-                BEQ  Teardown
-#----------------------------------------------------------------------------}}}
+                BEQ  JMPTeardown
+
+                BR   CommandExecuted
+
+JMPPrint:       JMP  Print
+JMPSetPalette:  JMP  SetPalette
+JMPTeardown:    JMP  Teardown
+#-------------------------------------------------------------------------------
 CommandExecuted: #-----------------------------------------------------------{{{
                 MOV  $PPU_PPUCommand, @$PBPADR
                 CLR  @$PBP12D        # inform CPU's program that we are done
                 MOV  $PGM, @$07124   # add to processes table
                 MOV  $1, @$07100     # require execution
-                MOV  (SP)+, R0       #
+                MOV  (SP)+, R0       # restore R0
                 JMP  @$0174170       # jump back to the process manager (63608; 0xF878)
 #----------------------------------------------------------------------------}}}
 SetPalette:     #------------------------------------------------------------{{{
@@ -329,7 +316,78 @@ SetData$:       MOV  R0,(R5)+
                 BNE  NextRecord$
                 JMP  CommandExecuted
 #----------------------------------------------------------------------------}}}
+Print: #---------------------------------------------------------------------{{{
+                .equiv LineWidth, 40
+                .equiv CharHeight, 9
+                .equiv CharLineSize, LineWidth * CharHeight
+                .equiv TextLinesCount, 9
 
+                MOV  $StrBuffer,R3
+                MOV  $LineWidth,R2
+                MOV  $PBP12D,R4
+                MOV  $PBPADR,R5
+
+                MOV  $PPU_PPUCommandArg, (R5) # load address register
+                MOV  (R4), R0 # get address of a string from CPU RAM
+                ASR  R0       # divide it by 2 to calculate bitplane address
+                MOV  R0,(R5)  # load address of a string into address register
+
+1$:             MOV  (R4),R0  # load 2 bytes from CPU RAM
+                MOV  R0,(R3)+ # store them into buffer
+                TSTB R0       # end of string?
+                BEQ  3$       # yes, we are done here
+                SWAB R0       # swap bytes to test most significant one
+                TSTB R0       # end of string?
+                BEQ  3$       # yes, we are done here
+                INC  (R5)     # next address
+                BR   1$
+
+3$:             MOV  @$CurrentLine,R1 # prepare to calculate relative char address
+                MUL  $CharLineSize,R1 # calculate relative address of the line
+                ADD  @$CurrentChar,R1 # calculate relative address of the char
+                ADD  $0x8000,R1       # calculate absolute address of the next char
+
+                MOV  $StrBuffer,R3
+                MOV  $PBP0DT,R4
+
+NextChar:       MOV  R1,(R5)      # load address of the next char into address register
+                MOVB (R3)+,R0     # load character code from string buffer
+                TSTB R0           # end of string?
+                BEQ  DonePrinting # yes, finish
+                CMPB $'\n, R0     # new line?
+                BEQ  NewLine      #
+
+Draw:           ASH  $3,R0        # shift left by 3(multiply by 8)
+                ADD  $CGAFont,R0  # calculate char position within font
+
+                .rept 8
+                MOVB (R0)+,(R4)   #
+                ADD  R2,(R5)      # set address reg to next line of the char
+                .endr
+
+                INC  R1
+                INC  @$CurrentChar
+                CMP  @$CurrentChar,R2  # end of screen line? (R2 == 40)
+                BNE  NextChar          # no, print another character
+NewLine:        CLR  @$CurrentChar
+                INC  @$CurrentLine
+                CMP  @$CurrentLine,$TextLinesCount
+                BNE  Recalculate
+                CLR  @$CurrentLine
+
+Recalculate:    MOV  @$CurrentLine,R1 # prepare to calculate relative char address
+                MUL  $CharLineSize,R1 #
+                ADD  @$CurrentChar,R1 # add char position
+                ADD  $0x8000,R1       # calculate absolute address of the next char
+                MOV  R1,(R5)  # load address of the next char into address register
+                BR   NextChar
+
+DonePrinting:   JMP  CommandExecuted
+
+CurrentLine:    .word 0
+CurrentChar:    .word 0
+StrBuffer:      .space 80*2
+#----------------------------------------------------------------------------}}}
 VblankIntHandler: #----------------------------------------------------------{{{
         # we do not need firmware interrupt handler except for this small
         # procedure
