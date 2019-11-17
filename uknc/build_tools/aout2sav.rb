@@ -17,7 +17,7 @@ end.parse!
 
 exit unless options.in_filename
 
-bin = File.binread(options.in_filename);
+bin = File.binread(options.in_filename)
 
 # The size of the header is not included in any of the other sizes.
 header = bin[0,16].unpack('v*')
@@ -89,12 +89,16 @@ sav = text
 # sav[040, 2] = [a_entry].pack('v')           # program’s relative start address
 # sav[042, 2] = [highest_word_addr].pack('v') # initial location of stack pointer
 # sav[050, 2] = [highest_word_addr].pack('v') # address of the program’s highest word
-# Locations 360–377 are the CCB and are are restricted for use by the system. The
-# Linker stores the program memory usage bits in these eight words, which are called a
-# bitmap. Each bit represents one 256-word block of memory and is set if the program
-# occupies any part of that block of memory. Bit 7 of byte 360 corresponds to locations
-# 0 through 777; bit 6 of byte 360 corresponds to locations 1000 through 1777, and so
-# on. The monitor uses this information when it loads the program.
+#
+# Locations 360–377 are the CCB and are are restricted for use by the system.
+# The Linker stores the program memory usage bits in these eight words, which
+# are called a bitmap.
+# Each bit represents one 256-word block of memory and is set if the program
+# occupies any part of that block of memory:
+#     bit 7 of byte 360 corresponds to locations    0 through  777,
+#     bit 6 of byte 360 corresponds to locations 1000 through 1777,
+#     and so on.
+# The monitor uses this information when it loads the program.
 #-------------------------------------------------------------------------------
 out_filename = if options.out_filename
                  options.out_filename

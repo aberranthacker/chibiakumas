@@ -41,8 +41,14 @@ build/bootstrap.o : bootstrap.s \
 
 build/core.o : core.s \
 	       disk_driver.s \
+	       object_driver.h.s \
+	       object_driver.s \
 	       player_driver.h.s \
 	       player_driver.s \
+	       stararray.h.s \
+	       stararray.s \
+	       stararray_add.h.s \
+	       stararray_add.s \
 	       $(common)
 	$(AS) core.s -o build/core.o
 

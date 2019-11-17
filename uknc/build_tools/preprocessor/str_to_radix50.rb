@@ -1,6 +1,32 @@
+#
+# Excerpt from "PDP-11 MACRO-11 Language Reference Manual":
+#
+# .RAD50
+#
+# The . RAD50 directive generates data in Radix-50 packed format. Radix-50 form allows
+# three characters to be packed into 16 bits (one word); therefore, any 6-character
+# symbol can be stored in two consecutive words.
+#
+# Each character is translated into its Radix-50 equivalent, as indicated in the following
+# table:
+# | Character   | Radix-50 Octal Equivalent |
+# +-------------+---------------------------+
+# | (space)     | 0
+# | A-Z         | 01 - 032
+# | $           | 033
+# | .           | 034
+# | (undefined) | 035
+# | 0-9         | 036 - 047
+#
+# The Radix-50 equivalents for characters 1 through 3 (C1,C2,C3) are combined as
+# follows:
+# Radix-50 value == ((C1 * 050) + C2) * 050 + C3
+# For example:
+# Radix-50 value of "ABC" = ((1 * 050) + 2) * 050 + 3 = 03223
+#
 class StrToRadix50
   class << self
-    POSITION_COEFFICIENTS = [03100, 00050, 00001].freeze
+    POSITION_COEFFICIENTS = [050 * 050, 050, 1].freeze
     # _ fills unused char position
     RADIX50_CHARS = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ$._0123456789'.chars.freeze
 

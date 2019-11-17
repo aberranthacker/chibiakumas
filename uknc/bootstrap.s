@@ -65,6 +65,10 @@ Bootstrap_StartGame:
         JSR  R5,PPEXEC
         .WORD FB1 # PPU module location
         .WORD PPU_ModuleSizeWords
+
+        .putstr $LoadingStr
+        TST  PPUCommand
+        BNE  .-4
 #----------------------------------------------------------------------------}}}
 # clear main screen area ----------------------------------------------------{{{
         MOV  $4000, R0
@@ -78,29 +82,39 @@ Bootstrap_StartGame:
         MOV  $PPU_SetPalette, @$PPUCommand
         MOV  $PPU_LoadingScreenPalette, @$PPUCommandArg
 
+        .putstr $CountStr
+
         MOV  $LoadingSCR, @$LookupFileName # ../AkuCPC/BootsStrap_StartGame_CPC.asm:64
         MOV  $FB1, @$ReadBuffer
         MOV  $8000, @$ReadWordsCount
         CALL Bootstrap_LoadDiskFile
 #----------------------------------------------------------------------------}}}
+        INC  @$CountStr
+        .putstr $CountStr
+
         # Load the game core - this is always in memory
         MOV  $CoreBin, @$LookupFileName
         MOV  $FileBeginCore, @$ReadBuffer
         MOV  $FileSizeCoreWords, @$ReadWordsCount
         CALL Bootstrap_LoadDiskFile
+
         # Load saved settings
+        INC  @$CountStr
+        .putstr $CountStr
         MOV  $SavSetBin, @$LookupFileName
         MOV  $SavedSettings, @$ReadBuffer
         MOV  $FileSizeSettingsWords, @$ReadWordsCount
         CALL Bootstrap_LoadDiskFile
 
+        INC  @$CountStr
+        .putstr $CountStr
         # TODO: font load
         # TODO: player sprites load
         # TODO: Initialize the Sound Effects.
 #----------------------------------------------------------------------------}}}
-Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------{{{
-        MOV  $SPReset,SP # we are not returning, so reset the stack # 01600
-        CALL StartANewGame              # call StartANewGame # 01664
+Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
+        MOV  $SPReset,SP # we are not returning, so reset the stack
+        CALL StartANewGame              # call StartANewGame
                                         # call LevelReset0000
                                         #
                                         # ld hl,DiskMap_MainMenu      ;T08-SC1.D01
@@ -113,12 +127,14 @@ Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------{{{
                                         #
                                         # ;need to use Specail MSX version - no extra tilemaps
                                         # jp Bootstrap_LoadEP2Level_1PartOnly
+         JMP  WaitKeyThenExit
          RETURN                         # ret
-#----------------------------------------------------------------------------}}}
+#----------------------------------------------------------------------------
 Player_Dead_ResumeB: # ../Aku/BootStrap.asm:1411
         SpendCreditSelfMod2:
             MOV  $Player_Array,R5 # ld iy,Player_Array ; All credits are (currently) stored in player 1's var!
 
+#----------------------------------------------------------------------------{{{
 FireMode_Normal: # ../Aku/BootStrap.asm:2116
         MOV  $NULL,R3
         MOV  R3,@$dstFireUpHandler
@@ -147,16 +163,16 @@ StartANewGame: # ../Aku/BootStrap.asm:2151
         # reset the core                 # xor a
         CLR  @$srcShowContinueCounter    # ld (ShowContinueCounter_Plus1-1),a
 
-        MOV  $0012700,R0 # MOV (PC)+,R0  # ld bc,&3E0D ;Split Continues ; 3E n = LD A,n
+        MOV  $0012700,R0 # MOV (PC)+,R0  # ld bc,&3E0D ;Split Continues ; 3E n == LD A,n
         MOV  $0x0D,R1
-        MOV  $0013704,R2 # MOV @(PC)+,R4 # ld de,&2ADD ; LD IX, (addr) = DD 2A dr ad
+        MOV  $0013704,R2 # MOV @(PC)+,R4 # ld de,&2ADD ; LD IX, (addr) == DD 2A dr ad
                                          # ld a,(ContinueMode)
         TSTB @$ContinueMode              # or a
         BNE  ContinueModeSet             # jr nz,ContinueModeSet
 
-        MOV  $0000207,R0 # RTS PC        # ld bc,&C90E ;Shared Continues ; C9 = RET
+        MOV  $0000207,R0 # RTS PC        # ld bc,&C90E ;Shared Continues ; C9 == RET
         MOV  $0x0E,R1
-        MOV  $0012705,R2 # MOV (PC)+,R5  # ld de,&21FD ; LD IY, hilo   = FD 21 lo hi
+        MOV  $0012705,R2 # MOV (PC)+,R5  # ld de,&21FD ; LD IY, hilo   == FD 21 lo hi
 
 ContinueModeSet: # ../Aku/BootStrap.asm:2165
         MOV  R0,@$ShowContinuesSelfMod
@@ -166,7 +182,7 @@ ContinueModeSet: # ../Aku/BootStrap.asm:2165
 
         CALL FireMode_Normal # set our standard Left-Right Firemode
         # reset all the scores n stuff
-        CALL AkuYou_Player_GetPlayerVars # $Player_Array -> R5
+        MOV  $Player_Array, R5                              #
                                                             #     ld a,(iy-15)
         BITB $0x80,-15(R5)                                  #     and %10000000
         BEQ  1$                                             #     call nz,FireMode_4D
@@ -186,33 +202,70 @@ ContinueModeSet: # ../Aku/BootStrap.asm:2165
                                                             #     ld hl,&78ED
 
 StartANewGame_NoMultiplay: # ../Aku/BootStrap.asm:2195
+        # TODO: implement this
 StartANewGame_NoControlFlip: # ../Aku/BootStrap.asm:2206
-        MOV  $Player_Array, R5
+        MOV  $Player_Array, R5 # AkuYou_Player_GetPlayerVars
         CALL StartANewGamePlayer
-        MOV  $Player_Array2,R5
+        MOV  $Player_Array2,R5 # AkuYou_Player_GetPlayerVars + 16
         CALL StartANewGamePlayer
-                                          # ld hl,Player_ScoreBytes
-                                          # ld b,8*2
-                                          # xor a
-        .putstr $YahooStr
-        .putstr $LongStr
-        .putstr $YahooStr
-        .putstr $YahooStr
-        .putstr $YahooStr
-        .putstr $LongStr
-        .putstr $YahooStr
-        .putstr $YahooStr
 
-        JMP  WaitKeyThenExit
+        MOV  $Player_ScoreBytes,R3
+        MOV  $8,R0
+        CLR  (R3)+ # wipe highscores
+        SOB  R0,.-2
 
-                 #0         1         2         3         4         5         6         7
-                 #01234567890123456789012345678901234567890123456789012345678901234567890123456789
-YahooStr: .asciz "Yippee! Whoopee! Woo-hoo! Yay! Hurrah!\n"
-LongStr:  .asciz "This is a very very very very very very very very very very very long string.\n"
+        MOV  $Player_Array, R5 # AkuYou_Player_GetPlayerVars
 
-        .even
+        MOV  $0010000,R2 # MOV R0,R0 # slightly faster than NOP
+        BITB $0b01000000,-11(R5) # test bit 6
+        BNE  NoBulletSlowdown
+        MOV  $0006200,R2 # ASR R0
+NoBulletSlowdown: # ../Aku/BootStrap.asm:2206
+        MOV  R2,@$srcStarSlowdown # ../SrcALL/Akuyou_Multiplatform_Stararray.asm:107
 
-StartANewGamePlayer: # ../Aku/BootStrap.asm:2256 ;player fire directions
+        .equiv BulletConfigSize, BulletConfigHeaven_End - BulletConfigHeaven
+        MOV  $Stars_AddBurst_Top,R2
+        MOV  $BulletConfigSize,R1
+        MOV  $BulletConfigHeaven,R3
+        MOV  $2,R0
+        BNE  useheaven
+        MOV  $BulletConfigHell,R3
+        MOV  $1,R0
+useheaven: # ../Aku/BootStrap.asm:2242
+        MOVB (R3)+,(R2)+
+        SOB  R1,.-2
+
+        MOVB -11(R5),R0
+        BIC  $!0b11,R0 # R0 & 0b11
+        BEQ  Difficulty_Normal
+        CMP  R0,$1
+        BEQ  Difficulty_Easy
+        CMP  R0,$2
+        BEQ  Difficulty_Hard
+RETURN
+
+Difficulty_Easy: # ../Aku/BootStrap.asm:2286
+        MOV  $0b00100000,R0
+        BR   Difficulty_Generic
+Difficulty_Normal:
+        MOV  $0b00010000,R0
+        BR   Difficulty_Generic
+Difficulty_Hard:
+        MOV  $0b00001000,R0
+        BR   Difficulty_Generic
+Difficulty_Generic:
+        CLC
+        MOV  R0,srcFireFrequencyA
+        ROR  R0
+        MOV  R0,srcFireFrequencyB
+        MOV  R0,srcFireFrequencyC
+        ROR  R0
+        MOV  R0,srcFireFrequencyD
+        ROR  R0
+        MOV  R0,srcFireFrequencyE
+RETURN
+
+StartANewGamePlayer: # ../Aku/BootStrap.asm:2256 ;player fire directions ----{{{
         ADD  $2,R5
         CLR  R0
         MOVB R0,   (R5)+  #  2 Fire Delay
@@ -230,19 +283,20 @@ StartANewGamePlayer: # ../Aku/BootStrap.asm:2256 ;player fire directions
         MOVB R0,   (R5)+  # 14 player shoot power
         MOVB $0x67,(R5)+  # 15 Fire dir
 RETURN
-
-WaitKeyThenExit:
+#----------------------------------------------------------------------------}}}
+#----------------------------------------------------------------------------}}}
+WaitKeyThenExit: #-----------------------------------------------------------{{{
         CALL WaitKey
         MOV  $PPU_Finalize, @$PPUCommand
         TST  @$PPUCommand # wait until PPU finishes command
         BNE  .-4
 
-        JSR  R5,PPFREE
-        .word PPU_UserRamStart
-        .word PPU_ModuleSizeWords
+        # JSR  R5,PPFREE
+        # .word PPU_UserRamStart
+        # .word PPU_ModuleSizeWords
 
 Finish: .exit
-
+#----------------------------------------------------------------------------}}}
 Bootstrap_LoadDiskFile: #----------------------------------------------------{{{
 # .cas_out_open   equ &bc8c
 # .cas_out_direct equ &bc98
@@ -272,20 +326,205 @@ Bootstrap_LoadDiskFile: #----------------------------------------------------{{{
         EMT  0375
 
         #.Close  $0      #.CLOSE  chan
-        MOV  $0x0600,R0 # operation code 6, channel 0
+        MOV  $0x0600,R0 # operation code 6(MSB), channel 0(LSB)
         EMT  0374       # close channel
 
 1$:     RETURN
 #----------------------------------------------------------------------------}}}
-
-WaitKey:
+WaitKey: #-------------------------------------------------------------------{{{
         TST  @$KeyboardScanner_KeyPresses + 2
         BEQ  .-4
         CLR  @$KeyboardScanner_KeyPresses + 2
         RETURN
+#----------------------------------------------------------------------------}}}
 
             .include "./ppucmd.s"
 
+BulletConfigHeaven: #--------------------------------------------------------{{{
+    # Starbust code - we use RST 6 as an 'add command' to save memory - RST 6 calls IY
+    # See EventStreamDefinitions for details of how the 'Directions' work
+    # Stars_AddBurst_Top
+    .word 0xFFFF
+    .word 0xFFFF
+    .word 0xFFFF
+    .word 0x1F1D
+    # Stars_AddBurst_TopLeft
+    .word 0xFFFF
+    .word 0xFFFF
+    .word 0xFFFF
+    .word 0x1b19
+    .byte 0
+    # Stars_AddBurst_Right #
+    .word 0x2725
+    .word 0xFFFF
+    .word 0xFFFF
+    .word 0xFFFF
+    # Stars_AddBurst_TopRight
+    .word 0xFFFF
+    .word 0xFFFF
+    .word 0xFFFF
+    .word 0x1F1D
+    .byte 0
+    # Stars_AddBurst_Left
+    .word 0xFFFF
+    .word 0xFFFF
+    .word 0xFFFF
+    .word 0x1b19
+    # Stars_AddBurst_BottomLeft
+    .word 0x2321
+    .word 0xFFFF
+    .word 0xFFFF
+    .word 0xFFFF
+    .byte 0
+    # Stars_AddBurst_Bottom
+    .word 0x2321
+    .word 0xFFFF
+    .word 0xFFFF
+    .word 0xFFFF
+    # Stars_AddBurst_BottomRight
+    .word 0x2725
+    .word 0xFFFF
+    .word 0xFFFF
+    .word 0xFFFF
+    .byte 0
+    # Stars_AddBurst_Outer
+    .word 0xFFFF
+    .word 0xFFFF
+    .word 0xFFFF
+    .word 0xFFFF
+    .word 0xFFFF
+    .word 0xFFFF
+    # OuterBurstPatternMini
+    .word 0x2F2F
+    .word 0x1F1F
+    .word 0x2929
+    .word 0x1919
+    .word 0x3F39
+    .word 0x0F09
+    # Stars_AddObjectOne
+    .byte 0
+    # Stars_AddBurst
+    .word 0xFFFF
+    .byte 0xFF,0xFF
+    # Stars_AddBurst_Small
+    .word 0x3632
+    .word 0x2e2A
+    .word 0x2622
+    .word 0x1e1A
+    .word 0x1612
+    .byte 0
+    .word 0x1d1b
+    .word 0xFFFF
+    .word 0xFFFF
+    .byte 0
+    .word 0x2726
+    .word 0xFFFF
+    .word 0xFFFF
+    .byte 0
+    .word 0x2221
+    .word 0xFFFF
+    .word 0xFFFF
+
+    .byte 0
+    .word 0x2d2b
+    .word 0xFFFF
+    .word 0xFFFF
+    .byte 0
+BulletConfigHeaven_End:
+#----------------------------------------------------------------------------}}}
+BulletConfigHell: #----------------------------------------------------------{{{
+    # Stars_AddBurst_Top
+    .word 0x0705
+    .word 0x0F0d
+    .word 0x1715
+    .word 0x1F1D
+    # Stars_AddBurst_TopLeft
+    .word 0x0301
+    .word 0x0b09
+    .word 0x1311
+    .word 0x1b19
+    .byte 0
+    # Stars_AddBurst_Right
+    .word 0x2725
+    .word 0x2f2D
+    .word 0x3735
+    .word 0x3f3D
+    # Stars_AddBurst_TopRight
+    .word 0x0705
+    .word 0x0F0d
+    .word 0x1715
+    .word 0x1F1D
+    .byte 0
+    # Stars_AddBurst_Left
+    .word 0x0301
+    .word 0x0b09
+    .word 0x1311
+    .word 0x1b19
+    # Stars_AddBurst_BottomLeft
+    .word 0x2321
+    .word 0x2b29
+    .word 0x3331
+    .word 0x3b39
+    .byte 0
+    # Stars_AddBurst_Bottom
+    .word 0x2321
+    .word 0x2b29
+    .word 0x3331
+    .word 0x3b39
+    # Stars_AddBurst_BottomRight
+    .word 0x2725
+    .word 0x2f2D
+    .word 0x3735
+    .word 0x3f3D
+    .byte 0
+    # Stars_AddBurst_Outer
+    .word 0x3737
+    .word 0x2727
+    .word 0x1717
+    .word 0x3131
+    .word 0x2121
+    .word 0x1111
+    # OuterBurstPatternMini
+    .word 0x2F2F
+    .word 0x1F1F
+    .word 0x2929
+    .word 0x1919
+    .word 0x3F39
+    .word 0x0F09
+    # Stars_AddObjectOne
+    .byte 0
+    # Stars_AddBurst
+    .word 0x3f08
+    .byte 0,0
+    # Stars_AddBurst_Small
+    .word 0x3632
+    .word 0x2e2A
+    .word 0x2622
+    .word 0x1e1A
+    .word 0x1612
+    .byte 0
+    # Stars_AddBurst_TopWide
+    .word 0x1d1b
+    .word 0x1513
+    .word 0x0d0b
+    .byte 0
+    # Stars_AddBurst_RightWide
+    .word 0x2726
+    .word 0x2f2d
+    .word 0x1f1d
+    .byte 0
+    # Stars_AddBurst_LeftWide
+    .word 0x2221
+    .word 0x1b19
+    .word 0x2b29
+    .byte 0
+    # Stars_AddBurst_BottomWide
+    .word 0x2d2b
+    .word 0x3533
+    .word 0x3d3b
+    .byte 0
+BulletConfigHell_End:
+#----------------------------------------------------------------------------}}}
 # files related data --------------------------------------------------------{{{
 LookupArea:         .byte  0,01 # chan, code(.LOOKUP)
     LookupFileName: .word  0 # dblk
@@ -334,16 +573,24 @@ LoadingScreenPalette: #------------------------------------------------------{{{
     .word 0xFF22  #  | br.white | green   |
     .word 201     #--line number, 201 - end of the main screen params
 #----------------------------------------------------------------------------}}}
-
-TextInit:    .byte  0033, 0240, '2 # symbol color
-             .byte  0033, 0241, '0 # symbol background color
-             .byte  0033, 0242, '0 # screen color
-             .byte  0033, 0045, 0041, 0061             # order screenlines and
-             .byte  0033, 0133, 0060, 0075, 0060, 0162 # clear screen
+TextInit:    .byte  033, 0240, '2 # symbol color
+             .byte  033, 0241, '0 # symbol background color
+             .byte  033, 0242, '0 # screen color
+             .byte  033,  045, 041, 061             # order screenlines and
+             .byte  033, 0133, 060, 075, 060, 0162 # clear screen
              .byte  0
 TitleStr:    .asciz "      -= ChibiAkumas  V1.666 =-"
 WebSiteStr:  .asciz "      -= www.chibiakumas.com =-"
-CreditsStr:  .asciz "-= UKNC version by aberrant.hacker =-"
-
+CreditsStr:  .asciz "-= UKNC version by aberrant_hacker =-"
+                 #0         1         2         3         4         5         6         7
+                 #01234567890123456789012345678901234567890123456789012345678901234567890123456789
+        .even # PPU reads strings by words so we have to align
+YahooStr:   .asciz "Yippee! Whoopee! Woo-hoo! Yay! Hurrah!\n"
+        .even
+LongStr:    .asciz "This is a very very very very very very very very very very very long string.\n"
+        .even
+LoadingStr: .asciz "\n\n     Loading"
+        .even
+CountStr:   .asciz "0"
         .even
 BootstrapEnd:

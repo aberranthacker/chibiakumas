@@ -26,7 +26,7 @@ PPFREE:         #------------------------------------------------------------{{{
         MOVB $02,  @$PS.Request # 02 - free memory
         CALL PPUOut             # => Send request to PPU
         BNE  MFrError           # If error, --> Memory freeing error
-        RTS     R5
+        RTS  R5
 #----------------------------------------------------------------------------}}}
 # Error messages ------------------------------------------------------------{{{
 MAError:
@@ -66,9 +66,9 @@ PPUOut:         #------------------------------------------------------------{{{
         TSTB PS.Reply       # Test PPU's operation status code
         RETURN              #
 
-AMP:        .byte  0, 0, 0, 0xFF # init sequence
-            .word  PStruct       # address of parameters struct
-            .byte  0xFF, 0xFF    # two termination bytes 0xff, 0xff
+AMP:    .byte  0, 0, 0, 0xFF # init sequence
+        .word  PStruct       # address of parameters struct
+        .byte  0xFF, 0xFF    # two termination bytes 0xff, 0xff
 
 PStruct:    # Parameters struct (PS)
     PS.Reply:   .byte  0   # operation status code

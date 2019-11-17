@@ -1,21 +1,28 @@
 .equiv PR7, 7 * 040 # highest priority to the processor
-.equiv PR0, 0       # lowest priority to the processor
+                    # MTPS PR7 disables interrupts
+.equiv PR0, 0       # lowest priority to the processor(enable interrupts
+                    # MTPS PR0 enables interrupts
 
 # CPU: bitplanes registers
 .equiv CBPADR, 0176640 # CPU bitplanes address register
-.equiv CBP12D, 0176642 # CPU bitplanes 1 and 2 data register
+.equiv CBP1DT, 0176642 # CPU bitplane 1 data register
+.equiv CBP2DT, 0176643 # CPU bitplane 2 data register
+.equiv CBP12D, CBP1DT  # CPU bitplanes 1 and 2 data register
+                       # alias for word access
 
 # PPU: bitplanes registers
 .equiv PBPADR, 0177010 # PPU bitplanes address register
 .equiv PBP0DT, 0177012 # PPU bitplane 0 data register
-.equiv PBP12D, 0177014 # PPU bitplanes 1 and 2 data register
+.equiv PBP1DT, 0177014 # PPU bitplane 1 data register
+.equiv PBP2DT, 0177015 # PPU bitplane 2 data register
+.equiv PBP12D, PBP1DT  # alias for word access
 .equiv DTSCOL, 0177016 # PPU dots color
 .equiv BP01BC, 0177020 # PPU bitplanes 0/1 background color
 .equiv BP12BC, 0177022 # PPU bitplanes 1/2 background color
 .equiv DTSOCT, 0177024 # PPU dots octet
 .equiv PBPMSK, 0177026 # PPU bitplanes mask register
 
-# CPU - PPU communication channels
+# CPU: to PPU communication channels
 # terminal emulation channel
 .equiv CCH0II, 060     # CPU channel 0 in   state interrupt
 .equiv CCH0IS, 0177560 # CPU channel 0 in   state register
@@ -35,14 +42,14 @@
 .equiv CCH2OS, 0176674 # CPU channel 2 out  state register
 .equiv CCH2OD, 0176676 # CPU channel 2 out  data register
 
-# Programmable timer
+# PPU: Programmable timer
 .equiv TMRST , 0177710 # State register
 .equiv TMREVN, 0310    # External event interrupt
 .equiv PGTMRI, 0304    # Programmable timer interrupt
 .equiv TMRBRG, 0177712 # Buffer register
 .equiv TMRCST, 0177714 # Current state register
 
-# PPU - CPU communication channels
+# PPU: to CPU communication channels
 .equiv PCH0II, 0320    # PPU channel 0 in  data interrupt
 .equiv PCH0ID, 0177060 # PPU channel 0 in  data register
 .equiv PCH1II, 0330    # PPU channel 1 in  data interrupt
@@ -65,7 +72,7 @@
 .equiv PCH1OD, 0177072 # PPU channel 1 out  data register
 .equiv PCHSOS, 0177076 # PPU channels 0/1 out - state register
 
-# PPU: keyboard registers
+# PPU: keyboard
 .equiv KBINT,  0300    # keyboard interrupt
 .equiv KBSTAT, 0177700 # keyboard state register
 .equiv KBDATA, 0177702 # keyboard data register

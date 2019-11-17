@@ -2,19 +2,19 @@
 ;*                              Object Driver                                  *
 ;*                                                                             *
 ;*******************************************************************************
-;We walk up 00XXXXXX then back down 01XXXXXX - this means the system needs half of 256*4,
-;and has an upper limit of 64 items!
+; We walk up 00XXXXXX then back down 01XXXXXX - this means the system needs half
+; of 256*4, and has an upper limit of 64 items!
 ; YYYYYXXXXMMMMSSS LLLLPPPRRRAAAA
 
-; Y = object y      (1)
-; X = object X      (2)
-; M = object Move   (3)
-; S = Object Sprite (4)
+; Y = object y       (1)
+; X = object X       (2)
+; M = object Move    (3)
+; S = Object Sprite  (4)
 
-; L = Object Life   (5)
-; P = Object Program    (6)
-; R = Resolution    (7) bytes #XXXX1111
-; A = Animator      (8)
+; L = Object Life    (5)
+; P = Object Program (6)
+; R = Resolution     (7) bytes #XXXX1111
+; A = Animator       (8)
 ObjectArray_reConfigureForSize:
     or a
     ret z
@@ -165,7 +165,7 @@ Objectloop_SpriteBankSet:
     ; we check anyway before deducting a life
     ;Jp Objectloop_PlayerVunrable ;Objectloop_DoPlayerCollisions_Plus2
 Objectloop_PlayerVunrable:
-;-----------------------------------player collisions---------------------------------
+;------------------------------ player collisions ------------------------------
             ld a,b
 ;           add 3 SpriteSizeShiftEight_Plus1
             cp 0 :PlayerX1_Plus1
@@ -325,9 +325,9 @@ ObjectLoop_PlayerStarScanContinue:
 
 ObjectLoopP1StarSkip:
         jr $+10 :ObjectLoop_IFShot_Plus1
-        call Object_DecreaseLifeShot :ObjectShotOverride_Plus2      ;3 bytes
-        ld a,8                              ;2 bytes
-        ld (ObjectLoop_IFShot_Plus1-1),a                ;3 bytes
+        call Object_DecreaseLifeShot :ObjectShotOverride_Plus2 ;3 bytes
+        ld a,8                           ;2 bytes
+        ld (ObjectLoop_IFShot_Plus1-1),a ;3 bytes
 
 ObjectLoop_NotShot:
         ld d,ixh
@@ -378,19 +378,19 @@ ObjectArray_Next:
     jp ObjectArray_Turbo
 
 Animator_VectorArray:
-defw ObjectAnimator_Update  ;1
-defw ObjectAnimator_Sprite  ;2
-defw ObjectAnimator_Move    ;3
-defw ObjectAnimator_Program ;4
-defw ObjectAnimator_EndOfLoop   ;5
-defw ObjectAnimator_SpriteMoveProg;6
-defw ObjectAnimator_Animator;7
-defw ObjectAnimator_CondLoop;8
-defw ObjectAnimator_CondJmp;9
-defw ObjectAnimator_Spawn;10
-defw ObjectAnimator_Kill;11
-defw ObjectAnimator_Call;12
-defw ObjectAnimator_Halt;13
+defw ObjectAnimator_Update         ; 1
+defw ObjectAnimator_Sprite         ; 2
+defw ObjectAnimator_Move           ; 3
+defw ObjectAnimator_Program        ; 4
+defw ObjectAnimator_EndOfLoop      ; 5
+defw ObjectAnimator_SpriteMoveProg ; 6
+defw ObjectAnimator_Animator       ; 7
+defw ObjectAnimator_CondLoop       ; 8
+defw ObjectAnimator_CondJmp        ; 9
+defw ObjectAnimator_Spawn          ;10
+defw ObjectAnimator_Kill           ;11
+defw ObjectAnimator_Call           ;12
+defw ObjectAnimator_Halt           ;13
 
 ObjectAnimator_Spawn:
     ld a,(hl)
@@ -594,9 +594,7 @@ ObjectProgram:
     ret z       ; return if zero
     cp %00000001
     jp z,ObjectProgram_BitShiftSprite   ; Used by background, sprite bank based on X co-ord
-    and %11111000
-
-                    ;00000XXX = Powerup
+    and %11111000           ;00000XXX = Powerup
     jr z,ObjectProgram_PowerUps
     cp %11110000            ;11110XXX = Animate every X frames
     jp z,ObjectProgram_FrameAnimate
@@ -827,7 +825,6 @@ Object_DecreaseLife:
     endif
     di
     exx
-
         ld d,a
         ld a,ixl
         and %11000000       ; Keep the 1st 2 bytes, format is ;MMLLLLLL

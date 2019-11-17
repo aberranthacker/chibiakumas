@@ -2,7 +2,6 @@
 ;                                  Star Array
 ;*******************************************************************************
 
-
 SetStarArrayPalette:
     ld (StarArrayColors_Plus2-2),hl
 ret
@@ -105,7 +104,7 @@ StarArray_PlayerVunrable2:
     ld hl,StarArrayPointer;&0000 StarArrayMemloc_Enemy_Plus2
 
     pop af ;get back time
-    ld de,&2FCB :StarSlowdown_Plus2     ;SRA        A
+    ld de,&2FCB :StarSlowdown_Plus2 ; CB 2F == SRA A / C6 00 == ADD A,0
     and %00000010   :SlowdownFreq_Plus1
     jr z,Starloop2_Start2
 
@@ -157,7 +156,7 @@ push bc
     jp z,DoMovesStars_NoMult2
      rlca
     DoMovesStars_NoMult2:
-    sra a           :StarSlowdownA_Plus2
+    sra a           :StarSlowdownA_Plus2 ; CB 2F == SRA A / C6 00 == ADD A,0 
     add C
 
 ifdef CPC320
@@ -165,7 +164,7 @@ ifdef CPC320
 else
     cp 191+24       ;we are at the bottom of the screen
 endif
-    jR NC,DoMovesStars_Kill ;over the page
+    jr NC,DoMovesStars_Kill ;over the page
 ifdef CPC320
     cp 24
 else
@@ -173,8 +172,6 @@ else
 endif
     jr C,DoMovesStars_Kill
 
-;   cp 0            ;we are at the bottom of the screen
-;   jr C,DoMoves_Kill   ;over the page
     ld c,a
 
     ld a,D
@@ -184,7 +181,7 @@ endif
     jp z,DoMovesStars_NoMult
          rlca
     DoMovesStars_NoMult:
-    sra a           :StarSlowdownB_Plus2
+    sra a           :StarSlowdownB_Plus2 ; CB 2F == SRA A / C6 00 == ADD A,0
     add b
 ifdef CPC320
     cp 160+24       ;we are at the bottom of the screen

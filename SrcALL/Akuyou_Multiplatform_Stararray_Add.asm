@@ -94,8 +94,8 @@ Stars_AddBurst_BottomWide:
     defw &3d3b
     defb 0
     
-;   ld hl,OuterBurstPatternMini;OuterBurstPattern
-;   ld iy,Stars_AddBurstStartOne    ; Change RST6 call
+;   ld hl,OuterBurstPatternMini  ; OuterBurstPattern
+;   ld iy,Stars_AddBurstStartOne ; Change RST6 call
 OuterBurstPatternLoop:
     ld a,(hl)
     or a

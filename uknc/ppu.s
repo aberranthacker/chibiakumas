@@ -12,22 +12,18 @@
                 .=PPU_UserRamStart
 
 start:
-# clear top and bottom screen areas -----------------------------------------{{{
-                BR   6$
-5$:             MOV  R1,@$PBP0DT
-                INC  @$PBPADR
-                MOV  R1,@$PBP0DT
-                INC  @$PBPADR
-                SOB  R0, 5$
-                RETURN
+ClrTextArea: # --------------------------------------------------------------{{{
+                MOV  $88*40>>1, R0
+                CLR  R1
+                MOV  $PBPADR,R5
+                MOV  $PBP0DT,R4
+                MOV  $0100000,(R5)
 
-6$:             CLR  R1
-                MOV  $0100000, @$PBPADR
-                MOV  $44*40>>1, R0
-                CALL 5$              # clear top screen area
-                MOV  $0103340, @$PBPADR
-                MOV  $44*40>>1, R0
-                CALL 5$              # clear bottom screen area
+1$:             .rept 2
+                MOV  R1,(R4)
+                INC  (R5)
+                .endr
+                SOB  R0,1$
 #----------------------------------------------------------------------------}}}
 # initialize our scanlines parameters table (SLTAB): ------------------------{{{
 /*
@@ -130,7 +126,7 @@ bitplanes  |      111      |      110      |      101      |      100      |
 bits 2,1,0
 -----------------------------------------------------------------------------}}}
 */
-                MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
+SLTABInit:      MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
                 MOV  R0,R1           # R0 address of current record (2)
 
                 MOV  $15,R2          #  records 2..16 are same
@@ -240,16 +236,17 @@ Setup:          #------------------------------------------------------------{{{
 Teardown:       #------------------------------------------------------------{{{
                 CLR  @$07100          # do not run the PGM anymore
                 MOV  @$SYS100, @$0100 # restore Vblank interrupt handler
-                MOV  @$SYS272, @$0272 # restore pointer to system SLTAB (186; 0xBA)
+                MOV  @$SYS272, @$0272 # restore default SLTAB (186; 0xBA)
                 MOV  @$SYS300, @$0300 # restore keyboard interrupt handler
                 MOV  $PPU_PPUCommand, @$PBPADR
                 CLR  @$PBP12D         # inform CPU program that we are done
-                # MOV  $start,R1        #
-                # JMP  @$0176300        # free allocatem memory and exit
-                RETURN
+                MOV  $start,R1        #
+                JMP  @$0176300        # free allocated memory and exit
+                # RETURN
 #----------------------------------------------------------------------------}}}
 PGM:            #---------------------------------------------------------------
-                MOV  R0, -(SP) # store R0 in order for the process manager to function correctly
+                MOV  R0, -(SP) # store R0 in order for the process manager to
+                               # function correctly
                 MOV  $PPU_PPUCommand, @$PBPADR
                 MOV  @$PBP12D,R0
                 CMP  R0, $PPU_Print
@@ -318,9 +315,9 @@ SetData$:       MOV  R0,(R5)+
 #----------------------------------------------------------------------------}}}
 Print: #---------------------------------------------------------------------{{{
                 .equiv LineWidth, 40
+                .equiv TextLinesCount, 9
                 .equiv CharHeight, 9
                 .equiv CharLineSize, LineWidth * CharHeight
-                .equiv TextLinesCount, 9
 
                 MOV  $StrBuffer,R3
                 MOV  $LineWidth,R2
@@ -328,7 +325,7 @@ Print: #---------------------------------------------------------------------{{{
                 MOV  $PBPADR,R5
 
                 MOV  $PPU_PPUCommandArg, (R5) # load address register
-                MOV  (R4), R0 # get address of a string from CPU RAM
+                MOV  (R4),R0  # get address of a string from CPU RAM
                 ASR  R0       # divide it by 2 to calculate bitplane address
                 MOV  R0,(R5)  # load address of a string into address register
 
@@ -358,11 +355,11 @@ NextChar:       MOV  R1,(R5)      # load address of the next char into address r
                 BEQ  NewLine      #
 
 Draw:           ASH  $3,R0        # shift left by 3(multiply by 8)
-                ADD  $CGAFont,R0  # calculate char position within font
+                ADD  $CGAFont,R0  # calculate char bitmap address
 
                 .rept 8
-                MOVB (R0)+,(R4)   #
-                ADD  R2,(R5)      # set address reg to next line of the char
+                MOVB (R0)+,(R4) #
+                ADD  R2,(R5)    # advance the address register to the next line
                 .endr
 
                 INC  R1
@@ -371,22 +368,22 @@ Draw:           ASH  $3,R0        # shift left by 3(multiply by 8)
                 BNE  NextChar          # no, print another character
 NewLine:        CLR  @$CurrentChar
                 INC  @$CurrentLine
-                CMP  @$CurrentLine,$TextLinesCount
-                BNE  Recalculate
-                CLR  @$CurrentLine
+                CMP  @$CurrentLine,$TextLinesCount # next line out of screen?
+                BNE  Recalculate       # no, recalculate screen address
+                CLR  @$CurrentLine     # yes, print from the beginning
 
-Recalculate:    MOV  @$CurrentLine,R1 # prepare to calculate relative char address
-                MUL  $CharLineSize,R1 #
-                ADD  @$CurrentChar,R1 # add char position
-                ADD  $0x8000,R1       # calculate absolute address of the next char
-                MOV  R1,(R5)  # load address of the next char into address register
+Recalculate:    MOV  @$CurrentLine,R1 #
+                MUL  $CharLineSize,R1 # calculate relative line address
+                ADD  @$CurrentChar,R1 # calculate relative char dst address
+                ADD  $0x8000,R1       # calculate screen address of the next char
+                MOV  R1,(R5)  # load screen address of the next char to address register
                 BR   NextChar
 
 DonePrinting:   JMP  CommandExecuted
 
 CurrentLine:    .word 0
 CurrentChar:    .word 0
-StrBuffer:      .space 80*2
+StrBuffer:      .space 80
 #----------------------------------------------------------------------------}}}
 VblankIntHandler: #----------------------------------------------------------{{{
         # we do not need firmware interrupt handler except for this small
@@ -394,7 +391,7 @@ VblankIntHandler: #----------------------------------------------------------{{{
         TST  @$07130 # is floppy drive spindle rotating?
         BEQ  1$      # no
         DEC  @$07130 # decrease spindle rotation counter
-        BNE  1$      # continue rotation if the counter is not zero
+        BNE  1$      # continue rotation unless the counter reaches zero
         CALL @07132  # stop floppy drive spindle
 1$:
 
@@ -405,16 +402,17 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         MOVB @$KBDATA,@$PBP12D
         INC  @$PBPADR
         MOV  $1,@$PBP12D
+
         RTI
 #----------------------------------------------------------------------------}}}
 
 CGAFont: .incbin "cga8x8b.raw"
-SYS100:  .word 0174612 # default vertical blank interrupt handler
+SYS100:  .word 0174612 # address of default vertical blank interrupt handler
 SYS272:  .word 02270   # address of default scanlines table
-SYS300:  .word 0175412 # default keyboard interrupt hadler
+SYS300:  .word 0175412 # address of default keyboard interrupt hadler
 FBSLTAB: .word 0       # adrress of main screen SLTAB
 
-         .balign 8 # align at 8 bytes or the new SLTAB will be invalid
+         .balign 8 # align at 4 words or the new SLTAB will be invalid
 SLTAB:   .space 288 * 2 * 4 # space for a 288 four-words entries
          .space 10 * 2 * 2  # reserve some more space for invisible scanlines
 

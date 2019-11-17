@@ -10,8 +10,7 @@
 
                 .macro .putstr str_addr
                   TST  @$PPUCommand
-                  NOP
-                  BNE  .-6
+                  BNE  .-4
                   MOV  $PPU_Print,@$PPUCommand
                   MOV  \str_addr, @$PPUCommandArg
                 .endm

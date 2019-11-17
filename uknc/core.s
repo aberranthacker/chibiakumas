@@ -14,6 +14,8 @@
                 .global ContinuesReset
                 .global MultiplayConfig
                 .global KeyboardScanner_KeyPresses
+                .global Player_ScoreBytes
+                .global Player_ScoreBytes2
 
                 .include "./macros.s"
                 .include "core_defs.s"
@@ -370,8 +372,8 @@ NULL:   RETURN
                                         # endif
                                         # read "../SrcCPC/Akuyou_CPC_ShowSprite.asm"
                                         #
-                                        # read "../SrcALL/Akuyou_Multiplatform_Stararray.asm"
-                                        # read "../SrcALL/Akuyou_Multiplatform_Stararray_Add.asm"
+        .include "stararray.s"          # read "../SrcALL/Akuyou_Multiplatform_Stararray.asm"
+        .include "stararray_add.s"      # read "../SrcALL/Akuyou_Multiplatform_Stararray_Add.asm"
                                         # read "../SrcALL/Akuyou_Multiplatform_DoMoves.asm"
                                         #
                                         # ;;;;;;;;;;;;;;;;;;;;Input Driver;;;;;;;;;;;;;;;;;;;;;;;;
@@ -391,7 +393,7 @@ NULL:   RETURN
                                         #
                                         # read "../SrcCPC/Akuyou_CPC_Gradient.asm"
                                         #
-                                        # read "../SrcALL/Akuyou_Multiplatform_ObjectDriver.asm"
+        .include "object_driver.s"      # read "../SrcALL/Akuyou_Multiplatform_ObjectDriver.asm"
                                         # read "../SrcALL/Akuyou_Multiplatform_EventStream.asm"
                                         # read "../SrcCPC/Akuyou_CPC_CpcPlus.asm"
                                         # read "../SrcALL/Akuyou_Multiplatform_ArkosTrackerLite.asm"

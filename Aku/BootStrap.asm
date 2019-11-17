@@ -2224,10 +2224,10 @@ ScoreWipeNext:
 
     call AkuYou_Player_GetPlayerVars
 
-    ld de,&00C6
+    ld de,&00C6 ; C6 n  == ADD A,n
     bit 6,(iy-11)
     jr nz,NoBulletSlowdown
-    ld de,&2FCB
+    ld de,&2FCB ; CB 2F == SRA A
 NoBulletSlowdown:
     ld (StarSlowdown_Plus2-2),de
 
