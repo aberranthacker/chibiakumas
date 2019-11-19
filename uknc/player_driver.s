@@ -1,6 +1,4 @@
 
-                .include "./player_driver.h.s"
-
                                                             # ;*****************************************************************************;
                                                             # ;*                              player Handler                               *;
                                                             # ;*****************************************************************************;
@@ -9,6 +7,7 @@
                                                             #     ld hl,HighScoreBytes
                                                             #     ret
 Player_GetPlayerVars:                                       # Player_GetPlayerVars:
+       .global Player_GetPlayerVars
         MOV  $Player_Array,R5                               #     ld iy,Player_Array
         RETURN                                              # ret
                                                             #     ; iy = Pointer to player vars
@@ -18,6 +17,7 @@ NoSpend:                                                    # NoSpend:
                                                             #
 SpendCheck:                                                 # SpendCheck:
         MOV  $1,R0; SpendTimeout_Plus2:                     #     ld a,1:SpendTimeout_Plus1   ;Dont let player continue right away!
+       .equiv  srcSpendTimeout, SpendTimeout_Plus2 - 2
         DEC  R0                                             #     dec a
         BNE  NoSpend                                        #     jr nz,NoSpend
                                                             #
@@ -29,6 +29,7 @@ SpendCheck:                                                 # SpendCheck:
 SpendCredit:                                                # SpendCredit:
          PUSH R5                                            #     push iy
          SpendCreditSelfMod:
+        .global SpendCreditSelfMod 
              MOV  $Player_Array,R5                          # SpendCreditSelfMod: ld iy,Player_Array ; All credits are (currently) stored in player 1's var!
          MOVB 5(R5),R0                                      #         ld a,(iy+5)
          DECB R0                                            #         sub 1
@@ -193,6 +194,8 @@ Players_Dead:                                               # Players_Dead:     
                                                             #
  Player_Handler_NoFireX:                                    # Player_Handler_NoFireX:
         CALL SetFireDir_RIGHTsave; Fire2Handler_Plus2:      #     call SetFireDir_RIGHTsave :Fire2Handler_Plus2
+       .equiv  dstFire2Handler, Fire2Handler_Plus2 - 2
+       .global dstFire2Handler
                                                             #
                                                             # ;Player_ShootSkip
                                                             #     ld e,2  :PlayerMoveSpeedSlow1_Plus1 ; slow move speed as we're firing
@@ -206,6 +209,8 @@ Players_Dead:                                               # Players_Dead:     
                                                             #
                                                             #     ;fire bullets
         CALL SetFireDir_LEFTsave; Fire1Handler_Plus2:       #     call SetFireDir_LEFTsave    :Fire1Handler_Plus2
+       .equiv  dstFire1Handler, Fire1Handler_Plus2 - 2
+       .global dstFire1Handler
                                                             #
                                                             # ;Player_ShootSkip2
                                                             #     ld e,2  :PlayerMoveSpeedSlow2_Plus1; Slow move speed as we're firing
@@ -222,6 +227,8 @@ Players_Dead:                                               # Players_Dead:     
                                                             #     ld C,a
                                                             #
         CALL NULL; FireUpHandler_Plus2:                     #     call null  :FireUpHandler_Plus2
+       .equiv  dstFireUpHandler, FireUpHandler_Plus2 - 2
+       .global dstFireUpHandler
                                                             #
                                                             # Player_Handler_KeyreadJoy1DownPre:
                                                             #     ld a,ixl
@@ -238,6 +245,8 @@ Players_Dead:                                               # Players_Dead:     
                                                             #     ld C,a
                                                             #
         CALL NULL; FireDownHandler_Plus2:                   #     call null   :FireDownHandler_Plus2
+       .equiv  dstFireDownHandler, FireDownHandler_Plus2 - 2
+       .global dstFireDownHandler
                                                             #
                                                             # Player_Handler_KeyreadJoy1LeftPre:
                                                             #     ld a,ixl
@@ -257,6 +266,8 @@ Players_Dead:                                               # Players_Dead:     
                                                             #     ld B,a
                                                             #
         CALL NULL; FireLeftHandler_Plus2:                   #     call null   :FireLeftHandler_Plus2
+       .equiv  dstFireLeftHandler, FireLeftHandler_Plus2 - 2
+       .global dstFireLeftHandler
                                                             #
                                                             # Player_Handler_KeyreadJoy1RightPre:
                                                             #     ld a,ixl
@@ -276,6 +287,8 @@ Players_Dead:                                               # Players_Dead:     
                                                             #     ld B,a
                                                             #
         CALL NULL; FireRightHandler_Plus2:                  #     call null   :FireRightHandler_Plus2
+       .equiv  dstFireRightHandler, FireRightHandler_Plus2 - 2
+       .global dstFireRightHandler
                                                             #
                                                             # Player_Handler_SmartBombPre:
                                                             #     ld a,ixl
@@ -298,14 +311,17 @@ Players_Dead:                                               # Players_Dead:     
                                                             #
 Player_Handler_KeyreadDone:                                 # Player_Handler_KeyreadDone:
         TST  $0; PlayerSaveShot_Plus2:                      #     ld a,0 :PlayerSaveShot_Plus1
+       .equiv  srcPlayerSaveShot, PlayerSaveShot_Plus2 - 2
         BEQ  Player_Handler_NoSaveFire                      #     or a
                                                             #     jr z,Player_Handler_NoSaveFire
                                                             #
                                                             #     ld a,0 :PlayerThisSprite_Plus1
         MOVB $0,8(R5); PlayerThisSprite_Plus4:              #     ld (iy+8),a
+       .equiv  srcPlayerThisSprite, PlayerThisSprite_Plus4 - 4
                                                             #
                                                             #     ld a,0 :PlayerThisShot_Plus1
         MOVB $0,15(R5); PlayerThisShot_Plus4:               #     ld (iy+15),a
+       .equiv  srcPlayerThisShot,   PlayerThisShot_Plus4 - 4
                                                             #
 Player_Handler_NoSaveFire:                                  # Player_Handler_NoSaveFire:
         MOVB 8(R5),R0                                       #     ld a,(iy+8)
@@ -315,6 +331,7 @@ Player_Handler_NoSaveFire:                                  # Player_Handler_NoS
                                                             #     call nz,DroneFlip
                                                             #
         TST  @$0; PlayerDoFire_Plus2:                       #     ld a,0 :PlayerDoFire_Plus1
+       .equiv  dstPlayerDoFire, PlayerDoFire_Plus2 - 2
         BEQ  1$                                             #     or a
         CALL Player_Fire4D                                  #     call nz,Player_Fire4D
 1$:                                                         #
@@ -473,6 +490,8 @@ Player_Fire4D:                                              # Player_Fire4D:  ; 
         MOVB 8(R5),R0                                       #     ld a,(iy+8)
         BIC  $!0x80,R0                                      #     and %10000000
         CMP  R0,$0; DroneFlipFireCurrent_Plus2:             #     cp 0 :DroneFlipFireCurrent_Plus1
+       .equiv  dstDroneFlipFireCurrent, DroneFlipFireCurrent_Plus2 - 2
+       .global dstDroneFlipFireCurrent
         BEQ  1$                                             #     call nz,DroneFlipFire
         CALL DroneFlipFire                                  #
 1$:                                                         #     ld a,(iy+15)
@@ -608,26 +627,32 @@ DroneFlipFire:                                              # DroneFlipFire:
         RETURN                                              # ret
                                                             #
 SetFireDir_UP:                                              # SetFireDir_UP:
+       .global SetFireDir_UP
         MOV  R1,-(SP)                                       #     push bc
         MOV  0x4C82,R1                                      #     ld bc,&4C82
         BR   SetFireDir_Any                                 #     jr SetFireDir_Any
                                                             #
  SetFireDir_DOWN:                                           # SetFireDir_DOWN:
+       .global SetFireDir_DOWN
                                                             #     push bc
                                                             #     ld bc,&7C80
                                                             #     jr SetFireDir_Any
                                                             #
 SetFireDir_LEFTsave:                                        # SetFireDir_LEFTsave:
+       .global SetFireDir_LEFTsave
         call SetFireDir_FireAndSave                         #     call SetFireDir_FireAndSave
 SetFireDir_LEFT:                                            # SetFireDir_LEFT:
+       .global SetFireDir_LEFT
         MOV  R1,-(SP)                                       #     push bc
         MOV  $0x6102,R1                                     #     ld bc,&6102
         BR   SetFireDir_Any                                 #     jr SetFireDir_Any
                                                             #
 SetFireDir_RIGHTsave:                                       # SetFireDir_RIGHTsave:
+       .global SetFireDir_RIGHTsave
         CALL SetFireDir_FireAndSave                         #     call SetFireDir_FireAndSave
                                                             #
 SetFireDir_RIGHT:                                           # SetFireDir_RIGHT:
+       .global SetFireDir_RIGHT
         MOV  R1,-(SP)                                       #     push bc
         MOV  0x6700,R1                                      #     ld bc,&6700
                                                             #
@@ -640,6 +665,7 @@ SetFireDir_Any:                                             # SetFireDir_Any:
         RETURN                                              # ret
                                                             #
 SetFireDir_FireAndSaveRestore:                              # SetFireDir_FireAndSaveRestore:
+       .global SetFireDir_FireAndSaveRestore
                                                             #     ld a,(iy+8)
         MOVB 8(R5), @$srcPlayerThisSprite                   #     ld (PlayerThisSprite_Plus1-1),a
                                                             #
@@ -651,6 +677,7 @@ SetFireDir_FireAndSave:                                     # SetFireDir_FireAnd
         MOV  R0,@$srcPlayerSaveShot                         #     ld (PlayerSaveShot_Plus1-1),a
                                                             #
 SetFireDir_Fire:                                            # SetFireDir_Fire:
+       .global SetFireDir_Fire
         MOV  R0,@$dstPlayerDoFire                           #     ld (PlayerDoFire_Plus1-1),a
 RETURN                                                      # ret
                                                             #
@@ -943,8 +970,9 @@ RETURN                                                      # ret
                                                             #     call nz, Player1Continue
                                                             #     jr Player1_DeadUI
 Player2DoContinue:                                          # Player2DoContinue:
-        MOV  $100,R0                                        #     ld a,100    :ShowContinueCounter_Plus1
-    ShowContinueCounter_Plus2:
+        MOV  $100,R0; ShowContinueCounter_Plus2:            #     ld a,100    :ShowContinueCounter_Plus1
+       .equiv  srcShowContinueCounter, ShowContinueCounter_Plus2 - 2
+       .global srcShowContinueCounter
         # MOV sets flags as well                            #     or a
         BEQ  1$
         CALL Player2Continue                                #     call nz,Player2Continue
@@ -983,6 +1011,8 @@ Player2_DeadUI:                                             # Player2_DeadUI:
                                                             #
 ShowContinues:                                              # ShowContinues:
         MOV  $0x0E,R3; ContinuesScreenPos_Plus2:            #     ld h,&0E    :ContinuesScreenpos_Plus1
+       .equiv  srcContinuesScreenPos, ContinuesScreenPos_Plus2 - 2
+       .global srcContinuesScreenPos
                                                             #     ld bc,txtCreditsMsg2
                                                             #     call DrawText_LocateAndPrintStringUnlimited
                                                             #
@@ -990,6 +1020,7 @@ ShowContinues:                                              # ShowContinues:
                                                             #     call DrawText_Decimal
                                                             #
 ShowContinuesSelfMod:                                       # ShowContinuesSelfMod:
+       .global ShowContinuesSelfMod
         MOV  $'/, R0                                        #     ld a,"/"
                                                             #     call Akuyou_DrawText_CharSprite
                                                             #

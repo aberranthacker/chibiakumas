@@ -1,4 +1,4 @@
-        .include "stararray.h.s"
+
                                                             #;*******************************************************************************
                                                             #;                                  Star Array
                                                             #;*******************************************************************************
@@ -22,7 +22,7 @@
                                                             #    ld (CurrentStarArrayCollisionsB2_Plus2-2),hl
                                                             #    ld (CurrentStarArrayCollisions2B2_Plus2-2),hl
                                                             #
-                                                            #    
+                                                            #
                                                             #    ld hl,PlayerStarArrayPointer;(StarArrayMemloc_Player)
                                                             #    ld b,PlayerStarArraySize;36 StarArraySize_Player_Plus1
                                                             #
@@ -63,12 +63,12 @@
                                                             #
                                                             #StarArray_PlayerVunrable:
                                                             #    ; load player 1 location - do it in advance to save time during the loop
-                                                            #    ld a,(P1_P01)   
+                                                            #    ld a,(P1_P01)
                                                             #    sub 2
                                                             #    ld (Player1LocX_Plus1-1),a
                                                             #    add 4
                                                             #    ld (Player1LocXB_Plus1-1),a
-                                                            #    ld a,(P1_P00)   
+                                                            #    ld a,(P1_P00)
                                                             #    sub 2
                                                             #    ld (Player1LocY_Plus1-1),a
                                                             #    add 4
@@ -79,7 +79,7 @@
                                                             #;;;;;;;;;;;;;;;;;;;;; Player 2 handler
                                                             #    ;configure the loop for the enemy star array
                                                             #    ld hl,Player_Hit_Injure_2
-                                                            #    ld a,(P2_P07) ;invincibility  
+                                                            #    ld a,(P2_P07) ;invincibility
                                                             #    or a
                                                             #    jp z,StarArray_PlayerVunrable2
                                                             #
@@ -87,13 +87,13 @@
                                                             #    ld hl,null
                                                             #StarArray_PlayerVunrable2:
                                                             #    ; load player 2 location - do it in advance to save time during the loop
-                                                            #    ld a,(P2_P01)   
+                                                            #    ld a,(P2_P01)
                                                             #    dec a
                                                             #    dec a
                                                             #    ld (Player2LocX_Plus1-1),a
                                                             #    add 4
                                                             #    ld (Player2LocXB_Plus1-1),a
-                                                            #    ld a,(P2_P00)   
+                                                            #    ld a,(P2_P00)
                                                             #    dec a
                                                             #    dec a
                                                             #    ld (Player2LocY_Plus1-1),a
@@ -106,6 +106,8 @@
                                                             #
                                                             #    pop af ;get back time
         MOV  $0006200,R2; StarSlowdown_Plus2: # ASR R0      #    ld de,&2FCB :StarSlowdown_Plus2 ; CB 2F == SRA A / C6 00 == ADD A,0
+       .equiv  srcStarSlowdown, StarSlowdown_Plus2 - 2
+       .global srcStarSlowdown
                                                             #    and %00000010   :SlowdownFreq_Plus1
                                                             #    jr z,Starloop2_Start2
                                                             #
@@ -121,7 +123,7 @@
                                                             #    ld (StarSlowdownA_Plus2-2),de
                                                             #
                                                             #    ;Reset the star array to allow more stars to be added
-                                                            #    xor a 
+                                                            #    xor a
                                                             #    ld (StarArrayFullMarker_Plus1-1),a
                                                             #Starloop2:
                                                             #
@@ -157,7 +159,7 @@
                                                             #    jp z,DoMovesStars_NoMult2
                                                             #     rlca
                                                             #    DoMovesStars_NoMult2:
-                                                            #    sra a           :StarSlowdownA_Plus2 ; CB 2F == SRA A / C6 00 == ADD A,0 
+                                                            #    sra a           :StarSlowdownA_Plus2 ; CB 2F == SRA A / C6 00 == ADD A,0
                                                             #    add C
                                                             #
                                                             #ifdef CPC320
@@ -177,7 +179,7 @@
                                                             #
                                                             #    ld a,D
                                                             #    and %00000111       :StarFlipperA_Plus1
-                                                            #    sub 4           
+                                                            #    sub 4
                                                             #    bit 6,d
                                                             #    jp z,DoMovesStars_NoMult
                                                             #         rlca
@@ -212,7 +214,7 @@
                                                             #        cp 0:Player1LocYB_Plus1
                                                             #
                                                             #        call C,Player_Hit_Injure_1 :CurrentStarArrayCollisionsB2_Plus2
-                                                            #        
+                                                            #
                                                             #StarLoopP1Skip:
                                                             #        ld a,c
                                                             #        cp 0:Player2LocY_Plus1
@@ -226,7 +228,7 @@
                                                             #        cp 0:Player2LocXB_Plus1
                                                             #
                                                             #        call C,Player_Hit_Injure_2 :CurrentStarArrayCollisions2B2_Plus2
-                                                            #        
+                                                            #
                                                             #StarLoopP2Skip:
                                                             #StarCollisionsDone:
                                                             #        dec h
@@ -234,9 +236,9 @@
                                                             #StarCollisionsStardead:
                                                             #        dec h
                                                             #        ld (hl),c ;Y
-                                                            #        ld a,c  
+                                                            #        ld a,c
                                                             #ifdef CPC320
-                                                            #        sub 24  
+                                                            #        sub 24
                                                             #else
                                                             #        sub 32
                                                             #endif

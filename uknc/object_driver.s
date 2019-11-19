@@ -1,4 +1,4 @@
-        .include "object_driver.h.s"
+
                                                             # ;*******************************************************************************
                                                             # ;*                              Object Driver                                  *
                                                             # ;*                                                                             *
@@ -702,18 +702,28 @@
                                                             #
 ObjectProgram_SnailFire:                                    # ObjectProgram_SnailFire:
         MOV  $0b00010000,R0; FireFrequencyA_Plus2:          #     ld a,%00010000  :FireFrequencyA_Plus1
+       .equiv  srcFireFrequencyA, FireFrequencyA_Plus2 - 2
+       .global srcFireFrequencyA
         BR   ObjectProgram_Fire                             #     jr ObjectProgram_Fire
 ObjectProgram_SlowFire:                                     # ObjectProgram_SlowFire:
         MOV  $0b00001000,R0; FireFrequencyB_Plus2:          #     ld a,%00001000  :FireFrequencyB_Plus1
+       .equiv  srcFireFrequencyB, FireFrequencyB_Plus2 - 2
+       .global srcFireFrequencyB
         BR   ObjectProgram_Fire                             #     jr ObjectProgram_Fire
 ObjectProgram_MidFire:                                      # ObjectProgram_MidFire:
         MOV  $0b00001000,R0; FireFrequencyC_Plus2:          #     ld a,%00001000  :FireFrequencyC_Plus1
+       .equiv  srcFireFrequencyC, FireFrequencyC_Plus2 - 2
+       .global srcFireFrequencyC
         BR   ObjectProgram_Fire                             #     jr ObjectProgram_Fire
 ObjectProgram_Mid2Fire:                                     # ObjectProgram_Mid2Fire:
         MOV  $0b00000100,R0; FireFrequencyD_Plus2:          #     ld a,%00000100; :FireFrequencyD_Plus1
+       .equiv  srcFireFrequencyD, FireFrequencyD_Plus2 - 2
+       .global srcFireFrequencyD
         BR   ObjectProgram_Fire                             #     jr ObjectProgram_Fire
 ObjectProgram_FastFire:                                     # ObjectProgram_FastFire:
         MOV  $0b00000010,R0; FireFrequencyE_Plus2:          #     ld a,%00000010; :FireFrequencyE_Plus1
+       .equiv  srcFireFrequencyE, FireFrequencyE_Plus2 - 2
+       .global srcFireFrequencyE
                                                             #
 ObjectProgram_Fire:                                         # ObjectProgram_Fire:
                                                             #     ld d,a ;ld iyh,a
