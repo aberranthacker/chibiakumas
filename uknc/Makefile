@@ -37,18 +37,22 @@ build/LOADIN.SCR : ../ResCPC/Old/T38-SC1.D01 \
 build/bootstrap.o : bootstrap.s \
 		    ppucmd.s $(common)
 	ruby build_tools/preprocessor.rb -i bootstrap.s
-	$(AS) bootstrap.s -o build/bootstrap.o
+	$(AS) -al bootstrap.s -o build/bootstrap.o
 
 build/core.o : core.s \
 	       disk_driver.s \
+	       do_moves.s \
+	       event_stream.s \
 	       object_driver.s \
 	       player_driver.s \
 	       show_sprite.s \
+	       sfx.s \
 	       stararray.s \
 	       stararray_add.s \
+	       timer.s \
 	       virtual_screen_pos_320.s \
 	       $(common)
-	$(AS) core.s -o build/core.o
+	$(AS) core.s -al -o build/core.o
 
 build/ppu.o : ppu.s \
 	      cga8x8b.raw \

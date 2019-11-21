@@ -25,9 +25,9 @@ BankSwitch_C0_CallHLDirect:
 BankSwitch_C0_SetCurrentToC0:
     ld a,&C0
 BankSwitch_C0_SetCurrent:       ; This allows us to remember 'current' bank
-    LD B,&7F ;Gate array port
+    LD B,&7F  ; Gate array port
     ld (BankSwitch_C0_CurrentB_Plus2-2),a
-    OUT (C),A ;Send it
+    OUT (C),A ; Send it
     ret
 
 BankSwitch_C0_BankCopy:
@@ -39,10 +39,9 @@ BankSwitch_C0_BankCopy:
 BankSwitch_C0_Reset:
     ld a,(BankSwitch_C0_CurrentB_Plus2-2)
 BankSwitch_C0:
-    ld B,&7F ;Gate array port
-
-    out (C),A ;Send it
-    ret
+    ld B,&7F  ; Gate array port
+    out (C),A ; Send it
+ret
 
 ;-Address-    0       1       2       3       4       5       6       7
 ;0000-3FFF  RAM_0   RAM_0   RAM_4   RAM_0   RAM_0   RAM_0   RAM_0   RAM_0
@@ -71,7 +70,7 @@ Firmware_Kill:  ; firmwares? we don't need no steenking firmwares!
     ldir
 
 DoCustomRsts:
-    ld hl,&0030     ; Set RST 6 to Call IY
+    ld hl,&0030 ; Set RST 6 to Call IY
     ld  de,&e9FD 
 LdHlEd:
     ld (hl),e
@@ -82,7 +81,7 @@ ret
 
 DoRestoreJumpBlock:
     rst #8
-    defw &08bd :FirmJumpLoc_Plus2 ;initialise firmware jumpblock entries
+    defw &08bd :FirmJumpLoc_Plus2 ; initialise firmware jumpblock entries
 
 DoRestoreJumpBlockEnd:
 DoRestoreLowJumpBlock:
@@ -146,4 +145,4 @@ Firmware_Restore:   ; About that firmware...
     ld hl,(&be7d)   ; get address where current drive number is held
     ld (hl),a   ; set drive number to previous value
 
-    ret
+ret

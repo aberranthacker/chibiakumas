@@ -1,21 +1,23 @@
+                .nolist
 
                 .TITLE Chibi Akumas core module
                 .GLOBAL start # make entry point available to linker
 
+                .global ContinueMode
+                .global ContinuesReset
                 .global FileBeginCore
                 .global FileEndCore
-                .global SavedSettings
-                .global SavedSettings_Last
-                .global ContinueMode
+                .global KeyboardScanner_KeyPresses
+                .global MultiplayConfig
                 .global NULL
                 .global Player_Array
                 .global Player_Array2
-                .global SmartBombsReset
-                .global ContinuesReset
-                .global MultiplayConfig
-                .global KeyboardScanner_KeyPresses
                 .global Player_ScoreBytes
                 .global Player_ScoreBytes2
+                .global SavedSettings
+                .global SavedSettings_Last
+                .global SmartBombsReset
+                .global StarArrayPointer
 
                 .include "./macros.s"
                 .include "core_defs.s"
@@ -93,8 +95,8 @@ SavedSettings: # {{{
     CPCVer: .byte 00                    # pos  -1
 
     Player_Array:
-        P1_P00: .byte 100        #  0 - Y
-        P1_P01: .byte 32         #  1 - X
+        P1_P00: .byte 100        #  0 - Y 0x64
+        P1_P01: .byte 32         #  1 - X 0x20
         P1_P02: .byte 0          #  2 - shoot delay
         P1_P03: .byte 2          #  3 - smartbombs
         P1_P04: .byte 0          #  4 - drones (0/1/2)
@@ -111,8 +113,8 @@ SavedSettings: # {{{
         P1_P15: .byte 0x67       # 15 - FireDir
 
     Player_Array2:             #Player 2 is 16 bytes after player 1
-        P2_P00: .byte 150        #  0 - Y
-        P2_P01: .byte 32         #  1 - X
+        P2_P00: .byte 150        #  0 - Y 0x96
+        P2_P01: .byte 32         #  1 - X 0x20
         P2_P02: .byte 0          #  2 - Shoot delay
         P2_P03: .byte 2          #  3 - smartbombs
         P2_P04: .byte 0          #  4 - Drones (0/1/2)
@@ -365,16 +367,16 @@ SavedSettings_Last: # 0x80 bytes --------------------------------------------}}}
 #     .word    2,    2,    2,    2,    1,    1,    1,    1,    1,    1,    1,    1
 NULL:   RETURN
                                         #
-                                        # ifdef CPC320
-                                        #     read "../SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm"
-                                        # else
-                                        #     read "../SrcCPC/Akuyou_CPC_VirtualScreenPos_256.asm"
-                                        # endif
-                                        # read "../SrcCPC/Akuyou_CPC_ShowSprite.asm"
+                                        #   # ifdef CPC320
+        .include "virtual_screen_pos_320.s" #     read "../SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm"
+                                        #   # else
+                                        #   #     read "../SrcCPC/Akuyou_CPC_VirtualScreenPos_256.asm"
+                                        #   # endif
+        .include "show_sprite.s"        # read "../SrcCPC/Akuyou_CPC_ShowSprite.asm"
                                         #
         .include "stararray.s"          # read "../SrcALL/Akuyou_Multiplatform_Stararray.asm"
         .include "stararray_add.s"      # read "../SrcALL/Akuyou_Multiplatform_Stararray_Add.asm"
-                                        # read "../SrcALL/Akuyou_Multiplatform_DoMoves.asm"
+        .include "do_moves.s"           # read "../SrcALL/Akuyou_Multiplatform_DoMoves.asm"
                                         #
                                         # ;;;;;;;;;;;;;;;;;;;;Input Driver;;;;;;;;;;;;;;;;;;;;;;;;
                                         # read "../SrcCPC/Akuyou_CPC_KeyboardDriver.asm"
@@ -383,28 +385,28 @@ NULL:   RETURN
                                         # read "../SrcCPC/Akuyou_CPC_ExecuteBootstrap.asm"
                                         # read "../SrcCPC/Akuyou_CPC_TextDriver.asm"
                                         #
-                                        # read "../SrcALL/Akuyou_Multiplatform_SFX.asm"
+        .include "sfx.s"                # read "../SrcALL/Akuyou_Multiplatform_SFX.asm"
                                         #
                                         # read "../SrcCPC/Akuyou_CPC_CompiledSpriteViewer.asm"    ;also includes CLS
                                         # read "../SrcCPC/Akuyou_CPC_BankSwapper.asm"
                                         #
         .include "player_driver.s"      # read "../SrcALL/Akuyou_Multiplatform_PlayerDriver.asm"
-                                        # read "../SrcALL/Akuyou_Multiplatform_Timer.asm"
+        .include "timer.s"              # read "../SrcALL/Akuyou_Multiplatform_Timer.asm"
                                         #
                                         # read "../SrcCPC/Akuyou_CPC_Gradient.asm"
                                         #
         .include "object_driver.s"      # read "../SrcALL/Akuyou_Multiplatform_ObjectDriver.asm"
-                                        # read "../SrcALL/Akuyou_Multiplatform_EventStream.asm"
+        .include "event_stream.s"       # read "../SrcALL/Akuyou_Multiplatform_EventStream.asm"
                                         # read "../SrcCPC/Akuyou_CPC_CpcPlus.asm"
                                         # read "../SrcALL/Akuyou_Multiplatform_ArkosTrackerLite.asm"
                                         # read "../SrcCPC/Akuyou_CPC_ScreenMemory.asm"
                                         # read "../SrcALL/Akuyou_Multiplatform_AkuCommandVectorArray.asm"
                                         #
-                                        # ifdef Debug_Monitor
-                                        # ;   read "../SrcALL/Multiplatform_Monitor.asm"
-                                        # ;   read "../SrcALL/Multiplatform_MonitorMemdump.asm"
-                                        # ;   read "../SrcALL/Multiplatform_MonitorSimple.asm"
-                                        # endif
+                                        ## ifdef Debug_Monitor
+                                        ## ;   read "../SrcALL/Multiplatform_Monitor.asm"
+                                        ## ;   read "../SrcALL/Multiplatform_MonitorMemdump.asm"
+                                        ## ;   read "../SrcALL/Multiplatform_MonitorSimple.asm"
+                                        ## endif
                                         #
                                         # list
                                         # Null:ret

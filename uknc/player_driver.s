@@ -327,14 +327,16 @@ Player_Handler_NoSaveFire:                                  # Player_Handler_NoS
         MOVB 8(R5),R0                                       #     ld a,(iy+8)
 
         BIC  $!0x80,R0                                      #     and %10000000
-                                                            #     cp 1 :DroneFlipCurrent_Plus1
-                                                            #     call nz,DroneFlip
+        CMP  R0,$1; DroneFlipCurrent_Plus2:                 #     cp 1 :DroneFlipCurrent_Plus1
+       .equiv  cmpDroneFlipCurrent, DroneFlipCurrent_Plus2 - 2
+       .global cmpDroneFlipCurrent
+       .CALL NE, DroneFlip                                  #     call nz,DroneFlip
                                                             #
         TST  @$0; PlayerDoFire_Plus2:                       #     ld a,0 :PlayerDoFire_Plus1
        .equiv  dstPlayerDoFire, PlayerDoFire_Plus2 - 2
-        BEQ  1$                                             #     or a
-        CALL Player_Fire4D                                  #     call nz,Player_Fire4D
-1$:                                                         #
+                                                            #     or a
+       .CALL NE, Player_Fire4D                              #     call nz,Player_Fire4D
+                                                            #
                                                             #     push bc
                                                             #         ld a,PlusSprite_ExtBank :PlayerSpriteBank_Plus1
                                                             #         call BankSwitch_C0_SetCurrent
@@ -490,11 +492,11 @@ Player_Fire4D:                                              # Player_Fire4D:  ; 
         MOVB 8(R5),R0                                       #     ld a,(iy+8)
         BIC  $!0x80,R0                                      #     and %10000000
         CMP  R0,$0; DroneFlipFireCurrent_Plus2:             #     cp 0 :DroneFlipFireCurrent_Plus1
-       .equiv  dstDroneFlipFireCurrent, DroneFlipFireCurrent_Plus2 - 2
-       .global dstDroneFlipFireCurrent
-        BEQ  1$                                             #     call nz,DroneFlipFire
-        CALL DroneFlipFire                                  #
-1$:                                                         #     ld a,(iy+15)
+       .equiv  cmpDroneFlipFireCurrent, DroneFlipFireCurrent_Plus2 - 2
+       .global cmpDroneFlipFireCurrent
+       .CALL NE, DroneFlipFire                              #     call nz,DroneFlipFire
+                                                            #
+                                                            #     ld a,(iy+15)
                                                             # Player_Fire:    ; Fire bullets!
                                                             #     push bc
                                                             #     push de
@@ -561,16 +563,17 @@ Player_Fire4D:                                              # Player_Fire4D:  ; 
                                                             #     push bc
                                                             #         ld d,b
                                                             #
-                                                            #         add d :DroneFlipFirePos3_Plus1
+                                                            #         ; ResetCore sets to add a,c
+                                                            #         add a,d :DroneFlipFirePos3_Plus1
                                                             #
                                                             #         ld d,a  :DroneFlipFirePos2_Plus1;ld c,a ;Flip for X
                                                             #         call Stars_AddObject
                                                             #     pop bc
                                                             # ret
                                                             #
-DroneFlipFire:                                              # DroneFlipFire:
-        #MOV  R0,dstDroneFlipFireCurrent                     #     ld (DroneFlipFireCurrent_Plus1-1),a
-        #MOV  R2,-(SP)                                       #     push de
+DroneFlipFire: .global DroneFlipFire                        # DroneFlipFire:
+        MOV  R0,@$cmpDroneFlipFireCurrent                   #     ld (DroneFlipFireCurrent_Plus1 - 1),a
+        PUSH R2                                             #     push de
                                                             #     or a
                                                             #     ld a,&82
                                                             #     jr z,DroneFlipFire_HorizontalMove
@@ -581,14 +584,14 @@ DroneFlipFire:                                              # DroneFlipFire:
                                                             #         dec a
                                                             #         ld de,&4F00  ; ld c,a nop
                                                             # DroneFlipFireApply:
-                                                            #     ld (DroneFlipFirePos3_Plus1-1),a
+                                                            #     ld (DroneFlipFirePos3_Plus1 - 1),a
                                                             #     ld a,d
-                                                            #     ld (DroneFlipFirePos2_Plus1-1),a
+                                                            #     ld (DroneFlipFirePos2_Plus1 - 1),a
                                                             #     ld a,e
-                                                            #     ld (DroneFlipFirePos5_Plus1-1),a
-#BR DroneFlipFinish                                          # jr DroneFlipFinish
-                                                            #
-                                                            # DroneFlip:
+                                                            #     ld (DroneFlipFirePos5_Plus1 - 1),a
+        POP  R2                                             # jr DroneFlipFinish
+RETURN                                                      #
+DroneFlip:                                                  # DroneFlip:
                                                             #     ld (DroneFlipCurrent_Plus1-1),a
                                                             #     push de
                                                             #     push hl
@@ -622,9 +625,9 @@ DroneFlipFire:                                              # DroneFlipFire:
                                                             #     pop bc
                                                             #
                                                             #     pop hl
-                                                            # DroneFlipFinish:
-                                                            #     pop de
-        RETURN                                              # ret
+DroneFlipFinish:                                            # DroneFlipFinish:
+        POP  R2                                             #     pop de
+RETURN                                                      # ret
                                                             #
 SetFireDir_UP:                                              # SetFireDir_UP:
        .global SetFireDir_UP
@@ -714,7 +717,9 @@ RETURN                                                      # ret
                                                             #
                                                             #     call MemoryFlushLDIR
                                                             #
-                                                            #     call null :SmartBombSpecial_Plus2 ; We can hack in our own smartbomb handler
+        CALL NULL; SmartBombSpecial_Plus2:                  #     call null :SmartBombSpecial_Plus2 ; We can hack in our own smartbomb handler
+       .equiv  dstSmartBombSpecial, SmartBombSpecial_Plus2  - 2
+       .global dstSmartBombSpecial
                                                             #                                       ; this is needed to wipe omega array for
                                                             #                                       ; final boss as it's not handled by
                                                             #                                       ; normal core code
@@ -741,7 +746,9 @@ RETURN                                                      # ret
                                                             #
                                                             #         dec h
                                                             #
-                                                            #         call null : CustomSmartBombEnemy_Plus2
+        CALL NULL; CustomSmartBombEnemy_Plus2:              #         call null : CustomSmartBombEnemy_Plus2
+       .equiv  dstCustomSmartBombEnemy, CustomSmartBombEnemy_Plus2 - 2
+       .global dstCustomSmartBombEnemy
                                                             #
                                                             #         ld a,(hl)
                                                             #         or a
@@ -812,7 +819,9 @@ RETURN                                                      # ret
                                                             #
                                                             #         ld a,iyl
                                                             #         cp 16+2
-                                                            #         call z,null :customPlayerHitter_Plus2
+       .CALL EQ,NULL; CustomPlayerHitter_Plus2:             #         call z,null :customPlayerHitter_Plus2
+       .equiv  dstCustomPlayerHitter, CustomPlayerHitter_Plus2 - 2
+       .global dstCustomPlayerHitter
                                                             #
                                                             #         cp 3
                                                             #         jp nz,Player_Hit_Injure
@@ -974,9 +983,8 @@ Player2DoContinue:                                          # Player2DoContinue:
        .equiv  srcShowContinueCounter, ShowContinueCounter_Plus2 - 2
        .global srcShowContinueCounter
         # MOV sets flags as well                            #     or a
-        BEQ  1$
-        CALL Player2Continue                                #     call nz,Player2Continue
-1$:     JMP  Player2_DeadUI                                 #     jr Player2_DeadUI
+       .CALL NE, Player2Continue                            #     call nz,Player2Continue
+        JMP  Player2_DeadUI                                 #     jr Player2_DeadUI
                                                             #
 Player_DrawUI:                                              # Player_DrawUI: ; We put PLus sprite anims here, as they
                                                             #                ; have to be run after the playerhandler

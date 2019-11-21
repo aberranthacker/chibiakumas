@@ -1,49 +1,66 @@
-As mentioned before, the 6th byte of the object array is the 'program', This
+    As mentioned before, the 6th byte of the object array is the 'program', This
 defines what actions the object performs, such as whether it shoots, if it has
 special actions, and allows for special sprite animation, the possible programs
 are shown below:
 
-%00000000	- Object with no program (also effectively Spritebank 0)
-%00000001	- Bitshift Sprite
-	the CPC has 80 byte positions across the screen, but Chibi Akumas uses X co-ords from 0-160 - this program allows the second sprite frame to be used for every other X co-ord, allowing for a half shift of the object... this is used by background objects on the CPC such as the gravestones on level 1, it has no function on the spectrum (where color clashing makes this useless) or MSX (where 1 byte is 2 pixels meaning the resolution is really 160 across)
-%0000xxxx 	- Powerups
-	Powerups are objects with special properties, they generally are not affected by smartbombs, and have special effects when they hit the player... coins are also powerups, and some special objects such as "enemy hit targets" are also powerups
-%0001xxxx	- Smartbombable powerup
-	These are special objects which are hit by a smartbomb - this is really only used for allowing enemies to have strange animation using power up options 5-7 (set object spritebank)
-%101fffff	- Hyper Fire
-	Fire bullets extremely fastwith pattern fffff - can only really be used with single bullets not bursts
-%001fffff	- Fast Fire
-	Fire bullets fastwith pattern fffff 
-%110fffff	- Mid Fire 2
-	Fire bullets quite fastwith pattern fffff  (Faster than Midfire)
-%010fffff	- Mid Fire
-	Fire bullets somewhat fastwith pattern fffff 
-%011fffff	- Slow Fire
-	Fire bullets slowly with pattern fffff 
-%100fffff	- Snail Fire
-	Fire bullets very slowly with pattern fffff 
+%00000000 - Object with no program (also effectively Spritebank 0)
+%00000001 - Bitshift Sprite
+            the CPC has 80 byte positions across the screen, but Chibi Akumas
+            uses X co-ords from 0-160 - this program allows the second sprite
+            frame to be used for every other X co-ord, allowing for a half shift
+            of the object... this is used by background objects on the CPC such
+            as the gravestones on level 1, it has no function on the spectrum
+            (where color clashing makes this useless) or MSX (where 1 byte is 2
+            pixels meaning the resolution is really 160 across)
+%0000xxxx - Powerups
+            Powerups are objects with special properties, they generally are not
+            affected by smartbombs, and have special effects when they hit the
+            player... coins are also powerups, and some special objects such as
+            "enemy hit targets" are also powerups
+%0001xxxx - Smartbombable powerup
+            These are special objects which are hit by a smartbomb - this is
+            really only used for allowing enemies to have strange animation
+            using power up options 5-7 (set object spritebank)
+%101fffff - Hyper Fire
+            Fire bullets extremely fastwith pattern fffff - can only really be
+            used with single bullets not bursts
+%001fffff - Fast Fire
+            Fire bullets fastwith pattern fffff
+%110fffff - Mid Fire 2
+            Fire bullets quite fastwith pattern fffff  (Faster than Midfire)
+%010fffff - Mid Fire
+            Fire bullets somewhat fastwith pattern fffff
+%011fffff - Slow Fire
+            Fire bullets slowly with pattern fffff
+%100fffff - Snail Fire
+            Fire bullets very slowly with pattern fffff
 %11111100 - Custom program 1
-	Custom programs are overridable by level code, these are used for special movements, sprite animation and bullet fire
-	There are currently 3 available, by default they do nothing until the level code defines where they should jump
+            Custom programs are overridable by level code, these are used for
+            special movements, sprite animation and bullet fire
+            There are currently 3 available, by default they do nothing until
+            the level code defines where they should jump
 %11111101 - Custom program 2
 %11111110 - Custom program 3
 %11111111 - Move chibiko towards object (Used for joke in ep2 where chibiko runs off!)
 
-Powerups:		(These can currently be 0-8... add +16 for smartbombable versions
-%xxxxx001 (0)	Default object (also effectively Spritebank 0)
-%xxxxx001 (1)	Bitshift sprite (background oject) - mentioned above 
-%xxxxx010 (2)	Special - this has no funtion, it is used in CustomPrograms as a detectable markerto see if, for example, the enemy hitzone has been shot
-%xxxxx100 (3)	Coin or player powerup
-%xxxxx100 (4)	Move both players towards object (used for end of level)
-%xxxxx101 (5)	Set object spritebank to 1 
-%xxxxx110 (6)	Set object spritebank to 2
-%xxxxx110 (7)	Set object spritebank to 3
-%xxxxx111 (8)	Custom program 1 - this is the same as Custom program 1 above, however this is an object that cannot be killed by a smart bomb
+Powerups:      (These can currently be 0-8... add +16 for smartbombable versions
+%xxxxx001 (0)  Default object (also effectively Spritebank 0)
+%xxxxx001 (1)  Bitshift sprite (background oject) - mentioned above
+%xxxxx010 (2)  Special - this has no function, it is used in CustomPrograms as a
+               detectable marker to see if, for example, the enemy hitzone has
+               been shot
+%xxxxx100 (3)  Coin or player powerup
+%xxxxx100 (4)  Move both players towards object (used for end of level)
+%xxxxx101 (5)  Set object spritebank to 1
+%xxxxx110 (6)  Set object spritebank to 2
+%xxxxx110 (7)  Set object spritebank to 3
+%xxxxx111 (8)  Custom program 1 - this is the same as Custom program 1 above,
+               however this is an object that cannot be killed by a smart bomb
 
-Bullet patterns:	
+Bullet patterns:
 These can be from 1-31
-%xxx00000 (0)	No effect
-%xxx00001 (1)	Fire 1/4 burst TopLeft
-%xxx00010 (2)	Fire 1/4 burst BottomLeft
-%xxx00011 (3)	Fire 1/4 burst TopRight
-%xxx00100 (4)	Fire 1/4 burst BottomRight
+%xxx00000 (0)  No effect
+%xxx00001 (1)  Fire 1/4 burst TopLeft
+%xxx00010 (2)  Fire 1/4 burst BottomLeft
+%xxx00011 (3)  Fire 1/4 burst TopRight
+%xxx00100 (4)  Fire 1/4 burst BottomRight

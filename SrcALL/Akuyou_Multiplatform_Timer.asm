@@ -19,13 +19,13 @@ ret
 
 NotPaused:
     ld a,&69 :Timer_CurrentTick_Plus1
-    ld b,a
+    ; ld b,a ; * what this for? *
     inc a
     ld (Timer_CurrentTick),a
-    xor b
+    ; xor b ; * what this for? *
     ld (hl),a
     
-    ld a,0 :SmartBomb_Plus1         ; Make the background flash with the smartbomb
+    ld a,0 :SmartBomb_Plus1 ; Make the background flash with the smartbomb
     or a
     ret z
 
@@ -42,9 +42,9 @@ NotPaused:
     pop af
 ret
 
-Timer_GetTimer:                 ;Return current timer in I
-    ld a,(Timer_CurrentTick)        ; and 'Ticks occured' Xor bitmap
+Timer_GetTimer:              ; Return current timer in I
+    ld a,(Timer_CurrentTick) ; and 'Ticks occured' Xor bitmap
     ld i,a
 
-    ld a, 0:Timer_TicksOccured_Plus1
+    ld a, 0 :Timer_TicksOccured_Plus1
 ret

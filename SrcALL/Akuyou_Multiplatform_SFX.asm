@@ -1,8 +1,7 @@
-;-------------------------------------------------------------------------------
+
 ;*******************************************************************************
-;                                 Music & SFX
+;*                                Music & SFX                                  *
 ;*******************************************************************************
-;-------------------------------------------------------------------------------
 
 ;
 ; Note - the version of ArkosTracker has had many of its functions removed,
@@ -19,8 +18,8 @@ SFX_PlaySfx:
     call PLY_SFX_Play
     ;ei
     xor a
-    ld (Sfx_CurrentPriority_Plus1-1),a  ; clear the to-do
-    ld (Sfx_Sound_Plus1-1),a    ; clear the note
+    ld (Sfx_CurrentPriority_Plus1-1),a ; clear the to-do
+    ld (Sfx_Sound_Plus1-1),a           ; clear the note
 ret
 
 ;This is our quick 'make a sound' function
@@ -42,7 +41,7 @@ SFX_QueueSFX_Generic:
     exx
         ld d,10 ; Priority Low
 SFX_QueueSFX_GenericPriCustom:
-        ld b,a  ;sfx A
+        ld b,a  ; sfx A
         ld c,70 ; pitch 70
         call SFX_QueueSFX
     exx
@@ -54,18 +53,19 @@ SFX_QueueSFX_GenericPriCustom:
 ret
 
 SFX_QueueSFX:
-    ; D= priority , zero = low, 1=high (replace pending)
+    ; D = priority, zero = low, 1=high (replace pending)
     ; B = Sfx
     ; C = Pitch (70 = middle)
 
-;A = No Channel (0,1,2)
-;L = SFX Number (>0)
-;H = Volume (0...F)
-;E = Note (0...143) (0 is the lowest, 143 the highest)
-;D = Speed (0 = As original, 1...255 = new Speed (1 is the fastest))
-;BC = Inverted Pitch (-&FFFF -> &FFFF). 0 is no pitch (=the original sound). The higher the pitch, the lower the sound.
+    ; A  = No Channel (0,1,2)
+    ; L  = SFX Number (>0)
+    ; H  = Volume (0...F)
+    ; E  = Note (0...143) (0 is the lowest, 143 the highest)
+    ; D  = Speed (0 = As original, 1...255 = new Speed (1 is the fastest))
+    ; BC = Inverted Pitch (-&FFFF -> &FFFF). 0 is no pitch (=the original sound).
+    ;      The higher the pitch, the lower the sound.
 
-    ld a,&00:Sfx_CurrentPriority_Plus1
+    ld a,&00 :Sfx_CurrentPriority_Plus1
     ;jp z,SFX_PlaySFX_NothingPlaying
     cp d
     ret nc ; we're have queued something already, and this sound is low priority
@@ -75,4 +75,4 @@ SFX_QueueSFX:
     ld (Sfx_Note_Plus1-1),a     ; queue up the sfx for the playloop
     ld a,d
     ld (Sfx_CurrentPriority_Plus1-1),a
-    ret
+ret

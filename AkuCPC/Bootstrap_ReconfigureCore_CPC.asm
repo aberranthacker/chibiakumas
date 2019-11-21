@@ -36,7 +36,6 @@ djnz ZeroPlusSprites
     ret z
     ld hl,null
     ld (MusicExec_PerFrame_Plus2-2),hl
-    and %00000010   ;See if we want to turn of music or rasters
+    and %00000010   ;See if we want to turn off rasters
     ret z
-    ;2
     ld (RasterColorInterruptHandler_Plus2-2),hl

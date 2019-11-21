@@ -2313,8 +2313,8 @@ LevelReset0000:
     ld (hl),0
     ldir
 
-;This resets anything the last level may have messed with during play so we can start
-;a new level with everything back to normal
+; This resets anything the last level may have messed with during play so we can
+; start a new level with everything back to normal
 ResetCore:
     ld a,1
 
@@ -2330,13 +2330,13 @@ ResetCore:
     ld (EventObjectSpriteSizeToAdd_Plus1-1),a
     ld (EventObjectProgramToAdd_Plus1-1),a
     ld (Timer_TicksOccured_Plus1-1),a
-    ld (Sfx_Sound_Plus1-1),a
+    ; ld (Sfx_Sound_Plus1-1),a ; * redundant *
 
-    or a
+    ; or a ; * what this for? * unnecessary *
     call DroneFlipFire
 
     ; reset reporgrammable stuff  - I AM USING EXX in these, so make sure that EX af and EXX are not used
-    ;at this point!!!
+    ; at this point!!!
     ld hl,Object_DecreaseLifeShot
     ld (ObjectShotOverride_Plus2-2),hl
 

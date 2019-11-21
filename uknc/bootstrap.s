@@ -1,3 +1,4 @@
+                .nolist
 
                 .TITLE BootstrapChibi Akumas loader
 
@@ -14,10 +15,10 @@
 
                 .=BootstrapStart
 
-        .cout $TextInit
-        .cout $TitleStr
-        .cout $WebSiteStr
-        .cout $CreditsStr
+       .cout $TextInit
+       .cout $TitleStr
+       .cout $WebSiteStr
+       .cout $CreditsStr
 Bootstrap_Launch:
         CLR R3
 
@@ -66,7 +67,7 @@ Bootstrap_StartGame:
         .WORD FB1 # PPU module location
         .WORD PPU_ModuleSizeWords
 
-        .putstr $LoadingStr
+       .putstr $LoadingStr
         TST  PPUCommand
         BNE  .-4
 #----------------------------------------------------------------------------}}}
@@ -78,11 +79,12 @@ Bootstrap_StartGame:
         MOV  R3, (R1)+
         SOB  R0, 1$
 #----------------------------------------------------------------------------}}}
+       .putstr $CountStr
+        TST  @$PPUCommand
+        BNE  .-4
 # load loading screen -------------------------------------------------------{{{
         MOV  $PPU_SetPalette, @$PPUCommand
         MOV  $PPU_LoadingScreenPalette, @$PPUCommandArg
-
-        .putstr $CountStr
 
         MOV  $LoadingSCR, @$LookupFileName # ../AkuCPC/BootsStrap_StartGame_CPC.asm:64
         MOV  $FB1, @$ReadBuffer
@@ -90,7 +92,7 @@ Bootstrap_StartGame:
         CALL Bootstrap_LoadDiskFile
 #----------------------------------------------------------------------------}}}
         INC  @$CountStr
-        .putstr $CountStr
+       .putstr $CountStr
 
         # Load the game core - this is always in memory
         MOV  $CoreBin, @$LookupFileName
@@ -98,16 +100,17 @@ Bootstrap_StartGame:
         MOV  $FileSizeCoreWords, @$ReadWordsCount
         CALL Bootstrap_LoadDiskFile
 
-        # Load saved settings
         INC  @$CountStr
-        .putstr $CountStr
+       .putstr $CountStr
+
+        # Load saved settings
         MOV  $SavSetBin, @$LookupFileName
         MOV  $SavedSettings, @$ReadBuffer
         MOV  $FileSizeSettingsWords, @$ReadWordsCount
         CALL Bootstrap_LoadDiskFile
 
         INC  @$CountStr
-        .putstr $CountStr
+       .putstr $CountStr
         # TODO: font load
         # TODO: player sprites load
         # TODO: Initialize the Sound Effects.
@@ -115,7 +118,7 @@ Bootstrap_StartGame:
 Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
         MOV  $SPReset,SP # we are not returning, so reset the stack
         CALL StartANewGame              # call StartANewGame
-                                        # call LevelReset0000
+        CALL LevelReset0000             # call LevelReset0000
                                         #
                                         # ld hl,DiskMap_MainMenu      ;T08-SC1.D01
                                         # ld c,DiskMap_MainMenu_Disk
@@ -134,7 +137,7 @@ Player_Dead_ResumeB: # ../Aku/BootStrap.asm:1411
         SpendCreditSelfMod2:
             MOV  $Player_Array,R5 # ld iy,Player_Array ; All credits are (currently) stored in player 1's var!
 
-#----------------------------------------------------------------------------{{{
+# StartANewGame -------------------------------------------------------------{{{
 FireMode_Normal: # ../Aku/BootStrap.asm:2116
         MOV  $NULL,R3
         MOV  R3,@$dstFireUpHandler
@@ -156,7 +159,7 @@ FireMode_4D: # ../Aku/BootStrap.asm:2128
         MOV  $SetFireDir_FireAndSaveRestore,@$dstFire2Handler
 
 FireMode_Both: # ../Aku/BootStrap.asm:2143
-        MOV $255,@$dstDroneFlipFireCurrent
+        MOV $255,@$cmpDroneFlipFireCurrent
         RETURN
 
 StartANewGame: # ../Aku/BootStrap.asm:2151
@@ -185,10 +188,10 @@ ContinueModeSet: # ../Aku/BootStrap.asm:2165
         MOV  $Player_Array, R5                              #
                                                             #     ld a,(iy-15)
         BITB $0x80,-15(R5)                                  #     and %10000000
-        BEQ  1$                                             #     call nz,FireMode_4D
-        CALL FireMode_4D                                    #
+       .CALL NE, FireMode_4D                                #     call nz,FireMode_4D
+                                                            #
                                                             #     ld a,1
-1$:     MOVB $1,-7(R5)                                      #     ld (iy-7),a ;live players
+        MOVB $1,-7(R5)                                      #     ld (iy-7),a ;live players
                                                             #
                                                             #     ;multiplay support
         MOV  $0x003E,R3                                     #     ld hl,&003E
@@ -285,6 +288,62 @@ StartANewGamePlayer: # ../Aku/BootStrap.asm:2256 ;player fire directions ----{{{
 RETURN
 #----------------------------------------------------------------------------}}}
 #----------------------------------------------------------------------------}}}
+
+LevelReset0000: # ../Aku/BootStrap.asm:2306 ---------------------------------{{{
+            # wipe our memory, to clear out any junk from old levels
+            .equiv LevelArraysSizeW, (Akuyou_CoreStart - Akuyou_GameVars) >> 1
+            MOV  $LevelArraysSizeW,R1
+            MOV  $StarArrayPointer,R3
+            CLR  (R3)+
+            SOB  R1, .-2
+            # This resets anything the last level may have messed with during
+            # play so we can start a new level with everything back to normal
+ResetCore: # ../Aku/BootStrap.asm:2318
+            MOV  $1,R0
+            CALL ShowSpriteReconfigureEnableDisable # ./SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm:82
+
+            MOV  $0x69,R0
+            MOV  R0,@$srcTimer_CurrentTick
+            MOV  R0,@$cmpDroneFlipCurrent
+            MOV  R0,@$cmpDroneFlipFireCurrent
+
+            CLR  R0
+            MOV  R0,@$srcEventObjectAnimatorToAdd
+            MOV  R0,@$srcEventObjectSpriteSizeToAdd
+            MOV  R0,@$srcEventObjectProgramToAdd
+            MOV  R0,@$srcTimer_TicksOccured
+            # R0 has to contain zero to tell the subroutine to init
+            CALL DroneFlipFire # TODO: implement this; does nothing for now
+
+            MOV  $Object_DecreaseLifeShot, @$dstObjectShotOverride
+
+            # set stuff that happens every level
+            MOV  $0x2064,@$Player_Array  # X:0x20 Y:0x64
+            MOV  $0x2096,@$Player_Array2 # X:0x20 Y:0x96
+
+            MOV  $DoMoves,@$dstObjectDoMovesOverride
+
+            MOV  $NULL,R3
+            MOV  R3,@$dstSmartBombSpecial
+            MOV  R3,@$dstCustomSmartBombEnemy
+            MOV  R3,@$dstCustomPlayerHitter
+            MOV  R3,@$dstCustomShotToDeathCall
+
+            CLR  R0
+            MOV  R0,@$srcSfx_CurrentPriority # clear the to-do
+            MOV  R0,@$srcSfx_Sound           # clear the note
+
+            CALL DoMovesBackground_SetScroll # TODO: implement the subroutine
+
+            # TODO: Set RST 6 to call IY
+            #CALL DoCustomRsts # ../SrcCPC/Akuyou_CPC_BankSwapper.asm:73
+
+            MOV  $Player_Array,R5 # call AkuYou_Player_GetPlayerVars
+            #read "..\AkuCPC\Bootstrap_ReconfigureCore_CPC.asm"
+            MOV  $Player_Array,R5 # call AkuYou_Player_GetPlayerVars
+RETURN
+#----------------------------------------------------------------------------}}}
+
 WaitKeyThenExit: #-----------------------------------------------------------{{{
         CALL WaitKey
         MOV  $PPU_Finalize, @$PPUCommand
@@ -297,25 +356,7 @@ WaitKeyThenExit: #-----------------------------------------------------------{{{
 
 Finish: .exit
 #----------------------------------------------------------------------------}}}
-Bootstrap_LoadDiskFile: #----------------------------------------------------{{{
-# .cas_out_open   equ &bc8c
-# .cas_out_direct equ &bc98
-# .cas_out_close  equ &bc8f
-#
-# BootStrap_LoadDiskFile:
-#     # HL - pointer to disk file
-#     # DE - Destination to write to
-#     push de
-#     ld de,&C000 ; address of 2k buffer,
-#     ld b,12     ; 12 chars
-#     call cas_in_open
-#
-#     pop hl
-#     jr nc, LoadGiveUp
-#     call cas_in_direct
-# LoadGiveUp:
-#     jp cas_in_close
-
+Bootstrap_LoadDiskFile: # ../Aku/BootStrap.asm:2795 -------------------------{{{
         #.LOOKUP $LkpArea  #.LOOKUP area,chan,dblk[,seqnum]
         MOV  $LookupArea,R0
         EMT  0375

@@ -1,28 +1,46 @@
-Chibi akumas uses a chunk of settings data, which is saved out to disk after a game, and reloaded when the game starts again. This chunk includes game settings, player status variables, player controls and highscore. 
+    Chibi akumas uses a chunk of settings data, which is saved out to disk after
+a game, and reloaded when the game starts again. This chunk includes game
+settings, player status variables, player controls and highscore. 
 
-Before the Player Vars, a chunk of 16 bytes are stored, these are addressed using the indirect register IY which points to the start of player 1, so they are numbered from -16 up.
-The main player loop is called twice, once with IY pointing to the start of player 1's status variables, and again pointing to player 2's - the variables block holds all needed player data, allowing the same loop to do the job of both players. Player variables are reset when a new game starts.
+    Before the Player Vars, a chunk of 16 bytes are stored, these are addressed
+using the indirect register IY which points to the start of player 1, so they are
+numbered from -16 up.
+
+    The main player loop is called twice, once with IY pointing to the start of
+player 1's status variables, and again pointing to player 2's - the variables
+block holds all needed player data, allowing the same loop to do the job of both
+players. Player variables are reset when a new game starts.
 
 
 First are the game settings:
 
 number	Meaning
--16	Screenshake (enabled/disabled)... on CPC screenshake causes my VGA box mayhem, so it can be disabled!
--15	Playmode... 0 is default playmode... 128 means '4 direction' mode - the whole game plays like Ep2 Level 5!
--14	Continue sharing... when 0 both players share continues, when 1 players have seperate continue stock - encouraging bonus stealing!
+-16	Screenshake (enabled/disabled)... on CPC screenshake causes my VGA box
+        mayhem, so it can be disabled!
+-15	Playmode... 0 is default playmode... 128 means '4 direction' mode - the
+        whole game plays like Ep2 Level 5!
+-14	Continue sharing... when 0 both players share continues, when 1 players
+        have seperate continue stock - encouraging bonus stealing!
 -13	Number of smartbombs per continue (max 3)
 -12	Number of Continues you start the game with
--11 	Difficulty (0-2)... +128 for reduced bullet bursts (bullet heaven mode) +64 for faster bullets (like original ep1)
--10 	Achievements - bitmask marking which achievements (EP2) the player has, and if they've won the game yet - achievements unlock 'eye catch' posters
+-11 	Difficulty (0-2)... +128 for reduced bullet bursts (bullet heaven mode)
+        +64 for faster bullets (like original ep1)
+-10 	Achievements - bitmask marking which achievements (EP2) the player has,
+        and if they've won the game yet - achievements unlock 'eye catch' posters
 -9	Multiplay config (TotO's CPC joystick adapter)
--8	Turbo mode... used to disable functionality for speed up... experimental - not officially implemented
+-8	Turbo mode... used to disable functionality for speed up... experimental
+        - not officially implemented
 -7	Live players... updated during gameplay for no of living players
 -6	TimerTicks... Used for benchmarking
--5	Disable Pageflipped colors...on CPC chibiakumas can swap between two palettes every other frame to simulate between colors, painful on emulators!
--4	Disable flicker... on CPC+ player sprites can flicker so you can see the bullets behind sprite
+-5	Disable Pageflipped colors...on CPC chibiakumas can swap between two
+        palettes every other frame to simulate between colors, painful on
+        emulators!
+-4	Disable flicker... on CPC+ player sprites can flicker so you can see the
+        bullets behind sprite
 -3	Screenbuffer memory location of buffer being updated
 -2	Screenbuffer memory location of visible screen
--1	Hardware Version (combination of bits define functionality of currently detected machine)
+-1	Hardware Version (combination of bits define functionality of currently
+        detected machine)
 	on CPC 0  =464 , +128=6128 ; +1 = CPCplus ; +64= 256k memory
 
 	MSX +1=V9990 GPU +2=WSX/WX (5.7mhz) +4=turbo R (8mhz++)
@@ -36,21 +54,30 @@ This ends the settings data, the next 16 bytes are player 1 Variables:
 2	player able to shoot (there is a delay between shots)
 3	Player smartbombs remaining
 4	Player Drones (0-2)
-5	Player Continues (0-255, in shared mode, player 1's continues are used by player 2 as well)
+5	Player Continues (0-255, in shared mode, player 1's continues are used
+        by player 2 as well)
 6	drone offset from player center
 7	invincibility time (after injury)
 8	player current visible sprite number
 9	Lives remaining (max 3)
-10	Burst Fire (Xfire)... player is awarded 50 burst shots per 1000 coins... they shoot in all directions when holding both fires.. burst shots are shown numerically below lives (max 255)
+10	Burst Fire (Xfire)... player is awarded 50 burst shots per 1000 coins...
+        they shoot in all directions when holding both fires.. burst shots are
+        shown numerically below lives (max 255)
 11	Fire speed (see 2)
-12 	Player Num (used to detect player in routines passed IY pointer to relevant player)
-13	Points to add to player score (score increaces 1 at a time, this is the score still waiting to add)
+12 	Player Num (used to detect player in routines passed IY pointer to
+        relevant player)
+13	Points to add to player score (score increaces 1 at a time, this is the
+        score still waiting to add)
 14	Player shoot power (0 normal /1 = doublepower)
 15  	Fire direction
 
-This ends player 1... player 2 has identical 16 bytes - to get to start of player 2 data, just add 16 to player1 IY location
+    This ends player 1... player 2 has identical 16 bytes - to get to start of
+player 2 data, just add 16 to player1 IY location
 
-Next there are 32 bytes which represent the hardware values of the defined player controls, they are in reverse order... they are made up of a key Row number, and a bitmask - here is the MSX version as an example
+    Next there are 32 bytes which represent the hardware values of the defined
+player controls, they are in reverse order... they are made up of a key Row
+number, and a bitmask - here is the MSX version as an example
+
 Player2 Keymap:
 	defb %11011111,&03 ;Pause
 	defb %10111111,&03 ;Fire3
@@ -71,11 +98,18 @@ Player 1 KeyMap:
 	defb %11111101,&0C ;Down	
 	defb %11111110,&0C ;Up
 
-After the keymap there is an array of the current key and joystick settings as read from the hardware, these are compared to the keymap and a single byte representation of each players controls is generated - this is used to decide player and menu movement.
+    After the keymap there is an array of the current key and joystick settings
+as read from the hardware, these are compared to the keymap and a single byte
+representation of each players controls is generated - this is used to decide
+player and menu movement.
 
-On the CPC and Spectrum this contains 10 bytes... on the MSX it contains 13 (11 key rows, 2 joysticks)... the byte pos is the row number, and the content is the current values of that row, which are compared to the bitmask in the keymap to decide if the key is pressed.
+    On the CPC and Spectrum this contains 10 bytes... on the MSX it contains 13
+(11 key rows, 2 joysticks)... the byte pos is the row number, and the content
+is the current values of that row, which are compared to the bitmask in the
+keymap to decide if the key is pressed.
 
 Finally there are 3x 8 byte 'scores'... in Binary Coded Decimal format
+
 The first score is Player 1, the 2nd is player 2... finally is the highscore.
 
 This ends the 'settings' block! 

@@ -13,8 +13,8 @@ LdAFromHLIncHL:
 ret
 
 DoMovesBackground_ScrollUp:
-    ; Move Up 
-    ld bc,&790D ; DEC C  (OD)      LD a,C (79) 
+    ; Move Up
+    ld bc,&790D ; DEC C  (OD)      LD a,C (79)
     ld de,&F7FE ; CP (FE) F7 (199+24+24=247)
     push de
     ld de,&7A57
@@ -31,15 +31,15 @@ DoMovesBackground_SetScroll:    ;A=Direction 0-Left 1-Right 2-Up 3-Down
     push ix
         cp 2
         jr nc,DoMovesBackground_ScrollUp
-        ; Move Left 
-        ld bc,&7805 ; INC B  (05)      LD a,B (78)   
-        ld de,&D0FE ; CP (FE)  D0 (160+24+24=208)
+        ; Move Left
+        ld bc,&7805 ; 05 == INC B; 78 == LD A,B
+        ld de,&D0FE ; FE == CP n;  D0 == 160+24+24 == 208
         push de
-    
-        ld de,&794F
 
-        ld ixl,&4F
-        ld hl,&B816
+        ld de,&794F ; 4F == LD C,A ; 79 == LD A,C
+
+        ld ixl,&4F  ; 4F   == LD C,A
+        ld hl,&B816 ; 16 n == LD D,n
 
         or a
         jr z,DoMovesBackground_SetScroll2
@@ -50,15 +50,15 @@ DoMovesBackground_SetScroll2_V2:
 
 DoMovesBackground_SetScroll2:
         ld a,d
-        ld (OBjectStripReprogram_Plus1-1),a
+        ld (OBjectStripReprogram_Plus1 - 1),a
         ld a,e
-        ld (OBjectStripReprogram_Plus1+1),a
-        ld (DoMovesBGShift_Plus1-1),bc
+        ld (OBjectStripReprogram_Plus1 + 1),a
+        ld (DoMovesBGShift_Plus1 - 1),bc
         pop de
-        ld (DoMovesBGShift_Plus1+1),de
+        ld (DoMovesBGShift_Plus1 + 1),de
         ld a,ixl
         ld (OneObjectQuick_Program),a
-        ld (OneObjectQuick_Program+1),hl
+        ld (OneObjectQuick_Program + 1),hl
 
     pop ix
     pop hl
@@ -74,7 +74,7 @@ SetLevelTime: ; This is used for jumping around the event stream
     ld (Event_NextEventPointer_Plus2-2),hl
 
     ret
-GetLevelTime:       ; Return the current level time
+GetLevelTime: ; Return the current level time
     ld a,(Event_NextEventTime)
     ld b,a
     ld a,(Event_LevelTime)
@@ -82,26 +82,28 @@ GetLevelTime:       ; Return the current level time
     dec hl
     ret
 
-;Restart the event stream for a new level
+; Restart the event stream for a new level
 Event_StreamInit:
-    ld (Event_SavedSettings_Plus2-2),de ;Store the address of our 2nd setting buffer (1st is contained in core)
+    ; Store the address of our 2nd setting buffer (1st is contained in core)
+    ld (Event_SavedSettings_Plus2-2),de
     xor a
     ld (Event_MultipleEventCount_Plus1-1),a
     call SetLevelTime
 
-    jr Event_GetEventsNow   ; process the first batch of events
+    jr Event_GetEventsNow ; process the first batch of events
 
-Event_MoreEventsDec:            ;multiple events at the same timepoint
+Event_MoreEventsDec:      ; multiple events at the same timepoint
     dec a
     ld (Event_MultipleEventCount_Plus1-1),a
     ld (Event_NextEventPointer),hl
     jr Event_GetEventsNow
 
-;Process the event stream - the eventstream is basically the level map, rather than a
-;bitmap which would waste memory, it is a bytestream based around a Time,Event structure.
-; Multiple events can be at the same time, and the length of each event varies depending
-;upon the event, for this reason, it is only intended that the stream is read forwards
-; not backwards.
+;     Process the event stream - the eventstream is basically the level map,
+; rather than a bitmap which would waste memory, it is a bytestream based around
+; a Time,Event structure.
+;    Multiple events can be at the same time, and the length of each event
+; varies depending upon the event, for this reason, it is only intended that the
+; stream is read forwards not backwards.
 Event_Stream:
     ld a,(Timer_TicksOccured)
     and %00000100:Event_LevelSpeed_Plus1    ; how often ticks occur
@@ -112,8 +114,7 @@ Event_Stream_ForceNow:
     ld (Event_LevelTime),a
     ld b,a
 
-
-Event_MoreEvents:               
+Event_MoreEvents:
     ld a,1 :Event_NextEventTime_Plus1       ;The time the event should occur
     cp b
     ret nz  ; event does not happen yet
@@ -123,13 +124,13 @@ Event_GetEventsNow:
     ld hl,Event_LoadNextEvt
     push hl         ;We do a dirty trick to save space, all these actions end in a RET
 
-    ld hl,6969:Event_NextEventPointer_Plus2     ; mem pointer of next byte
+    ld hl,6969 :Event_NextEventPointer_Plus2 ; mem pointer of next byte
     ld a,(hl)
     inc hl
     ld d,a
     and %00001111
     ld b,a
-    ld a,d 
+    ld a,d
     and %11110000
     rrca
     rrca
@@ -158,11 +159,11 @@ Event_CoreMultipleEventsAtOneTime:
     ld (Event_MultipleEventCount_Plus1-1),a
     ret
 
-Event_SpriteSwitch_0101:            ;Set the next sprite
+Event_SpriteSwitch_0101:          ;Set the next sprite
     ld de,EventObjectSpriteToAdd_Plus1-1
     jr Event_CoreReprogram_ByteCopy
 
-Event_ProgramSwitch_0001:           ;Set the next program
+Event_ProgramSwitch_0001:         ;Set the next program
     ld de,EventObjectProgramToAdd_Plus1-1
     jr Event_CoreReprogram_ByteCopy
 
@@ -173,29 +174,29 @@ Event_SpriteSizeSwitch_1101:
     ld de,EventObjectSpriteSizeToAdd_Plus1-1
     jr Event_CoreReprogram_ByteCopy
 
-Event_MoveSwitch_0011:              ;Set the next move
+Event_MoveSwitch_0011:            ;Set the next move
     ld de,EventObjectMoveToAdd_Plus1-1
     jr Event_CoreReprogram_ByteCopy
 
 
-Event_ProgramMoveLifeSwitch_0100:   ;Set Prog,MoveLife
+Event_ProgramMoveLifeSwitch_0100: ;Set Prog,MoveLife
     rst 6
     ;ld a,(hl)  ;Program Type
     ld (EventObjectProgramToAdd_Plus1-1),a
-    ;inc hl                     ;Fall into Move Life code
+    ;inc hl                       ;Fall into Move Life code
 Event_MoveLifeSwitch_0000:
     rst 6
     ;ld a,(hl)  ;Move Type
     ld (EventObjectMoveToAdd_Plus1-1),a
-    ;inc hl                     ; Fall into Life code
+    ;inc hl                       ;Fall into Life code
 
 Event_LifeSwitch_0010:
     ld de,EventObjectLifeToAdd_Plus1-1
 
-Event_CoreReprogram_ByteCopy:           
+Event_CoreReprogram_ByteCopy:
     rst 6
-    ;ld a,(hl)  ;read in a byte
-    ld (de),a       ; put it at DE
+    ;ld a,(hl)  ; read in a byte
+    ld (de),a   ; put it at DE
     ret
 
 ; Reconfigure the core for custom actions this level
@@ -203,7 +204,7 @@ Event_CoreReprogram:    ;1111????
     ld a,b
 ;   cp 16
 ;   ret nc;jp nc,Event_LoadNextEvt  ; our array only has 6 entries
-    
+
     push hl
     ld hl,Event_ReprogramVector
     jp VectorJump_PushHlFirst
@@ -233,9 +234,9 @@ Event_CoreReprogram_CustomMove2:
     ld de,LevelSpecificMoveB_Plus2-2
     jr SetCustMove
 Event_SmartBombSpecial:
-    ld de,SmartBombSpecial_Plus2-2      ; Custom smartbomb handler - needed to wipe Omega array during final boss
+    ld de,SmartBombSpecial_Plus2-2 ; Custom smartbomb handler - needed to wipe Omega array during final boss
     jr SetCustMove
-Event_ObjectFullCustomMoves:            ; Override whole move handler
+Event_ObjectFullCustomMoves:       ; Override whole move handler
     ld de,ObjectDoMovesOverride_Plus2-2
     jr SetCustMove
 Event_CoreReprogram_CustomMove3:
@@ -279,14 +280,14 @@ Event_CoreReprogram_ObjectHitHandler:
 
 ;Event_CoreReprogram_PlusPalette            ; Set background (41 byte max)
 ;   ld de,PlusRasterPalette
-;di 
+;di
 ;halt ;this is deprecated
 ;   jr Event_CoreReprogram_DataCopy
 
 ; Program raster palette - careful - this can cause all nasty crashes if you
 ; do it wrong, as you have to specify bytes, offsets and loop counters,
 ; it's best to copy existing ones from levels and modify them
-    
+
 Event_CoreReprogram_Palette:
     ld de,RasterColors_ColorArray1 :RasterColors_ColorArray1PointerB_Plus2
 
@@ -319,8 +320,8 @@ Event_MoveSwitch:
     ld hl,Event_MoveVector
     jp VectorJump_PushHlFirst
 
-Event_LoadLastAddedObjectToAddress_1010:        
-; Used to remember boss objects and apply custom animation etc by hacking the 
+Event_LoadLastAddedObjectToAddress_1010:
+; Used to remember boss objects and apply custom animation etc by hacking the
 ; object array.
     ld c,(hl)
     inc hl
@@ -334,7 +335,7 @@ Event_LoadLastAddedObjectToAddress_1010:
 
         ld (hl),c
         inc hl
-        ld (hl),b   
+        ld (hl),b
     pop hl
     ret
 
@@ -355,8 +356,8 @@ Event_ClearPowerups:        ; used at the start of each level to take the users 
 CallBC:
     push bc
     ret
-    
-; alter stream time 
+
+; alter stream time
 Event_ChangeStreamTime_1000:
     ld c,(hl)
     inc hl
@@ -365,7 +366,7 @@ Event_ChangeStreamTime_1000:
     ld a,(hl)
 
     ld h,b
-    ld l,c  
+    ld l,c
 
     call SetLevelTime
 
@@ -373,7 +374,7 @@ Event_ChangeStreamTime_1000:
     jp Event_MoreEvents
 
 ; Add to the foreground (top of the object array)
-Event_AddFront_0110:    
+Event_AddFront_0110:
     ld a,1
     jr Event_AddXX
 
@@ -405,17 +406,18 @@ Event_ObjStrip:
 Event_ObjStrip_Next:
     rst 6
     ld (EventObjectSpriteToAdd_Plus1-1),a
-    
+
     push bc
     push de
         call EventoneObjectStrip
     pop de
     pop bc
 
-    ld a,c  :OBjectStripReprogram_Plus1
+    ld a,c ; 79 == LD A,C
+    OBjectStripReprogram_Plus1:
     add e
-    ld c,a
-    
+    ld c,a ; 4F == LD C,A
+
     djnz Event_ObjStrip_Next
     ret
 
@@ -442,27 +444,27 @@ Event_MultiObj:     ; Type 16 - multiple objects
     ret
 
 Event_OneObj:       ; Type 0 - one Obj
-    ld a,b  
+    ld a,b
 
     cp 1
     jr z,Event_OneObjYOnly
     cp 14
     jr NC,Event_OneObjectBurst  ;>=14
     or a
-    jr nz,Event_OneObjQuick 
+    jr nz,Event_OneObjQuick
     jr EventoneObject
 Event_OneObjectBurst:
 ;Burst Object
     ld bc,&0000 :BurstPosition_Plus2
     ld d,b
     jr EventoneObjectStrip
-    
-Event_OneObjYOnly:      ; Type 1 - Read in Y and dump the same sprite to far right
-    ld c,(hl)   ;Y
+
+Event_OneObjYOnly: ; Type 1 - Read in Y and dump the same sprite to far right
+    ld c,(hl) ; Y
     inc hl
     jr Event_OneObjQuick_GO
 
-Event_OneObjQuick:  ; one sprite, same as last time Y * 16 (Y 2-13)
+Event_OneObjQuick: ; one sprite, same as last time Y * 16 (Y 2-13)
     rla
     rla
     rla
@@ -470,17 +472,17 @@ Event_OneObjQuick:  ; one sprite, same as last time Y * 16 (Y 2-13)
     sub 8
 
 OneObjectQuick_Program:
-    ld C,a      
+    ld C,a
 
 Event_OneObjQuick_GO:
-    ld D,160+24 
+    ld D,160+24
     jr EventoneObjectStrip
 
 ; Read in the next object
 Event_LoadNextEvt:
     ld a,0 :Event_MultipleEventCount_Plus1
     or a
-    jp nz,Event_MoreEventsDec       ; there are multiple events at this point
+    jp nz,Event_MoreEventsDec ; there are multiple events at this point
     rst 6
     ld (Event_NextEventTime),a
     ld (Event_NextEventPointer),hl
@@ -498,7 +500,7 @@ EventoneObject:
     EventoneObjectStrip:
     ;look for a space in the object array
     push hl
-    call Event_AddObject    
+    call Event_AddObject
     pop hl
     ret
 
@@ -529,9 +531,9 @@ Event_AddObjectStart:
     add l       ; add l to a (start of loop)
     ld l,a
 
-Event_Objectloop:   
+Event_Objectloop:
     ld a,(hl)   ; Y check
-    or a    
+    or a
     jp NZ,Event_ObjectLoopNext
 
     ;found a free slot!
@@ -541,13 +543,13 @@ Event_Objectloop:
     and %11111000
     ld (hl),a
     inc h;
-    ld (hl),d   ;X
+    ld (hl),d ;X
 
-    
+
     inc h
-    ld (hl),&0      :EventObjectMoveToAdd_Plus1 ;Move
+    ld (hl),&0 :EventObjectMoveToAdd_Plus1   ; Move
     inc h
-    ld (hl),&0  :EventObjectSpriteToAdd_Plus1   ;sprite
+    ld (hl),&0 :EventObjectSpriteToAdd_Plus1 ; sprite
 
     set 6,l
 
@@ -577,11 +579,11 @@ AddObjectOnePlayer:
 AddObjectTwoPlayer:
     ld (hl),a
     dec h
-    ld (hl),&0  :EventObjectProgramToAdd_Plus1 ; Program code
+    ld (hl),&0 :EventObjectProgramToAdd_Plus1    ; Program code
     dec h
-    ld (hl),&0  :EventObjectSpriteSizeToAdd_Plus1 ; Sprite size for collisions
+    ld (hl),&0 :EventObjectSpriteSizeToAdd_Plus1 ; Sprite size for collisions
     dec h
-    ld (hl),&0  :EventObjectAnimatorToAdd_Plus1 ; Animator
+    ld (hl),&0 :EventObjectAnimatorToAdd_Plus1   ; Animator
     ret
 Event_ObjectLoopNext:
     inc hl      :Event_AddObject_MoveDirection_Plus1
@@ -589,28 +591,34 @@ Event_ObjectLoopNext:
     djnz,Event_Objectloop
     ret
 
-Event_CoreSaveLoadSettings2: ;     1001XXXX Save/Load object settings XXXX bank (0-15 = load . 16 = Save (to bank marked by next byte))
+Event_CoreSaveLoadSettings2:
+    ; 1001XXXX Save/Load object settings XXXX bank
+    ; (0-15 = load . 16 = Save (to bank marked by next byte))
     push hl
         ld hl,&6969 :Event_SavedSettings_Plus2
     jr Event_CoreSaveLoadSettingsStart
-Event_CoreSaveLoadSettings: ;     1001XXXX Save/Load object settings XXXX bank (0-15 = load . 16 = Save (to bank marked by next byte))
+Event_CoreSaveLoadSettings:
+    ; 1001XXXX Save/Load object settings XXXX bank
+    ; (0-15 = load . 16 = Save (to bank marked by next byte))
     push hl
         ld hl,Event_SavedSettings ;Event_SavedSettings_Plus2
 
-Event_CoreSaveLoadSettingsStart: ;     1001XXXX Save/Load object settings XXXX bank (0-15 = load . 16 = Save (to bank marked by next byte))
+Event_CoreSaveLoadSettingsStart:
+    ; 1001XXXX Save/Load object settings XXXX bank
+    ; (0-15 = load . 16 = Save (to bank marked by next byte))
         ld (Event_SavedSettingsFinal_Plus2-2),hl
     pop hl
-    ld a,d 
+    ld a,d
     and %00001111   ; bank no
     cp  %00001111
-    jr nz,Event_CoreSaveLoadSettings_Load1  ;15 means save
+    jr nz,Event_CoreSaveLoadSettings_Load1 ; 15 means save
     rst 6
     jr Event_CoreSaveLoadSettings_Part2
 Event_CoreSaveLoadSettings_Load1:
     ld d,b
 Event_CoreSaveLoadSettings_Part2:
     push hl
-        call SettingsGetLocation        
+        call SettingsGetLocation
         bit 7,d     ; This will only be 1 if we are saving
         jr nz,Event_CoreSaveLoadSettings_Save ;----1--- = save
 Event_CoreSaveLoadSettings_Load:
@@ -677,7 +685,7 @@ Event_CoreSaveLoadSettings_Done:
 ; --------------------------------------------------
 ;                 Reset Powerup
 ; --------------------------------------------------
-ResetPowerup: ; used by levelcode to take our bonuses 
+ResetPowerup: ; used by levelcode to take our bonuses
     push iy
         ld iy,Player_Array
         call ResetPlayerPowerup
@@ -690,7 +698,7 @@ ResetPlayerPowerup:
         ld a,&06
         ld (PlayerStarColor_Plus1-1),a
         xor a
-        ld (iy+14),a    ;(PlayerShootPower_Plus1
+        ld (iy+14),a ; (PlayerShootPower_Plus1
         ld a,%00000100
-        ld (iy+11),a ;ld (PlayerShootSpeed_Plus1-1),a
+        ld (iy+11),a ; ld (PlayerShootSpeed_Plus1-1),a
 ret

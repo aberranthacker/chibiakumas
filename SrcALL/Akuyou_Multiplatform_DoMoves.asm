@@ -1,9 +1,8 @@
 
 ;See EventStreamDirections for details of how DoMoves works
 DoMoves: 
-
     ; B=X C=Y D=Move
-    ;SDYYYXXX   S=1 means 'special move'
+    ; SDYYYXXX   S=1 means 'special move'
     ; all others work in the format D = Doubler (speed up move)
     ; YYY Y movement bits
     ; XXX X movement bits
@@ -15,23 +14,17 @@ DoMoves:
     and %00111000
     rrca
     rrca
-    ;rrca
 
     sub 8
-    ;sub 4
     bit 6,d
     jp z,DoMoves_NoMult2
-     rlca
+         rlca
     DoMoves_NoMult2:
     add C
 
-;   jp PE,DoMoves_Kill  ;overflow
     cp 199+24       ;we are at the bottom of the screen
     jr NC,DoMoves_Kill  ;over the page
-;   cp 0            ;we are at the bottom of the screen
-;   jr C,DoMoves_Kill   ;over the page
     ld c,a
-
 
     ld a,D
     and %00000111
@@ -42,15 +35,12 @@ DoMoves:
     DoMoves_NoMult:
     add b
 
-    cp 160+24       ;we are at the bottom of the screen
-    jr NC,DoMoves_Kill  ;over the page
-;   cp 0            ;we are at the bottom of the screen
-;   jr C,DoMoves_Kill   ;over the page
+    cp 160+24          ;we are at the bottom of the screen
+    jr NC,DoMoves_Kill ;over the page
     ld b,a
-
     
     ret
-DoMoves_Kill:           ; Object has gone offscreen
+DoMoves_Kill:          ; Object has gone offscreen
     ld C,0
     ret
 DoMoves_Background: ; Background sprites move much more slowly, and only in 1 direction
@@ -78,12 +68,8 @@ DoMoves_Spec:   ;Special moves - various kinds
     cp %11000000    ;1100XXXX ; Background
     jr z,DoMoves_Background 
 
-
-;   cp %10010000    ;1001XXXX ; Wave
-;   jr z,DoMoves_WaveSmall
     cp %10100000    ;1010XXXX ; Wave
-    jr z,DoMoves_Wave               ;Wave pattern - pretty naff, but it seemed a good idea at the time
-
+    jr z,DoMoves_Wave ;Wave pattern - pretty naff, but it seemed a good idea at the time
 
     ; Level specifics are overriden by the code in the level
     cp %10110000    ;1011XXXX ; Level Specific 4
@@ -95,8 +81,8 @@ DoMoves_Spec:   ;Special moves - various kinds
     cp %11110000    ;1111XXXX ; Level Specific 1
     jp z,null   :LevelSpecificMove_Plus2
 
-    ld a,d      ;1000XXXX
-    and %11111100   ;101111XX
+    ld a,d        ;1000XXXX
+    and %11111100 ;101111XX
     cp  %10010000               ; P2 Used by 'Chu attack' - and also coins! 
     jr z,DoMoves_Seekerp2           ; Used by 'Chu attack' - and also coins!
     cp  %10000100
@@ -126,7 +112,7 @@ DoMoves_WaveContinue:
     
 DoMoves_WaveSlowSpeed
     sll a
-    sll a   ; rem to reduce wave depth
+    sll a ; rem to reduce wave depth
 
     ld C,a
     ld a,d
@@ -134,7 +120,7 @@ DoMoves_WaveSlowSpeed
 DoMoves_WaveEnd
     rrca
     rrca
-    rrca        ; equivalent to 5 left shifts
+    rrca  ; equivalent to 5 left shifts
     or %00011100
 
     add C
@@ -142,8 +128,8 @@ DoMoves_WaveEnd
 
     dec B
     ld a,b
-    cp 24           ;we are at the bottom of the screen
-    jr C,DoMoves_Kill   ;over the page
+    cp 24 ; we are at the bottom of the screen
+    jr C,DoMoves_Kill ; over the page
     ret
 
 DoMoves_SeekerAuto:
@@ -192,17 +178,17 @@ DoMoves_Seeker:         ;Home in on player 1
 DoMoves_SeekerContinue:
     push de
     ld a,d
-    and %00000011   ; Speed
+    and %00000011 ; Speed
     sll a
     inc a
     ld d,a
-    ld a,r          ; Crude randomizer, as we move so fast the object may never hit the player otherwise
+    ld a,r        ; Crude randomizer, as we move so fast the object may never hit the player otherwise
     bit 0,a
     jr z,DoMoves_SeekerS
     inc d
 DoMoves_SeekerS:
         ; B=X C=Y D=Move speed
-        ld a,(iy)   ;Y
+        ld a,(iy) ; Y
         sub 8
         cp C
         jr NC,DoMoves_Seeker_Ylower

@@ -326,13 +326,18 @@
                                                             #
                                                             # ObjectLoopP1StarSkip:
                                                             #         jr $+10 :ObjectLoop_IFShot_Plus1
-                                                            #         call Object_DecreaseLifeShot :ObjectShotOverride_Plus2 ;3 bytes
+        CALL Object_DecreaseLifeShot; ObjectShotOverride_Plus2: #         call Object_DecreaseLifeShot :ObjectShotOverride_Plus2 ;3 bytes
+       .equiv  dstObjectShotOverride, ObjectShotOverride_Plus2 - 2
+       .global dstObjectShotOverride
                                                             #         ld a,8                           ;2 bytes
                                                             #         ld (ObjectLoop_IFShot_Plus1-1),a ;3 bytes
                                                             #
                                                             # ObjectLoop_NotShot:
                                                             #         ld d,ixh
-                                                            #         call DoMoves    :ObjectDoMovesOverride_Plus2
+        CALL DoMoves; ObjectDoMovesOverride_Plus2:          #         call DoMoves    :ObjectDoMovesOverride_Plus2
+       .equiv  dstObjectDoMovesOverride, ObjectDoMovesOverride_Plus2 - 2
+       .global dstObjectDoMovesOverride
+
                                                             #         ld ixh,d
                                                             #
                                                             # ObjectLoop_SaveChanges:
@@ -763,7 +768,7 @@ ObjectProgram_Fire:                                         # ObjectProgram_Fire
                                                             # Object_DecreaseShot_Player2:
                                                             #     ld iy,Player_Array2
                                                             #     jr Object_DecreaseShot_Start
-                                                            #  Object_DecreaseLifeShot:
+Object_DecreaseLifeShot: .global Object_DecreaseLifeShot    #  Object_DecreaseLifeShot:
                                                             #     ld a,ixl
                                                             #     and %00111111
                                                             #     ret z   ; if life is zero drop out (For custom hit code callback)
@@ -798,7 +803,9 @@ ObjectProgram_Fire:                                         # ObjectProgram_Fire
                                                             # Object_DecreaseShotToDeathB:
                                                             #     ;object has been shot to death
                                                             #
-                                                            #     call null :CustomShotToDeathCall_Plus2
+        CALL NULL; CustomShotToDeathCall_Plus2:             #     call null :CustomShotToDeathCall_Plus2
+       .equiv  dstCustomShotToDeathCall, CustomShotToDeathCall_Plus2 - 2
+       .global dstCustomShotToDeathCall
                                                             #
                                                             #     xor a
                                                             #     ld (hl),a ;Clear object animator

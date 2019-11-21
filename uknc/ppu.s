@@ -1,3 +1,4 @@
+                .nolist
 
                 .TITLE Chibi Akumas PPU module
                 .GLOBAL start # make entry point available to linker
