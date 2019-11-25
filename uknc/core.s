@@ -1,7 +1,7 @@
                 .nolist
 
-                .TITLE Chibi Akumas core module
-                .GLOBAL start # make entry point available to linker
+                .title Chibi Akumas core module
+                .global start # make entry point available to linker
 
                 .global ContinueMode
                 .global ContinuesReset
@@ -19,7 +19,7 @@
                 .global SmartBombsReset
                 .global StarArrayPointer
 
-                .include "./macros.s"
+                .include "macros.s"
                 .include "core_defs.s"
 
         .equiv TextScreen_MaxX, 39
@@ -413,5 +413,9 @@ NULL:   RETURN
                                         # FileEndCore:
                                         #     save direct "CORE    .AKU",Akuyou_CoreStart,&3001   ;address,size...}[,exec_address]
                                         # nolist
-        .asciz "9876543210end"
 end: FileEndCore:
+       .global LevelStart
+LevelStart:
+        JMP  $LevelStart # - Level start
+LevelLoop:
+        JMP  $LevelLoop  # - Level loop

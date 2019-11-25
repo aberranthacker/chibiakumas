@@ -1,54 +1,73 @@
-The Amstrad CPC screen hardware allows for Interrupts at 6 points down the
+    The Amstrad CPC screen hardware allows for Interrupts at 6 points down the
 screen, and if we change the colors at those points, we can simulate more colors
 on-screen.
 
-The first of these interrupts occurs in the 'Border area'... so is not shown in
-normal circumstances.. the second is also mostly offscreen, so we can
+    The first of these interrupts occurs in the 'Border area'... so is not shown
+in normal circumstances.. the second is also mostly offscreen, so we can
 realisticly use 4 interrupt based color changes.
 
-In Chibiakumas... Color 0 is a constant color, and the 3rd color is always White
-(this means 'White' enemies can cross the color boundaries without looking
+    In Chibiakumas... Color 0 is a constant color, and the 3rd color is always
+White (this means 'White' enemies can cross the color boundaries without looking
 wierd!)... Color 2 is always brighter than Color 1, but Colors 1&2 can be anything!
 
-the color chagnges are defined by a 'color change block of 5 labels for each of the usable raster interrupts, eg:
+the color changes are defined by a 'color change block of 5 labels for each of
+the usable raster interrupts, eg:
 
-RasterColors_ColorArray1:			;Label to the block (5 in total)
-	defb 1				;Number of Colors in the block
-	defb 1				;Delay
-	defb 64+20,64+24,64+29,64+11		;4 hardware colors
-RasterColors_ColorArray2:			;Label to the block
-	defb 2				;Number of Colors in the block
-	defb 1				;Delay
-	defb 64+20,64+12,64+13,64+11		;4 hardware colors
-	defb 0				;Delay
-	defb 64+20,64+24,64+29,64+11		;4 hardware colors
+RasterColors_ColorArray1: ;Label to the block (5 in total)
+    defb 1                ;Number of Colors in the block
+    defb 1                ;Delay
+    defb 64+20,64+24,64+29,64+11 ;4 hardware colors
+RasterColors_ColorArray2: ;Label to the block
+    defb 2                ;Number of Colors in the block
+    defb 1                ;Delay
+    defb 64+20,64+12,64+13,64+11 ;4 hardware colors
+    defb 0                ;Delay
+    defb 64+20,64+24,64+29,64+11 ;4 hardware colors
 ....
 
-The labels are used to 'self-modify' the interrupt handler.
-Each block can contain more than 1 color... each color change occurs after a software 'delay'... note this wastes CPU power, so is not really viable 'ingame' but does allow for precise (and far more) color-changes during the title and levels... there is a delay per color block, and the delay happens before the color change.
+    The labels are used to 'self-modify' the interrupt handler.
+    Each block can contain more than 1 color... each color change occurs after a
+software 'delay'... note this wastes CPU power, so is not really viable 'ingame'
+but does allow for precise (and far more) color-changes during the title and
+levels... there is a delay per color block, and the delay happens before the
+color change.
 
-a call to "Akuyou_RasterColors_SetPointers" will define all the labels that point to the colors... it's also possible to define a 'screen refresh interrupt handler'... this will at 50hz... and can be used to 'flip palettes' each screen draw... this is done to simulate colors that do not exist on the CPC by alternating between two similar colors... which will appear as a 'between' color due to the image persistance of CRT phosphors.
+    a call to "Akuyou_RasterColors_SetPointers" will define all the labels that
+point to the colors... it's also possible to define a 'screen refresh interrupt
+handler'... this will at 50hz... and can be used to 'flip palettes' each screen
+draw... this is done to simulate colors that do not exist on the CPC by
+alternating between two similar colors... which will appear as a 'between' color
+due to the image persistance of CRT phosphors.
 
-The CPC PLUS has a new alternate raster color switcher... it allows precise 'line no based' hardware refreshes... so there is no need for delays... unfortunately, however if Interrupts were disabled for too long, and two interrupts were missed... the colors will not update until the whole next screen redraw... this means it's not advisable to have 2 color changes less than about 10 lines apart... also Chibi akumas has a limit of 8 color changes per screen... this is due to memory shortage in the Core... not a limitation of the CPC PLUS
+    The CPC PLUS has a new alternate raster color switcher... it allows precise
+'line no based' hardware refreshes... so there is no need for delays...
+unfortunately, however if Interrupts were disabled for too long, and two
+interrupts were missed... the colors will not update until the whole next screen
+redraw... this means it's not advisable to have 2 color changes less than about
+10 lines apart... also Chibi akumas has a limit of 8 color changes per screen...
+this is due to memory shortage in the Core... not a limitation of the CPC PLUS
 
-You cannot specify a color change of 0... thsi has a special meaning... you must specify a color change at 200... this tells the core to update the music... all 8 colorchanges must be defined  - with the last at 200... 
+    You cannot specify a color change of 0... this has a special meaning... you
+must specify a color change at 200... this tells the core to update the music...
+all 8 colorchanges must be defined  - with the last at 200...
 'ideal' valuese are 25,50,75,100,125,150,175,200
 
-Note that PLUS Icons are relocated midscreen to allow more onscreen sprites than possible for the CPC... this occurs around line 32.
+    Note that PLUS Icons are relocated midscreen to allow more onscreen sprites
+than possible for the CPC... this occurs around line 32.
 
-	defb 25		;Next Color Change Position (next 4 colors shown until)
-	defw &0000	;Color 0 -GRB
-	defw &04C4	;Color 1 -GRB
-	defw &0F44	;Color 2 -GRB
-	defw &0FCF	;Color 3 -GRB
-	defb 50		;Next Color Change Position (next 4 colors shown until)
-	defw &0000	;Color 0 -GRB
-	defw &04C4	;Color 1 -GRB
-	defw &0F44	;Color 2 -GRB
-	defw &0FBF	;Color 3 -GRB
+    defb 25     ;Next Color Change Position (next 4 colors shown until)
+    defw &0000  ;Color 0 -GRB
+    defw &04C4  ;Color 1 -GRB
+    defw &0F44  ;Color 2 -GRB
+    defw &0FCF  ;Color 3 -GRB
+    defb 50     ;Next Color Change Position (next 4 colors shown until)
+    defw &0000  ;Color 0 -GRB
+    defw &04C4  ;Color 1 -GRB
+    defw &0F44  ;Color 2 -GRB
+    defw &0FBF  ;Color 3 -GRB
 ...
-	defb 200		;Next Color Change Position (next 4 colors shown until)
-	defw &0000	;Color 0 -GRB
-	defw &04C4	;Color 1 -GRB
-	defw &0F44	;Color 2 -GRB
-	defw &0FBF	;Color 3 -GRB
+    defb 200    ;Next Color Change Position (next 4 colors shown until)
+    defw &0000  ;Color 0 -GRB
+    defw &04C4  ;Color 1 -GRB
+    defw &0F44  ;Color 2 -GRB
+    defw &0FBF  ;Color 3 -GRB

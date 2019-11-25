@@ -11,7 +11,6 @@ SetFader:
     pop de
 ret
 
-
 EnablePlusPalette:
     push hl
 
@@ -34,8 +33,6 @@ endif
     pop bc
     pop de
     pop hl
-
-
 ret
 
 PlusPaletteSet:
@@ -159,7 +156,6 @@ PlusPaletteShiftInitAgainC:
     dec c
     jp nz,PlusPaletteShiftInitAgain2
 
-
     ld hl,PlusPaletteDoShift
     ld (FadeCommand_Plus2-2),hl
 
@@ -199,7 +195,6 @@ PlusPaletteShiftNxt:
         inc hl
         inc de
         exx
-
 
 PlusPaletteShift:
         exx
@@ -333,7 +328,7 @@ RasterColorsSetPalette1:
 jp Akuyou_RasterColors_SetPointers
 
 PaletteSwitcher:
-    ld a,64:PaletteNo_Plus1
+    ld a,64 :PaletteNo_Plus1
     cpl
     ld (PaletteNo_Plus1-1),a
     or a

@@ -658,7 +658,7 @@ Bootstrap_LoadEP2Music_Z:
     ld de,Akuyou_MusicPos
     ld ix,Akuyou_MusicPos+&400
     ld l, &C9
-    jp LoadDiscSectorZ_WithPushes
+    jp LoadDiscSectorZ_WithPushes ; BootStrap.asm:625
 
 Bootstrap_LoadEP2Level_2Part_Z:
     ld a,&C1           ;128k Part

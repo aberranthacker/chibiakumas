@@ -55,27 +55,27 @@ defb 4
     defb 60         ; new time
 endif ; }}}
 
-EventStreamArray_EP1:
+EventStreamArray_EP1: ;------------------------------------------------------{{{
     ; Load Palette
-    defb 0,%01110000+4     ; 4 Commands
-    defb 240,0,6           ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 0,%01110000+4    ; 4 Commands
+    defb 240,0,6          ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&55,&4C,&4B
 
-    defb 240,26*0+6,5*2+1  ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
-    defb 2  ; Switches
-    defb 0  ;delay
+    defb 240,26*0+6,5*2+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 2     ; Switches
+    defb 0     ; delay
     defb &54,&55,&4C,&4B
-    defb 64+16;delay
+    defb 64+16 ; delay
     defb &54,&58,&5F,&4B
 
-    defb 240,26*1+6,5*1+1  ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,5*1+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1
     defb 48
     defb &54,&56,&5B,&4B
 
-    defb 240,26*2+6,5*3+1  ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*2+6,5*3+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 3   ; no of switches
     defb 0   ; delays
     defb &54,&56,&5B,&4B
@@ -88,7 +88,7 @@ defb 4
     defb 136        ; Jump to a different level point
     defw PauseLoop  ; pointer
     defb 60         ; new time
-
+;----------------------------------------------------------------------------}}}
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                          CPC Raster Pallete                                ;;
 ;;        The core is full, so this is now stored in the level block          ;;
@@ -433,8 +433,7 @@ defb 4
     defb 60
 
 
-EventStreamArray_Menu_EP2:
-
+EventStreamArray_Menu_EP2: ;-------------------------------------------------{{{
 defb 0,%01110000+4        ; 4 Commands
     defb 240,0,6          ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
@@ -601,8 +600,9 @@ defb 4
     defb 136       ; Jump to a different level point
     defw PauseLoop ; pointer
     defb 60        ; new time
+;----------------------------------------------------------------------------}}}
 
-Safepalette:
+Safepalette: ;---------------------------------------------------------------{{{
 defb 1,%01110000+4      ; 4 Commands
     defb 240,0,6        ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
@@ -674,7 +674,7 @@ defb 4
     defb 136       ; Jump to a different level point
     defw PauseLoop ; pointer
     defb 60        ; new time
-
+;----------------------------------------------------------------------------}}}
 
 PauseLoop:
 defb 4
@@ -682,8 +682,7 @@ defb 4
     defw PauseLoop ; pointer
     defb 60        ; new time
 
-EventStreamFadeOut:
-
+EventStreamFadeOut: ;-------------------------------------------------------{{{
 ;Palette Change
 defb 1,%01110000+4      ; 4 Commands
     defb 240,0,6        ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
@@ -732,6 +731,7 @@ defb 2,%01110000+4      ; 4 Commands
 
 defb 8,%10001001            ;Call a memory location
     defw    EndLevel
+;----------------------------------------------------------------------------}}}
 EndLevel:
     call &6969 :FadeOutJump_Plus2
 
@@ -750,7 +750,7 @@ ResetEventStream:
 
 ret
 
-EventStreamArray_ContentWarning:
+EventStreamArray_ContentWarning: ;-------------------------------------------{{{
 defb 0,%01110000+4      ; 4 Commands
     defb 240,0,6        ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
@@ -821,6 +821,7 @@ defb 4
     defb 136       ; Jump to a different level point
     defw PauseLoop ; pointer
     defb 60
+;----------------------------------------------------------------------------}}}
 
 ifdef CompileEP2 ; {{{
     ContentWarning0:
@@ -1042,7 +1043,7 @@ LevelInit:
     jp nz,LevelInitUsingRasterFlip
     ld (DisablePaletteSwitcher_Plus2-2),hl
 LevelInitUsingRasterFlip:
-    call RasterColorsSetPalette1
+    call RasterColorsSetPalette1 ; ../SrcCPC/Akuyou_CPC_Level_GenericRasterSwitcher.asm:321
 
     ld a,&C0
     call Akuyou_BankSwitch_C0_SetCurrent
@@ -1199,8 +1200,8 @@ ShowMenu_Loop:
 
     ld a,ixl
     and ixh
-    or Keymap_AnyFire ; %11001111
-%11110001
+    or Keymap_AnyFire ; %11001111 ;%11110001
+
     cp 255
     jp nz,MainMenuSelection
 
@@ -2607,7 +2608,6 @@ Cheats_Apply:
     cp posCheats
     jr z,Cheats_Cheats
 
-
     cp posGameEngineMode
     jr z,Cheats_ChangeGameEngineMode
     cp posGameEngineApply
@@ -2615,7 +2615,6 @@ Cheats_Apply:
 
     cp posCheatMainMenu
     jp z,showmenu
-
 
 jp ShowCheats2
 
@@ -2679,7 +2678,7 @@ Turbomode:
 
 db &0
 
-;---------------------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
 
 ShowText:
     call SetFont2b

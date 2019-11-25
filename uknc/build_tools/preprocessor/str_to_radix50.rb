@@ -27,7 +27,7 @@
 class StrToRadix50
   class << self
     POSITION_COEFFICIENTS = [050 * 050, 050, 1].freeze
-    # _ fills unused char position
+                                                # _ fills unused char position
     RADIX50_CHARS = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ$._0123456789'.chars.freeze
 
     def call(str)

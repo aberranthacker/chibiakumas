@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 require 'optparse'
 
-options = Struct.new(:in_filename, :out_filename, :binary).new
+options = Struct.new(:in_filename, :out_filename, :binary, :brief).new
 OptionParser.new do |opts|
   opts.banner = "Usage: ruby aout_info.rb FILENAME"
   options.in_filename = opts.default_argv[0]
@@ -12,6 +12,10 @@ OptionParser.new do |opts|
 
   opts.on("-b", "--binary", "binary, pluck from entry point to end of text segment") do
     options.binary = true
+  end
+
+  opts.on("-s", "--brief", "brief info") do
+    options.brief = true
   end
 end.parse!
 
@@ -30,6 +34,7 @@ a_entry  = header[5] # entry point
 a_unused = header[6] # not used
 a_flag   = header[7] # relocation info stripped
 
+
 magic_numbers = {
   0407 => 'normal',
   0410 => 'read-only text',
@@ -39,14 +44,15 @@ magic_numbers = {
   0431 => 'auto-overlay (separate)'
 }
 
-puts "magic number:               #{a_magic.to_s(8)} (#{magic_numbers[a_magic]})"
-puts "size of text segment:       #{a_text}"
-puts "size of initialized data:   #{a_data}"
-puts "size of uninitialized data: #{a_bss}"
-puts "size of symbol table:       #{a_syms}"
+puts "magic number:               #{a_magic.to_s(8)} (#{magic_numbers[a_magic]})" unless options.brief
+puts "size of text segment:       #{a_text}" unless options.brief
+puts "size of initialized data:   #{a_data}" unless options.brief
+puts "size of uninitialized data: #{a_bss}" unless options.brief
+puts "size of symbol table:       #{a_syms}" unless options.brief
 puts "entry point:                #{a_entry}"
-puts "not used:                   #{a_unused}"
-puts "relocation info stripped:   #{a_flag}"
+puts "not used:                   #{a_unused}" unless options.brief
+puts "relocation info stripped:   #{a_flag}" unless options.brief
+puts "size - entry:               #{a_text - a_entry}"
 
 # the start of the text segment in the file is 20(8)
 text = if options.binary

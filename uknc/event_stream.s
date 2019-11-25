@@ -67,8 +67,8 @@ DoMovesBackground_SetScroll:                                # DoMovesBackground_
         POP  R3                                             #     pop hl
                                                             #
 RETURN                                                      # ret
-                                                            # SetLevelTime: ; This is used for jumping around the event stream
-                                                            #     ; Make sure level time is LOWER than the first event, otherwise run Event_GetEventsNow
+SetLevelTime: # This is used for jumping around the event stream # SetLevelTime:
+        # Make sure level time is LOWER than the first event, otherwise run Event_GetEventsNow
                                                             #     ld (Event_LevelTime),a
                                                             #     ld a,(hl)
                                                             #     ld (Event_NextEventTime_Plus1-1),a
@@ -86,14 +86,15 @@ RETURN                                                      # ret
                                                             #     ret
                                                             #
                                                             # ; Restart the event stream for a new level
-                                                            # Event_StreamInit:
-                                                            #     ; Store the address of our 2nd setting buffer (1st is contained in core)
-                                                            #     ld (Event_SavedSettings_Plus2-2),de
-                                                            #     xor a
-                                                            #     ld (Event_MultipleEventCount_Plus1-1),a
-                                                            #     call SetLevelTime
-                                                            #
-                                                            #     jr Event_GetEventsNow ; process the first batch of events
+Event_StreamInit:                                           # Event_StreamInit:
+       .global Event_StreamInit
+        # Store the address of our 2nd setting buffer (1st is contained in core)
+        MOV  R2,@$srcEvent_SavedSettings
+        CLR  R0
+        MOV  R0,@$srcEvent_MultipleEventCount
+        CALL SetLevelTime
+
+        BR   Event_GetEventsNow # process the first batch of events
                                                             #
                                                             # Event_MoreEventsDec:      ; multiple events at the same timepoint
                                                             #     dec a
@@ -483,7 +484,8 @@ RETURN                                                      # ret
                                                             #
                                                             # ; Read in the next object
                                                             # Event_LoadNextEvt:
-                                                            #     ld a,0 :Event_MultipleEventCount_Plus1
+       MOV  $0,R0; Event_MultipleEventCount_Plus2:          #     ld a,0 :Event_MultipleEventCount_Plus1
+      .equiv srcEvent_MultipleEventCount, Event_MultipleEventCount_Plus2 - 2
                                                             #     or a
                                                             #     jp nz,Event_MoreEventsDec ; there are multiple events at this point
                                                             #     rst 6
@@ -604,7 +606,8 @@ RETURN                                                      # ret
                                                             #     ; 1001XXXX Save/Load object settings XXXX bank
                                                             #     ; (0-15 = load . 16 = Save (to bank marked by next byte))
                                                             #     push hl
-                                                            #         ld hl,&6969 :Event_SavedSettings_Plus2
+        MOV   $Event_SavedSettings,R3; Event_SavedSettings_Plus2: #         ld hl,&6969 :Event_SavedSettings_Plus2
+       .equiv srcEvent_SavedSettings, Event_SavedSettings_Plus2 - 2
                                                             #     jr Event_CoreSaveLoadSettingsStart
                                                             # Event_CoreSaveLoadSettings:
                                                             #     ; 1001XXXX Save/Load object settings XXXX bank

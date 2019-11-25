@@ -56,7 +56,7 @@ Bootstrap_Level:
 # some missing code...
 Bootstrap_StartGame:
 # Prepare screen-lines table to display loading screen ----------------------{{{
-        MOV  $PPUBIN, @$LookupFileName
+        MOV  $PPU___BIN, @$LookupFileName
         MOV  $FB1, @$ReadBuffer
         MOV  $PPU_ModuleSizeWords, @$ReadWordsCount
         CALL Bootstrap_LoadDiskFile
@@ -86,7 +86,7 @@ Bootstrap_StartGame:
         MOV  $PPU_SetPalette, @$PPUCommand
         MOV  $PPU_LoadingScreenPalette, @$PPUCommandArg
 
-        MOV  $LoadingSCR, @$LookupFileName # ../AkuCPC/BootsStrap_StartGame_CPC.asm:64
+        MOV  $LOADINSCR, @$LookupFileName # ../AkuCPC/BootsStrap_StartGame_CPC.asm:64
         MOV  $FB1, @$ReadBuffer
         MOV  $8000, @$ReadWordsCount
         CALL Bootstrap_LoadDiskFile
@@ -95,7 +95,7 @@ Bootstrap_StartGame:
        .putstr $CountStr
 
         # Load the game core - this is always in memory
-        MOV  $CoreBin, @$LookupFileName
+        MOV  $CORE__BIN, @$LookupFileName
         MOV  $FileBeginCore, @$ReadBuffer
         MOV  $FileSizeCoreWords, @$ReadWordsCount
         CALL Bootstrap_LoadDiskFile
@@ -104,7 +104,7 @@ Bootstrap_StartGame:
        .putstr $CountStr
 
         # Load saved settings
-        MOV  $SavSetBin, @$LookupFileName
+        MOV  $SAVSETBIN, @$LookupFileName
         MOV  $SavedSettings, @$ReadBuffer
         MOV  $FileSizeSettingsWords, @$ReadWordsCount
         CALL Bootstrap_LoadDiskFile
@@ -120,16 +120,21 @@ Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
         CALL StartANewGame              # call StartANewGame
         CALL LevelReset0000             # call LevelReset0000
                                         #
+        MOV  $LVL00_BIN, @$LookupFileName
+        MOV  $Akuyou_LevelStart, @$ReadBuffer
+        MOV  $Level00SizeWords, @$ReadWordsCount
+        CALL Bootstrap_LoadDiskFile
                                         # ld hl,DiskMap_MainMenu      ;T08-SC1.D01
                                         # ld c,DiskMap_MainMenu_Disk
                                         #
-                                        # call Bootstrap_LoadEP2Music_Z
+                                        # call Bootstrap_LoadEP2Music_Z # ../Aku/BootStrap.asm:656
                                         #
                                         # ld hl,DiskMap_MainMenu      ;T08-SC1.D01
                                         # ld c,DiskMap_MainMenu_Disk
                                         #
                                         # ;need to use Specail MSX version - no extra tilemaps
-                                        # jp Bootstrap_LoadEP2Level_1PartOnly
+                                        # jp Bootstrap_LoadEP2Level_1PartOnly # ../Aku/BootStrap.asm:724
+         JMP  $Akuyou_LevelStart
          JMP  WaitKeyThenExit
          RETURN                         # ret
 #----------------------------------------------------------------------------
@@ -575,14 +580,16 @@ ReadArea:           .byte  0,010 # chan, code(.READ/.READC/.READW)
     ReadBuffer:     .word  0 # buf
     ReadWordsCount: .word  0 # wcnt
                     .word  0 # end of area(.READW=0,.READ=1)
-CoreBin:
+CORE__BIN:
     .word 0x1AB8, 0x152A, 0x1F40, 0x0DF6 # .RAD50 "DK CORE  BIN"
-SavSetBin: # saved settings bin
+SAVSETBIN: # saved settings bin
     .word 0x1AB8, 0x76FE, 0x779C, 0x0DF6 # .RAD50 "DK SAVSETBIN"
-PPUBIN:
+PPU___BIN:
     .word 0x1AB8, 0x6695, 0x0000, 0x0DF6 # .RAD50 "DK PPU   BIN"
-LoadingSCR:
+LOADINSCR:
     .word 0x1AB8, 0x4D59, 0x1A76, 0x774A # .RAD50 "DK LOADINSCR"
+LVL00_BIN:
+    .word 0x1AB8, 0x4E7C, 0xC030, 0x0DF6 # .RAD50 "DK LVL00 BIN"
 
 LookupError: .asciz "File lookup error."
 ReadError:   .asciz "File read error."
@@ -623,8 +630,8 @@ TextInit:    .byte  033, 0240, '2 # symbol color
 TitleStr:    .asciz "      -= ChibiAkumas  V1.666 =-"
 WebSiteStr:  .asciz "      -= www.chibiakumas.com =-"
 CreditsStr:  .asciz "-= UKNC version by aberrant_hacker =-"
-                 #0         1         2         3         4         5         6         7
-                 #01234567890123456789012345678901234567890123456789012345678901234567890123456789
+                   #0         1         2         3         4         5         6         7
+                   #01234567890123456789012345678901234567890123456789012345678901234567890123456789
         .even # PPU reads strings by words so we have to align
 YahooStr:   .asciz "Yippee! Whoopee! Woo-hoo! Yay! Hurrah!\n"
         .even
