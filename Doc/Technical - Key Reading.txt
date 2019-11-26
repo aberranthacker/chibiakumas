@@ -1,22 +1,44 @@
-ChibiAkumas Key and Joystick reading has two stages,
+    ChibiAkumas Key and Joystick reading has two stages,
 
-1. The hardware stage 
-This is different depending on the hardware platform, but essentially is pretty similar... 
-The process for getting data is to send the 'line number' you want to the IO hardware, then read in the result.
+1. The hardware stage
+    This is different depending on the hardware platform, but essentially is
+pretty similar...
+    The process for getting data is to send the 'line number' you want to the IO
+hardware, then read in the result.
+    The programe connects to each data line of the systems keyboard, and reads
+that line into a buffer, if there are any joysticks, these are read in too...
+the data in this buffer is 'reversed'... if a key is pushed down, it's bit will
+be 0 ... if it is not, it will be 1... in some hardware cases bits have to
+inverted to ensure this standard is met.
 
-The programe connects to each data line of the systems keyboard, and reads that line into a buffer, if there are any joysticks, these are read in too... the data in this buffer is 'reversed'... if a key is pushed down, it's bit will be 0 ... if it is not, it will be 1... in some hardware cases bits have to inverted to ensure this standard is met.
+    On the CPC, the Joysticks are part of the Keyboard Matrix. On the Spectrum,
+most joysticks map to keys, but the Kempson is a special case, the MSX has 2
+joysticks that need special reading. On the Enterprise they are actually on a
+separete 'Port', and there seem to be 2 (or more) undocumented fire buttons!
 
-On the CPC, the Joysticks are part of the Keyboard Matrix. On the Spectrum, most joysticks map to keys, but the Kempson is a special case, the MSX has 2 joysticks that need special reading. On the Enterprise they are actually on a separete 'Port', and there seem to be 2 (or more) undocumented fire buttons!
-
-Because each system has a different number of 'Lines' The resulting buffer size varies depending on the system
+    Because each system has a different number of 'Lines' The resulting buffer
+size varies depending on the system
 
 2. The software stage
-This processes the buffer, and converts it to a single byte for each player - where each bit relates to 1 of the 8 controls... because there are 2 players, there are 2 such bytes
+    This processes the buffer, and converts it to a single byte for each player
+- where each bit relates to 1 of the 8 controls... because there are 2 players,
+there are 2 such bytes
 
-Once the hardware has been scanned, and the key results stored into the buffer, each line of the buffer is compared to the Keymap. 
-This 'Keymap' is the 8 defined controls of each player (U D L R Fire1 Fire2 Fire3 Pause) each defined control has a 'Row' and a "Bitmask' 
-For each entry in the keymap, the program checks that 'row' number in the buffer, and if the bitmask matches the hardware state, that button's bit is set to 1... this is done by ORing the bitmask with the buffer content - if the result is not 255 then that key must be 'down'
+    Once the hardware has been scanned, and the key results stored into the
+buffer, each line of the buffer is compared to the Keymap.
+    This 'Keymap' is the 8 defined controls of each player (U D L R Fire1 Fire2
+Fire3 Pause) each defined control has a 'Row' and a "Bitmask'
+    For each entry in the keymap, the program checks that 'row' number in the
+buffer, and if the bitmask matches the hardware state, that button's bit is set
+to 1... this is done by ORing the bitmask with the buffer content - if the
+result is not 255 then that key must be 'down'
+    There is a 'Quick scan' routine which does this whole procedure, and returns
+the result of this is returned in two bytes  IXL for player 1, and IXH for
+player 2... if you just need to see if any key of any player is down, you can
+just 'AND' both these bytes together, and if the result is less than 255, one
+of the defined controls is down!
 
-There is a 'Quick scan' routine which does this whole procedure, and returns the result of this is returned in two bytes  IXL for player 1, and IXH for player 2... if you just need to see if any key of any player is down, you can just 'AND' both these bytes together, and if the result is less than 255, one of the defined controls is down!
-
-If you need to check 'real keys' (eg letters rather than 'defined keys') you have to go to the 'buffer'... But of course what the bits mean in the buffer is totally platform dependent, so ChibiAkumas only does if for the cheatmode keypress, and define keys routine!
+    If you need to check 'real keys' (eg letters rather than 'defined keys') you
+have to go to the 'buffer'... But of course what the bits mean in the buffer is
+totally platform dependent, so ChibiAkumas only does if for the cheatmode
+keypress, and define keys routine!

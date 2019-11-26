@@ -1,55 +1,90 @@
-A sprite file starts with a header - the header is unspecified in size, as it depends how many sprites the file contains - the sprite data follows the header  although there is likely to be a zero bytes spacer - some sprites may need to be byte aligned (eg background tiles)
+    A sprite file starts with a header - the header is unspecified in size, as
+it depends how many sprites the file contains - the sprite data follows the
+header although there is likely to be a zero bytes spacer - some sprites may
+need to be byte aligned (eg background tiles)
 
-ON THE CPC & Spectrum each sprite has a 6 byte definition - this means you can get the definition of sprite n by reading the six bytes starting n*6
-Sprite files can be loaded anywhere in memory, the sprite data memory location is held as an offset- so you must add the start address of the sprite file to get the final address of the data
+    ON THE CPC & Spectrum each sprite has a 6 byte definition - this means you
+can get the definition of sprite n by reading the six bytes starting n*6
+    Sprite files can be loaded anywhere in memory, the sprite data memory
+location is held as an offset- so you must add the start address of the sprite
+file to get the final address of the data
 
 Bytes:
 [Hei][Wid][Yoff][Xoff][AddrL][AddrH]
 
-Hei - Sprite Height in pixels
-Wid - Sprite Width (In screen bytes)
-Yoff - screen Y-Offset - empty rows of sprites are skipped to save ram, this is how many lines to 'move down' before drawing
+Hei  - Sprite Height in pixels
+Wid  - Sprite Width (In screen bytes)
+Yoff - screen Y-Offset - empty rows of sprites are skipped to save ram, this is
+       how many lines to 'move down' before drawing
 Xoff - called 'xoff' in the code, but this is actually thr Sprite Settings
-	Bit 7 (128)	PSET - non-transparent sprite (erases background - faster)
-	Bit 6 (64)		(CPC) - Double height sprite interlaced 	(ZX) - colorless sprite 
-	Bit 5 (32)		(ZX) - Backgroundless sprite (takes background color)
-	Bit 0-2 (0-5)	(CPC) transparency options (0: black = transparent 4: 1234 color byte is transparent  5: 4321 color byte is transparent)
+        Bit 7 (128)   PSET - non-transparent sprite (erases background - faster)
+        Bit 6 (64)    (CPC) - Double height sprite interlaced
+                      (ZX) - colorless sprite
+        Bit 5 (32)    (ZX) - Backgroundless sprite (takes background color)
+        Bit 0-2 (0-5) (CPC) transparency options (0: black = transparent 4: 1234
+                            color byte is transparent  5: 4321 color byte is
+                            transparent)
 
-AdrH+AdrL - LowHigh Byte of sprite data offset address  - these two make up the address of the bitmap data, add the address of the start of the sprite bank to these to get the sprite data... on the spectrum the bitmap data comes first, then the color data of the sprite.
+AdrH+AdrL - LowHigh Byte of sprite data offset address  - these two make up the
+address of the bitmap data, add the address of the start of the sprite bank to
+these to get the sprite data... on the spectrum the bitmap data comes first,
+then the color data of the sprite.
 
-
-ON THE MSX the 'sprite file' is just a header - there is a seperate 'RLE file' which is loaded into video ram
+ON THE MSX the 'sprite file' is just a header - there is a seperate 'RLE file'
+which is loaded into video ram
 
 there are a few extra bytes on the MSX version
 [Hei][Wid][Yoff][Xoff][SXL][SXH][SYL][SYH][NX][NY]
 
-
 Hei - Sprite Height in pixels
 Wid - Sprite Width (In screen bytes)
-Yoff - screen Y-Offset - empty rows of sprites are skipped to save ram, this is how many lines to 'move down' before drawing
+Yoff - screen Y-Offset - empty rows of sprites are skipped to save ram, this is
+       how many lines to 'move down' before drawing
 Xoff - called 'xoff' in the code, but this is actually thr Sprite Settings
-	Bit 7 (128)	PSET - on MSX2 this is a non-transparent sprite (usually palette 0 is transparent) - all sprites are transparent on V9990
+       Bit 7 (128) PSET - on MSX2 this is a non-transparent sprite (usually
+       palette 0 is transparent) - all sprites are transparent on V9990
 
 SXH+SXL - X pos in Vram of the sprite
-SYH+SYL - Y pos in Vram of the sprite compared to the start of the RLE (the load destination is added to this to get true Ypos)
+SYH+SYL - Y pos in Vram of the sprite compared to the start of the RLE (the load
+          destination is added to this to get true Ypos)
 NX - Width of the sprite in pixels
 NY - Height of the sprite in pixels
 
 ---------------
 
-The game engine can render any sprite width from one byte up (8px on ZX , 4px on CPC , 2px on MSX)... however there are some issues with this
+    The game engine can render any sprite width from one byte up (8px on ZX ,
+4px on CPC , 2px on MSX)... however there are some issues with this
 
-1. Some resolutions have an optimized rending path that uses faster 'stack misuse' to speed up reading - this is not the case with the MSX which uses the VDP for rendering
+1. Some resolutions have an optimized rending path that uses faster 'stack misuse'
+to speed up reading - this is not the case with the MSX which uses the VDP for
+rendering
 
-2. The 'Clipping' only works properly on square sprites of certain sizes - this applies to all systems including the MSX
-	a sprite of 32x24 will overclip if at the bottom of the screen - meaning part will be missing
-	worse still, a sprite of 24x32 will underclip, and if at the bottom of the screen could cause a crash (as memory below the screen is corrupted) - therefore making sprites square is advisable if they will go over the bottom of the screen... some of the larger sprite sizes have 'overrides' hard coded  to a height of 24 (see ShowSpriteReconfigure_128px on the CPC)... this is because super large 'strip' sprites are used in boss sprites - really there is no need for a sprite ingame above 48x48 - and any larger sprite (eg 128x128) should be split into wide and short strips (128x24) to remove any 'blank space' (some strips narrower than others) and allow for per strip transparency ... the GetNextLine command is inefficient - so spliting to 128x128 into strips of 24x128 makes things worse
+2. The 'Clipping' only works properly on square sprites of certain sizes - this
+applies to all systems including the MSX a sprite of 32x24 will overclip if at
+the bottom of the screen - meaning part will be missing worse still, a sprite
+of 24x32 will underclip, and if at the bottom of the screen could cause a crash
+(as memory below the screen is corrupted) - therefore making sprites square is
+advisable if they will go over the bottom of the screen... some of the larger
+sprite sizes have 'overrides' hard coded  to a height of 24 (see
+ShowSpriteReconfigure_128px on the CPC)... this is because super large 'strip'
+sprites are used in boss sprites - really there is no need for a sprite ingame
+above 48x48 - and any larger sprite (eg 128x128) should be split into wide and
+short strips (128x24) to remove any 'blank space' (some strips narrower than
+others) and allow for per strip transparency ... the GetNextLine command is
+inefficient - so spliting to 128x128 into strips of 24x128 makes things worse
 
 Clipping can work for pixel widths of: 8,16,24,32,48,64,80,96,128
 
-On the CPC there are optimized renders for PSET (Non transparent sprites) of pixel widths 8,16,24,32,48,64,72,80,96,128
-On the CPC there are optimized renders for transparent sprites of pixel width: 8,16,24,32,40,48,72,96
+    On the CPC there are optimized renders for PSET (Non transparent sprites)
+of pixel widths 8,16,24,32,48,64,72,80,96,128
+    On the CPC there are optimized renders for transparent sprites of pixel
+width: 8,16,24,32,40,48,72,96
 
-On the Spectrum there are optimized renders for PSET (Non transparent sprites) of pixel widths 16,32,48,64,80,96,128,160,192,256
-On the Spectrum there are optimized renders for transparent sprites of pixel width: 16.32,64,96,192
-* Some of these are pretty absurdly large - because the Spectrum sprite routines are based on the CPC ones - and they have not been removed - it's pretty hard to think of a use for a 256 pixel wide sprite!
+    On the Spectrum there are optimized renders for PSET (Non transparent
+sprites) of pixel widths 16,32,48,64,80,96,128,160,192,256
+    On the Spectrum there are optimized renders for transparent sprites of pixel
+width: 16.32,64,96,192
+
+* Some of these are pretty absurdly large - because the Spectrum sprite routines
+are based on the CPC ones - and they have not been removed - it's pretty hard to
+think of a use for a 256 pixel wide sprite!

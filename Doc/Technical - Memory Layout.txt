@@ -1,19 +1,19 @@
 Memory allocation
 
-Chibi akumas started as a CPC based game, and the requirement that it still
+    Chibi akumas started as a CPC based game, and the requirement that it still
 worked on 64k systems forced some 'strange' design choices such as splitting
 the player and level sprites into multiple banks - to allow a 'simpler' version
 of the games on 64k systems, but to give the 128k version some special
 enhancements!
 
-On the 64k version the Bootstrap is loaded into memory at &8000 when needed -
+    On the 64k version the Bootstrap is loaded into memory at &8000 when needed -
 on 6128 it's always in memory, but it's copied to &8000 so that the 128k version
 works the same as the 64k version
 
-Because the ZX spectrum version requires 128k, the player spritedata is in a
+    Because the ZX spectrum version requires 128k, the player spritedata is in a
 single chunk - this is also true for the MSX which has it's own Vram
 
-On the MSX the 'sprite data' is much smaller, this is because the data in
+    On the MSX the 'sprite data' is much smaller, this is because the data in
 memory is just the sprite definitions - with the actual spritedata stored in
 the MSX Vram. to allow the sprite data to be positioned in memory 'neatly' the
 icons are separate from the player sprites on the MSX (they are stored in the
@@ -21,12 +21,12 @@ spare 64 lines between the two screenbuffers - font and icons are stored at the
 end of the 128k VDP memory)...  also the font has no header - the position of
 the characters is calculated mathmatically without header data.
 
-Because the spectrum 2nd screenbuffer screen shares the same address space as
-the leveldata ,the spectrum version copies a chunk of data from approx
+    Because the spectrum 2nd screenbuffer screen shares the same address space
+as the leveldata ,the spectrum version copies a chunk of data from approx
 &E000-&FFFF from the leveldata bank (0) to the screenbuffer bank (7) - this is
 to allow the background drawing code to be executed with both screenbuffers in
 memory.
 
-The Enterprise 128 version will probably be pretty much identical to the CPC
+    The Enterprise 128 version will probably be pretty much identical to the CPC
 version.
 

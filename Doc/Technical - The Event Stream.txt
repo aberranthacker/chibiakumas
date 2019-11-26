@@ -1,128 +1,181 @@
-Ok, I've saved the worst for last! I'll now be covering the 'event stream'... it's going to take several weeks, so bear with me!
+    Ok, I've saved the worst for last! I'll now be covering the 'event stream'...
+it's going to take several weeks, so bear with me!
 
-The event stream is what effectively creates the enemies and scenary objects that make up a level...
-Because of memory limitations, a level isn't stored as any kind of 'map of data'... there's no 32x200 data array defining the levels.
+    The event stream is what effectively creates the enemies and scenary objects
+that make up a level...
+Because of memory limitations, a level isn't stored as any kind of 'map of data'...
+there's no 32x200 data array defining the levels.
 
-Instead there is a stream of byte data called the 'event stream'
+    Instead there is a stream of byte data called the 'event stream'
 
-Each event in the stream starts with a single byte, which is the 'Time' the event occurs, followed by a 'Event' Byte...and what follows that depends on the event... the 'Time' is counter which starts at zero and goes up infinately, the end of the level is defined by an event in the event stream, so there is no limit to the length of levels (provided the event stream fits in the level block)
+    Each event in the stream starts with a single byte, which is the 'Time' the
+event occurs, followed by a 'Event' Byte...and what follows that depends on the
+event... the 'Time' is counter which starts at zero and goes up infinately, the
+end of the level is defined by an event in the event stream, so there is no
+limit to the length of levels (provided the event stream fits in the level block)
 
 After the 'Time' of the event, there will be a single byte event definition
 
-There is no level editor in ChibiAkuams, you define the level by putting def's in the level block.. but to make things simple I've defined symbols to make things easier.
+    There is no level editor in ChibiAkuams, you define the level by putting
+def's in the level block.. but to make things simple I've defined symbols to
+make things easier.
 
 Lets have a look at a simple event:
-	defb 115,evtMultipleCommands +2
-	defb 	evtSettingsBank_Load +7
-	defb 	evtSingleSprite+3
+        defb 115,evtMultipleCommands +2
+        defb    evtSettingsBank_Load +7
+        defb    evtSingleSprite+3
 
 
-115 			is the time of the event
-evtMultipleCommands +2	is an event 'Combiner' and tells the engine that two events will occur at this time... this is done to save a few bytes, and make clustering objects easier
-evtSettingsBank_Load +7	This event loads predefined object settings from bank 7
-evtSingleSprite+3		This puts a single sprite on row 3 (or column 3 on vertical levels)
+115                     is the time of the event
+evtMultipleCommands +2  is an event 'Combiner' and tells the engine that two
+                        events will occur at this time... this is done to save
+                        a few bytes, and make clustering objects easier
+evtSettingsBank_Load +7 This event loads predefined object settings from bank 7
+evtSingleSprite+3       This puts a single sprite on row 3 (or column 3 on
+                        vertical levels)
 
-Note that some events such as the three above have a +V added parameter value to the event byte... others also have bytes following, eg:
+    Note that some events such as the three above have a +V added parameter
+value to the event byte... others also have bytes following, eg:
 
-defb	evtSingleSprite,TwoFrameSprite+17,24*3+12,199+24		Define a single object... using sprite 17 with alternating frame animation, Xpos 24*3+12, Ypos 199+24
-
-
+; Define a single object... using sprite 17 with alternating frame animation,
+; Xpos 24*3+12, Ypos 199+24
+defb    evtSingleSprite,TwoFrameSprite+17,24*3+12,199+24
 
 ------
 
-So lets take a quick look at all the possible commands in a list... we'll look at them in detail in later weeks!
+    So lets take a quick look at all the possible commands in a list... we'll
+look at them in detail in later weeks!
 ;Layout
 ;defb EVT+V ,b1,b2,b3,b4,b5,b6
 
 ; where an event needs to bytes w1 w2 etc will be used
 
-evtSettingsBank_Save equ %10010000+15		;Save settings to bank b1
-evtSettingsBank_Load equ %10010000;+V		;Load settings from bank V
+evtSettingsBank_Save equ %10010000+15  ; Save settings to bank b1
+evtSettingsBank_Load equ %10010000;+V  ; Load settings from bank V
 
-evtSettingsBankEXT_Save equ %10110000+15	;Save ExtraBank settings to bank b1
-evtSettingsBankEXT_Load equ %10110000;+V	;Load ExtraBank settings from bank V
+evtSettingsBankEXT_Save equ %10110000+15  ; Save ExtraBank settings to bank b1
+evtSettingsBankEXT_Load equ %10110000;+V  ; Load ExtraBank settings from bank V
 
-evtMultipleCommands equ %01110000;+V		;Multiple commands... V commands will follow
+evtMultipleCommands equ %01110000;+V      ; Multiple commands... V commands will follow
 
-evtSetProg	   equ 129			;Set Prog to b1
-evtSetLife	   	   equ 130			;set Life to b1
-evtSetMove	   equ 131			;set Move to b1
-evtSetSprite	   equ 133			;set sprite to b1
-evtSetObjectSize         equ 141 		;set Object sprite size to b1... default is 24
-evtSetAnimator	   equ 142			;set animator to b1... 0 means no animator
+evtSetProg         equ 129 ; Set Prog to b1
+evtSetLife         equ 130 ; set Life to b1
+evtSetMove         equ 131 ; set Move to b1
+evtSetSprite       equ 133 ; set sprite to b1
+evtSetObjectSize   equ 141 ; set Object sprite size to b1... default is 24
+evtSetAnimator     equ 142 ; set animator to b1... 0 means no animator
 
-evtSetProgMoveLife     equ 132			;Set prog to b1, Set move to b2, set life to b3
-evtSetMoveLife           equ 128			;Set Move to b1, Set Life to b2
-
-
-evtAddToForeground equ 135			;Add oject to foreground (back of object array)
-evtAddToBackground equ 134			;Add oject to foreground (front of object array)
+evtSetProgMoveLife equ 132 ; Set prog to b1, Set move to b2, set life to b3
+evtSetMoveLife     equ 128 ; Set Move to b1, Set Life to b2
 
 
-evtSaveLstObjToAdd equ 138			;Save the memory position of last added object in the object array to memory location w1... used for boss sprites
-
-evtSetLevelSpeed   equ 140			;Change the speed of the object array to b1... %00000100 is default.. .%00000010 is faster
-evtJumpToNewTime   equ 136			;Change event stream position to w1 , and levetime to b2... time in b2 must be lower than first event at w1
-evtCallAddress	   equ 137			;Call a memory address w1... make sure you don't change any registers (other than A)
+evtAddToForeground equ 135 ; Add oject to foreground (back of object array)
+evtAddToBackground equ 134 ; Add oject to foreground (front of object array)
 
 
-evtResetPowerup    equ 139			;Take away the player powerups... how mean!
+evtSaveLstObjToAdd equ 138 ; Save the memory position of last added object in
+                           ; the object array to memory location w1... used for
+                           ; boss sprites
 
+evtSetLevelSpeed   equ 140 ; Change the speed of the object array to b1...
+                           ; %00000100 is default.. .%00000010 is faster
+evtJumpToNewTime   equ 136 ; Change event stream position to w1, and levetime
+                           ; to b2... time in b2 must be lower than first event
+                           ; at w1
+evtCallAddress     equ 137 ; Call a memory address w1... make sure you don't
+                           ; change any registers (other than A)
 
+evtResetPowerup    equ 139 ; Take away the player powerups... how mean!
 
-evtSetAnimatorPointers   equ 143 		;set address of array of animators to w1
+evtSetAnimatorPointers  equ 143       ;set address of array of animators to w1
 
-evtStarburt 		equ %01000000		;0100xxxx X Y   = (64) add stars to X,Y (pattern xxxx) - is this ever used???
-evtReprogramPalette 	equ %11110000		;Reprogram the CPC palette - no effect on other systems
-evtReprogramPlusPalette 	equ %11110001	;Reprogram the CPC PLUS palette
+evtStarburt             equ %01000000 ; 0100xxxx X Y = (64) add stars to X,Y
+                                      ; (pattern xxxx) - is this ever used???
+evtReprogramPalette     equ %11110000 ; Reprogram the CPC palette - no effect on
+                                      ; other systems
+evtReprogramPlusPalette equ %11110001 ; Reprogram the CPC PLUS palette
 
-evtReprogramHitHandler 	equ %11110010		;Define Custom hit handler as call to w1, used for boss battles
-evtReprogramShotToDeath	equ %11110011		;Define Custom destroy object event as call to w1, used for nuke satellite, and lasers in Ep2 Tech Noir level
+evtReprogramHitHandler  equ %11110010 ; Define Custom hit handler as call to w1,
+                                      ; used for boss battles
+evtReprogramShotToDeath equ %11110011 ; Define Custom destroy object event as
+                                      ; call to w1, used for nuke satellite, and
+                                      ; lasers in Ep2 Tech Noir level
 evtReprogramSmartBombed equ %11111100
 
-evtReprogramCustomPlayerHitter equ %11111011 	;Define Custom hit handler for players as call to w1 - used for steaks in Alchemy level of ep2
+evtReprogramCustomPlayerHitter equ %11111011 ; Define Custom hit handler for
+                                             ; players as call to w1 - used for
+                                             ; steaks in Alchemy level of ep2
 
-evtReprogramCustomMove1 equ %11110100		;Define Custom Move handler1 to call w1 each object move
-evtReprogramCustomMove2 equ %11110101		;Define Custom Move handler1 to call w2 each object move
-evtReprogramCustomMove3 equ %11110111		;Define Custom Move handler1 to call w3 each object move
-evtReprogramCustomMove4 equ %11111000		;Define Custom Move handler1 to call w4 each object move
+evtReprogramCustomMove1 equ %11110100 ; Define Custom Move handler1 to call w1
+                                      ; each object move
+evtReprogramCustomMove2 equ %11110101 ; Define Custom Move handler1 to call w2
+                                      ; each object move
+evtReprogramCustomMove3 equ %11110111 ; Define Custom Move handler1 to call w3
+                                      ; each object move
+evtReprogramCustomMove4 equ %11111000 ; Define Custom Move handler1 to call w4
+                                      ; each object move
 
-evtReprogramCustomProg1 equ %11111001		;Define Custom Programmer handler1 to call w1 each program tick (custom fire patterns)
-evtReprogramCustomProg2 equ %11111010		;Define Custom Programmer handler1 to call w2 each program tick (custom fire patterns)
+evtReprogramCustomProg1 equ %11111001 ; Define Custom Programmer handler1 to call
+                                      ; w1 each program tick (custom fire patterns)
+evtReprogramCustomProg2 equ %11111010 ; Define Custom Programmer handler1 to call
+                                      ; w2 each program tick (custom fire patterns)
 
-evtReprogram_PowerupSprites 	  equ 	%11110110	;Define the sprite numbers of the power up objects and coin to b1,b2,b3,b4
+evtReprogram_PowerupSprites equ %11110110 ; Define the sprite numbers of the
+                                          ; power up objects and coin to
+                                          ; b1,b2,b3,b4
 
-evtReprogramObjectBurstPosition	  equ 	%11111101	;Set Burst Animation position to (b1,b2)... used for nuke blasts in Ep2
-evtReprogramObjectFullCustomMoves equ	%11111110	;All Move events call to w1
+evtReprogramObjectBurstPosition equ %11111101 ; Set Burst Animation position to
+                                              ; (b1,b2)... used for nuke blasts
+                                              ; in Ep2
+evtReprogramObjectFullCustomMoves equ %11111110 ; All Move events call to w1
 
-evtReprogramSmartBombSpecial 	  equ	%11111111	;Smart bomb event calls to w1... used by omega array to wipe omega stars
+evtReprogramSmartBombSpecial equ %11111111 ; Smart bomb event calls to w1...
+                                           ; used by omega array to wipe omega
+                                           ; stars
 
-evtSingleSprite equ 0					;Single sprite... multiple options depending on V	
-							;0+0 		add one object...sprite b1.. at pos (b2,b3)
-							;0+1   		Add one sprite to pos b1 Far right (sprite predefined)
-							;0+(2-13)	add one 24 pixel object far right X=160+24 Y=v*16 -8 (sprite predefined)
+evtSingleSprite equ 0 ; Single sprite... multiple options depending on V
+                      ; 0+0            add one object...sprite b1.. at pos
+                      ;                (b2,b3)
+                      ; 0+1            Add one sprite to pos b1 Far right
+                      ;                (sprite predefined)
+                      ; 0+(2-13)       add one 24 pixel object far right
+                      ;                X=160+24 Y=v*16 -8 (sprite predefined)
 
-evtTileSprite equ 48 					;add  V objects... all on column b1 starting at row b2.. Spaced b3 apart vertically
+evtTileSprite equ 48  ; add  V objects... all on column b1 starting at row b2..
+                      ; Spaced b3 apart vertically
 
-
-evtBurstSprite equ 14					;Add an object to the burst position
-
-
+evtBurstSprite equ 14 ; Add an object to the burst position
 
 -----------------
 
-Before an object is added to the object array by the event stream, it's attributes must be defined - as the "Add object" command does not define any attributes by itself... it can at most, define X,Y location, and Sprite... and may not even define sprite!
+    Before an object is added to the object array by the event stream, it's
+attributes must be defined - as the "Add object" command does not define any
+attributes by itself... it can at most, define X,Y location, and Sprite... and
+may not even define sprite!
 
-To set the life, Movement and attack of the enemy, we use the "Set" commands... the following all read in a single byte:
+    To set the life, Movement and attack of the enemy, we use the "Set" commands...
+the following all read in a single byte:
 
-evtSetProg - will read in a byte, and set the program of the next object to add to the program defined by that byte... remember, program typically defines 'Fire pattern' of the enemy
-evtSetLife	 - will define the 'Life' of the object, which will also define if it hurts the player, or is merely inanimate background...
+evtSetProg - will read in a byte, and set the program of the next object to add
+             to the program defined by that byte... remember, program typically
+             defines 'Fire pattern' of the enemy
+evtSetLife - will define the 'Life' of the object, which will also define if it
+             hurts the player, or is merely inanimate background...
 evtSetMove - will define the Movement of the next object to add.
-evtSetObjectSize - will define the size of the object hitbox in pixels (eg default is 24 - meaning 24x24) ... this defines the 'hitbox' for enemy, defining when it hurts the player, and is injured by player bullets
-evtSetAnimator - will define the 'Animator'... 0 means no animator, others will define an animation sequence and frame... see the animators document for more details
-evtSetSprite - while some 'Add' commands define sprite, others do not, so this will be used for those that do not.
-evtAddToForeground - add the next object to the end of the object array - effectively ensuring it will appear in the foreground (because the objects are drawn in order)
-evtAddToBackground - add the next object to the front of the object array - effectively ensuring it will appear in the background
+evtSetObjectSize - will define the size of the object hitbox in pixels
+                   (eg default is 24 - meaning 24x24) ... this defines the
+                   'hitbox' for enemy, defining when it hurts the player, and
+                   is injured by player bullets
+evtSetAnimator - will define the 'Animator'... 0 means no animator, others will
+                 define an animation sequence and frame... see the animators
+                 document for more details
+evtSetSprite - while some 'Add' commands define sprite, others do not, so this
+               will be used for those that do not.
+evtAddToForeground - add the next object to the end of the object array -
+                     effectively ensuring it will appear in the foreground
+                     (because the objects are drawn in order)
+evtAddToBackground - add the next object to the front of the object array -
+                     effectively ensuring it will appear in the background
 
 In some cases you can define multiple at the same time:
 evtSetMoveLife - read in two bytes, and use them as Move and Life
@@ -144,10 +197,10 @@ A single sprite can be created, using the defined sprite, to the far right, in a
 
 if a sprite needs to appear in a different, or more precise position it can be defined with evtSingleSprite,ss,xx,yy... where ss is the sprite number, xx is the Xpos, and yy is the ypos
 
-To add a 'strip' of sprites (eg to create the giant angler-grinder boss) the evtTileSprite command can be used... for example: 
+To add a 'strip' of sprites (eg to create the giant angler-grinder boss) the evtTileSprite command can be used... for example:
 defb evtTileSprite+V,xx,yy,space,s1,s2... will add V sprites, to pos xx,yy... spaced 'space' vertically apart, and the sprites will be s1, s2... up to sV
 
 Lets see it in the game code:
-	defb 	evtTileSprite+2 ,BossXpos+24 ,BossYPos2  ,24
-	defb	TwoFrameSprite +5 
-	defb 	TwoFrameSprite +4 
+        defb    evtTileSprite+2 ,BossXpos+24 ,BossYPos2  ,24
+        defb    TwoFrameSprite +5
+        defb    TwoFrameSprite +4
