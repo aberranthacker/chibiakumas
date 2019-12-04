@@ -65,7 +65,7 @@ Stars_AddObjectOne:
     defb 0
 Stars_AddBurst:
     defw &3f08
-    defb 0,0 
+    defb 0,0
 Stars_AddBurst_Small:
     defw &3632
     defw &2e2A
@@ -93,7 +93,7 @@ Stars_AddBurst_BottomWide:
     defw &3533
     defw &3d3b
     defb 0
-    
+
 ;   ld hl,OuterBurstPatternMini  ; OuterBurstPattern
 ;   ld iy,Stars_AddBurstStartOne ; Change RST6 call
 OuterBurstPatternLoop:
@@ -113,10 +113,11 @@ Stars_AddObjectBatchDefault:
 Stars_AddObjectBatch:
     ;ld iy,Stars_AddBurstStart
 
-    ; B= pattern (0-15)
-    ; C = Y pos, D= X pos
+    ; B = pattern (0-15)
+    ; C = Y pos
+    ; D = X pos
     ld a,b
-    cp 16           ;radial blast!
+    cp 16 ; radial blast!
     jp nc,Stars_AddObjectBatch2
 
     ld hl,Stars_VectorArray
@@ -146,7 +147,7 @@ VectorLookup:
         add hl,bc   ;add twice for a two byte address
         add hl,bc
     pop bc
-    ld a,(hl)       ; read the two bytes in     
+    ld a,(hl)       ; read the two bytes in
     inc hl
     ld h,(hl)
     ld l,a      ; hl now is the memory loc of the line
@@ -181,13 +182,13 @@ Stars_VectorArray:
 Stars_AddToPlayer:
     xor a
     ld (StarArrayFullMarker_Plus1-1),a
-    ld a,PlayerStarArraySize;(StarArraySize_Player) 
-    ld hl,PlayerStarArrayPointer;(StarArrayMemloc_Player)      
+    ld a,PlayerStarArraySize;(StarArraySize_Player)
+    ld hl,PlayerStarArrayPointer;(StarArrayMemloc_Player)
 jr Stars_AddToDefaultB
 
 Stars_AddToDefault:
-    ld a,StarArraySize;(StarArraySize_Enemy) 
-    ld hl,StarArrayPointer;(StarArrayMemloc_Enemy)     
+    ld a,StarArraySize;(StarArraySize_Enemy)
+    ld hl,StarArrayPointer;(StarArrayMemloc_Enemy)
 
 Stars_AddToDefaultB:
     ld (StarsAddObjectStarArraySize_Plus1-1),a
@@ -217,12 +218,12 @@ Stars_AddBurstLoop:
     pop de
 
     ld a,ixh
-    sub 2 :BurstSpacing_Plus1   ;alter to reduce fire
+    sub 2 :BurstSpacing_Plus1 ; alter to reduce fire
     ret c
     cp ixl
     ret c
 
-    cp &24 
+    cp &24
     jr nz,Stars_AddBurstOk  ; dont add a static star!
 
     dec a
@@ -234,30 +235,31 @@ Stars_AddObjectFromA:
     ld (StarObjectMoveToAdd_Plus1-1),a
 
 Stars_AddObject:
-    ; C = Y pos, D= X pos
+    ; C = Y pos
+    ; D = X pos
     ld a,0 :StarArrayFullMarker_Plus1
     or a
     ret nz  ; If A>0 we cannot add any stars as the loop is full!
 
     ld b,0         :StarArrayStartPoint_Plus1
     ld hl,&6969    :StarsAddObjectStarArrayPointer_Plus2
-    
+
     ld a,l
     add b
     ld l,a
 
-Stars_SeekLoop: 
-    ld a,(hl)   ; Y check
-    or a    
+Stars_SeekLoop:
+    ld a,(hl) ; Y check
+    or a
     jp NZ,Stars_SeekLoopNext        ; if Y<>0 then this slot is in use
     ld a,b
     ld (StarArrayStartPoint_Plus1-1),a
 
     ;found a free slot!
-    ld (hl),c   ;Y
+    ld (hl),c ; Y
     inc h   ;add hl,de
 
-    ld (hl),d   ;X
+    ld (hl),d ; X
 
     inc h   ;add hl,de
     ld (hl),&0      :StarObjectMoveToAdd_Plus1  ;**** THIS SHOULD BE THE MOVE - need to finish coding!
@@ -265,24 +267,25 @@ Stars_SeekLoop:
     ret
 
 Stars_SeekLoopNext:
-    inc l;inc hl
+    inc l ;inc hl
     inc b
     ld a,0 :StarsAddObjectStarArraySize_Plus1
-    cp b 
+    cp b
     jr nz,Stars_SeekLoop
     ld (StarArrayFullMarker_Plus1-1),a
     ret
 
 Stars_AddObjectBatch2:
-    ; a= pattern (16+)
-    ; C = Y pos, D= X pos
+    ; A = pattern (16+)
+    ; C = Y pos
+    ; D = X pos
     sub 16
     ld hl,StarsOneByteDirs
 
     add l
     ld l,a
 
-    ld a,(hl)   
+    ld a,(hl)
     jr Stars_AddObjectFromA
 
 ;    16   17  18 19   20  21  22 23   24, 25 ,26, 27,28 , 29,30 , 31

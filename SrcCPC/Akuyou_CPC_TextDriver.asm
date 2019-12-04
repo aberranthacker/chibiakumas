@@ -97,12 +97,11 @@ ret
 
 
 DrawText_CarriageReturnSprite:
-ld hl,&0000 :DrawText_CarriageReturnSpritePos_Plus2
-inc l
+    ld hl,&0000 :DrawText_CarriageReturnSpritePos_Plus2
+    inc l
 DrawText_LocateSprite4CR:
-ld (DrawText_CarriageReturnSpritePos_Plus2-2),hl
+    ld (DrawText_CarriageReturnSpritePos_Plus2-2),hl
 DrawText_LocateSprite:  ; this mimics the way the firmare functions work  (DrawText_Locate)
-
     ld a,l
     add a
     add a

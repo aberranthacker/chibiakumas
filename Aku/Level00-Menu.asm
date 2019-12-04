@@ -2699,7 +2699,7 @@ ShowText_MoreText:
     inc bc
 
     push hl
-        call Akuyou_DrawText_LocateSprite
+        call Akuyou_DrawText_LocateSprite ; SrcCPC/Akuyou_CPC_TextDriver.asm:104
     pop hl
 
     inc l

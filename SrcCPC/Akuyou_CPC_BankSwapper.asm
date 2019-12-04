@@ -71,7 +71,7 @@ Firmware_Kill:  ; firmwares? we don't need no steenking firmwares!
 
 DoCustomRsts:
     ld hl,&0030 ; Set RST 6 to Call IY
-    ld  de,&e9FD 
+    ld de,&E9FD ; FD E9 == JP (iy)
 LdHlEd:
     ld (hl),e
     inc hl
