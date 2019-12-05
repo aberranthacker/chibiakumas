@@ -1,3 +1,4 @@
+       .nolist
 
        .include "./hwdefs.s"
        .include "./macros.s"
@@ -8,17 +9,19 @@
        .equiv  Level00SizeWords, (end - start) >> 1
        .global Level00SizeWords
 
-       .=Akuyou_LevelStart
+        .=Akuyou_LevelStart
+start:  JMP  LevelInit
 
-start:
-        JMP  LevelInit
-
+TITLETEX: .incbin "resources/titletex.spr"
+       .even
+YahooStr: .asciz "Yippee! Whoopee! Woo-hoo! Yay! Hurrah!\n"
+       .even
 CustomRam: .space 64 # Pos-Tick-Pos-Tick # enough memory for 16 enemies!
 
-EventStreamArray_EP1: #------------------------------------------------------{{{
+EventStreamArray_Ep1: #------------------------------------------------------{{{
     # Load Palette
     .byte 0,0b01110000+4   # 4 Commands
-    .byte 240,0,6          # (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    .byte 0xF0,0,6          # (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     .byte 1                    # 2
     .byte 1                    # 3
     .byte 0x54,0x55,0x4C,0x4B  # 4
@@ -52,31 +55,63 @@ EventStreamArray_EP1: #------------------------------------------------------{{{
     .even
 #----------------------------------------------------------------------------}}}
 PauseLoop:
-   .byte 4
+    .byte 4
        .byte 136       # Jump to a different level point
        .word PauseLoop # pointer
        .byte 60        # new time
     .even
 
 LevelInit:
-        MOV  $Player_Array,R5
-
     .ifdef CompileEP2
         MOV  $EventStreamArray_Ep2,R3 # Event Stream
     .else
         MOV  $EventStreamArray_Ep1,R3 # Event Stream
     .endif
         MOV  $Event_SavedSettings,R2  # Saved Settings
-        CALL AkuYou_Event_StreamInit
+        CALL Event_StreamInit
 
-        #call Akuyou_Music_Restart
-        #call Akuyou_ScreenBuffer_Reset
-        #call Akuyou_Interrupt_Init
+        #CALL Akuyou_Music_Restart
+        #CALL Akuyou_ScreenBuffer_Reset
+        #CALL Akuyou_Interrupt_Init
 
         #JMP ShowTitlePic
 
+        TST  @$PPUCommand
+        BNE  .-4
+       .putstr $YahooStr
+
+        MOV  $37*2,R1
+
+        MOV  $62,R0
+        MOV  $TITLETEX,R4
+        ADD  4(R4),R4
+        MOV  $FB1,R5
+1$:    .rept 3
+        MOV  (R4)+,(R5)+
+       .endr
+        ADD  R1,R5
+        SOB  R0,1$
+
+        MOV  $62,R0
+        MOV  $TITLETEX,R4
+        ADD  10(R4),R4
+        MOV  $FB1+6,R5
+2$:    .rept 3
+        MOV  (R4)+,(R5)+
+       .endr
+        ADD  R1,R5
+        SOB  R0,2$
+
         JMP  WaitKeyThenExit
 
+ResetEventStream:
+        MOV  $256*4>>2,R1
+        MOV  $StarArrayPointer,R2
+1$:     CLR  (R2)+
+        CLR  (R2)+
+        SOB  R1,1$
+        MOV  $Event_SavedSettings,R2
+RETURN
 WaitKeyThenExit: #-----------------------------------------------------------{{{
         TST  @$KeyboardScanner_KeyPresses + 2
         BEQ  .-4

@@ -36,7 +36,7 @@ cpc_bmp.each.with_index do |cpc_word, i|
   line_idx = i / 40 # 40 words per line
   word_idx_within_a_line = i % 40
   line = line_idx % 25
-  row =  line_idx / 25
+  row  = line_idx / 25
   uknc_line_idx = line * 8 + row
   uknc_word_idx = uknc_line_idx * 40 + word_idx_within_a_line
 

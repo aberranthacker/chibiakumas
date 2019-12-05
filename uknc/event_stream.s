@@ -3,7 +3,7 @@
                                                             # ;*                            Object Event Array                               *
                                                             # ;*******************************************************************************
                                                             #
-                                                            # Event_LevelTime equ Event_LevelTime_Plus1-1
+                                                            # Event_LevelTime equ Event_LevelTime_Plus1 - 1
                                                             # Event_LevelSpeed equ Event_LevelSpeed_Plus1-1
                                                             # Event_NextEventPointer equ Event_NextEventPointer_Plus2-2
                                                             # Event_NextEventTime equ Event_NextEventTime_Plus1-1
@@ -69,14 +69,14 @@ DoMovesBackground_SetScroll:                                # DoMovesBackground_
 RETURN                                                      # ret
 SetLevelTime: # This is used for jumping around the event stream # SetLevelTime:
         # Make sure level time is LOWER than the first event, otherwise run Event_GetEventsNow
-                                                            #     ld (Event_LevelTime),a
-                                                            #     ld a,(hl)
-                                                            #     ld (Event_NextEventTime_Plus1-1),a
+        MOV  R0,@$srcEvent_LevelTime                        #     ld (Event_LevelTime),a
+        MOVB (R3)+,@$srcEvent_NextEventTime                 #     ld a,(hl)
+                                                            #     ld (Event_NextEventTime_Plus1 - 1),a
                                                             #
                                                             #     inc hl
-                                                            #     ld (Event_NextEventPointer_Plus2-2),hl
+        MOV  R3,@$srcEvent_NextEventPointer                 #     ld (Event_NextEventPointer_Plus2 - 2),hl
                                                             #
-                                                            #     ret
+RETURN                                                      #     ret
                                                             # GetLevelTime: ; Return the current level time
                                                             #     ld a,(Event_NextEventTime)
                                                             #     ld b,a
@@ -96,7 +96,7 @@ Event_StreamInit:                                           # Event_StreamInit:
 
         BR   Event_GetEventsNow # process the first batch of events
                                                             #
-                                                            # Event_MoreEventsDec:      ; multiple events at the same timepoint
+Event_MoreEventsDec: #multiple events at the same timepoint # Event_MoreEventsDec: ; multiple events at the same timepoint
                                                             #     dec a
                                                             #     ld (Event_MultipleEventCount_Plus1-1),a
                                                             #     ld (Event_NextEventPointer),hl
@@ -113,55 +113,58 @@ Event_StreamInit:                                           # Event_StreamInit:
                                                             #     and %00000100:Event_LevelSpeed_Plus1    ; how often ticks occur
                                                             #     ret z       ; no ticks occured
                                                             # Event_Stream_ForceNow:
-                                                            #     ld a,&0 :Event_LevelTime_Plus1
+        MOV  $0x00,R0; Event_LevelTime_Plus2:               #     ld a,&0 :Event_LevelTime_Plus1
+       .equiv srcEvent_LevelTime, Event_LevelTime_Plus2 - 2
                                                             #     inc a
                                                             #     ld (Event_LevelTime),a
                                                             #     ld b,a
                                                             #
                                                             # Event_MoreEvents:
-                                                            #     ld a,1 :Event_NextEventTime_Plus1       ;The time the event should occur
+        MOV  $1,R0; Event_NextEventTime_Plus2:              #     ld a,1 :Event_NextEventTime_Plus1       ;The time the event should occur
+       .equiv srcEvent_NextEventTime, Event_NextEventTime_Plus2 - 2
                                                             #     cp b
                                                             #     ret nz  ; event does not happen yet
-                                                            # Event_GetEventsNow:
-                                                            #
-                                                            #     ld iy,LdAFromHLIncHL    ; Set RST 6 to do our bidding
+
+Event_GetEventsNow:                                         # Event_GetEventsNow:
+        #MOV  $LdAFromHLIncHL,R5                             #     ld iy,LdAFromHLIncHL ; Set RST 6 to do our bidding
                                                             #     ld hl,Event_LoadNextEvt
-                                                            #     push hl         ;We do a dirty trick to save space, all these actions end in a RET
+        MOV  $Event_LoadNextEvt,-(SP)                       #     push hl ; We do a dirty trick to save space, all these actions end in a RET
                                                             #
-                                                            #     ld hl,6969 :Event_NextEventPointer_Plus2 ; mem pointer of next byte
-                                                            #     ld a,(hl)
+        MOV  $0x0000,R3; Event_NextEventPointer_Plus2:      #     ld hl,6969 :Event_NextEventPointer_Plus2 ; mem pointer of next byte
+       .equiv srcEvent_NextEventPointer, Event_NextEventPointer_Plus2 - 2
+        MOVB (R3)+,R0                                       #     ld a,(hl)
                                                             #     inc hl
-                                                            #     ld d,a
-                                                            #     and %00001111
+        MOV  R0,R1                                          #     ld d,a
+        BIC  $0xFFF0,R1                                     #     and %00001111
                                                             #     ld b,a
                                                             #     ld a,d
-                                                            #     and %11110000
+        BIC  $0xFF0F,R0                                     #     and %11110000
+        ASH  $-4,R0                                         #     rrca
                                                             #     rrca
                                                             #     rrca
                                                             #     rrca
-                                                            #     rrca
-                                                            #     push hl
-                                                            #     ld hl,Event_VectorArray
-                                                            #     jp VectorJump_PushHlFirst
+        PUSH R3                                             #     push hl
+        MOV  $Event_VectorArray,R3                          #     ld hl,Event_VectorArray
+        JMP  VectorJump_PushHlFirst                         #     jp VectorJump_PushHlFirst
                                                             #
-                                                            # Event_StarBust:
+Event_StarBust:                                             # Event_StarBust:
                                                             #     ld d,(hl)   ;X
                                                             #     inc hl
-                                                            #     ld C,(hl)   ;Y
+                                                            #     ld c,(hl)   ;Y
                                                             #     inc hl
                                                             #     push hl
                                                             #     push iy
-                                                            #         call Stars_AddObjectBatchDefault;Stars_AddObjectBatch
+                                                            #         call Stars_AddObjectBatchDefault
                                                             #     pop iy
                                                             #     pop hl
-                                                            #     ret
+HALT #RETURN                                                #     ret
                                                             #
-                                                            # ;By default each time can only have ONE event, but we can use this commend to declare
-                                                            # ;XX events will occur at this time to save memory!
-                                                            # Event_CoreMultipleEventsAtOneTime:
+# By default each time can only have ONE event, but we can use this commend to declare
+# XX events will occur at this time to save memory!
+Event_CoreMultipleEventsAtOneTime:                          # Event_CoreMultipleEventsAtOneTime:
                                                             #     ld a,b
-                                                            #     ld (Event_MultipleEventCount_Plus1-1),a
-                                                            #     ret
+        MOV  R1,@$srcEvent_MultipleEventCount               #     ld (Event_MultipleEventCount_Plus1 - 1),a
+RETURN                                                      #     ret
                                                             #
                                                             # Event_SpriteSwitch_0101:          ;Set the next sprite
                                                             #     ld de,EventObjectSpriteToAdd_Plus1-1
@@ -204,14 +207,11 @@ Event_StreamInit:                                           # Event_StreamInit:
                                                             #     ret
                                                             #
                                                             # ; Reconfigure the core for custom actions this level
-                                                            # Event_CoreReprogram:    ;1111????
-                                                            #     ld a,b
-                                                            # ;   cp 16
-                                                            # ;   ret nc;jp nc,Event_LoadNextEvt  ; our array only has 6 entries
-                                                            #
-                                                            #     push hl
-                                                            #     ld hl,Event_ReprogramVector
-                                                            #     jp VectorJump_PushHlFirst
+Event_CoreReprogram: # 0b1111????                           # Event_CoreReprogram:    ;1111????
+        MOV  R1,R0                                          #     ld a,b
+        PUSH R3                                             #     push hl
+        MOV  $Event_ReprogramVector,R3                      #     ld hl,Event_ReprogramVector
+        JMP  VectorJump_PushHlFirst                         #     jp VectorJump_PushHlFirst
                                                             #
                                                             # ;Powerup objects are defined by their sprite, which changes each level
                                                             # ; OK so I didn't think this through very well!
@@ -288,11 +288,11 @@ Event_StreamInit:                                           # Event_StreamInit:
                                                             # ;halt ;this is deprecated
                                                             # ;   jr Event_CoreReprogram_DataCopy
                                                             #
-                                                            # ; Program raster palette - careful - this can cause all nasty crashes if you
-                                                            # ; do it wrong, as you have to specify bytes, offsets and loop counters,
-                                                            # ; it's best to copy existing ones from levels and modify them
+# ; Program raster palette - careful - this can cause all nasty crashes if you
+# ; do it wrong, as you have to specify bytes, offsets and loop counters,
+# ; it's best to copy existing ones from levels and modify them
                                                             #
-                                                            # Event_CoreReprogram_Palette:
+Event_CoreReprogram_Palette:                                # Event_CoreReprogram_Palette:
                                                             #     ld de,RasterColors_ColorArray1 :RasterColors_ColorArray1PointerB_Plus2
                                                             #
                                                             # Event_CoreReprogram_DataCopy:
@@ -309,13 +309,12 @@ Event_StreamInit:                                           # Event_StreamInit:
                                                             #     pop hl
                                                             #     inc hl
                                                             #
-                                                            #
                                                             #     ld b,a
                                                             #     ld c,(hl)   ;bytecount
                                                             #     inc hl
                                                             #
                                                             #     ldir
-                                                            #     ret
+RETURN                                                      #     ret
                                                             #
                                                             # Event_MoveSwitch:
                                                             #     ld a,b
@@ -483,11 +482,17 @@ Event_StreamInit:                                           # Event_StreamInit:
                                                             #     jr EventoneObjectStrip
                                                             #
                                                             # ; Read in the next object
-                                                            # Event_LoadNextEvt:
-       MOV  $0,R0; Event_MultipleEventCount_Plus2:          #     ld a,0 :Event_MultipleEventCount_Plus1
-      .equiv srcEvent_MultipleEventCount, Event_MultipleEventCount_Plus2 - 2
+Event_LoadNextEvt:                                          # Event_LoadNextEvt:
+        TST  $0x00; Event_MultipleEventCount_Plus2: # 4     #     ld a,0 :Event_MultipleEventCount_Plus1
+       .equiv srcEvent_MultipleEventCount, Event_MultipleEventCount_Plus2 - 2
                                                             #     or a
-                                                            #     jp nz,Event_MoreEventsDec ; there are multiple events at this point
+        BEQ  EventsProcessed                                #     jp nz,Event_MoreEventsDec ; there are multiple events at this point
+        # multiple events at the same timepoint             # Event_MoreEventsDec: ; multiple events at the same timepoint
+                                                            #     dec a
+        DEC  @$srcEvent_MultipleEventCount                  #     ld (Event_MultipleEventCount_Plus1-1),a
+        MOV  R3,@$srcEvent_NextEventPointer                 #     ld (Event_NextEventPointer),hl
+        JMP  Event_GetEventsNow                             #     jr Event_GetEventsNow
+    EventsProcessed:
                                                             #     rst 6
                                                             #     ld (Event_NextEventTime),a
                                                             #     ld (Event_NextEventPointer),hl

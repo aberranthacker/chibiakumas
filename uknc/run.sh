@@ -9,6 +9,7 @@ cp -f RT11SJ54g.dsk aku.dsk
 ../build_tools/rt11dsk a aku.dsk AKU.SAV 1>/dev/null
 ../build_tools/rt11dsk a aku.dsk CORE.BIN 1>/dev/null
 ../build_tools/rt11dsk a aku.dsk PPU.BIN 1>/dev/null
+../build_tools/rt11dsk a aku.dsk LVL00.BIN 1>/dev/null
 ../build_tools/rt11dsk a aku.dsk LOADIN.SCR 1>/dev/null
 
 echo starting UKNCBTL

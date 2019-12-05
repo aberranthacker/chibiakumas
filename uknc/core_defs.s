@@ -10,15 +10,17 @@
 .equiv FB0,           0x300  # 01400   768
 .equiv FB1,           0x4180 # 04060 16768
 
-.equiv PPU_Print, 2
-.equiv PPU_SetPalette, 1
+.equiv PPU_Print, 4
+.equiv PPU_SetPalette, 3
+.equiv PPU_MultiProcess, 2
+.equiv PPU_SingleProcess, 1
 .equiv PPU_Finalize, -1
 
 .equiv BootstrapStart,  FB0
 .equiv Akuyou_GameVars, 0x8000 # 0100000 32768
 .equiv Akuyou_CoreStart, (Akuyou_GameVars + 0x700) # Need &700 (1792) bytes!
                                                    # 0x8700 (34560)
-.equiv Akuyou_LevelStart, 0x8A56 # 0105126 35414
+.equiv Akuyou_LevelStart, 0x8C1A # 0106032 35866
 # 0x5900 (22784) bytes of RAM the rest
 # 0xE000 (57344) end of ram
 

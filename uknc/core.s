@@ -1,65 +1,66 @@
-                .nolist
+       .nolist
 
-                .title Chibi Akumas core module
-                .global start # make entry point available to linker
+       .title Chibi Akumas core module
+       .global start # make entry point available to linker
 
-                .global ContinueMode
-                .global ContinuesReset
-                .global FileBeginCore
-                .global FileEndCore
-                .global KeyboardScanner_KeyPresses
-                .global MultiplayConfig
-                .global NULL
-                .global Player_Array
-                .global Player_Array2
-                .global Player_ScoreBytes
-                .global Player_ScoreBytes2
-                .global SavedSettings
-                .global SavedSettings_Last
-                .global SmartBombsReset
-                .global StarArrayPointer
+       .global ContinueMode
+       .global ContinuesReset
+       .global Event_SavedSettings
+       .global FileBeginCore
+       .global FileEndCore
+       .global KeyboardScanner_KeyPresses
+       .global MultiplayConfig
+       .global NULL
+       .global Player_Array
+       .global Player_Array2
+       .global Player_ScoreBytes
+       .global Player_ScoreBytes2
+       .global SavedSettings
+       .global SavedSettings_Last
+       .global SmartBombsReset
+       .global StarArrayPointer
 
-                .include "macros.s"
-                .include "core_defs.s"
+       .include "macros.s"
+       .include "core_defs.s"
 
-        .equiv TextScreen_MaxX, 39
-        .equiv TextScreen_MinX, 0
-        .equiv TextScreen_MaxY, 24
-        .equiv TextScreen_MinY, 0
+       .equiv TextScreen_MaxX, 39
+       .equiv TextScreen_MinX, 0
+       .equiv TextScreen_MaxY, 24
+       .equiv TextScreen_MinY, 0
 
 #******************************************************************************#
 #*                             Main Project Code                              *#
 #******************************************************************************#
                 .=Akuyou_GameVars # Need &700 bytes!
 
-        .equiv StarArraySize, 255
-        .equiv ObjectArraySize, 60 # Must be under 64!
-        .equiv PlayerStarArraySize, 128
+       .equiv StarArraySize, 255
+       .equiv ObjectArraySize, 60 # Must be under 64!
+       .equiv PlayerStarArraySize, 128
 
-        .balign 256
+       .balign 256
 StarArrayPointer:
-        .space 256*3
+       .space 256*3
 
 ObjectArrayPointer: # first ObjectArraySize*2 of each 256 are used - rest (>128) are spare
-        .space 256*4
+       .space 256*4
         # First 128 are used by object array
-        .equiv PlayerStarArrayPointer, (ObjectArrayPointer + 128)
+       .equiv PlayerStarArrayPointer, (ObjectArrayPointer + 128)
         # Out the way of the Object array!??
-        .equiv Event_SavedSettings, (256 * 3 + ObjectArrayPointer + 128)
+       .equiv Event_SavedSettings, (256 * 3 + ObjectArrayPointer + 128)
 
         # -Player 2's data starts XX bytes after player so you can use IY+XX+1 to get
         # a var from player 2 without changing IY
-        .equiv Akuyou_PlayerSeparator, 16
+       .equiv Akuyou_PlayerSeparator, 16
 
-        .equiv Keymap_U,     0
-        .equiv Keymap_D,     1
-        .equiv Keymap_L,     2
-        .equiv Keymap_R,     3
-        .equiv Keymap_F1,    4
-        .equiv Keymap_F2,    5
-        .equiv Keymap_F3,    6
-        .equiv Keymap_Pause, 7
-        .equiv Keymap_AnyFire, 0b11001111
+       .equiv Keymap_U,     0
+       .equiv Keymap_D,     1
+       .equiv Keymap_L,     2
+       .equiv Keymap_R,     3
+       .equiv Keymap_F1,    4
+       .equiv Keymap_F2,    5
+       .equiv Keymap_F3,    6
+       .equiv Keymap_Pause, 7
+       .equiv Keymap_AnyFire, 0b11001111
 
 ################################################################################
 #                                 Aligned Code                                 #
@@ -131,28 +132,28 @@ SavedSettings: # {{{
         P2_P15: .byte 0x67       # 15 - FireDir
 
     KeyMap2:
-        .byte 0xFF,       0x00 # Pause
-        .byte 0b01111111, 0x05 # Fire3
-        .byte 0b10111111, 0x06 # Fire2R
-        .byte 0b01111111, 0x06 # Fire1L
-        .byte 0b11011111, 0x07 # Right
-        .byte 0b11011111, 0x08 # Left
-        .byte 0b11101111, 0x07 # Down
-        .byte 0b11110111, 0x07 # Up
+       .byte 0xFF,       0x00 # Pause
+       .byte 0b01111111, 0x05 # Fire3
+       .byte 0b10111111, 0x06 # Fire2R
+       .byte 0b01111111, 0x06 # Fire1L
+       .byte 0b11011111, 0x07 # Right
+       .byte 0b11011111, 0x08 # Left
+       .byte 0b11101111, 0x07 # Down
+       .byte 0b11110111, 0x07 # Up
 
     KeyMap:
-        .byte 0xF7,       0x03 # Pause bit 20
-        .byte 0b11111011, 0x02 # Fire3     19
-        .byte 0b11111011, 0x04 # Fire2R    18
-        .byte 0b11110111, 0x04 # Fire1L    17
-        .byte 0xFD,       0x00 # Right     16
-        .byte 0xFE,       0x01 # Left      15
-        .byte 0xFB,       0x00 # Down      14
-        .byte 0xFE,       0x00 # Up        13
+       .byte 0xF7,       0x03 # Pause bit 20
+       .byte 0b11111011, 0x02 # Fire3     19
+       .byte 0b11111011, 0x04 # Fire2R    18
+       .byte 0b11110111, 0x04 # Fire1L    17
+       .byte 0xFD,       0x00 # Right     16
+       .byte 0xFE,       0x01 # Left      15
+       .byte 0xFB,       0x00 # Down      14
+       .byte 0xFE,       0x00 # Up        13
 
     KeyboardScanner_KeyPresses: .space 10,0 # This is the raw keypress data
 
-        .balign 8,0
+       .balign 8,0
     Player_ScoreBytes:  .space 8,0 # Player 2 current score
     Player_ScoreBytes2: .space 8,0 # Player 1 current score
     # 25
@@ -290,8 +291,8 @@ SavedSettings_Last: # 0x80 bytes --------------------------------------------}}}
                                         # StarsOneByteDirs:
                                         #     defb &21,&09,&0C,&0F,&27,&3F,&3C,&39,&61,&49,&4c,&4f,&67,&7f,&7c,&79
                                         #
-                                        # Event_ReprogramVector:
-                                        #     defw Event_CoreReprogram_Palette          ; 0
+Event_ReprogramVector:
+       .word Event_CoreReprogram_Palette # 0 # TODO: implement this
                                         #     defw null;Event_CoreReprogram_PlusPalette ; 1      ; Obsolete - Reserver for Plus Palette
                                         #     defw Event_CoreReprogram_ObjectHitHandler ; 2
                                         #     defw Event_CoreReprogram_ShotToDeath      ; 3
@@ -328,23 +329,23 @@ SavedSettings_Last: # 0x80 bytes --------------------------------------------}}}
                                         #
                                         # ; These are the jump-pointes used by the raster color interrupt routine - to
                                         # ; try to save time only one byte is altered, so it must be byte aligned!
-                                        # Event_VectorArray:
-                                        #     defw Event_OneObj                      ;  0
-                                        #     defw Event_MultiObj                    ; 16
-                                        #     defw Event_ObjColumn                   ; 32
-                                        #     defw Event_ObjStrip                    ; 48
-                                        #     defw Event_StarBust                    ; 64
-                                        #     defw null                              ; 80
-                                        #     defw null                              ; 96
-                                        #     defw Event_CoreMultipleEventsAtOneTime ;112
-                                        #     defw Event_MoveSwitch                  ;128
-                                        #     defw Event_CoreSaveLoadSettings        ;144
-                                        #     defw null;Event_MoveSwitchMore         ;160
-                                        #     defw Event_CoreSaveLoadSettings2       ;176
-                                        #     defw null                              ;192
-                                        #     defw null                              ;208
-                                        #     defw null                              ;224
-                                        #     defw Event_CoreReprogram               ;240
+Event_VectorArray:
+       .word NULL  #  0  0              #     defw Event_OneObj                      ;  0
+       .word NULL  # 16  2              #     defw Event_MultiObj                    ; 16
+       .word NULL  # 32  4              #     defw Event_ObjColumn                   ; 32
+       .word NULL  # 48  6              #     defw Event_ObjStrip                    ; 48
+       .word NULL  # 64  8              #     defw Event_StarBust                    ; 64
+       .word NULL  # 80 10              #     defw null                              ; 80
+       .word NULL  # 96 12              #     defw null                              ; 96
+       .word Event_CoreMultipleEventsAtOneTime #112 14
+       .word NULL  #128 16              #     defw Event_MoveSwitch                  ;128
+       .word NULL  #144 18              #     defw Event_CoreSaveLoadSettings        ;144
+       .word NULL  #160 20              #     defw null;Event_MoveSwitchMore         ;160
+       .word NULL  #176 22              #     defw Event_CoreSaveLoadSettings2       ;176
+       .word NULL  #192 24              #     defw null                              ;192
+       .word NULL  #208 26              #     defw null                              ;208
+       .word NULL  #224 28              #     defw null                              ;224
+       .word Event_CoreReprogram               #240 30
                                         #
                                         # read "..\SrcCPC\Akuyou_CPC_InterruptHandler.asm"
 
@@ -352,51 +353,51 @@ SavedSettings_Last: # 0x80 bytes --------------------------------------------}}}
 #                            End of aligned code                               #
 ################################################################################
 
-# PLY_FrequencyTable:
-#     .word 3822, 3608, 3405, 3214, 3034, 2863, 2703, 2551, 2408, 2273, 2145, 2025
-#     .word 1911, 1804, 1703, 1607, 1517, 1432, 1351, 1276, 1204, 1136, 1073, 1012
-#     .word  956,  902,  851,  804,  758,  716,  676,  638,  602,  568,  536,  506
-#     .word  478,  451,  426,  402,  379,  358,  338,  319,  301,  284,  268,  253
-#     .word  239,  225,  213,  201,  190,  179,  169,  159,  150,  142,  134,  127
-#     .word  119,  113,  106,  100,   95,   89,   84,   80,   75,   71,   67,   63
-#     .word   60,   56,   53,   50,   47,   45,   42,   40,   38,   36,   34,   32
-#     .word   30,   28,   27,   25,   24,   22,   21,   20,   19,   18,   17,   16
-#     .word   15,   14,   13,   13,   12,   11,   11,   10,    9,    9,    8,    8
-#     .word    7,    7,    7,    6,    6,    6,    5,    5,    5,    4,    4,    4
-#     .word    4,    4,    3,    3,    3,    3,    3,    2,    2,    2,    2,    2
-#     .word    2,    2,    2,    2,    1,    1,    1,    1,    1,    1,    1,    1
+PLY_FrequencyTable:
+    .word 3822, 3608, 3405, 3214, 3034, 2863, 2703, 2551, 2408, 2273, 2145, 2025
+    .word 1911, 1804, 1703, 1607, 1517, 1432, 1351, 1276, 1204, 1136, 1073, 1012
+    .word  956,  902,  851,  804,  758,  716,  676,  638,  602,  568,  536,  506
+    .word  478,  451,  426,  402,  379,  358,  338,  319,  301,  284,  268,  253
+    .word  239,  225,  213,  201,  190,  179,  169,  159,  150,  142,  134,  127
+    .word  119,  113,  106,  100,   95,   89,   84,   80,   75,   71,   67,   63
+    .word   60,   56,   53,   50,   47,   45,   42,   40,   38,   36,   34,   32
+    .word   30,   28,   27,   25,   24,   22,   21,   20,   19,   18,   17,   16
+    .word   15,   14,   13,   13,   12,   11,   11,   10,    9,    9,    8,    8
+    .word    7,    7,    7,    6,    6,    6,    5,    5,    5,    4,    4,    4
+    .word    4,    4,    3,    3,    3,    3,    3,    2,    2,    2,    2,    2
+    .word    2,    2,    2,    2,    1,    1,    1,    1,    1,    1,    1,    1
 NULL:   RETURN
                                         #
                                         #   # ifdef CPC320
-        .include "virtual_screen_pos_320.s" #     read "../SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm"
+       .include "virtual_screen_pos_320.s" #     read "../SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm"
                                         #   # else
                                         #   #     read "../SrcCPC/Akuyou_CPC_VirtualScreenPos_256.asm"
                                         #   # endif
-        .include "show_sprite.s"        # read "../SrcCPC/Akuyou_CPC_ShowSprite.asm"
+       .include "show_sprite.s"         # read "../SrcCPC/Akuyou_CPC_ShowSprite.asm"
                                         #
-        .include "stararray.s"          # read "../SrcALL/Akuyou_Multiplatform_Stararray.asm"
-        .include "stararray_add.s"      # read "../SrcALL/Akuyou_Multiplatform_Stararray_Add.asm"
-        .include "do_moves.s"           # read "../SrcALL/Akuyou_Multiplatform_DoMoves.asm"
+       .include "stararray.s"           # read "../SrcALL/Akuyou_Multiplatform_Stararray.asm"
+       .include "stararray_add.s"       # read "../SrcALL/Akuyou_Multiplatform_Stararray_Add.asm"
+       .include "do_moves.s"            # read "../SrcALL/Akuyou_Multiplatform_DoMoves.asm"
                                         #
                                         # ;;;;;;;;;;;;;;;;;;;;Input Driver;;;;;;;;;;;;;;;;;;;;;;;;
                                         # read "../SrcCPC/Akuyou_CPC_KeyboardDriver.asm"
                                         # ;;;;;;;;;;;;;;;;;;;;Disk Driver;;;;;;;;;;;;;;;;;;;;;;;;
-        .include "disk_driver.s"        # read "../SrcCPC/Akuyou_CPC_DiskDriver.asm"
+       .include "disk_driver.s"         # read "../SrcCPC/Akuyou_CPC_DiskDriver.asm"
                                         # read "../SrcCPC/Akuyou_CPC_ExecuteBootstrap.asm"
                                         # read "../SrcCPC/Akuyou_CPC_TextDriver.asm"
                                         #
-        .include "sfx.s"                # read "../SrcALL/Akuyou_Multiplatform_SFX.asm"
+       .include "sfx.s"                 # read "../SrcALL/Akuyou_Multiplatform_SFX.asm"
                                         #
                                         # read "../SrcCPC/Akuyou_CPC_CompiledSpriteViewer.asm"    ;also includes CLS
                                         # read "../SrcCPC/Akuyou_CPC_BankSwapper.asm"
                                         #
-        .include "player_driver.s"      # read "../SrcALL/Akuyou_Multiplatform_PlayerDriver.asm"
-        .include "timer.s"              # read "../SrcALL/Akuyou_Multiplatform_Timer.asm"
+       .include "player_driver.s"       # read "../SrcALL/Akuyou_Multiplatform_PlayerDriver.asm"
+       .include "timer.s"               # read "../SrcALL/Akuyou_Multiplatform_Timer.asm"
                                         #
                                         # read "../SrcCPC/Akuyou_CPC_Gradient.asm"
                                         #
-        .include "object_driver.s"      # read "../SrcALL/Akuyou_Multiplatform_ObjectDriver.asm"
-        .include "event_stream.s"       # read "../SrcALL/Akuyou_Multiplatform_EventStream.asm"
+       .include "object_driver.s"       # read "../SrcALL/Akuyou_Multiplatform_ObjectDriver.asm"
+       .include "event_stream.s"        # read "../SrcALL/Akuyou_Multiplatform_EventStream.asm"
                                         # read "../SrcCPC/Akuyou_CPC_CpcPlus.asm"
                                         # read "../SrcALL/Akuyou_Multiplatform_ArkosTrackerLite.asm"
                                         # read "../SrcCPC/Akuyou_CPC_ScreenMemory.asm"
@@ -414,8 +415,10 @@ NULL:   RETURN
                                         #     save direct "CORE    .AKU",Akuyou_CoreStart,&3001   ;address,size...}[,exec_address]
                                         # nolist
 end: FileEndCore:
+.list
        .global LevelStart
 LevelStart:
-        JMP  $LevelStart # - Level start
+        JMP  @$LevelStart # - Level start
 LevelLoop:
-        JMP  $LevelLoop  # - Level loop
+        JMP  @$LevelLoop  # - Level loop
+.nolist

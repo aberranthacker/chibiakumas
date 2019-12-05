@@ -65,7 +65,7 @@ Stars_AddObjectOne:
     .byte 0
 Stars_AddBurst:
     .word 0x3f08
-    .byte 0,0 
+    .byte 0,0
 Stars_AddBurst_Small:
     .word 0x3632
     .word 0x2E2A
@@ -93,7 +93,7 @@ Stars_AddBurst_BottomWide:
     .word 0x3533
     .word 0x3D3B
     .byte 0
-                                                            #     
+                                                            #
                                                             # ;   ld hl,OuterBurstPatternMini  ; OuterBurstPattern
                                                             # ;   ld iy,Stars_AddBurstStartOne ; Change RST6 call
                                                             # OuterBurstPatternLoop:
@@ -106,23 +106,24 @@ Stars_AddBurst_BottomWide:
                                                             #     pop hl
                                                             #     inc hl
                                                             #     jr OuterBurstPatternLoop
-                                                            # 
+                                                            #
                                                             # Stars_AddObjectBatchDefault:
                                                             #     call Stars_AddToDefault
-                                                            # 
+                                                            #
                                                             # Stars_AddObjectBatch:
                                                             #     ;ld iy,Stars_AddBurstStart
-                                                            # 
-                                                            #     ; B= pattern (0-15)
-                                                            #     ; C = Y pos, D= X pos
+                                                            #
+                                                            #     ; B = pattern (0-15)
+                                                            #     ; C = Y pos
+                                                            #     ; D = X pos
                                                             #     ld a,b
                                                             #     cp 16           ;radial blast!
                                                             #     jp nc,Stars_AddObjectBatch2
-                                                            # 
+                                                            #
                                                             #     ld hl,Stars_VectorArray
-                                                            # 
+                                                            #
                                                             #     call VectorLookup
-                                                            # 
+                                                            #
                                                             # Stars_AddBurstsLoop
                                                             #     ld a,(hl)
                                                             #     or a
@@ -134,32 +135,25 @@ Stars_AddBurst_BottomWide:
                                                             #         inc a   ;only run if two vals aren't the same!
                                                             #         call nz,Stars_AddBurstStart
                                                             #     pop hl
-                                                            # 
+                                                            #
                                                             #     inc hl
                                                             #     inc hl
                                                             # jr Stars_AddBurstsLoop
-                                                            # 
-                                                            # VectorLookup:
-                                                            #     push bc
-                                                            #         ld b,0
-                                                            #         ld c,a
-                                                            #         add hl,bc   ;add twice for a two byte address
-                                                            #         add hl,bc
-                                                            #     pop bc
-                                                            #     ld a,(hl)       ; read the two bytes in     
-                                                            #     inc hl
-                                                            #     ld h,(hl)
-                                                            #     ld l,a      ; hl now is the memory loc of the line
-                                                            # ret
-                                                            # 
-                                                            # ;Jump to address No A at HL  - MUST PUSH HL Before Jumping here!
-                                                            # VectorJump_PushHlFirst:
-                                                            #     call VectorLookup
-                                                            # 
-                                                            #     ld (VectorJump_Plus2-2),hl
-                                                            #     pop hl
-                                                            # jp &0000 :VectorJump_Plus2
-                                                            # 
+                                                            #
+.macro VectorLookup # VectorLookup:
+        ADD  R0,R3   # add twice for a two byte address
+        ADD  R0,R3
+        MOV  (R3),R3 # hl now is the memory loc of the line
+.endm
+        # Jump to address No A at HL - MUST PUSH HL Before Jumping here!
+VectorJump_PushHlFirst: # ../SrcALL/Akuyou_Multiplatform_Stararray_Add.asm:156
+        ADD  R0,R3   # add twice for a two byte address
+        ADD  R0,R3
+        # TODO: use JMP  @(R4)
+        MOV  (R3),$VectorJump_Plus2-2 # hl now is the memory loc of the line
+        POP  R3
+        JMP  $0x0000; VectorJump_Plus2:
+
                                                             # Stars_VectorArray:
                                                             #     defw Stars_AddObjectOne         ;  0 = just one - obsolete
                                                             #     defw Stars_AddBurst_TopLeft     ;  1
@@ -177,112 +171,113 @@ Stars_AddBurst_BottomWide:
                                                             #     defw Stars_AddBurst             ; 13
                                                             #     defw Stars_AddBurst_Small       ; 14
                                                             #     defw Stars_AddBurst_Outer       ; 15
-                                                            # 
+                                                            #
                                                             # Stars_AddToPlayer:
                                                             #     xor a
                                                             #     ld (StarArrayFullMarker_Plus1-1),a
-                                                            #     ld a,PlayerStarArraySize;(StarArraySize_Player) 
-                                                            #     ld hl,PlayerStarArrayPointer;(StarArrayMemloc_Player)      
+                                                            #     ld a,PlayerStarArraySize;(StarArraySize_Player)
+                                                            #     ld hl,PlayerStarArrayPointer;(StarArrayMemloc_Player)
                                                             # jr Stars_AddToDefaultB
-                                                            # 
+                                                            #
                                                             # Stars_AddToDefault:
-                                                            #     ld a,StarArraySize;(StarArraySize_Enemy) 
-                                                            #     ld hl,StarArrayPointer;(StarArrayMemloc_Enemy)     
-                                                            # 
+                                                            #     ld a,StarArraySize ; (StarArraySize_Enemy)
+                                                            #     ld hl,StarArrayPointer ; (StarArrayMemloc_Enemy)
+                                                            #
                                                             # Stars_AddToDefaultB:
                                                             #     ld (StarsAddObjectStarArraySize_Plus1-1),a
                                                             #     ld (StarsAddObjectStarArrayPointer_Plus2-2),hl
                                                             #     xor a
                                                             #     ld (StarArrayStartPoint_Plus1-1),a
                                                             #     ret
-                                                            # 
+                                                            #
                                                             # ;Stars_AddBurst
                                                             # ;   ld hl,&3f08 ; FROM - TO
                                                             # ;   jr Stars_AddBurstStart
                                                             # Stars_AddBurstStartOne:
                                                             #     ld l,h
-                                                            # 
+                                                            #
                                                             # Stars_AddBurstStart:
                                                             #     push hl
                                                             #     ld a,h
-                                                            # 
+                                                            #
                                                             # Stars_AddBurstStart2:
                                                             #     pop ix
-                                                            # 
+                                                            #
                                                             # Stars_AddBurstLoop:
                                                             #     push de
                                                             #     push bc
                                                             #         call Stars_AddObjectFromA
                                                             #     pop bc
                                                             #     pop de
-                                                            # 
+                                                            #
                                                             #     ld a,ixh
                                                             #     sub 2 :BurstSpacing_Plus1   ;alter to reduce fire
                                                             #     ret c
                                                             #     cp ixl
                                                             #     ret c
-                                                            # 
-                                                            #     cp &24 
+                                                            #
+                                                            #     cp &24
                                                             #     jr nz,Stars_AddBurstOk  ; dont add a static star!
-                                                            # 
+                                                            #
                                                             #     dec a
                                                             # Stars_AddBurstOk:
                                                             #     ld ixh,a
                                                             #     jr Stars_AddBurstLoop
-                                                            # 
+                                                            #
                                                             # Stars_AddObjectFromA:
                                                             #     ld (StarObjectMoveToAdd_Plus1-1),a
-                                                            # 
+                                                            #
                                                             # Stars_AddObject:
                                                             #     ; C = Y pos, D= X pos
                                                             #     ld a,0 :StarArrayFullMarker_Plus1
                                                             #     or a
                                                             #     ret nz  ; If A>0 we cannot add any stars as the loop is full!
-                                                            # 
+                                                            #
                                                             #     ld b,0         :StarArrayStartPoint_Plus1
                                                             #     ld hl,&6969    :StarsAddObjectStarArrayPointer_Plus2
-                                                            #     
+                                                            #
                                                             #     ld a,l
                                                             #     add b
                                                             #     ld l,a
-                                                            # 
-                                                            # Stars_SeekLoop: 
+                                                            #
+                                                            # Stars_SeekLoop:
                                                             #     ld a,(hl)   ; Y check
-                                                            #     or a    
+                                                            #     or a
                                                             #     jp NZ,Stars_SeekLoopNext        ; if Y<>0 then this slot is in use
                                                             #     ld a,b
                                                             #     ld (StarArrayStartPoint_Plus1-1),a
-                                                            # 
+                                                            #
                                                             #     ;found a free slot!
                                                             #     ld (hl),c   ;Y
                                                             #     inc h   ;add hl,de
-                                                            # 
+                                                            #
                                                             #     ld (hl),d   ;X
-                                                            # 
+                                                            #
                                                             #     inc h   ;add hl,de
                                                             #     ld (hl),&0      :StarObjectMoveToAdd_Plus1  ;**** THIS SHOULD BE THE MOVE - need to finish coding!
-                                                            # 
+                                                            #
                                                             #     ret
-                                                            # 
+                                                            #
                                                             # Stars_SeekLoopNext:
                                                             #     inc l;inc hl
                                                             #     inc b
                                                             #     ld a,0 :StarsAddObjectStarArraySize_Plus1
-                                                            #     cp b 
+                                                            #     cp b
                                                             #     jr nz,Stars_SeekLoop
                                                             #     ld (StarArrayFullMarker_Plus1-1),a
                                                             #     ret
-                                                            # 
+                                                            #
                                                             # Stars_AddObjectBatch2:
-                                                            #     ; a= pattern (16+)
-                                                            #     ; C = Y pos, D= X pos
+                                                            #     ; A = pattern (16+)
+                                                            #     ; C = Y pos
+                                                            #     ; D = X pos
                                                             #     sub 16
                                                             #     ld hl,StarsOneByteDirs
-                                                            # 
+                                                            #
                                                             #     add l
                                                             #     ld l,a
-                                                            # 
-                                                            #     ld a,(hl)   
+                                                            #
+                                                            #     ld a,(hl)
                                                             #     jr Stars_AddObjectFromA
-                                                            # 
+                                                            #
                                                             # ;    16   17  18 19   20  21  22 23   24, 25 ,26, 27,28 , 29,30 , 31

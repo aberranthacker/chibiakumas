@@ -1,4 +1,4 @@
-#!/bin/ruby
+#!/usr/bin/ruby
 
 nm='~/opt/binutils-pdp11/pdp11-dec-aout/bin/nm'
 nm_output = `#{nm} build/core.o -g`

@@ -66,10 +66,6 @@ Bootstrap_StartGame:
         JSR  R5,PPEXEC
         .WORD FB1 # PPU module location
         .WORD PPU_ModuleSizeWords
-
-       .putstr $LoadingStr
-        TST  PPUCommand
-        BNE  .-4
 #----------------------------------------------------------------------------}}}
 # clear main screen area ----------------------------------------------------{{{
         MOV  $4000, R0
@@ -79,10 +75,7 @@ Bootstrap_StartGame:
         MOV  R3, (R1)+
         SOB  R0, 1$
 #----------------------------------------------------------------------------}}}
-       .putstr $CountStr
-        TST  @$PPUCommand
-        BNE  .-4
-# load loading screen -------------------------------------------------------{{{
+        # load loading screen
         MOV  $PPU_SetPalette, @$PPUCommand
         MOV  $PPU_LoadingScreenPalette, @$PPUCommandArg
 
@@ -90,27 +83,18 @@ Bootstrap_StartGame:
         MOV  $FB1, @$ReadBuffer
         MOV  $8000, @$ReadWordsCount
         CALL Bootstrap_LoadDiskFile
-#----------------------------------------------------------------------------}}}
-        INC  @$CountStr
-       .putstr $CountStr
-
         # Load the game core - this is always in memory
         MOV  $CORE__BIN, @$LookupFileName
         MOV  $FileBeginCore, @$ReadBuffer
         MOV  $FileSizeCoreWords, @$ReadWordsCount
         CALL Bootstrap_LoadDiskFile
 
-        INC  @$CountStr
-       .putstr $CountStr
+        # # Load saved settings
+        # MOV  $SAVSETBIN, @$LookupFileName
+        # MOV  $SavedSettings, @$ReadBuffer
+        # MOV  $FileSizeSettingsWords, @$ReadWordsCount
+        # CALL Bootstrap_LoadDiskFile
 
-        # Load saved settings
-        MOV  $SAVSETBIN, @$LookupFileName
-        MOV  $SavedSettings, @$ReadBuffer
-        MOV  $FileSizeSettingsWords, @$ReadWordsCount
-        CALL Bootstrap_LoadDiskFile
-
-        INC  @$CountStr
-       .putstr $CountStr
         # TODO: font load
         # TODO: player sprites load
         # TODO: Initialize the Sound Effects.
@@ -120,6 +104,7 @@ Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
         CALL StartANewGame              # call StartANewGame
         CALL LevelReset0000             # call LevelReset0000
                                         #
+        .list
         MOV  $LVL00_BIN, @$LookupFileName
         MOV  $Akuyou_LevelStart, @$ReadBuffer
         MOV  $Level00SizeWords, @$ReadWordsCount
@@ -134,9 +119,15 @@ Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
                                         #
                                         # ;need to use Specail MSX version - no extra tilemaps
                                         # jp Bootstrap_LoadEP2Level_1PartOnly # ../Aku/BootStrap.asm:724
-         JMP  $Akuyou_LevelStart
-         JMP  WaitKeyThenExit
-         RETURN                         # ret
+
+        # TST  @$PPUCommand
+        # BNE  .-4
+        # MOV  $PPU_SingleProcess,@$PPUCommand
+
+        JMP  @$Akuyou_LevelStart
+        JMP  WaitKeyThenExit
+        RETURN                         # ret
+        .nolist
 #----------------------------------------------------------------------------
 Player_Dead_ResumeB: # ../Aku/BootStrap.asm:1411
         SpendCreditSelfMod2:
@@ -194,10 +185,8 @@ ContinueModeSet: # ../Aku/BootStrap.asm:2165
                                                             #     ld a,(iy-15)
         BITB $0x80,-15(R5)                                  #     and %10000000
        .CALL NE, FireMode_4D                                #     call nz,FireMode_4D
-                                                            #
                                                             #     ld a,1
         MOVB $1,-7(R5)                                      #     ld (iy-7),a ;live players
-                                                            #
                                                             #     ;multiplay support
         MOV  $0x003E,R3                                     #     ld hl,&003E
                                                             #     ld a,(MultiplayConfig)
@@ -225,13 +214,13 @@ StartANewGame_NoControlFlip: # ../Aku/BootStrap.asm:2206
         MOV  $Player_Array, R5 # AkuYou_Player_GetPlayerVars
 
         MOV  $0010000,R2 # MOV R0,R0 # slightly faster than NOP
-        BITB $0b01000000,-11(R5) # test bit 6
+        BITB $0x40,-11(R5) # test bit 6
         BNE  NoBulletSlowdown
         MOV  $0006200,R2 # ASR R0
 NoBulletSlowdown: # ../Aku/BootStrap.asm:2206
         MOV  R2,@$srcStarSlowdown # ../SrcALL/Akuyou_Multiplatform_Stararray.asm:107
 
-        .equiv BulletConfigSize, BulletConfigHeaven_End - BulletConfigHeaven
+       .equiv BulletConfigSize, BulletConfigHeaven_End - BulletConfigHeaven
         MOV  $Stars_AddBurst_Top,R2
         MOV  $BulletConfigSize,R1
         MOV  $BulletConfigHeaven,R3
@@ -253,13 +242,13 @@ useheaven: # ../Aku/BootStrap.asm:2242
 RETURN
 
 Difficulty_Easy: # ../Aku/BootStrap.asm:2286
-        MOV  $0b00100000,R0
+        MOV  $0x20,R0 # bit 5
         BR   Difficulty_Generic
 Difficulty_Normal:
-        MOV  $0b00010000,R0
+        MOV  $0x10,R0 # bit 4
         BR   Difficulty_Generic
 Difficulty_Hard:
-        MOV  $0b00001000,R0
+        MOV  $0x08,R0 # bit 3
         BR   Difficulty_Generic
 Difficulty_Generic:
         CLC
@@ -296,56 +285,56 @@ RETURN
 
 LevelReset0000: # ../Aku/BootStrap.asm:2306 ---------------------------------{{{
             # wipe our memory, to clear out any junk from old levels
-            .equiv LevelArraysSizeW, (Akuyou_CoreStart - Akuyou_GameVars) >> 1
-            MOV  $LevelArraysSizeW,R1
-            MOV  $StarArrayPointer,R3
-            CLR  (R3)+
-            SOB  R1, .-2
-            # This resets anything the last level may have messed with during
-            # play so we can start a new level with everything back to normal
+       .equiv LevelArraysSizeW, (Akuyou_CoreStart - Akuyou_GameVars) >> 1
+        MOV  $LevelArraysSizeW,R1
+        MOV  $StarArrayPointer,R3
+        CLR  (R3)+
+        SOB  R1, .-2
+        # This resets anything the last level may have messed with during
+        # play so we can start a new level with everything back to normal
 ResetCore: # ../Aku/BootStrap.asm:2318
-            MOV  $1,R0
-            CALL ShowSpriteReconfigureEnableDisable # ./SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm:82
+        MOV  $1,R0
+        CALL ShowSpriteReconfigureEnableDisable # ./SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm:82
 
-            MOV  $0x69,R0
-            MOV  R0,@$srcTimer_CurrentTick
-            MOV  R0,@$cmpDroneFlipCurrent
-            MOV  R0,@$cmpDroneFlipFireCurrent
+        MOV  $0x69,R0
+        MOV  R0,@$srcTimer_CurrentTick
+        MOV  R0,@$cmpDroneFlipCurrent
+        MOV  R0,@$cmpDroneFlipFireCurrent
 
-            CLR  R0
-            MOV  R0,@$srcEventObjectAnimatorToAdd
-            MOV  R0,@$srcEventObjectSpriteSizeToAdd
-            MOV  R0,@$srcEventObjectProgramToAdd
-            MOV  R0,@$srcTimer_TicksOccured
-            # R0 has to contain zero to tell the subroutine to init
-            CALL DroneFlipFire # TODO: implement this; does nothing for now
+        CLR  R0
+        MOV  R0,@$srcEventObjectAnimatorToAdd
+        MOV  R0,@$srcEventObjectSpriteSizeToAdd
+        MOV  R0,@$srcEventObjectProgramToAdd
+        MOV  R0,@$srcTimer_TicksOccured
+        # R0 has to contain zero to tell the subroutine to init
+        CALL DroneFlipFire # TODO: implement this; does nothing for now
 
-            MOV  $Object_DecreaseLifeShot, @$dstObjectShotOverride
+        MOV  $Object_DecreaseLifeShot, @$dstObjectShotOverride
 
-            # set stuff that happens every level
-            MOV  $0x2064,@$Player_Array  # X:0x20 Y:0x64
-            MOV  $0x2096,@$Player_Array2 # X:0x20 Y:0x96
+        # set stuff that happens every level
+        MOV  $0x2064,@$Player_Array  # X:0x20 Y:0x64
+        MOV  $0x2096,@$Player_Array2 # X:0x20 Y:0x96
 
-            MOV  $DoMoves,@$dstObjectDoMovesOverride
+        MOV  $DoMoves,@$dstObjectDoMovesOverride
 
-            MOV  $NULL,R3
-            MOV  R3,@$dstSmartBombSpecial
-            MOV  R3,@$dstCustomSmartBombEnemy
-            MOV  R3,@$dstCustomPlayerHitter
-            MOV  R3,@$dstCustomShotToDeathCall
+        MOV  $NULL,R3
+        MOV  R3,@$dstSmartBombSpecial
+        MOV  R3,@$dstCustomSmartBombEnemy
+        MOV  R3,@$dstCustomPlayerHitter
+        MOV  R3,@$dstCustomShotToDeathCall
 
-            CLR  R0
-            MOV  R0,@$srcSfx_CurrentPriority # clear the to-do
-            MOV  R0,@$srcSfx_Sound           # clear the note
+        CLR  R0
+        MOV  R0,@$srcSfx_CurrentPriority # clear the to-do
+        MOV  R0,@$srcSfx_Sound           # clear the note
 
-            CALL DoMovesBackground_SetScroll # TODO: implement the subroutine
+        CALL DoMovesBackground_SetScroll # TODO: implement the subroutine
 
-            # TODO: Set RST 6 to call IY
-            #CALL DoCustomRsts # ../SrcCPC/Akuyou_CPC_BankSwapper.asm:73
+        # TODO: Set RST 6 to call IY
+        #CALL DoCustomRsts # ../SrcCPC/Akuyou_CPC_BankSwapper.asm:73
 
-            MOV  $Player_Array,R5 # call AkuYou_Player_GetPlayerVars
-            #read "..\AkuCPC\Bootstrap_ReconfigureCore_CPC.asm"
-            MOV  $Player_Array,R5 # call AkuYou_Player_GetPlayerVars
+        MOV  $Player_Array,R5 # call AkuYou_Player_GetPlayerVars
+        #read "..\AkuCPC\Bootstrap_ReconfigureCore_CPC.asm"
+        MOV  $Player_Array,R5 # call AkuYou_Player_GetPlayerVars
 RETURN
 #----------------------------------------------------------------------------}}}
 
@@ -384,7 +373,7 @@ WaitKey: #-------------------------------------------------------------------{{{
         RETURN
 #----------------------------------------------------------------------------}}}
 
-            .include "./ppucmd.s"
+       .include "./ppucmd.s"
 
 BulletConfigHeaven: #--------------------------------------------------------{{{
     # Starbust code - we use RST 6 as an 'add command' to save memory - RST 6 calls IY
@@ -639,6 +628,16 @@ LongStr:    .asciz "This is a very very very very very very very very very very 
         .even
 LoadingStr: .asciz "\n\n     Loading"
         .even
-CountStr:   .asciz "0"
+TestStr: #.byte 0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,0x0F
+         #.byte 0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F
+         #.byte 0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F
+         .byte        '!,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F
+         .byte 0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x3A,0x3B,0x3C,0x3D,0x3E,0x3F
+         .byte 0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F
+         .byte 0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A,0x5B,0x5C,0x5D,0x5E,0x5F
+         .byte 0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67,0x68,0x69,0x6A,0x6B,0x6C,0x6D,0x6E,0x6F
+         .byte 0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77,0x78,0x79,0x7A,0x7B,0x7C,0x7D,0x7E,0x7F
+         .byte 0x80,0x81,0x82,0x83,0x84,0x85
+         .byte 0x00
         .even
 BootstrapEnd:

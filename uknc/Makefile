@@ -13,6 +13,7 @@ common = hwdefs.s core_defs.s macros.s
 
 build/AKU.SAV : build/bootstrap.o \
 		build/core.o \
+		build/level-00_menu.o \
 		build/CORE.BIN \
 		build/PPU.BIN \
 		build/LOADIN.SCR \
@@ -62,12 +63,19 @@ build/core.o : core.s \
 	build_tools/level_start_update.rb
 
 build/ppu.o : ppu.s \
-	      cga8x8b.raw \
+	      resources/font.bin \
 	      $(common)
 	$(AS) ppu.s -o build/ppu.o
 build/level-00_menu.o : core_defs.s \
-                        level-00_menu.s
-	$(AS) level-00_menu.s -o build/level-00_menu.o
+                        level-00_menu.s \
+                        resources/titletex.spr
+	$(AS) -al level-00_menu.s -o build/level-00_menu.o
+#resources/font.bin : ../Aku/Sprites/T07-SC1.SPR
+#	build_tools/spr_cpc_to_uknc.rb ../Aku/Sprites/T07-SC1.SPR --font -o resources/font.bin
+resources/font.bin : ../ResCPC/font.bin
+	build_tools/spr_cpc_to_uknc.rb ../ResCPC/font.bin --font -o resources/font.bin
+resources/titletex.spr : ../Aku/Sprites/TITLETEX.SPR
+	build_tools/spr_cpc_to_uknc.rb ../Aku/Sprites/TITLETEX.SPR -o resources/titletex.spr
 
 clean :
 	rm -f build/*.o build/*.out build/*.SAV build/*.BIN

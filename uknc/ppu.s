@@ -1,16 +1,16 @@
-                .nolist
+               .nolist
 
-                .TITLE Chibi Akumas PPU module
-                .GLOBAL start # make entry point available to linker
+               .TITLE Chibi Akumas PPU module
+               .GLOBAL start # make entry point available to linker
 
-                .include "./macros.s"
-                .include "./hwdefs.s"
-                .include "./core_defs.s"
+               .include "./macros.s"
+               .include "./hwdefs.s"
+               .include "./core_defs.s"
 
-                .equiv  PPU_ModuleSizeWords, (end - start) >> 1
-                .global PPU_ModuleSizeWords
+               .equiv  PPU_ModuleSizeWords, (end - start) >> 1
+               .global PPU_ModuleSizeWords
 
-                .=PPU_UserRamStart
+               .=PPU_UserRamStart
 
 start:
 ClrTextArea: # --------------------------------------------------------------{{{
@@ -20,10 +20,10 @@ ClrTextArea: # --------------------------------------------------------------{{{
                 MOV  $PBP0DT,R4
                 MOV  $0100000,(R5)
 
-1$:             .rept 2
+1$:            .rept 2
                 MOV  R1,(R4)
                 INC  (R5)
-                .endr
+               .endr
                 SOB  R0,1$
 #----------------------------------------------------------------------------}}}
 # initialize our scanlines parameters table (SLTAB): ------------------------{{{
@@ -235,7 +235,10 @@ Setup:          #------------------------------------------------------------{{{
                 RETURN                # end of the init subroutine
 #----------------------------------------------------------------------------}}}
 Teardown:       #------------------------------------------------------------{{{
-                CLR  @$07100          # do not run the PGM anymore
+                TST  SingleProcessFlag # were we in single process mode?
+                BEQ  1$
+                MOV  (SP)+,R0         # yes, remove stored R0 from stack
+1$:             CLR  @$07100          # do not run the PGM anymore
                 MOV  @$SYS100, @$0100 # restore Vblank interrupt handler
                 MOV  @$SYS272, @$0272 # restore default SLTAB (186; 0xBA)
                 MOV  @$SYS300, @$0300 # restore keyboard interrupt handler
@@ -245,15 +248,29 @@ Teardown:       #------------------------------------------------------------{{{
                 JMP  @$0176300        # free allocated memory and exit
                 # RETURN
 #----------------------------------------------------------------------------}}}
+CommandExecuted: #-----------------------------------------------------------{{{
+                MOV  $PPU_PPUCommand, @$PBPADR
+                CLR  @$PBP12D        # inform CPU's program that we are done
+                TST  @$SingleProcessFlag
+                BNE  ShortLoop       # non-zero, loop
+                MOV  $PGM, @$07124   # add to processes table
+                MOV  $1, @$07100     # require execution
+                MOV  (SP)+, R0       # restore R0
+                JMP  @$0174170       # jump back to the process manager (63608; 0xF878)
+#----------------------------------------------------------------------------}}}
 PGM:            #---------------------------------------------------------------
                 MOV  R0, -(SP) # store R0 in order for the process manager to
                                # function correctly
-                MOV  $PPU_PPUCommand, @$PBPADR
+ShortLoop:      MOV  $PPU_PPUCommand, @$PBPADR
                 MOV  @$PBP12D,R0
                 CMP  R0, $PPU_Print
                 BEQ  JMPPrint
                 CMP  R0, $PPU_SetPalette
                 BEQ  JMPSetPalette
+                CMP  R0, $PPU_MultiProcess
+                BEQ  ClrSingleProcessFlag
+                CMP  R0, $PPU_SingleProcess
+                BEQ  SetSingleProcessFlag
                 CMP  R0, $PPU_Finalize
                 BEQ  JMPTeardown
 
@@ -261,16 +278,17 @@ PGM:            #---------------------------------------------------------------
 
 JMPPrint:       JMP  Print
 JMPSetPalette:  JMP  SetPalette
+
+ClrSingleProcessFlag:
+                CLR  @$SingleProcessFlag
+                JMP  CommandExecuted
+SetSingleProcessFlag:
+                MOV  $1,@$SingleProcessFlag
+                JMP  CommandExecuted
+
 JMPTeardown:    JMP  Teardown
+SingleProcessFlag: .word 0
 #-------------------------------------------------------------------------------
-CommandExecuted: #-----------------------------------------------------------{{{
-                MOV  $PPU_PPUCommand, @$PBPADR
-                CLR  @$PBP12D        # inform CPU's program that we are done
-                MOV  $PGM, @$07124   # add to processes table
-                MOV  $1, @$07100     # require execution
-                MOV  (SP)+, R0       # restore R0
-                JMP  @$0174170       # jump back to the process manager (63608; 0xF878)
-#----------------------------------------------------------------------------}}}
 SetPalette:     #------------------------------------------------------------{{{
                 MOV  $PPU_PPUCommandArg, @$PBPADR
                 MOV  @$PBP12D, @$PBPADR
@@ -315,10 +333,13 @@ SetData$:       MOV  R0,(R5)+
                 JMP  CommandExecuted
 #----------------------------------------------------------------------------}}}
 Print: #---------------------------------------------------------------------{{{
-                .equiv LineWidth, 40
-                .equiv TextLinesCount, 9
-                .equiv CharHeight, 9
-                .equiv CharLineSize, LineWidth * CharHeight
+               .equiv LineWidth, 40
+               .equiv TextLinesCount, 25
+               .equiv CharHeight, 8
+               .equiv CharLineSize, LineWidth * CharHeight
+               .equiv FbStart, FB1 >> 1
+               .equiv BPDataReg, PBP12D
+               .equiv Font, CGAFont - (32 * 8 * 2)
 
                 MOV  $StrBuffer,R3
                 MOV  $LineWidth,R2
@@ -343,10 +364,10 @@ Print: #---------------------------------------------------------------------{{{
 3$:             MOV  @$CurrentLine,R1 # prepare to calculate relative char address
                 MUL  $CharLineSize,R1 # calculate relative address of the line
                 ADD  @$CurrentChar,R1 # calculate relative address of the char
-                ADD  $0x8000,R1       # calculate absolute address of the next char
+                ADD  $FbStart,R1      # calculate absolute address of the next char
 
                 MOV  $StrBuffer,R3
-                MOV  $PBP0DT,R4
+                MOV  $BPDataReg,R4
 
 NextChar:       MOV  R1,(R5)      # load address of the next char into address register
                 MOVB (R3)+,R0     # load character code from string buffer
@@ -355,13 +376,13 @@ NextChar:       MOV  R1,(R5)      # load address of the next char into address r
                 CMPB $'\n, R0     # new line?
                 BEQ  NewLine      #
 
-Draw:           ASH  $3,R0        # shift left by 3(multiply by 8)
-                ADD  $CGAFont,R0  # calculate char bitmap address
+Draw:           ASH  $4,R0        # shift left by 4(multiply by 16)
+                ADD  $Font,R0     # calculate char bitmap address
 
-                .rept 8
-                MOVB (R0)+,(R4) #
+               .rept 8
+                MOV  (R0)+,(R4) #
                 ADD  R2,(R5)    # advance the address register to the next line
-                .endr
+               .endr
 
                 INC  R1
                 INC  @$CurrentChar
@@ -376,15 +397,15 @@ NewLine:        CLR  @$CurrentChar
 Recalculate:    MOV  @$CurrentLine,R1 #
                 MUL  $CharLineSize,R1 # calculate relative line address
                 ADD  @$CurrentChar,R1 # calculate relative char dst address
-                ADD  $0x8000,R1       # calculate screen address of the next char
-                MOV  R1,(R5)  # load screen address of the next char to address register
+                ADD  $FbStart,R1      # calculate screen address of the next char
+                MOV  R1,(R5)          # load screen address of the next char to address register
                 BR   NextChar
 
 DonePrinting:   JMP  CommandExecuted
 
-CurrentLine:    .word 0
-CurrentChar:    .word 0
-StrBuffer:      .space 80
+CurrentLine:   .word 0
+CurrentChar:   .word 0
+StrBuffer:     .space 160
 #----------------------------------------------------------------------------}}}
 VblankIntHandler: #----------------------------------------------------------{{{
         # we do not need firmware interrupt handler except for this small
@@ -407,13 +428,15 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         RTI
 #----------------------------------------------------------------------------}}}
 
-CGAFont: .incbin "cga8x8b.raw"
+#CGAFont: .incbin "cga8x8b.raw"
+CGAFont: .space 8*2, 0 # whitespace symbol
+         .incbin "resources/font.bin"
 SYS100:  .word 0174612 # address of default vertical blank interrupt handler
 SYS272:  .word 02270   # address of default scanlines table
 SYS300:  .word 0175412 # address of default keyboard interrupt hadler
 FBSLTAB: .word 0       # adrress of main screen SLTAB
 
-         .balign 8 # align at 4 words or the new SLTAB will be invalid
+         .balign 8 # scan-lines parameters table, it has to be aligned at 4 words
 SLTAB:   .space 288 * 2 * 4 # space for a 288 four-words entries
          .space 10 * 2 * 2  # reserve some more space for invisible scanlines
 
