@@ -293,21 +293,21 @@ SavedSettings_Last: # 0x80 bytes --------------------------------------------}}}
                                         #
 Event_ReprogramVector:
        .word Event_CoreReprogram_Palette # 0 # TODO: implement this
-                                        #     defw null;Event_CoreReprogram_PlusPalette ; 1      ; Obsolete - Reserver for Plus Palette
-                                        #     defw Event_CoreReprogram_ObjectHitHandler ; 2
-                                        #     defw Event_CoreReprogram_ShotToDeath      ; 3
-                                        #     defw Event_CoreReprogram_CustomMove1      ; 4
-                                        #     defw Event_CoreReprogram_CustomMove2      ; 5
-                                        #     defw Event_CoreReprogram_PowerupSprites   ; 6
-                                        #     defw Event_CoreReprogram_CustomMove3      ; 7
-                                        #     defw Event_CoreReprogram_CustomMove4      ; 8
-                                        #     defw Event_CustomProgram1                 ; 9
-                                        #     defw Event_CustomProgram2                 ;10
-                                        #     defw Event_CustomPlayerHitter             ;11
-                                        #     defw Event_CustomSmartBomb                ;12
-                                        #     defw Event_ReprogramObjectBurstPosition   ;13
-                                        #     defw Event_ObjectFullCustomMoves          ;14
-                                        #     defw Event_SmartBombSpecial               ;15
+       .word NULL # 2                   #     defw null;Event_CoreReprogram_PlusPalette ; 1      ; Obsolete - Reserver for Plus Palette
+       .word NULL # 4                   #     defw Event_CoreReprogram_ObjectHitHandler ; 2
+       .word NULL # 6                   #     defw Event_CoreReprogram_ShotToDeath      ; 3
+       .word NULL # 8                   #     defw Event_CoreReprogram_CustomMove1      ; 4
+       .word NULL #10                   #     defw Event_CoreReprogram_CustomMove2      ; 5
+       .word NULL #12                   #     defw Event_CoreReprogram_PowerupSprites   ; 6
+       .word NULL #14                   #     defw Event_CoreReprogram_CustomMove3      ; 7
+       .word NULL #16                   #     defw Event_CoreReprogram_CustomMove4      ; 8
+       .word NULL #18                   #     defw Event_CustomProgram1                 ; 9
+       .word NULL #20                   #     defw Event_CustomProgram2                 ;10
+       .word NULL #22                   #     defw Event_CustomPlayerHitter             ;11
+       .word NULL #24                   #     defw Event_CustomSmartBomb                ;12
+       .word NULL #26                   #     defw Event_ReprogramObjectBurstPosition   ;13
+       .word NULL #28                   #     defw Event_ObjectFullCustomMoves          ;14
+       .word NULL #30                   #     defw Event_SmartBombSpecial               ;15
                                         #
                                         # Event_MoveVector:               ;128+
                                         #     defw Event_MoveLifeSwitch_0000               ; 0
@@ -335,20 +335,20 @@ Event_VectorArray:
        .word NULL  # 32  4              #     defw Event_ObjColumn                   ; 32
        .word NULL  # 48  6              #     defw Event_ObjStrip                    ; 48
        .word NULL  # 64  8              #     defw Event_StarBust                    ; 64
-       .word NULL  # 80 10              #     defw null                              ; 80
-       .word NULL  # 96 12              #     defw null                              ; 96
+       .word NULL                       # 80 10
+       .word NULL                       # 96 12
        .word Event_CoreMultipleEventsAtOneTime #112 14
        .word NULL  #128 16              #     defw Event_MoveSwitch                  ;128
        .word NULL  #144 18              #     defw Event_CoreSaveLoadSettings        ;144
-       .word NULL  #160 20              #     defw null;Event_MoveSwitchMore         ;160
+       .word NULL                       #160 20
        .word NULL  #176 22              #     defw Event_CoreSaveLoadSettings2       ;176
-       .word NULL  #192 24              #     defw null                              ;192
-       .word NULL  #208 26              #     defw null                              ;208
-       .word NULL  #224 28              #     defw null                              ;224
-       .word Event_CoreReprogram               #240 30
+       .word NULL                       #192 24
+       .word NULL                       #208 26
+       .word NULL                       #224 28
+       .word Event_CoreReprogram        #240 30 # uknc/event_stream.s:210
                                         #
                                         # read "..\SrcCPC\Akuyou_CPC_InterruptHandler.asm"
-
+NULL:   RETURN
 ################################################################################
 #                            End of aligned code                               #
 ################################################################################
@@ -366,7 +366,6 @@ PLY_FrequencyTable:
     .word    7,    7,    7,    6,    6,    6,    5,    5,    5,    4,    4,    4
     .word    4,    4,    3,    3,    3,    3,    3,    2,    2,    2,    2,    2
     .word    2,    2,    2,    2,    1,    1,    1,    1,    1,    1,    1,    1
-NULL:   RETURN
                                         #
                                         #   # ifdef CPC320
        .include "virtual_screen_pos_320.s" #     read "../SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm"
@@ -415,10 +414,10 @@ NULL:   RETURN
                                         #     save direct "CORE    .AKU",Akuyou_CoreStart,&3001   ;address,size...}[,exec_address]
                                         # nolist
 end: FileEndCore:
-.list
+
        .global LevelStart
 LevelStart:
         JMP  @$LevelStart # - Level start
 LevelLoop:
         JMP  @$LevelLoop  # - Level loop
-.nolist
+

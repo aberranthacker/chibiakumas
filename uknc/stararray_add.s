@@ -150,9 +150,12 @@ VectorJump_PushHlFirst: # ../SrcALL/Akuyou_Multiplatform_Stararray_Add.asm:156
         ADD  R0,R3   # add twice for a two byte address
         ADD  R0,R3
         # TODO: use JMP  @(R4)
-        MOV  (R3),$VectorJump_Plus2-2 # hl now is the memory loc of the line
+        MOV  (R3),@$VectorJump_Plus2 - 2 # hl now is the memory loc of the line
         POP  R3
-        JMP  $0x0000; VectorJump_Plus2:
+        JMP  @$0x0000; VectorJump_Plus2:
+        # ASL  R0
+        # MOV  R0,@$VectorJump_Plus2 - 2
+        # JMP  @0(R4); VectorJump_Plus2: # $0x0000; VectorJump_Plus2:
 
                                                             # Stars_VectorArray:
                                                             #     defw Stars_AddObjectOne         ;  0 = just one - obsolete

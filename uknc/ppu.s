@@ -271,6 +271,8 @@ ShortLoop:      MOV  $PPU_PPUCommand, @$PBPADR
                 BEQ  ClrSingleProcessFlag
                 CMP  R0, $PPU_SingleProcess
                 BEQ  SetSingleProcessFlag
+                CMP  R0, $PPU_NOP
+                BEQ  CommandExecuted
                 CMP  R0, $PPU_Finalize
                 BEQ  JMPTeardown
 
@@ -291,13 +293,15 @@ SingleProcessFlag: .word 0
 #-------------------------------------------------------------------------------
 SetPalette:     #------------------------------------------------------------{{{
                 MOV  $PPU_PPUCommandArg, @$PBPADR
-                MOV  @$PBP12D, @$PBPADR
+                MOV  @$PBP12D, @$PBPADR # get palette address
+                ASR  @$PBPADR           #
                 # R0 - first parameter word
                 # R1 - second parameter word
                 # R2 - display/color parameters flag
                 # R3 - current line
                 # R4 - next line where parameters change
-                MOV  @$PBP12D,R3     # get line number
+                CLR  R3
+                BISB @$PBP1DT,R3     # get line number
                 MOV  R3,R4
 NextRecord$:
                 MOV  R4,R3           # R3 = previous iteration's next line
@@ -305,16 +309,16 @@ NextRecord$:
                 ASH  $3,R5           # calculate offset by multiplying by 8 (by shifting R5 left by 3 bits)
                 ADD  @$FBSLTAB,R5    # and add address of SLTAB section we modify
 
-                INC  @$PBPADR
-                MOV  @$PBP12D,R2     # get display/color parameters flag
+                MOVB @$PBP2DT,R2     # get display/color parameters flag
                 INC  @$PBPADR
                 MOV  @$PBP12D,R0     # get first data word
                 INC  @$PBPADR
                 MOV  @$PBP12D,R1     # get second data word
                 INC  @$PBPADR
-                MOV  @$PBP12D,R4     # get next line idx
+                CLR  R4
+                BISB @$PBP1DT,R4     # get next line idx
 
-SetParams$:     TST  R2
+SetParams$:     TSTB R2
                 BNE  ColorSet$
                 BIC  $0b100,(R5)+
                 BR   SetData$

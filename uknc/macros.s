@@ -5,6 +5,16 @@
     BNE  .-4
     MOV  \str_addr, @$PPUCommandArg
     MOV  $PPU_Print,@$PPUCommand
+    TST  @$PPUCommand
+    BNE  .-4
+.endm
+
+.macro .ppudo cmd
+    TST  @$PPUCommand
+    BNE  .-4
+    MOV  \cmd, @$PPUCommand
+    TST  @$PPUCommand
+    BNE  .-4
 .endm
 
 # generic macros
@@ -12,7 +22,7 @@
     JSR  PC,\addr
 .endm
 
-.macro .call cond=none, addr:req
+.macro .call cond=none, dst:req # CALL cc,nn
   .if \cond == "EQ" # equal (z)
     BNE  .+6
   .elseif \cond == "NE" # not equal (nz)
@@ -20,7 +30,18 @@
   .else
     .error "Unknown condition for conditional call"
   .endif
-    JSR  PC,\addr
+    JSR  PC,\dst
+.endm
+
+.macro .jmp cond=none, dst:req # JP cc,nn
+  .if \cond == "EQ" # equal (z)
+    BNE  .+6
+  .elseif \cond == "NE" # not equal (nz)
+    BEQ  .+6
+  .else
+    .error "Unknown condition for conditional jump"
+  .endif
+    JMP  \dst
 .endm
 
 .macro return

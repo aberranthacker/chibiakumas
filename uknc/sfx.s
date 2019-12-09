@@ -9,7 +9,7 @@
                                                             # ;
                                                             #
                                                             # SFX_PlaySfx:
-        MOV  0x00,R0; Sfx_Sound_Plus2:                      #     ld a,&00 :Sfx_Sound_Plus1
+        MOV  $0x0000,R0; Sfx_Sound_Plus2:                   #     ld a,&00 :Sfx_Sound_Plus1
        .equiv  srcSfx_Sound, Sfx_Sound_Plus2 - 2
        .global srcSfx_Sound
                                                             #     or a
@@ -67,7 +67,7 @@
                                                             #     ; BC = Inverted Pitch (-&FFFF -> &FFFF). 0 is no pitch (=the original sound).
                                                             #     ;      The higher the pitch, the lower the sound.
                                                             #
-         MOV  0x00,R0; Sfx_CurrentPriority_Plus2:           #     ld a,&00 :Sfx_CurrentPriority_Plus1
+         MOV  $0x0000,R0; Sfx_CurrentPriority_Plus2:        #     ld a,&00 :Sfx_CurrentPriority_Plus1
         .equiv  srcSfx_CurrentPriority, Sfx_CurrentPriority_Plus2 - 2
         .global srcSfx_CurrentPriority
                                                             #     ;jp z,SFX_PlaySFX_NothingPlaying

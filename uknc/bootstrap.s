@@ -55,56 +55,56 @@ RETURN                                  # ret
 Bootstrap_Level:
 # some missing code...
 Bootstrap_StartGame:
-# Prepare screen-lines table to display loading screen ----------------------{{{
+# clear main screen area ----------------------------------------------------{{{
+        MOV  $2000, R0
+        MOV  $FB1, R1
+        CLR  R3
+1$:    .rept 4
+        MOV  R3, (R1)+
+       .endr
+        SOB  R0, 1$
+#----------------------------------------------------------------------------}}}
+# Load and execute PPU module -----------------------------------------------{{{
         MOV  $PPU___BIN, @$LookupFileName
         MOV  $FB1, @$ReadBuffer
         MOV  $PPU_ModuleSizeWords, @$ReadWordsCount
         CALL Bootstrap_LoadDiskFile
-
-        CLR  PPUCommand
+        # PPU will clear the command code when it ready to execute a new one
+        MOV  $PPU_NOP,@$PPUCommand
 
         JSR  R5,PPEXEC
         .WORD FB1 # PPU module location
         .WORD PPU_ModuleSizeWords
 #----------------------------------------------------------------------------}}}
-# clear main screen area ----------------------------------------------------{{{
-        MOV  $4000, R0
-        MOV  $FB1, R1
-        CLR  R3
-1$:     MOV  R3, (R1)+
-        MOV  R3, (R1)+
-        SOB  R0, 1$
-#----------------------------------------------------------------------------}}}
-        # load loading screen
-        MOV  $PPU_SetPalette, @$PPUCommand
-        MOV  $PPU_LoadingScreenPalette, @$PPUCommandArg
-
+        # Load loading screen
         MOV  $LOADINSCR, @$LookupFileName # ../AkuCPC/BootsStrap_StartGame_CPC.asm:64
         MOV  $FB1, @$ReadBuffer
         MOV  $8000, @$ReadWordsCount
         CALL Bootstrap_LoadDiskFile
+        # Apply loading screen palette
+        MOV  $LoadingScreenPalette, @$PPUCommandArg
+       .ppudo $PPU_SetPalette
         # Load the game core - this is always in memory
         MOV  $CORE__BIN, @$LookupFileName
         MOV  $FileBeginCore, @$ReadBuffer
         MOV  $FileSizeCoreWords, @$ReadWordsCount
         CALL Bootstrap_LoadDiskFile
+        # Load saved settings
+        MOV  $SAVSETBIN, @$LookupFileName
+        MOV  $SavedSettings, @$ReadBuffer
+        MOV  $FileSizeSettingsWords, @$ReadWordsCount
+        CALL Bootstrap_LoadDiskFile
 
-        # # Load saved settings
-        # MOV  $SAVSETBIN, @$LookupFileName
-        # MOV  $SavedSettings, @$ReadBuffer
-        # MOV  $FileSizeSettingsWords, @$ReadWordsCount
-        # CALL Bootstrap_LoadDiskFile
-
-        # TODO: font load
         # TODO: player sprites load
         # TODO: Initialize the Sound Effects.
 #----------------------------------------------------------------------------}}}
 Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
-        MOV  $SPReset,SP # we are not returning, so reset the stack
-        CALL StartANewGame              # call StartANewGame
-        CALL LevelReset0000             # call LevelReset0000
-                                        #
-        .list
+        # MTPS PR7
+        # MOV  $SPReset,SP # we are not returning, so reset the stack
+        # MTPS PR0
+        CALL StartANewGame
+        CALL LevelReset0000
+
         MOV  $LVL00_BIN, @$LookupFileName
         MOV  $Akuyou_LevelStart, @$ReadBuffer
         MOV  $Level00SizeWords, @$ReadWordsCount
@@ -120,12 +120,11 @@ Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
                                         # ;need to use Specail MSX version - no extra tilemaps
                                         # jp Bootstrap_LoadEP2Level_1PartOnly # ../Aku/BootStrap.asm:724
 
-        # TST  @$PPUCommand
-        # BNE  .-4
-        # MOV  $PPU_SingleProcess,@$PPUCommand
-
+       .ppudo $PPU_SingleProcess
+       .putstr $ExecutingLevelStr
         JMP  @$Akuyou_LevelStart
-        JMP  WaitKeyThenExit
+       .putstr $WarningStr
+        JMP  .
         RETURN                         # ret
         .nolist
 #----------------------------------------------------------------------------
@@ -354,7 +353,7 @@ Bootstrap_LoadDiskFile: # ../Aku/BootStrap.asm:2795 -------------------------{{{
         #.LOOKUP $LkpArea  #.LOOKUP area,chan,dblk[,seqnum]
         MOV  $LookupArea,R0
         EMT  0375
-        BCS  1$ # TODO: carry the carry flag out of the procedure
+        BCS  1$         # return if file not found
 
         #.READW  $RdArea   #.READW  area,chan,buf,wcnt,blk[,BMODE=strg]
         MOV  $ReadArea,R0
@@ -584,36 +583,37 @@ LookupError: .asciz "File lookup error."
 ReadError:   .asciz "File read error."
 #----------------------------------------------------------------------------}}}
 LoadingScreenPalette: #------------------------------------------------------{{{
-    .word 0       #--line number, last line of the top screen area, *required!*
-    .word 0       #  0 - set cursor/scale/palette, *ignored for the first record*
+    .byte 0       #--line number, last line of the top screen area, *required!*
+    .byte 0       #  0 - set cursor/scale/palette, *ignored for the first record*
     .word 0b10000 #  graphical cursor
     .word 0b10101 #  320 dots per line, pallete 5
-    .word 1       #--line number, first line of the main screen area, *required!*
-    .word 1       #  set colors
+    .byte 1       #--line number, first line of the main screen area, *required!*
+    .byte 1       #  set colors
     .word 0xCC00  #  colors 011 010 001 000 (YRGB) | br.red   | black   |
     .word 0xFF99  #  colors 111 110 101 100 (YRGB) | br.white | br.blue |
-    .word 49      #--line number (201 if there is no more parameters)
-    .word 1       #  set colors
+    .byte 49      #--line number (201 if there is no more parameters)
+    .byte 1       #  set colors
     .word 0x1100  #  | blue     | black   |
     .word 0xFF55  #  | br.white | magenta |
-    .word 63      #--line number
-    .word 1       #  set colors
+    .byte 63      #--line number
+    .byte 1       #  set colors
     .word 0xAA00  #  | br.green | black   |
     .word 0xFF55  #  | br.white | magenta |
-    .word 95      #--line number
-    .word 1       #  set colors
+    .byte 95      #--line number
+    .byte 1       #  set colors
     .word 0xBB00  #  | br.cyan  | black   |
     .word 0xFF22  #  | br.white | green   |
-    .word 195     #--line number
-    .word 1       #  set colors
+    .byte 196     #--line number
+    .byte 1       #  set colors
     .word 0xCC00  #  | br.red   | black   |
     .word 0xFF22  #  | br.white | green   |
-    .word 201     #--line number, 201 - end of the main screen params
+    .byte 201     #--line number, 201 - end of the main screen params
+    .even
 #----------------------------------------------------------------------------}}}
 TextInit:    .byte  033, 0240, '2 # symbol color
              .byte  033, 0241, '0 # symbol background color
              .byte  033, 0242, '0 # screen color
-             .byte  033,  045, 041, 061             # order screenlines and
+             .byte  033,  045, 041, 061            # order screenlines and
              .byte  033, 0133, 060, 075, 060, 0162 # clear screen
              .byte  0
 TitleStr:    .asciz "      -= ChibiAkumas  V1.666 =-"
@@ -621,17 +621,18 @@ WebSiteStr:  .asciz "      -= www.chibiakumas.com =-"
 CreditsStr:  .asciz "-= UKNC version by aberrant_hacker =-"
                    #0         1         2         3         4         5         6         7
                    #01234567890123456789012345678901234567890123456789012345678901234567890123456789
-        .even # PPU reads strings by words so we have to align
+        .even # PPU reads strings by word by word, so align
 YahooStr:   .asciz "Yippee! Whoopee! Woo-hoo! Yay! Hurrah!\n"
         .even
 LongStr:    .asciz "This is a very very very very very very very very very very very long string.\n"
         .even
 LoadingStr: .asciz "\n\n     Loading"
         .even
-TestStr: #.byte 0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,0x0F
-         #.byte 0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F
-         #.byte 0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F
-         .byte        '!,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F
+ExecutingLevelStr: .asciz "Executing level 0 (menu).\n"
+        .even
+WarningStr: .asciz "Warning!\n"
+        .even
+TestStr: .byte        '!,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F
          .byte 0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x3A,0x3B,0x3C,0x3D,0x3E,0x3F
          .byte 0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F
          .byte 0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A,0x5B,0x5C,0x5D,0x5E,0x5F

@@ -3,12 +3,12 @@
 #
 # .RAD50
 #
-# The . RAD50 directive generates data in Radix-50 packed format. Radix-50 form allows
-# three characters to be packed into 16 bits (one word); therefore, any 6-character
-# symbol can be stored in two consecutive words.
+# The .RAD50 directive generates data in Radix-50 packed format. Radix-50 form
+# allows three characters to be packed into 16 bits (one word); therefore, any
+# 6-character symbol can be stored in two consecutive words.
 #
-# Each character is translated into its Radix-50 equivalent, as indicated in the following
-# table:
+# Each character is translated into its Radix-50 equivalent, as indicated in the
+# following table:
 # | Character   | Radix-50 Octal Equivalent |
 # +-------------+---------------------------+
 # | (space)     | 0

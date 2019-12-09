@@ -24,21 +24,20 @@
 #
 # These 6 bytes will be repeated for the next sprite, and so on
 
-require 'pry'
 require 'optparse'
 require_relative 'reverse_tables'
 
 options = Struct.new(:in_filename, :out_filename, :font).new
 
 OptionParser.new do |opts|
-  opts.banner = "Usage: cpc_to_uknc_sprites.rb FILENAME"
+  opts.banner = 'Usage: cpc_to_uknc_sprites.rb FILENAME'
   options.in_filename = opts.default_argv[0]
 
-  opts.on("-o NAME", "--out-file=NAME", "filename to store resulting binary") do |v|
+  opts.on('-o NAME', '--out-file=NAME", "output filename') do |v|
     options.out_filename = v
   end
 
-  opts.on("--font", "Font conversion. No header, all sprites 8 lines high.") do
+  opts.on('--font', 'Font conversion. No header, all sprites 8 lines high.') do
     options.font = true
   end
 end.parse!
@@ -56,12 +55,10 @@ def transform(sprite_words)
   end
 end
 
-
 file = File.binread(options.in_filename)
 file = file[0x80, file.size - 0x80] if file[0].ord.zero?
 
 data_offset = file[4, 2].unpack('v').first
-uknc_words = []
 header = []
 
 0.step(data_offset - 6, 6).each.with_index do |i, idx|
@@ -91,21 +88,25 @@ header.each do |rec|
   new_file << values.pack('CCCCv')
 end
 
-header.each do |rec|
-  print "i: #{rec[:idx].to_s.rjust(3, '0')} "
-  print "h: #{rec[:height].to_s.rjust(3, '0')} "
-  print "w: #{rec[:width].to_s.rjust(2, '0')} "
-  print "y_offset: #{rec[:y_offset].to_s.rjust(2, '0')} "
-  puts  "offset: #{rec[:offset]}"
-  uknc_words = []
+header.each do |md|
+  print "i: #{md[:idx].to_s.rjust(3, '0')} "
+  print "h: #{md[:height].to_s.rjust(3, '0')} "
+  print "w: #{md[:width].to_s.rjust(2, '0')} "
+  print "y_offset: #{md[:y_offset].to_s.rjust(2, '0')} "
+  puts  "offset: #{md[:offset]}"
 
-  rec[:y_offset].times { uknc_words << 0 } if options.font
+  sprite = file[md[:offset], md[:height] * md[:width]].unpack('v*')
+  uknc_sprite = []
 
-  uknc_words += transform(file[rec[:offset], rec[:height] * rec[:width]].unpack('v*'))
+  if options.font
+    meta[:y_offset].times { uknc_words << 0 }
+    uknc_sprite += transform(sprite)
+    (8 - md[:height] - md[:y_offset]).times { uknc_words << 0 }
+  else
+    uknc_sprite = transform(sprite)
+  end
 
-  (8 - rec[:height] - rec[:y_offset]).times { uknc_words << 0 } if options.font
-
-  new_file << uknc_words.pack('v*')
+  new_file << uknc_sprite.pack('v*')
 end
 
 File.binwrite(options.out_filename, new_file)

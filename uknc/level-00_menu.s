@@ -1,53 +1,34 @@
-       .nolist
+               .nolist
 
-       .include "./hwdefs.s"
-       .include "./macros.s"
-       .include "./core_defs.s"
+               .include "./hwdefs.s"
+               .include "./macros.s"
+               .include "./core_defs.s"
 
-       .global start # make entry point available to linker
+               .global start # make entry point available to linker
 
-       .equiv  Level00SizeWords, (end - start) >> 1
-       .global Level00SizeWords
+               .equiv  Level00SizeWords, (end - start) >> 1
+               .global Level00SizeWords
 
-        .=Akuyou_LevelStart
+               .=Akuyou_LevelStart
+
 start:  JMP  LevelInit
 
 TITLETEX: .incbin "resources/titletex.spr"
        .even
-YahooStr: .asciz "Yippee! Whoopee! Woo-hoo! Yay! Hurrah!\n"
+LevelStartedStr: .asciz "Level 0 just started."
        .even
 CustomRam: .space 64 # Pos-Tick-Pos-Tick # enough memory for 16 enemies!
 
 EventStreamArray_Ep1: #------------------------------------------------------{{{
     # Load Palette
-    .byte 0,0b01110000+4   # 4 Commands
-    .byte 0xF0,0,6          # (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
-    .byte 1                    # 2
-    .byte 1                    # 3
-    .byte 0x54,0x55,0x4C,0x4B  # 4
+    .byte 0 # -> srcEvent_NextEventTime
+    # MSN->R0, LSN->R1
+    .byte 0x70 | 1 # 0x70 - multiple commands, 1 -> srcEvent_MultipleEventCount
+    # (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    .byte 0xF0 | 0 # Event_CoreReprogram | Event_CoreReprogram_Palette
+    .word 0x0000 # palette data address
 
-    .byte 240,26*0+6,5*2+1 # (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
-    .byte 2     # Switches     # 6
-    .byte 0     # delay        # 7
-    .byte 0x54,0x55,0x4C,0x4B  # 8
-    .byte 64+16 # delay        # 9
-    .byte 0x54,0x58,0x5F,0x4B  #10
-
-    .byte 240,26*1+6,5*1+1 # (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
-    .byte 1                    #12
-    .byte 48                   #13
-    .byte 0x54,0x56,0x5B,0x4B  #14
-
-    .byte 240,26*2+6,5*3+1 # (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
-    .byte 3   # no of switches #15
-    .byte 0   # delays         #16
-    .byte 0x54,0x56,0x5B,0x4B  #17
-    .byte 255 # delays         #18
-    .byte 0x54,0x4C,0x4D,0x4B  #19
-    .byte 36  # delays         #20
-    .byte 0x54,0x56,0x5B,0x4B  #21
-
-.byte 4
+    .byte 4 # -> srcEvent_NextEventTime
     .byte 136       # Jump to a different level point
     .word PauseLoop # pointer
     .byte 60        # new time
@@ -55,20 +36,22 @@ EventStreamArray_Ep1: #------------------------------------------------------{{{
     .even
 #----------------------------------------------------------------------------}}}
 PauseLoop:
-    .byte 4
+    .byte 4 # srcEvent_NextEventTime
        .byte 136       # Jump to a different level point
        .word PauseLoop # pointer
        .byte 60        # new time
-    .even
+       .even
 
 LevelInit:
+       .putstr $LevelStartedStr
+
     .ifdef CompileEP2
         MOV  $EventStreamArray_Ep2,R3 # Event Stream
     .else
         MOV  $EventStreamArray_Ep1,R3 # Event Stream
     .endif
         MOV  $Event_SavedSettings,R2  # Saved Settings
-        CALL Event_StreamInit
+        CALL Event_StreamInit # uknc/event_stream.s:90
 
         #CALL Akuyou_Music_Restart
         #CALL Akuyou_ScreenBuffer_Reset
@@ -76,16 +59,13 @@ LevelInit:
 
         #JMP ShowTitlePic
 
-        TST  @$PPUCommand
-        BNE  .-4
-       .putstr $YahooStr
-
-        MOV  $37*2,R1
+       .equiv SprDst, FB1+(80*64)
+        MOV  $80-6,R1
 
         MOV  $62,R0
         MOV  $TITLETEX,R4
         ADD  4(R4),R4
-        MOV  $FB1,R5
+        MOV  $SprDst,R5
 1$:    .rept 3
         MOV  (R4)+,(R5)+
        .endr
@@ -95,7 +75,7 @@ LevelInit:
         MOV  $62,R0
         MOV  $TITLETEX,R4
         ADD  10(R4),R4
-        MOV  $FB1+6,R5
+        MOV  $SprDst+6,R5
 2$:    .rept 3
         MOV  (R4)+,(R5)+
        .endr
@@ -117,9 +97,7 @@ WaitKeyThenExit: #-----------------------------------------------------------{{{
         BEQ  .-4
         CLR  @$KeyboardScanner_KeyPresses + 2
 
-        MOV  $PPU_Finalize, @$PPUCommand
-        TST  @$PPUCommand # wait until PPU finishes command
-        BNE  .-4
+       .ppudo $PPU_Finalize
 
        .exit
 #----------------------------------------------------------------------------}}}

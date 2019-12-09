@@ -72,10 +72,8 @@ SetLevelTime: # This is used for jumping around the event stream # SetLevelTime:
         MOV  R0,@$srcEvent_LevelTime                        #     ld (Event_LevelTime),a
         MOVB (R3)+,@$srcEvent_NextEventTime                 #     ld a,(hl)
                                                             #     ld (Event_NextEventTime_Plus1 - 1),a
-                                                            #
                                                             #     inc hl
         MOV  R3,@$srcEvent_NextEventPointer                 #     ld (Event_NextEventPointer_Plus2 - 2),hl
-                                                            #
 RETURN                                                      #     ret
                                                             # GetLevelTime: ; Return the current level time
                                                             #     ld a,(Event_NextEventTime)
@@ -86,15 +84,16 @@ RETURN                                                      #     ret
                                                             #     ret
                                                             #
                                                             # ; Restart the event stream for a new level
+# ../SrcALL/Akuyou_Multiplatform_EventStream.asm:86
 Event_StreamInit:                                           # Event_StreamInit:
        .global Event_StreamInit
         # Store the address of our 2nd setting buffer (1st is contained in core)
-        MOV  R2,@$srcEvent_SavedSettings
+        MOV  R2,@$srcEvent_SavedSettings # uknc/event_stream.s:614
         CLR  R0
-        MOV  R0,@$srcEvent_MultipleEventCount
-        CALL SetLevelTime
-
-        BR   Event_GetEventsNow # process the first batch of events
+        MOV  R0,@$srcEvent_MultipleEventCount # uknc/event_stream.s:485
+        CALL SetLevelTime # uknc/event_stream.s:68 # does MOVB (R3)+,@$srcEvent_NextEventTime
+        # process the first batch of events
+        BR   Event_GetEventsNow # uknc/event_stream.s:127
                                                             #
 Event_MoreEventsDec: #multiple events at the same timepoint # Event_MoreEventsDec: ; multiple events at the same timepoint
                                                             #     dec a
@@ -113,20 +112,20 @@ Event_MoreEventsDec: #multiple events at the same timepoint # Event_MoreEventsDe
                                                             #     and %00000100:Event_LevelSpeed_Plus1    ; how often ticks occur
                                                             #     ret z       ; no ticks occured
                                                             # Event_Stream_ForceNow:
-        MOV  $0x00,R0; Event_LevelTime_Plus2:               #     ld a,&0 :Event_LevelTime_Plus1
+        INC  $0x00; Event_LevelTime_Plus2:                  #     ld a,&0 :Event_LevelTime_Plus1
        .equiv srcEvent_LevelTime, Event_LevelTime_Plus2 - 2
-                                                            #     inc a
+        MOV  $srcEvent_LevelTime,R0                         #     inc a
                                                             #     ld (Event_LevelTime),a
                                                             #     ld b,a
                                                             #
-                                                            # Event_MoreEvents:
-        MOV  $1,R0; Event_NextEventTime_Plus2:              #     ld a,1 :Event_NextEventTime_Plus1       ;The time the event should occur
+Event_MoreEvents:                                           # Event_MoreEvents:
+        CMPB $01,R0; Event_NextEventTime_Plus2:             #     ld a,1 :Event_NextEventTime_Plus1 ;The time the event should occur
        .equiv srcEvent_NextEventTime, Event_NextEventTime_Plus2 - 2
-                                                            #     cp b
-                                                            #     ret nz  ; event does not happen yet
+        BEQ  Event_GetEventsNow                             #     cp b
+        RETURN                                              #     ret nz  ; event does not happen yet
 
 Event_GetEventsNow:                                         # Event_GetEventsNow:
-        #MOV  $LdAFromHLIncHL,R5                             #     ld iy,LdAFromHLIncHL ; Set RST 6 to do our bidding
+        #MOV  $LdAFromHLIncHL,R5                            #     ld iy,LdAFromHLIncHL ; Set RST 6 to do our bidding
                                                             #     ld hl,Event_LoadNextEvt
         MOV  $Event_LoadNextEvt,-(SP)                       #     push hl ; We do a dirty trick to save space, all these actions end in a RET
                                                             #
@@ -145,7 +144,7 @@ Event_GetEventsNow:                                         # Event_GetEventsNow
                                                             #     rrca
         PUSH R3                                             #     push hl
         MOV  $Event_VectorArray,R3                          #     ld hl,Event_VectorArray
-        JMP  VectorJump_PushHlFirst                         #     jp VectorJump_PushHlFirst
+        JMP  VectorJump_PushHlFirst # uknc/stararray_add.s:149 #     jp VectorJump_PushHlFirst
                                                             #
 Event_StarBust:                                             # Event_StarBust:
                                                             #     ld d,(hl)   ;X
@@ -162,7 +161,7 @@ HALT #RETURN                                                #     ret
 # By default each time can only have ONE event, but we can use this commend to declare
 # XX events will occur at this time to save memory!
 Event_CoreMultipleEventsAtOneTime:                          # Event_CoreMultipleEventsAtOneTime:
-                                                            #     ld a,b
+        # uknc/event_stream.s:485                           #     ld a,b
         MOV  R1,@$srcEvent_MultipleEventCount               #     ld (Event_MultipleEventCount_Plus1 - 1),a
 RETURN                                                      #     ret
                                                             #
@@ -206,12 +205,12 @@ RETURN                                                      #     ret
                                                             #     ld (de),a   ; put it at DE
                                                             #     ret
                                                             #
-                                                            # ; Reconfigure the core for custom actions this level
-Event_CoreReprogram: # 0b1111????                           # Event_CoreReprogram:    ;1111????
+        # Reconfigure the core for custom actions this level
+Event_CoreReprogram: # 0b1111???? 240 0xF0                  # Event_CoreReprogram:    ;1111????
         MOV  R1,R0                                          #     ld a,b
         PUSH R3                                             #     push hl
         MOV  $Event_ReprogramVector,R3                      #     ld hl,Event_ReprogramVector
-        JMP  VectorJump_PushHlFirst                         #     jp VectorJump_PushHlFirst
+        JMP  VectorJump_PushHlFirst # uknc/stararray_add.s:149 #     jp VectorJump_PushHlFirst
                                                             #
                                                             # ;Powerup objects are defined by their sprite, which changes each level
                                                             # ; OK so I didn't think this through very well!
@@ -231,9 +230,9 @@ Event_CoreReprogram: # 0b1111????                           # Event_CoreReprogra
                                                             # Event_ReprogramObjectBurstPosition:
                                                             #     ld de,BurstPosition_Plus2-2
                                                             #     jr SetCustMove
-                                                            # Event_CoreReprogram_CustomMove1:
-                                                            #     ld de,LevelSpecificMove_Plus2-2
-                                                            #     jr SetCustMove
+Event_CoreReprogram_CustomMove1:                            # Event_CoreReprogram_CustomMove1:
+        MOV  (R3)+,@$dstLevelSpecificMove                   #     ld de,LevelSpecificMove_Plus2-2
+        RETURN # JMP @$Event_LoadNextEvt                    #     jr SetCustMove
                                                             # Event_CoreReprogram_CustomMove2:
                                                             #     ld de,LevelSpecificMoveB_Plus2-2
                                                             #     jr SetCustMove
@@ -264,8 +263,8 @@ Event_CoreReprogram: # 0b1111????                           # Event_CoreReprogra
                                                             # Event_CustomSmartBomb:
                                                             #     ld de,CustomSmartBombEnemy_Plus2-2
                                                             #     jr SetCustMove
-                                                            # SetCustMove:
-                                                            #     ld c,(hl)
+SetCustMove:                                                # SetCustMove:
+        MOV  (R3)+,(R2)                                     #     ld c,(hl)
                                                             #     inc hl
                                                             #     ld b,(hl)
                                                             #     inc hl
@@ -274,7 +273,7 @@ Event_CoreReprogram: # 0b1111????                           # Event_CoreReprogra
                                                             #     inc de
                                                             #     ld a,b
                                                             #     ld (de),a
-                                                            #     ret;    jp Event_LoadNextEvt
+RETURN # JMP @$Event_LoadNextEvt                            #     ret;    jp Event_LoadNextEvt
                                                             # Event_CoreReprogram_ShotToDeath:
                                                             #     ld de,CustomShotToDeathCall_Plus2-2
                                                             #     jr SetCustMove
@@ -293,8 +292,8 @@ Event_CoreReprogram: # 0b1111????                           # Event_CoreReprogra
 # ; it's best to copy existing ones from levels and modify them
                                                             #
 Event_CoreReprogram_Palette:                                # Event_CoreReprogram_Palette:
-                                                            #     ld de,RasterColors_ColorArray1 :RasterColors_ColorArray1PointerB_Plus2
-                                                            #
+        MOV  (R3)+,$PPUCommandArg                           #     ld de,RasterColors_ColorArray1 :RasterColors_ColorArray1PointerB_Plus2
+RETURN                                                      #
                                                             # Event_CoreReprogram_DataCopy:
                                                             #     ;reads in Offset then Bytecount from (HL) and dumps to destination DE
                                                             #     xor a
@@ -491,14 +490,14 @@ Event_LoadNextEvt:                                          # Event_LoadNextEvt:
                                                             #     dec a
         DEC  @$srcEvent_MultipleEventCount                  #     ld (Event_MultipleEventCount_Plus1-1),a
         MOV  R3,@$srcEvent_NextEventPointer                 #     ld (Event_NextEventPointer),hl
-        JMP  Event_GetEventsNow                             #     jr Event_GetEventsNow
+        JMP  @$Event_GetEventsNow                           #     jr Event_GetEventsNow
     EventsProcessed:
-                                                            #     rst 6
+        MOVB (R3)+,@$srcEvent_NextEventTime                 #     rst 6
                                                             #     ld (Event_NextEventTime),a
-                                                            #     ld (Event_NextEventPointer),hl
-                                                            #     ld a,(Event_LevelTime)
+        MOV  R3,@$srcEvent_NextEventPointer                 #     ld (Event_NextEventPointer),hl
+        MOV  $srcEvent_LevelTime,R0                         #     ld a,(Event_LevelTime)
                                                             #     ld b,a
-                                                            #     jp Event_MoreEvents
+        JMP  @$Event_MoreEvents # uknc/event_stream.s:121   #     jp Event_MoreEvents
                                                             # EventoneObject:
                                                             #     rst 6
                                                             #     ld (EventObjectSpriteToAdd_Plus1-1),a

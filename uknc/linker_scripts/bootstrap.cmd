@@ -6,7 +6,6 @@ OUTPUT(build/AKU.SAV)
 
 FileSizeCoreWords = ((FileEndCore - FileBeginCore) / 2);
 FileSizeSettingsWords = ((SavedSettings - SavedSettings_Last) / 2);
-PPU_LoadingScreenPalette = LoadingScreenPalette / 2;
 
 SECTIONS
 {

@@ -79,7 +79,9 @@ DoMoves: .global DoMoves                                    # DoMoves:
                                                             #     cp %11100000    ;1110XXXX ; Level Specific 2
                                                             #     jp z,null   :LevelSpecificMoveB_Plus2
                                                             #     cp %11110000    ;1111XXXX ; Level Specific 1
-                                                            #     jp z,null   :LevelSpecificMove_Plus2
+        BNE  .+6
+        JMP  @$NULL; LevelSpecificMove_Plus2:               #     jp z,null   :LevelSpecificMove_Plus2
+       .equiv  dstLevelSpecificMove, LevelSpecificMove_Plus2 - 2
                                                             #
                                                             #     ld a,d        ;1000XXXX
                                                             #     and %11111100 ;101111XX
