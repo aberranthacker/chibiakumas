@@ -19,10 +19,10 @@ ret
 
 NotPaused:
     ld a,&69 :Timer_CurrentTick_Plus1
-    ; ld b,a ; * what this for? *
+    ld b,a
     inc a
     ld (Timer_CurrentTick),a
-    ; xor b ; * what this for? *
+    xor b
     ld (hl),a
     
     ld a,0 :SmartBomb_Plus1 ; Make the background flash with the smartbomb
