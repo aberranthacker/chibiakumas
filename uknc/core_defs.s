@@ -10,12 +10,13 @@
 .equiv FB0,           0x300  # 01400   768
 .equiv FB1,           0x4180 # 04060 16768
 
-.equiv PPU_Print, 4
-.equiv PPU_SetPalette, 3
-.equiv PPU_MultiProcess, 2
-.equiv PPU_SingleProcess, 1
-.equiv PPU_NOP, 0x7FFF
-.equiv PPU_Finalize, -1
+.equiv PPU_NOP,            1
+.equiv PPU_Finalize,       2
+.equiv PPU_SingleProcess,  3
+.equiv PPU_MultiProcess,   4
+.equiv PPU_SetPalette,     5
+.equiv PPU_Print,          6
+.equiv PPU_PrintAt,        7
 
 .equiv BootstrapStart,  FB0
 .equiv Akuyou_GameVars, 0x8000 # 0100000 32768

@@ -65,7 +65,7 @@ build/core.o : core.s \
 build/ppu.o : ppu.s \
 	      resources/font.bin \
 	      $(common)
-	$(AS) ppu.s -o build/ppu.o
+	$(AS) ppu.s -al -o build/ppu.o
 build/level-00_menu.o : core_defs.s \
                         level-00_menu.s \
                         resources/titletex.spr

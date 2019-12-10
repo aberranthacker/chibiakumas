@@ -234,7 +234,33 @@ Setup:          #------------------------------------------------------------{{{
                 MOV  $1, @$07100      # add PGM to PPU's processes execution table
                 RETURN                # end of the init subroutine
 #----------------------------------------------------------------------------}}}
-Teardown:       #------------------------------------------------------------{{{
+PGM: #--------------------------------------------------------------------------
+                MOV  R0, -(SP) # store R0 in order for the process manager to
+                               # function correctly
+ShortLoop:      MOV  $PPU_PPUCommand, @$PBPADR
+                MOV  @$PBP12D,R0
+                ASL  R0
+                JMP  @JMPTable(R0)
+JMPTable:      .word EventLoop
+               .word CommandExecuted      # PPU_NOP
+               .word Teardown             # PPU_Finalize
+               .word SetSingleProcessFlag # PPU_SingleProcess
+               .word ClrSingleProcessFlag # PPU_MultiProcess
+               .word SetPalette           # PPU_SetPalette
+               .word Print                # PPU_Print
+                #JMP  PrintAt              # PPU_PrintAt
+#-------------------------------------------------------------------------------
+CommandExecuted: #-----------------------------------------------------------{{{
+                MOV  $PPU_PPUCommand, @$PBPADR
+                CLR  @$PBP12D        # inform CPU's program that we are done
+EventLoop:      TST  @$SingleProcessFlag
+                BNE  ShortLoop       # non-zero, loop
+                MOV  $PGM, @$07124   # add to processes table
+                MOV  $1, @$07100     # require execution
+                MOV  (SP)+, R0       # restore R0
+                JMP  @$0174170       # jump back to the process manager (63608; 0xF878)
+#----------------------------------------------------------------------------}}}
+Teardown: #------------------------------------------------------------------{{{
                 TST  SingleProcessFlag # were we in single process mode?
                 BEQ  1$
                 MOV  (SP)+,R0         # yes, remove stored R0 from stack
@@ -248,53 +274,19 @@ Teardown:       #------------------------------------------------------------{{{
                 JMP  @$0176300        # free allocated memory and exit
                 # RETURN
 #----------------------------------------------------------------------------}}}
-CommandExecuted: #-----------------------------------------------------------{{{
-                MOV  $PPU_PPUCommand, @$PBPADR
-                CLR  @$PBP12D        # inform CPU's program that we are done
-                TST  @$SingleProcessFlag
-                BNE  ShortLoop       # non-zero, loop
-                MOV  $PGM, @$07124   # add to processes table
-                MOV  $1, @$07100     # require execution
-                MOV  (SP)+, R0       # restore R0
-                JMP  @$0174170       # jump back to the process manager (63608; 0xF878)
-#----------------------------------------------------------------------------}}}
-PGM:            #---------------------------------------------------------------
-                MOV  R0, -(SP) # store R0 in order for the process manager to
-                               # function correctly
-ShortLoop:      MOV  $PPU_PPUCommand, @$PBPADR
-                MOV  @$PBP12D,R0
-                CMP  R0, $PPU_Print
-                BEQ  JMPPrint
-                CMP  R0, $PPU_SetPalette
-                BEQ  JMPSetPalette
-                CMP  R0, $PPU_MultiProcess
-                BEQ  ClrSingleProcessFlag
-                CMP  R0, $PPU_SingleProcess
-                BEQ  SetSingleProcessFlag
-                CMP  R0, $PPU_NOP
-                BEQ  CommandExecuted
-                CMP  R0, $PPU_Finalize
-                BEQ  JMPTeardown
-
-                BR   CommandExecuted
-
-JMPPrint:       JMP  Print
-JMPSetPalette:  JMP  SetPalette
-
-ClrSingleProcessFlag:
+ClrSingleProcessFlag: #------------------------------------------------------{{{
                 CLR  @$SingleProcessFlag
                 JMP  CommandExecuted
-SetSingleProcessFlag:
+#----------------------------------------------------------------------------}}}
+SetSingleProcessFlag: #------------------------------------------------------{{{
                 MOV  $1,@$SingleProcessFlag
                 JMP  CommandExecuted
-
-JMPTeardown:    JMP  Teardown
-SingleProcessFlag: .word 0
-#-------------------------------------------------------------------------------
-SetPalette:     #------------------------------------------------------------{{{
+#----------------------------------------------------------------------------}}}
+SetPalette: #----------------------------------------------------------------{{{
                 MOV  $PPU_PPUCommandArg, @$PBPADR
                 MOV  @$PBP12D, @$PBPADR # get palette address
-                ASR  @$PBPADR           #
+                CLC
+                ROR  @$PBPADR           #
                 # R0 - first parameter word
                 # R1 - second parameter word
                 # R2 - display/color parameters flag
@@ -352,7 +344,8 @@ Print: #---------------------------------------------------------------------{{{
 
                 MOV  $PPU_PPUCommandArg, (R5) # load address register
                 MOV  (R4),R0  # get address of a string from CPU RAM
-                ASR  R0       # divide it by 2 to calculate bitplane address
+                CLC
+                ROR  R0       # divide it by 2 to calculate bitplane address
                 MOV  R0,(R5)  # load address of a string into address register
 
 1$:             MOV  (R4),R0  # load 2 bytes from CPU RAM
@@ -411,6 +404,7 @@ CurrentLine:   .word 0
 CurrentChar:   .word 0
 StrBuffer:     .space 160
 #----------------------------------------------------------------------------}}}
+
 VblankIntHandler: #----------------------------------------------------------{{{
         # we do not need firmware interrupt handler except for this small
         # procedure
@@ -432,6 +426,7 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         RTI
 #----------------------------------------------------------------------------}}}
 
+SingleProcessFlag: .word 0
 #CGAFont: .incbin "cga8x8b.raw"
 CGAFont: .space 8*2, 0 # whitespace symbol
          .incbin "resources/font.bin"
