@@ -248,7 +248,7 @@ JMPTable:      .word EventLoop
                .word ClrSingleProcessFlag # PPU_MultiProcess
                .word SetPalette           # PPU_SetPalette
                .word Print                # PPU_Print
-                #JMP  PrintAt              # PPU_PrintAt
+               .word PrintAt              # PPU_PrintAt
 #-------------------------------------------------------------------------------
 CommandExecuted: #-----------------------------------------------------------{{{
                 MOV  $PPU_PPUCommand, @$PBPADR
@@ -327,6 +327,21 @@ SetData$:       MOV  R0,(R5)+
                 CMP  R4,$201
                 BNE  NextRecord$
                 JMP  CommandExecuted
+#----------------------------------------------------------------------------}}}
+PrintAt: #-------------------------------------------------------------------{{{
+                MOV  $PBP12D,R4
+                MOV  $PBPADR,R5
+                MOV  $PPU_PPUCommandArg,(R5)
+                MOV  (R4),R0
+                INC  (R4)
+                INC  (R4)
+                CLC
+                ROR  R0
+                MOV  R0,(R5)
+                MOV  (R4),R0
+                MOVB R0,@$CurrentChar
+                SWAB R0
+                MOVB R0,@$CurrentLine
 #----------------------------------------------------------------------------}}}
 Print: #---------------------------------------------------------------------{{{
                .equiv LineWidth, 40

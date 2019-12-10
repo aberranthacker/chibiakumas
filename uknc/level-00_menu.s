@@ -43,22 +43,6 @@ PauseLoop:
        .even
 
 LevelInit:
-       .putstr $LevelStartedStr
-
-    .ifdef CompileEP2
-        MOV  $EventStreamArray_Ep2,R3 # Event Stream
-    .else
-        MOV  $EventStreamArray_Ep1,R3 # Event Stream
-    .endif
-        MOV  $Event_SavedSettings,R2  # Saved Settings
-        CALL Event_StreamInit # uknc/event_stream.s:90
-
-        #CALL Akuyou_Music_Restart
-        #CALL Akuyou_ScreenBuffer_Reset
-        #CALL Akuyou_Interrupt_Init
-
-        #JMP ShowTitlePic
-
        .equiv SprDst, FB1+(80*64)
         MOV  $80-6,R1
 
@@ -82,6 +66,16 @@ LevelInit:
         ADD  R1,R5
         SOB  R0,2$
 
+    .ifdef CompileEP2
+        MOV  $EventStreamArray_Ep2,R3 # Event Stream
+    .else
+        MOV  $EventStreamArray_Ep1,R3 # Event Stream
+    .endif
+        MOV  $Event_SavedSettings,R2  # Saved Settings
+        CALL Event_StreamInit # uknc/event_stream.s:90
+
+       .ppudo $PPU_PrintAt,$TitleText1 # Aku/Level00-Menu.asm:1101
+
         JMP  WaitKeyThenExit
 
 ResetEventStream:
@@ -101,4 +95,8 @@ WaitKeyThenExit: #-----------------------------------------------------------{{{
 
        .exit
 #----------------------------------------------------------------------------}}}
+TitleText1: .byte 9,22
+            .asciz "Press Fire to Continue"
+            .even
+
 end:

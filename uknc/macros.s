@@ -9,9 +9,12 @@
     BNE  .-4
 .endm
 
-.macro .ppudo cmd
+.macro .ppudo cmd:req,arg=0
     TST  @$PPUCommand
     BNE  .-4
+  .if \arg != 0
+    MOV  \arg, @$PPUCommandArg
+  .endif
     MOV  \cmd, @$PPUCommand
     TST  @$PPUCommand
     BNE  .-4
