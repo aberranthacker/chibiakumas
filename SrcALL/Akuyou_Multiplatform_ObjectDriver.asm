@@ -32,42 +32,33 @@ ObjectArray_ConfigureForSizeB:
     ld (SpriteSizeShiftHalfH_Plus1-1),a
 
 ObjectArray_ConfigureForSize:
-push iy
-;   ld iy,Player_Array  ;we update player location in advance for fast collision detection
-;   ld a,(iy+0) ;PlayerY
     ld a,(P1_P00)   ;PlayerY
 
-;   sub 12  SpriteSizeShiftHalf_Plus1
     ld (PlayerY2_Plus1-1),a
     sub 24  :SpriteSizeShiftFull_Plus1
     call C,ZeroA
     ld (PlayerY1_Plus1-1),a
-;   ld a,(iy+1) ;PlayerX
+
     ld a,(P1_P01)   ;PlayerX
-;   sub 6 SpriteSizeShiftQuarter_Plus1
+
     ld (PlayerX2_Plus1-1),a
     sub 12  :SpriteSizeShiftHalfB_Plus1
     call C,ZeroA
     ld (PlayerX1_Plus1-1),a
 
-;   ld iy,Player_Array2 ;we update player location in advance for fast collision detection
-;   ld a,(iy+0) ;PlayerY
     ld a,(P2_P00)   ;PlayerY
-;   sub 12 SpriteSizeShiftHalfC_Plus1
+
     ld (Player2Y2_Plus1-1),a
     sub 24  :SpriteSizeShiftFullB_Plus1
     call C,ZeroA
     ld (Player2Y1_Plus1-1),a
 
-;   ld a,(iy+1) ;PlayerX
     ld a,(P2_P01)   ;PlayerX
-;   sub 6   SpriteSizeShiftQuarterB_Plus1
+
     ld (Player2X2_Plus1-1),a
     sub 12  :SpriteSizeShiftHalfD_Plus1
     call C,ZeroA
     ld (Player2X1_Plus1-1),a
-pop iy
-
 ret
 ZeroA:
     xor a
