@@ -5,12 +5,15 @@
 
        .global ContinueMode
        .global ContinuesReset
+       .global Event_Stream
+       .global EventStream_Process
        .global Event_SavedSettings
        .global FileBeginCore
        .global FileEndCore
        .global KeyboardScanner_KeyPresses
        .global MultiplayConfig
        .global NULL
+       .global ObjectArray_Redraw
        .global Player_Array
        .global Player_Array2
        .global Player_ScoreBytes
@@ -19,6 +22,7 @@
        .global SavedSettings_Last
        .global SmartBombsReset
        .global StarArrayPointer
+       .global Timer_UpdateTimer
 
        .include "macros.s"
        .include "core_defs.s"
@@ -309,23 +313,23 @@ Event_ReprogramVector:
        .word NULL #28                   #     defw Event_ObjectFullCustomMoves          ;14
        .word NULL #30                   #     defw Event_SmartBombSpecial               ;15
                                         #
-                                        # Event_MoveVector:               ;128+
-                                        #     defw Event_MoveLifeSwitch_0000               ; 0
-                                        #     defw Event_ProgramSwitch_0001                ; 1
-                                        #     defw Event_LifeSwitch_0010                   ; 2
-                                        #     defw Event_MoveSwitch_0011                   ; 3
-                                        #     defw Event_ProgramMoveLifeSwitch_0100        ; 4
-                                        #     defw Event_SpriteSwitch_0101                 ; 5
-                                        #     defw Event_AddFront_0110                     ; 6
-                                        #     defw Event_AddBack_0111                      ; 7
-                                        #     defw Event_ChangeStreamTime_1000             ; 8
-                                        #     defw Event_Call_1001                         ; 9
-                                        #     defw Event_LoadLastAddedObjectToAddress_1010 ;10
-                                        #     defw Event_ClearPowerups                     ;11
-                                        #     defw Event_ChangeStreamSpeed_1100            ;12
-                                        #     defw Event_SpriteSizeSwitch_1101             ;13
-                                        #     defw Event_AnimatorSwitch_1110               ;14
-                                        #     defw Event_CoreReprogram_AnimatorPointer     ;15
+Event_MoveVector: # 128+
+       .word NULL                       #     defw Event_MoveLifeSwitch_0000               ; 0
+       .word Event_ProgramSwitch        # 2 # defw Event_ProgramSwitch_0001                ; 1
+       .word NULL                       #     defw Event_LifeSwitch_0010                   ; 2
+       .word NULL                       #     defw Event_MoveSwitch_0011                   ; 3
+       .word NULL                       #     defw Event_ProgramMoveLifeSwitch_0100        ; 4
+       .word NULL                       #     defw Event_SpriteSwitch_0101                 ; 5
+       .word NULL                       #     defw Event_AddFront_0110                     ; 6
+       .word NULL                       #     defw Event_AddBack_0111                      ; 7
+       .word Event_ChangeStreamTime     #16   defw Event_ChangeStreamTime_1000             ; 8
+       .word NULL                       #     defw Event_Call_1001                         ; 9
+       .word NULL                       #     defw Event_LoadLastAddedObjectToAddress_1010 ;10
+       .word NULL                       #     defw Event_ClearPowerups                     ;11
+       .word NULL                       #     defw Event_ChangeStreamSpeed_1100            ;12
+       .word NULL                       #     defw Event_SpriteSizeSwitch_1101             ;13
+       .word Event_AnimatorSwitch       #28 # defw Event_AnimatorSwitch_1110               ;14
+       .word NULL                       #     defw Event_CoreReprogram_AnimatorPointer     ;15
                                         #
                                         # ; These are the jump-pointes used by the raster color interrupt routine - to
                                         # ; try to save time only one byte is altered, so it must be byte aligned!
@@ -337,8 +341,8 @@ Event_VectorArray:
        .word NULL  # 64  8              #     defw Event_StarBust                    ; 64
        .word NULL                       # 80 10
        .word NULL                       # 96 12
-       .word Event_CoreMultipleEventsAtOneTime #112 14
-       .word NULL  #128 16              #     defw Event_MoveSwitch                  ;128
+       .word Event_CoreMultipleEventsAtOneTime #112 14 0xE
+       .word Event_MoveSwitch           #128 16  #     defw ;128
        .word NULL  #144 18              #     defw Event_CoreSaveLoadSettings        ;144
        .word NULL                       #160 20
        .word NULL  #176 22              #     defw Event_CoreSaveLoadSettings2       ;176

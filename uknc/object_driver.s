@@ -74,7 +74,7 @@
                                                             #     xor a
                                                             # ret
                                                             #
-                                                            # ObjectArray_Redraw:
+ObjectArray_Redraw:                                         # ObjectArray_Redraw:
                                                             #     ld a,(Timer_TicksOccured)
                                                             #     or a
                                                             #     ret z   ; see if game is paused (TicksOccurred = 0 )
@@ -94,7 +94,7 @@
                                                             # ObjectArray_Turbo:
                                                             #     inc l
                                                             #     djnz Objectloop2
-                                                            #     ret
+RETURN                                                      #     ret
                                                             #
                                                             # Objectloop_NotZero:
                                                             #     ld a,c

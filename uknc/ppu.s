@@ -292,23 +292,24 @@ SetPalette: #----------------------------------------------------------------{{{
                 # R2 - display/color parameters flag
                 # R3 - current line
                 # R4 - next line where parameters change
-                CLR  R3
-                BISB @$PBP1DT,R3     # get line number
+                CLR  R3 # MOVB does sign expansion into most significant byte
+                        # we use CLR and BISB commands to avoid this
+                BISB @$PBP1DT,R3  # get line number
                 MOV  R3,R4
 NextRecord$:
-                MOV  R4,R3           # R3 = previous iteration's next line
-                MOV  R3,R5           # prepare to calculate address of SLTAB section to modify
-                ASH  $3,R5           # calculate offset by multiplying by 8 (by shifting R5 left by 3 bits)
-                ADD  @$FBSLTAB,R5    # and add address of SLTAB section we modify
+                MOV  R4,R3        # R3 = previous iteration's next line
+                MOV  R3,R5        # prepare to calculate address of SLTAB section to modify
+                ASH  $3,R5        # calculate offset by multiplying by 8 (by shifting R5 left by 3 bits)
+                ADD  @$FBSLTAB,R5 # and add address of SLTAB section we modify
 
-                MOVB @$PBP2DT,R2     # get display/color parameters flag
+                MOVB @$PBP2DT,R2  # get display/color parameters flag
                 INC  @$PBPADR
-                MOV  @$PBP12D,R0     # get first data word
+                MOV  @$PBP12D,R0  # get first data word
                 INC  @$PBPADR
-                MOV  @$PBP12D,R1     # get second data word
+                MOV  @$PBP12D,R1  # get second data word
                 INC  @$PBPADR
                 CLR  R4
-                BISB @$PBP1DT,R4     # get next line idx
+                BISB @$PBP1DT,R4  # get next line idx
 
 SetParams$:     TSTB R2
                 BNE  ColorSet$
@@ -318,11 +319,11 @@ ColorSet$:      BIS  $0b100,(R5)+
 
 SetData$:       MOV  R0,(R5)+
                 MOV  R1,(R5)+
-                ADD  $2,R5           # skip third word (screen line address)
+                ADD  $2,R5        # skip third word (screen line address)
 
-                INC  R3              # increase current line idx
-                CMP  R3,R4           # compare current line idx with next line idx
-                BLO  SetParams$      # branch if lower
+                INC  R3           # increase current line idx
+                CMP  R3,R4        # compare current line idx with next line idx
+                BLO  SetParams$   # branch if lower
 
                 CMP  R4,$201
                 BNE  NextRecord$
@@ -398,13 +399,13 @@ Draw:           ASH  $4,R0        # shift left by 4(multiply by 16)
 
                 INC  R1
                 INC  @$CurrentChar
-                CMP  @$CurrentChar,R2  # end of screen line? (R2 == 40)
-                BNE  NextChar          # no, print another character
+                CMP  @$CurrentChar,R2 # end of screen line? (R2 == 40)
+                BNE  NextChar         # no, print another character
 NewLine:        CLR  @$CurrentChar
                 INC  @$CurrentLine
                 CMP  @$CurrentLine,$TextLinesCount # next line out of screen?
-                BNE  Recalculate       # no, recalculate screen address
-                CLR  @$CurrentLine     # yes, print from the beginning
+                BNE  Recalculate      # no, recalculate screen address
+                CLR  @$CurrentLine    # yes, print from the beginning
 
 Recalculate:    MOV  @$CurrentLine,R1 #
                 MUL  $CharLineSize,R1 # calculate relative line address

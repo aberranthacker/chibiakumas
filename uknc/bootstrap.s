@@ -121,7 +121,6 @@ Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
                                         # jp Bootstrap_LoadEP2Level_1PartOnly # ../Aku/BootStrap.asm:724
 
        .ppudo $PPU_SingleProcess
-       .putstr $ExecutingLevelStr
         JMP  @$Akuyou_LevelStart
        .putstr $WarningStr
         JMP  .

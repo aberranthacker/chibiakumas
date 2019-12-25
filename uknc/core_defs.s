@@ -22,7 +22,7 @@
 .equiv Akuyou_GameVars, 0x8000 # 0100000 32768
 .equiv Akuyou_CoreStart, (Akuyou_GameVars + 0x700) # Need &700 (1792) bytes!
                                                    # 0x8700 (34560)
-.equiv Akuyou_LevelStart, 0x8C66 # 0106146 35942
+.equiv Akuyou_LevelStart, 0x8CDC # 0106334 36060
 # 0x5900 (22784) bytes of RAM the rest
 # 0xE000 (57344) end of ram
 

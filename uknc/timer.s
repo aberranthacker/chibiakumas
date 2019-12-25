@@ -8,32 +8,33 @@ RETURN                                                      # ret
 # The Background also updates the Timer, if you use a custom background
 # such as stage 9, you need to do this yourself or nothing will happen!
 Timer_UpdateTimer:                                          # Timer_UpdateTimer:
-                                                            #     ld hl,Timer_TicksOccured
+        MOV  $srcTimer_TicksOccured,R3                      #     ld hl,Timer_TicksOccured
                                                             #
-                                                            #     ld a,0 :Timer_Pause_Plus1
-                                                            #     or a
-                                                            #     jr z,NotPaused
+        TST  $0x00; Timer_Pause_Plus2:                      #     ld a,0 :Timer_Pause_Plus1
+       .equiv srcTimer_Pause, Timer_Pause_Plus2 - 2         #     or a
+        BEQ  NotPaused                                      #     jr z,NotPaused
                                                             #
-                                                            #     xor a
-                                                            #     ld (hl),a
-                                                            # ret
+        CLR  R0                                             #     xor a
+        MOV  R0,(R3) # R3 == srcTimer_TicksOccured          #     ld (hl),a
+RETURN                                                      # ret
                                                             #
-                                                            # NotPaused:
-        MOV  $0x69,R0; Timer_CurrentTick_Plus2:              #     ld a,&69 :Timer_CurrentTick_Plus1
-        .equiv  srcTimer_CurrentTick, Timer_CurrentTick_Plus2 - 2
-        .global srcTimer_CurrentTick
-                                                            #     ld b,a ; * what this for? *
-                                                            #     inc a
-                                                            #     ld (Timer_CurrentTick),a
-                                                            #     xor b ; * what this for? *
-                                                            #     ld (hl),a
+NotPaused:                                                  # NotPaused:
+        MOV  $0x69,R0; Timer_CurrentTick_Plus2: # bootstrap reset the value
+       .equiv  srcTimer_CurrentTick, Timer_CurrentTick_Plus2 - 2
+       .global srcTimer_CurrentTick                         #     ld a,&69 :Timer_CurrentTick_Plus1
+        MOV  R0,R1                                          #     ld b,a
+        INC  R0                                             #     inc a
+        MOV  R0,@$srcTimer_CurrentTick                      #     ld (Timer_CurrentTick),a
+        XOR  R1,R0                                          #     xor b
+        MOV  R0,(R3) # R3 == srcTimer_TicksOccured          #     ld (hl),a
                                                             #
-                                                            #     ld a,0 :SmartBomb_Plus1 ; Make the background flash with the smartbomb
-                                                            #     or a
-                                                            #     ret z
-                                                            #
-                                                            #     dec a                   ; Smartbomb timer down one
-                                                            #     ld (SmartBomb_Plus1-1),a
+        MOV  $0x00,R0; SmartBomb_Plus2:                     #     ld a,0 :SmartBomb_Plus1 ; Make the background flash with the smartbomb
+       .equiv srcSmartBomb, SmartBomb_Plus2 - 2 
+        BNE  SmartBombCountdown$                            #     or a
+RETURN                                                      #     ret z
+SmartBombCountdown$:
+        DEC  R0                                             #     dec a                   ; Smartbomb timer down one
+        MOV  R0,@$srcSmartBomb                              #     ld (SmartBomb_Plus1-1),a
                                                             #
                                                             #     push af
                                                             #     push hl
@@ -49,7 +50,7 @@ Timer_UpdateTimer:                                          # Timer_UpdateTimer:
                                                             #     ld a,(Timer_CurrentTick) ; and 'Ticks occured' Xor bitmap
                                                             #     ld i,a
                                                             #
-        MOV  $0,R0; Timer_TicksOccured_Plus2:               #     ld a, 0 :Timer_TicksOccured_Plus1
+        MOV  $0x00,R0; Timer_TicksOccured_Plus2:            #     ld a, 0 :Timer_TicksOccured_Plus1
        .equiv  srcTimer_TicksOccured, Timer_TicksOccured_Plus2 - 2
        .global srcTimer_TicksOccured
                                                             # ret
