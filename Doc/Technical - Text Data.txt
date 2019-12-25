@@ -1,39 +1,59 @@
-As previously mentioned, in Chibi Akumas Text co-ordinates are based on the CPC's firmare co-ordinate of  0-39 columns, and 0-24 rows.
-on MSX/ZX the physical screen is smaller,so the visible text co-ordinates are now from 4-35 across  0-23 down - this means the 'center' of the screen is the same - minimizing changes.
+    As previously mentioned, in Chibi Akumas Text co-ordinates are based on the
+CPC's firmare co-ordinate of  0-39 columns, and 0-24 rows.
+On MSX/ZX the physical screen is smaller,so the visible text co-ordinates are
+now from 4-35 across  0-23 down - this means the 'center' of the screen is the
+same - minimizing changes.
 
 General Text:
 
-Text in ChibiAkumas is not compressed, and varies in format slightly depending on language, so lets take a look at a typical 'single line of data
+    Text in ChibiAkumas is not compressed, and varies in format slightly
+depending on language, so lets take a look at a typical 'single line of data
 	db "Continue","?"+&80
 or
-
 	db "CONTINUE","?",255
-You'll notice in the top example the last character has 128 added to it to note an end of line - this is the 'english' version, and the bottom one has a byte with 255 for end of line - this is the 'non english' version.
-This is because Russian and Japanese need more characters than 32-127 would allow, so the range has been 'extended' by changing the 'end of line character'... also to reduce characters, non engligh charset lanugages do not have lower case letters.
+    You'll notice in the top example the last character has 128 added to it to
+note an end of line - this is the 'english' version, and the bottom one has a
+byte with 255 for end of line - this is the 'non english' version.
+    This is because Russian and Japanese need more characters than 32-127 would
+allow, so the range has been 'extended' by changing the 'end of line character'.
+Also to reduce characters, non engligh charset lanugages do not have lower case
+letters.
 
 Lets take a look at a multiline example
 	db 15,"You're Dead!"," "+&80
 	db 17,"(Again!)"," "+&80
 	db 0
-you'll notice that each line is prepended with a number - this is the starting X co-ordinate (the Y position will be one lower than the last line)... the last line ends with a 0 - which means the text has ended.
-Instead of an X pos, there are some special commands you can use in certian cases!
+you'll notice that each line is prepended with a number - this is the starting X
+co-ordinate (the Y position will be one lower than the last line)...
+the last line ends with a 0 - which means the text has ended.
+
+    Instead of an X pos, there are some special commands you can use in certian
+cases!
 	252 - set normal font
 	254 - set Mini font (half width)
-	253 - Zero pos... yes it's a bugfix! as I'd used Zero as 'end of text'.. I needed something when I really needed to print text at Xpos 0!
+	253 - Zero pos... yes it's a bugfix! as I'd used Zero as 'end of text'..
+	      I needed something when I really needed to print text at Xpos 0!
 
 Now lets take a look at the Japanese equivalent:
 	db 15,125,158,125,159,109,112,129,"!",255
 	db 17,139,159,114,113,119,"!",255
 	db 0
-Whoa! numbers! these are the 'character positions' in the ChibiAkumas Font, I use a small windows .Net app to convert the japanese symbols to the right binary numbers for the program
+    Whoa! numbers! these are the 'character positions' in the ChibiAkumas Font,
+I use a small windows .Net app to convert the japanese symbols to the right
+binary numbers for the program
 
 Interactive Insults:
-'spoken text' does not have an X co-ordinate, as it's positioned according to the character who's speaking, it also has some extra features, so lets take a look!
+    'spoken text' does not have an X co-ordinate, as it's positioned according
+to the character who's speaking, it also has some extra features, so lets take
+a look!
 	db 1,"That's the stupidest s--t",13,"I've ever heard","!"+&80,8
 	db 1,"Seriously, Why can't I be",13
 	db "in a GOOD GAME?",13,"F--k this s--t!",13,"I'm outta here","!"+&80
 	db 12
-This is a line of Chibiko's speech from Ep2, in which she leaves the game in a huff!... you'll see it uses special characters from 1-13, so lets take a look what they do
+
+    This is a line of Chibiko's speech from Ep2, in which she leaves the game
+in a huff!... you'll see it uses special characters from 1-13, so lets take a
+look what they do
 	 1 = Chibiko speaks!
 	 2 = Boccan speaks!
 	 3 = hero (yumi/yume) speaks!
@@ -47,4 +67,5 @@ This is a line of Chibiko's speech from Ep2, in which she leaves the game in a h
 	13 =newline (cursor returns to 1 line below last line, same X position)
 	14 =Level specific Special command command (eg chibiko return point)
 
-More advanced 8 bit games may use some kind of compression, but text in ChibiAkumas is relatively limited, so it wasn't needed.
+    More advanced 8 bit games may use some kind of compression, but text in
+ChibiAkumas is relatively limited, so it wasn't needed.
