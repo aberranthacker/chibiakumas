@@ -1,39 +1,60 @@
-The object array handles all onscreen objects onscreen, such as enemies and background items. The object array is drawn in order, so items which should appear at the front of the screen are added to the end, and background items are added to the front.
+    The object array handles all onscreen objects onscreen, such as enemies and
+background items. The object array is drawn in order, so items which should
+appear at the front of the screen are added to the end, and background items are
+added to the front.
 
-The object array has up to 64 items in it, and is byte aligned, so if object 1's data starts at 0001, object 2 would be at 0002
+    The object array has up to 64 items in it, and is byte aligned, so if object
+1's data starts at 0001, object 2 would be at 0002
 
-The object array contains 8 single bytes of data per item, they cover &400 bytes of data, but the second 'half' of these bytes is empty - see the chart below to see how the data is layed out
+    The object array contains 8 single bytes of data per item, they cover &400
+bytes of data, but the second 'half' of these bytes is empty - see the chart
+below to see how the data is layed out.
 
 Object Y:
-	Screen Y co-ordinate (one byte), 0 means this object is unused
-Object X: 
-	Screen X co-ordinate (one byte)
-Object Move:
-	One byte move command - see previous star array description for details
-Object Sprite:
-	A sprite number in the format %BBSSSSSS - 
-	sprite number SSSSSS can be 0-63
-	if BB=00 then the sprite is single frame from bank 0
-	if BB=10 then the sprite is a two frame sprite from banks 0,2
-	if BB=01 or 11 then the sprite is a four frame sprite from banks 0,1,2,3
+    Screen Y co-ordinate (one byte), 0 means this object is unused
 
-The next four bytes are read in reverse, after setting bit 6 of L high, effectively using the 'second half' of the aligned memory (see diagram above)
+Object X: 
+    Screen X co-ordinate (one byte)
+
+Object Move:
+    One byte move command - see previous star array description for details
+
+Object Sprite:
+    A sprite number in the format %BBSSSSSS - sprite number SSSSSS can be 0-63
+    if BB=00 then the sprite is single frame from bank 0
+    if BB=10 then the sprite is a two frame sprite from banks 0,2
+    if BB=01 or 11 then the sprite is a four frame sprite from banks 0,1,2,3
+
+
+    The next four bytes are read in reverse, after setting bit 6 of L high,
+effectively using the 'second half' of the aligned memory (see diagram above)
 
 Object Life:
-	Object Life is a 1 byte definiton of when the object will die, in the format %MMLLLLLL
-	LLLLLL is the current life of the object from 0-63, an object that starts with a life of 0 is immortal, an object which reaches zero dies and is removed
-	MM Defines how the object ages, and if it hurts players
-	if MM=00 the object ages over time, but can't hurt the player
-	if MM=11 the object will hurt the player, and can be shot - this is a normal enemy
-	if MM=01 the object cannot be shot, and can hurt the player (eg deadly background)
-
+    Object Life is a 1 byte definiton of when the object will die, in the format %MMLLLLLL
+    LLLLLL is the current life of the object from 0-63, an object that starts
+      with a life of 0 is immortal, an object which reaches zero dies and is
+      removed
+    MM Defines how the object ages, and if it hurts players
+      if MM=00 the object ages over time, but can't hurt the player
+      if MM=11 the object will hurt the player, and can be shot - this is a normal enemy
+      if MM=01 the object cannot be shot, and can hurt the player (eg deadly background)
 
 Object Program:
-	Programs define how an object 'works', if it is an enemy it defines how the object shoots, it also defines 'bonuses' such as coins and powerups, and 'background objects' that have a half byte pixel-shited sprite in bank 2... there are 'custom programs' which call out to code in the level data for more complex move movements - these aren't really used much since the introduction of animators... programs will be described in detail in a later post
+    Programs define how an object 'works', if it is an enemy it defines how the
+object shoots, it also defines 'bonuses' such as coins and powerups, and
+'background objects' that have a half byte pixel-shited sprite in bank 2...
+there are 'custom programs' which call out to code in the level data for more
+complex move movements - these aren't really used much since the introduction of
+animators... programs will be described in detail in a later post
 
 Object Size: 
-	the object size is a defined pixel size which defines the 'hitbox' of the object for collision detection with the player, and player bullets - an object size can be different to its sprite size - in Episode 1 all objects had a size of 24x24 - this feature was added with EP2
+    The object size is a defined pixel size which defines the 'hitbox' of the
+object for collision detection with the player, and player bullets - an object
+size can be different to its sprite size - in Episode 1 all objects had a size
+of 24x24 - this feature was added with EP2
 
 Object Animator:
-	These were added in EP2 and allow timed changes to sprite, movement etc, they will be described in detail later
-	The data is in the format %FFFFAAAA , where AAAA is animator number, and FFFF is the current 'frame' in the animation
+    These were added in EP2 and allow timed changes to sprite, movement etc,
+they will be described in detail later
+    The data is in the format %FFFFAAAA , where AAAA is animator number, and
+FFFF is the current 'frame' in the animation
