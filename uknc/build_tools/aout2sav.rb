@@ -49,10 +49,11 @@ puts "size of text segment:       #{a_text}" unless options.brief
 puts "size of initialized data:   #{a_data}" unless options.brief
 puts "size of uninitialized data: #{a_bss}" unless options.brief
 puts "size of symbol table:       #{a_syms}" unless options.brief
-puts "entry point:                #{a_entry}"
+puts "entry point:                #{a_entry}" unless options.brief
 puts "not used:                   #{a_unused}" unless options.brief
 puts "relocation info stripped:   #{a_flag}" unless options.brief
-puts "size - entry:               #{a_text - a_entry}"
+puts "size - entry:               #{a_text - a_entry}" unless options.brief
+puts "entry: #{a_entry} size: #{a_text - a_entry} ends: #{a_text}"
 
 # the start of the text segment in the file is 20(8)
 text = if options.binary
