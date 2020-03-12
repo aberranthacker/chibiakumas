@@ -52,6 +52,8 @@ Bootstrap_SystemEvent:
                                         #     cp 8
                                         #     jp z,NewGame_CheatStart
 RETURN                                  # ret
+Finish: .exit
+
 Bootstrap_Level:
 # some missing code...
 Bootstrap_StartGame:
@@ -81,14 +83,17 @@ Bootstrap_StartGame:
         MOV  $FB1, @$ReadBuffer
         MOV  $8000, @$ReadWordsCount
         CALL Bootstrap_LoadDiskFile
+
         # Apply loading screen palette
         MOV  $LoadingScreenPalette, @$PPUCommandArg
-       .ppudo $PPU_SetPalette
+       .ppudo_ensure $PPU_SetPalette
+
         # Load the game core - this is always in memory
         MOV  $CORE__BIN, @$LookupFileName
         MOV  $FileBeginCore, @$ReadBuffer
         MOV  $FileSizeCoreWords, @$ReadWordsCount
         CALL Bootstrap_LoadDiskFile
+
         # Load saved settings
         MOV  $SAVSETBIN, @$LookupFileName
         MOV  $SavedSettings, @$ReadBuffer
@@ -120,12 +125,11 @@ Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
                                         # ;need to use Specail MSX version - no extra tilemaps
                                         # jp Bootstrap_LoadEP2Level_1PartOnly # ../Aku/BootStrap.asm:724
 
-       .ppudo $PPU_SingleProcess
+       .ppudo_ensure $PPU_SingleProcess
         JMP  @$Akuyou_LevelStart
        .putstr $WarningStr
         JMP  .
         RETURN                         # ret
-        .nolist
 #----------------------------------------------------------------------------
 Player_Dead_ResumeB: # ../Aku/BootStrap.asm:1411
         SpendCreditSelfMod2:
@@ -310,6 +314,7 @@ ResetCore: # ../Aku/BootStrap.asm:2318
         MOV  $Object_DecreaseLifeShot, @$dstObjectShotOverride
 
         # set stuff that happens every level
+        # TODO: check if 2 lines below still relevant
         MOV  $0x2064,@$Player_Array  # X:0x20 Y:0x64
         MOV  $0x2096,@$Player_Array2 # X:0x20 Y:0x96
 
@@ -336,18 +341,6 @@ ResetCore: # ../Aku/BootStrap.asm:2318
 RETURN
 #----------------------------------------------------------------------------}}}
 
-WaitKeyThenExit: #-----------------------------------------------------------{{{
-        CALL WaitKey
-        MOV  $PPU_Finalize, @$PPUCommand
-        TST  @$PPUCommand # wait until PPU finishes command
-        BNE  .-4
-
-        # JSR  R5,PPFREE
-        # .word PPU_UserRamStart
-        # .word PPU_ModuleSizeWords
-
-Finish: .exit
-#----------------------------------------------------------------------------}}}
 Bootstrap_LoadDiskFile: # ../Aku/BootStrap.asm:2795 -------------------------{{{
         #.LOOKUP $LkpArea  #.LOOKUP area,chan,dblk[,seqnum]
         MOV  $LookupArea,R0
@@ -363,12 +356,6 @@ Bootstrap_LoadDiskFile: # ../Aku/BootStrap.asm:2795 -------------------------{{{
         EMT  0374       # close channel
 
 1$:     RETURN
-#----------------------------------------------------------------------------}}}
-WaitKey: #-------------------------------------------------------------------{{{
-        TST  @$KeyboardScanner_KeyPresses + 2
-        BEQ  .-4
-        CLR  @$KeyboardScanner_KeyPresses + 2
-        RETURN
 #----------------------------------------------------------------------------}}}
 
        .include "./ppucmd.s"

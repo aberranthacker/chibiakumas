@@ -239,7 +239,7 @@ PGM: #--------------------------------------------------------------------------
                                # function correctly
 ShortLoop:      MOV  $PPU_PPUCommand, @$PBPADR
                 MOV  @$PBP12D,R0
-                ASL  R0
+                ASL  R0 # multiply by 2 to calculate word offset
                 JMP  @JMPTable(R0)
 JMPTable:      .word EventLoop
                .word CommandExecuted      # PPU_NOP
@@ -254,25 +254,24 @@ CommandExecuted: #-----------------------------------------------------------{{{
                 MOV  $PPU_PPUCommand, @$PBPADR
                 CLR  @$PBP12D        # inform CPU's program that we are done
 EventLoop:      TST  @$SingleProcessFlag
-                BNE  ShortLoop       # non-zero, loop
+                BNE  ShortLoop       # non-zero, flag is set, loop
+
                 MOV  $PGM, @$07124   # add to processes table
                 MOV  $1, @$07100     # require execution
                 MOV  (SP)+, R0       # restore R0
                 JMP  @$0174170       # jump back to the process manager (63608; 0xF878)
 #----------------------------------------------------------------------------}}}
 Teardown: #------------------------------------------------------------------{{{
-                TST  SingleProcessFlag # were we in single process mode?
-                BEQ  1$
-                MOV  (SP)+,R0         # yes, remove stored R0 from stack
-1$:             CLR  @$07100          # do not run the PGM anymore
-                MOV  @$SYS100, @$0100 # restore Vblank interrupt handler
                 MOV  @$SYS272, @$0272 # restore default SLTAB (186; 0xBA)
                 MOV  @$SYS300, @$0300 # restore keyboard interrupt handler
+                MOV  @$SYS100, @$0100 # restore Vblank interrupt handler
+
                 MOV  $PPU_PPUCommand, @$PBPADR
                 CLR  @$PBP12D         # inform CPU program that we are done
-                MOV  $start,R1        #
-                JMP  @$0176300        # free allocated memory and exit
-                # RETURN
+
+                MOV  (SP)+,R0
+                CLR  @$07100          # do not run the PGM anymore
+                JMP  @$0174170        # jump back to the process manager (63608; 0xF878)
 #----------------------------------------------------------------------------}}}
 ClrSingleProcessFlag: #------------------------------------------------------{{{
                 CLR  @$SingleProcessFlag
@@ -292,11 +291,10 @@ SetPalette: #----------------------------------------------------------------{{{
                 # R2 - display/color parameters flag
                 # R3 - current line
                 # R4 - next line where parameters change
-                CLR  R3 # MOVB does sign expansion into most significant byte
-                        # we use CLR and BISB commands to avoid this
+                CLR  R3
                 BISB @$PBP1DT,R3  # get line number
                 MOV  R3,R4
-NextRecord$:
+    next_record$:
                 MOV  R4,R3        # R3 = previous iteration's next line
                 MOV  R3,R5        # prepare to calculate address of SLTAB section to modify
                 ASH  $3,R5        # calculate offset by multiplying by 8 (by shifting R5 left by 3 bits)
@@ -310,23 +308,26 @@ NextRecord$:
                 INC  @$PBPADR
                 CLR  R4
                 BISB @$PBP1DT,R4  # get next line idx
-
-SetParams$:     TSTB R2
-                BNE  ColorSet$
-                BIC  $0b100,(R5)+
-                BR   SetData$
-ColorSet$:      BIS  $0b100,(R5)+
-
-SetData$:       MOV  R0,(R5)+
+    set_params$:
+                TSTB R2
+                BMI  palette_is_set$ # negative value - terminator
+                BNE  set_colors$     # 1 - set colors
+                BIC  $0b100,(R5)+    # 0 - set data
+                BR   set_data$
+    set_colors$:
+                BIS  $0b100,(R5)+
+    set_data$:
+                MOV  R0,(R5)+
                 MOV  R1,(R5)+
                 ADD  $2,R5        # skip third word (screen line address)
 
                 INC  R3           # increase current line idx
                 CMP  R3,R4        # compare current line idx with next line idx
-                BLO  SetParams$   # branch if lower
+                BLO  set_params$  # branch if lower
 
                 CMP  R4,$201
-                BNE  NextRecord$
+                BNE  next_record$
+    palette_is_set$:
                 JMP  CommandExecuted
 #----------------------------------------------------------------------------}}}
 PrintAt: #-------------------------------------------------------------------{{{
@@ -434,11 +435,62 @@ VblankIntHandler: #----------------------------------------------------------{{{
         RTI
 #----------------------------------------------------------------------------}}}
 KeyboardIntHadler: #---------------------------------------------------------{{{
+# key codes #----------------------------------------------------------------{{{
+# | code |   key   | note   | code |  key  |  note  |
+# |   05 | ,       | NumPad | 0106 | АЛФ   |  Alph  |
+# |   06 | АР2     | Esc    | 0107 | ФИКС  |  Lock  |
+# |   07 | ; / +   |        | 0110 | Ч / ^ |        |
+# |  010 | К1 / К6 |        | 0111 | С / S |        |
+# |  011 | К2 / К7 |        | 0112 | М / M |        |
+# |  012 | КЗ / К8 |        | 0113 | SPACE |        |
+# |  013 | 4 / ¤   |        | 0114 | Т / T |        |
+# |  014 | К4 / К8 |        | 0115 | Ь / X |        |
+# |  015 | К5 / К10|        | 0116 | ←     |        |
+# |  016 | 7 / '   |        | 0117 | , / < |        |
+# |  017 | 8 / (   |        | 0125 | 7     | NumPad |
+# |  025 | -       | NumPad | 0126 | 0     | NumPad |
+# |  026 | ТАБ     | Tab    | 0127 | 1     | NumPad |
+# |  027 | Й / J   |        | 0130 | 4     | NumPad |
+# |  028 | 1 / !   |        | 0131 | +     | NumPad |
+# |  031 | 2 / "   |        | 0132 | ЗБ    | bspc   |
+# |  032 | 3 / #   |        | 0133 | →     |        |
+# |  033 | Е / E   |        | 0134 | ↓     |        |
+# |  034 | 5 / %   |        | 0135 | . / > |        |
+# |  035 | 6 / &   |        | 0136 | Э / \ |        |
+# |  036 | Ш / [   |        | 0137 | Ж / V |        |
+# |  037 | Щ / ]   |        | 0145 | 8     | NumPad |
+# |  046 | УПР     | Ctrl   | 0146 | .     | NumPad |
+# |  047 | Ф / F   |        | 0147 | 2     | NumPad |
+# |  050 | Ц / C   |        | 0150 | 5     | NumPad |
+# |  051 | У / U   |        | 0151 | ИСП   |        |
+# |  052 | К / K   |        | 0152 | УСТ   |        |
+# |  053 | П / P   |        | 0153 | ВВОД  | Enter  |
+# |  054 | H / N   |        | 0154 | ↑     |        |
+# |  055 | Г / G   |        | 0155 | : / * |        |
+# |  056 | Л / L   |        | 0156 | Х / H |        |
+# |  057 | Д / D   |        | 0157 | З / Z |        |
+# |  066 | ГРАФ    | Graph  | 0165 | 9     | NumPad |
+# |  067 | Я / Q   |        | 0166 | ВВОД  | NumPad |
+# |  070 | Ы / Y   |        | 0167 | 3     | NumPad |
+# |  071 | В / W   |        | 0170 | 7     | NumPad |
+# |  072 | А / A   |        | 0171 | СБРОС |        |
+# |  073 | И / I   |        | 0172 | ПС    |        |
+# |  074 | Р / R   |        | 0173 | / / ? |        |
+# |  075 | О / O   |        | 0174 | Ъ / } |        |
+# |  076 | Б / B   |        | 0175 | - / = |        |
+# |  077 | Ю / @   |        | 0176 | О / } |        |
+# | 0105 | HP      | shift  | 0177 | 9 / ) |        |
+# ----------------------------------------------------------------------------}}}
+        PUSH R0
         MOV  $PPU_KeyboardScanner_KeyPresses,@$PBPADR
-        MOVB @$KBDATA,@$PBP12D
+        MOVB @$KBDATA,R0
+        BMI  1$
+
+        MOVB R0,@$PBP12D
         INC  @$PBPADR
         MOV  $1,@$PBP12D
 
+1$:     POP  R0
         RTI
 #----------------------------------------------------------------------------}}}
 

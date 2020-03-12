@@ -190,10 +190,10 @@
                                                             #
                                                             # ShowSprite_OK:
                                                             #     ld a,48 :SprShow_Yoff_Plus1
-                                                            #     add 48  :SprShow_Y_Plus1
+        ADD  (PC)+,R0; srcSprShow_Y: .word 48               #     add 48  :SprShow_Y_Plus1
                                                             #     ld c,a
                                                             #     ld a,48 :SprShow_Xoff_Plus1
-                                                            #     ld b,48 :SprShow_X_Plus1
+                       srcSprShow_X: .word 48               #     ld b,48 :SprShow_X_Plus1
                                                             #
                                                             #     bit 6,a
                                                             #     jp z,ShowSprite_OK_NoDoubler

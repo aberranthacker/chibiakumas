@@ -41,12 +41,14 @@ build/LVL00.BIN : build/core.o \
 	$(LD) build/level-00_menu.o -R build/core.o -o build/level-00_menu.out -s
 	ruby build_tools/aout2sav.rb build/level-00_menu.out -b -s -o build/LVL00.BIN
 
-build/bootstrap.o : bootstrap.s \
-		    ppucmd.s $(common)
+build/bootstrap.o : $(common) \
+                    bootstrap.s \
+		    ppucmd.s
 	ruby build_tools/preprocessor.rb -i bootstrap.s
 	$(AS) -al bootstrap.s -o build/bootstrap.o
 
-build/core.o : core.s \
+build/core.o : $(common) \
+               core.s \
 	       disk_driver.s \
 	       do_moves.s \
 	       event_stream.s \
@@ -57,19 +59,20 @@ build/core.o : core.s \
 	       stararray.s \
 	       stararray_add.s \
 	       timer.s \
-	       virtual_screen_pos_320.s \
-	       $(common)
+	       virtual_screen_pos_320.s
 	$(AS) core.s -al -o build/core.o
 	build_tools/level_start_update.rb
 
-build/ppu.o : ppu.s \
-	      resources/font.bin \
-	      $(common)
+build/ppu.o : $(common) \
+	      ppu.s \
+	      resources/font.bin
 	$(AS) ppu.s -al -o build/ppu.o
-build/level-00_menu.o : core_defs.s \
+build/level-00_menu.o : $(common) \
+                        core_defs.s \
                         level-00_menu.s \
                         resources/titletex.spr
 	$(AS) -al level-00_menu.s -o build/level-00_menu.o
+
 #resources/font.bin : ../Aku/Sprites/T07-SC1.SPR
 #	build_tools/spr_cpc_to_uknc.rb ../Aku/Sprites/T07-SC1.SPR --font -o resources/font.bin
 resources/font.bin : ../ResCPC/font.bin

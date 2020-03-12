@@ -14,6 +14,7 @@ cp -f RT11SJ54g.dsk aku.dsk
 
 echo starting UKNCBTL
 wine cmd.exe /c "z:\home\random\opt\UKNCBTL\UKNCBTL.exe /boot" 2>/dev/null
+
 cd ..
 
 echo done

@@ -1,21 +1,20 @@
-
-                                                            # ;*******************************************************************************
-                                                            # ;*                              Object Driver                                  *
-                                                            # ;*                                                                             *
-                                                            # ;*******************************************************************************
-                                                            # ; We walk up 00XXXXXX then back down 01XXXXXX - this means the system needs half
-                                                            # ; of 256*4, and has an upper limit of 64 items!
-                                                            # ; YYYYYXXXXMMMMSSS LLLLPPPRRRAAAA
-                                                            #
-                                                            # ; Y = object y       (1)
-                                                            # ; X = object X       (2)
-                                                            # ; M = object Move    (3)
-                                                            # ; S = Object Sprite  (4)
-                                                            #
-                                                            # ; L = Object Life    (5)
-                                                            # ; P = Object Program (6)
-                                                            # ; R = Resolution     (7) bytes #XXXX1111
-                                                            # ; A = Animator       (8)
+################################################################################
+#                               Object Driver                                  #
+################################################################################
+#
+# We walk up 00XXXXXX then back down 01XXXXXX - this means the system needs half
+# of 256*4, and has an upper limit of 64 items!
+# YYYYYXXXXMMMMSSS LLLLPPPRRRAAAA
+#
+# Y = object y       (1)
+# X = object X       (2)
+# M = object Move    (3)
+# S = Object Sprite  (4)
+#
+# L = Object Life    (5)
+# P = Object Program (6)
+# R = Resolution     (7) bytes #XXXX1111
+# A = Animator       (8)
                                                             # ObjectArray_reConfigureForSize:
                                                             #     or a
                                                             #     ret z
@@ -32,106 +31,102 @@
                                                             #     or %00000011
                                                             #     ld (SpriteSizeShiftHalfH_Plus1-1),a
                                                             #
-                                                            # ObjectArray_ConfigureForSize:
-                                                            # push iy
-                                                            # ;   ld iy,Player_Array  ;we update player location in advance for fast collision detection
-                                                            # ;   ld a,(iy+0) ;PlayerY
-                                                            #     ld a,(P1_P00)   ;PlayerY
+ObjectArray_ConfigureForSize:                               # ObjectArray_ConfigureForSize:
+        # We update player location in advance for fast collision detection
+        # Define player 1's hitbox
+        CLR  R0
+        BISB @$P1_P00,R0                                    #     ld a,(P1_P00)   ;PlayerY
+        MOV  R0,@$srcPlayerY2                               #     ld (PlayerY2_Plus1 - 1),a
+        SUB  (PC)+,R0; srcSpriteSizeShiftFull: .word 24     #     sub 24  :SpriteSizeShiftFull_Plus1
+        BCC  1$                                             #     call C,ZeroA
+        CLR  R0                                             #     ld (PlayerY1_Plus1 - 1),a
+1$:     MOV  R0,@$srcPlayerY1                               #
                                                             #
-                                                            # ;   sub 12  SpriteSizeShiftHalf_Plus1
-                                                            #     ld (PlayerY2_Plus1-1),a
-                                                            #     sub 24  :SpriteSizeShiftFull_Plus1
-                                                            #     call C,ZeroA
-                                                            #     ld (PlayerY1_Plus1-1),a
-                                                            # ;   ld a,(iy+1) ;PlayerX
-                                                            #     ld a,(P1_P01)   ;PlayerX
-                                                            # ;   sub 6 SpriteSizeShiftQuarter_Plus1
-                                                            #     ld (PlayerX2_Plus1-1),a
-                                                            #     sub 12  :SpriteSizeShiftHalfB_Plus1
-                                                            #     call C,ZeroA
-                                                            #     ld (PlayerX1_Plus1-1),a
+        CLR  R0
+        BISB @$P1_P01,R0                                    #     ld a,(P1_P01)   ;PlayerX
+        MOV  R0,@$srcPlayerX2                               #     ld (PlayerX2_Plus1 - 1),a
+        SUB  (PC)+,R0; srcSpriteSizeShiftHalfB: .word 12    #     sub 12  :SpriteSizeShiftHalfB_Plus1
+        BCC  2$                                             #     call C,ZeroA
+        CLR  R0                                             #     ld (PlayerX1_Plus1 - 1),a
+2$:     MOV  R0,@$srcPlayerX1                               #
+
+        # Define player 2's hitbox
+        CLR  R0
+        BISB @$P2_P00,R0                                    #     ld a,(P2_P00)   ;PlayerY
+        MOV  R0,@$srcPlayer2Y2                              #     ld (Player2Y2_Plus1 - 1),a
+        SUB  (PC)+,R0; srcSpriteSizeShiftFullB: .word 24    #     sub 24  :SpriteSizeShiftFullB_Plus1
+        BCC  3$                                             #     call C,ZeroA
+        CLR  R0                                             #     ld (Player2Y1_Plus1 - 1),a
+3$:     MOV  R0,@$srcPlayer2Y1                              #
                                                             #
-                                                            # ;   ld iy,Player_Array2 ;we update player location in advance for fast collision detection
-                                                            # ;   ld a,(iy+0) ;PlayerY
-                                                            #     ld a,(P2_P00)   ;PlayerY
-                                                            # ;   sub 12 SpriteSizeShiftHalfC_Plus1
-                                                            #     ld (Player2Y2_Plus1-1),a
-                                                            #     sub 24  :SpriteSizeShiftFullB_Plus1
-                                                            #     call C,ZeroA
-                                                            #     ld (Player2Y1_Plus1-1),a
-                                                            #
-                                                            # ;   ld a,(iy+1) ;PlayerX
-                                                            #     ld a,(P2_P01)   ;PlayerX
-                                                            # ;   sub 6   SpriteSizeShiftQuarterB_Plus1
-                                                            #     ld (Player2X2_Plus1-1),a
-                                                            #     sub 12  :SpriteSizeShiftHalfD_Plus1
-                                                            #     call C,ZeroA
-                                                            #     ld (Player2X1_Plus1-1),a
-                                                            # pop iy
-                                                            #
-                                                            # ret
+        CLR  R0
+        BISB @$P1_P01,R0                                    #     ld a,(P2_P01)   ;PlayerX
+        MOV  R0,@$srcPlayer2X2                              #     ld (Player2X2_Plus1 - 1),a
+        SUB  (PC)+,R0; srcSpriteSizeShiftHalfD: .word 12    #     sub 12  :SpriteSizeShiftHalfD_Plus1
+        BCC  4$                                             #     call C,ZeroA
+        CLR  R0                                             #     ld (Player2X1_Plus1 - 1),a
+4$:     MOV  R0,@$srcPlayer2X1                              #
+RETURN                                                      # ret
                                                             # ZeroA:
                                                             #     xor a
                                                             # ret
                                                             #
 ObjectArray_Redraw:                                         # ObjectArray_Redraw:
-                                                            #     ld a,(Timer_TicksOccured)
+        TST  @$srcTimer_TicksOccured                        #     ld a,(Timer_TicksOccured)
                                                             #     or a
-                                                            #     ret z   ; see if game is paused (TicksOccurred = 0 )
+        BEQ  game_paused$                                   #     ret z   ; see if game is paused (TicksOccurred = 0 )
                                                             #
-                                                            #     call ObjectArray_ConfigureForSize
-                                                            #
-                                                            #     ld B,ObjectArraySize ;00ObjectArray_Size_Plus1
-                                                            #
-                                                            #     ld hl,ObjectArrayPointer;(ObjectArrayAddress)
+        CALL ObjectArray_ConfigureForSize                   #     call ObjectArray_ConfigureForSize
+        #?                                                  #
+        MOV  $ObjectArraySize,R1 # uknc/core.s:41           #     ld B,ObjectArraySize ;00ObjectArray_Size_Plus1
+        MOV  $ObjectArrayPointer,R3 # uknc/core.s:48        #     ld hl,ObjectArrayPointer;(ObjectArrayAddress)
                                                             #
                                                             #     xor a ; Zero
-                                                            #
-                                                            # Objectloop2:
-                                                            #     ld c,(hl)   ; Y
-                                                            #     cp c
-                                                            #     jr NZ,Objectloop_NotZero        ;if object Y =0 the object is dead
+    object_loop$:                                           # Objectloop2:
+        CLR  R0
+        BISB (R3),R0 # Screen Y co-ordinate (one byte),     #     ld c,(hl)   ; Y
+                     # 0 means this object is unused        #     cp c
+        BNE  object_present$                                #     jr NZ,Objectloop_NotZero ;if object Y =0 the object is dead
                                                             # ObjectArray_Turbo:
-                                                            #     inc l
-                                                            #     djnz Objectloop2
-RETURN                                                      #     ret
+        INC  R3                                             #     inc l
+        SOB  R1,object_loop$                                #     djnz Objectloop2
+    game_paused$:                                           #
+        RETURN                                              #     ret
                                                             #
-                                                            # Objectloop_NotZero:
+    object_present$:                                        # Objectloop_NotZero:
                                                             #     ld a,c
-                                                            #     ld (SprShow_Y),a
-                                                            #     push bc
-                                                            #     push hl
-                                                            #                 ;1
+        MOV  R0,@$srcSprShow_Y # uknc/show_sprite.s:193     #     ld (SprShow_Y),a
+        PUSH R1                                             #     push bc
+        PUSH R3                                             #     push hl
+                                                            #     ;1
                                                             #         inc h
                                                             #         ld a,(hl) ; X
                                                             #         ld (SprShow_X),a
                                                             #         ld b,a
-                                                            #         ;add hl,de              ;2
+                                                            #     ;2
                                                             #         inc h
-                                                            #         ;
-                                                            #         ld a,(hl) ; M
+                                                            #         ld a,(hl) ; Move
                                                             #         ld ixh,a
-                                                            #         ;add hl,de              ;3
+                                                            #     ;3
                                                             #         inc h
                                                             #         ld a,(hl) ; Sprite etc
                                                             #         ld iyh,a
                                                             #
                                                             #         set 6,l ;Flip to the second half
-                                                            #
-                                                            #         ;add hl,de              ;4
-                                                            #
+                                                            #     ;4  ---
                                                             #         ld a,(hl) ; Life etc
                                                             #         ld ixl,a
-                                                            #         ;add hl,de              ;5
-                                                            #         dec h;inc h
+                                                            #     ;5
+                                                            #         dec h
                                                             #         ld a,(hl) ; Program Code
                                                             #         ld iyl,a
-                                                            #         dec h;inc h
+                                                            #     ;6
+                                                            #         dec h
                                                             #         ld a,(hl) ; Sprite Size
                                                             #         cp 0    :ObjectSpriteSizeCurrent_Plus1
                                                             #         call nz,ObjectArray_reConfigureForSize      ;Code to change sprite size!
-                                                            #
-                                                            #         dec h;inc h
+                                                            #     ;7
+                                                            #         dec h
                                                             #         ld a,(hl) ; animator
                                                             #         or a
                                                             #         call nz,ObjectAnimator
@@ -166,19 +161,17 @@ RETURN                                                      #     ret
                                                             #     ; we check anyway before deducting a life
                                                             #     ;Jp Objectloop_PlayerVunrable ;Objectloop_DoPlayerCollisions_Plus2
                                                             # Objectloop_PlayerVunrable:
-                                                            # ;------------------------------ player collisions ------------------------------
+#------------------------------ player collisions ------------------------------
                                                             #             ld a,b
-                                                            # ;           add 3 SpriteSizeShiftEight_Plus1
-                                                            #             cp 0 :PlayerX1_Plus1
+        CMPB (PC)+,R0; srcPlayerX1: .word 0                 #             cp 0 :PlayerX1_Plus1
                                                             #             jr c,ObjectLoopP1Skip
-                                                            #             cp 0 :PlayerX2_Plus1
+        CMPB (PC)+,R0; srcPlayerX2: .word 0                 #             cp 0 :PlayerX2_Plus1
                                                             #             jr nc,ObjectLoopP1Skip
                                                             #
                                                             #             ld a,c
-                                                            # ;           add 12 SpriteSizeShiftHalfE_Plus1
-                                                            #             cp 0 :PlayerY1_Plus1
+        CMPB (PC)+,R0; srcPlayerY1: .word 0                 #             cp 0 :PlayerY1_Plus1
                                                             #             jr c,ObjectLoopP1Skip
-                                                            #             cp 0 :PlayerY2_Plus1
+        CMPB (PC)+,R0; srcPlayerY2: .word 0                 #             cp 0 :PlayerY2_Plus1
                                                             #             jr nc,ObjectLoopP1Skip
                                                             #
                                                             #             ld a,(P1_P09)
@@ -204,16 +197,16 @@ RETURN                                                      #     ret
                                                             #
                                                             #             ld a,b
                                                             # ;           add 3    SpriteSizeShiftEightB_Plus1
-                                                            #             cp 0 :Player2X1_Plus1
+        CMPB (PC)+,R0; srcPlayer2X1: .word 0                #             cp 0 :Player2X1_Plus1
                                                             #             jr c,ObjectLoopP2Skip
-                                                            #             cp 0 :Player2X2_Plus1
+        CMPB (PC)+,R0; srcPlayer2X2: .word 0                #             cp 0 :Player2X2_Plus1
                                                             #             jr nc,ObjectLoopP2Skip
                                                             #
                                                             #             ld a,c
                                                             # ;           add 12  SpriteSizeShiftHalfF_Plus1
-                                                            #             cp 0 :Player2Y1_Plus1
+        CMPB (PC)+,R0; srcPlayer2Y1: .word 0                #             cp 0 :Player2Y1_Plus1
                                                             #             jr c,ObjectLoopP2Skip
-                                                            #             cp 0 :Player2Y2_Plus1
+        CMPB (PC)+,R0; srcPlayer2Y2: .word 0                #             cp 0 :Player2Y2_Plus1
                                                             #             jr nc,ObjectLoopP2Skip
                                                             #
                                                             #             push hl
@@ -802,7 +795,7 @@ Object_DecreaseLifeShot: .global Object_DecreaseLifeShot    #  Object_DecreaseLi
                                                             #     pop bc
                                                             # Object_DecreaseShotToDeathB:
                                                             #     ;object has been shot to death
-                                                            #
+        # check if address mode is right                                                    #
         CALL NULL; CustomShotToDeathCall_Plus2:             #     call null :CustomShotToDeathCall_Plus2
        .equiv  dstCustomShotToDeathCall, CustomShotToDeathCall_Plus2 - 2
        .global dstCustomShotToDeathCall

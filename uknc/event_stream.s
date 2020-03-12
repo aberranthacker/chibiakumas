@@ -88,9 +88,9 @@ RETURN                                                      #     ret
 Event_StreamInit:                                           # Event_StreamInit:
        .global Event_StreamInit
         # Store the address of our 2nd setting buffer (1st is contained in core)
-        MOV  R2,@$srcEvent_SavedSettings # uknc/event_stream.s:614
+        MOV  R2,@$srcEvent_SavedSettings # uknc/event_stream.s:621
         CLR  R0
-        MOV  R0,@$srcEvent_MultipleEventCount # uknc/event_stream.s:485
+        MOV  R0,@$srcEvent_MultipleEventCount # uknc/event_stream.s:493
         CALL SetLevelTime # uknc/event_stream.s:70 # does MOV (R3)+,@$srcEvent_NextEventTime
         # process the first batch of events
         BR   Event_GetEventsNow # uknc/event_stream.s:127
@@ -130,7 +130,7 @@ Event_MoreEvents:                                           # Event_MoreEvents:
 
 Event_GetEventsNow:                                         # Event_GetEventsNow:
         #MOV  $LdAFromHLIncHL,R5                            #     ld iy,LdAFromHLIncHL ; Set RST 6 to do our bidding
-        .list                                                    #     ld hl,Event_LoadNextEvt
+                                                            #     ld hl,Event_LoadNextEvt
         MOV  $Event_LoadNextEvt,-(SP)                       #     push hl ; We do a dirty trick to save space, all these actions end in a RET
                                                             #
       #  MOV  $0x0000,R3; Event_NextEventPointer_Plus2:      #     ld hl,6969 :Event_NextEventPointer_Plus2 ; mem pointer of next byte
@@ -300,7 +300,7 @@ RETURN # JMP @$Event_LoadNextEvt                            #     ret;    jp Eve
                                                             #
 Event_CoreReprogram_Palette:                                # Event_CoreReprogram_Palette:
         MOV  (R3)+,@$PPUCommandArg                          #     ld de,RasterColors_ColorArray1 :RasterColors_ColorArray1PointerB_Plus2
-       .ppudo $PPU_SetPalette
+       .ppudo_ensure $PPU_SetPalette
 RETURN                                                      #
                                                             # Event_CoreReprogram_DataCopy:
                                                             #     ;reads in Offset then Bytecount from (HL) and dumps to destination DE
@@ -490,8 +490,7 @@ Event_ChangeStreamTime:                                     # Event_ChangeStream
                                                             #
                                                             # ; Read in the next object
 Event_LoadNextEvt:                                          # Event_LoadNextEvt:
-        TST  $0x00; Event_MultipleEventCount_Plus2: # 4     #     ld a,0 :Event_MultipleEventCount_Plus1
-       .equiv srcEvent_MultipleEventCount, Event_MultipleEventCount_Plus2 - 2
+        TST  (PC)+; srcEvent_MultipleEventCount: .word 0x00 #     ld a,0 :Event_MultipleEventCount_Plus1
                                                             #     or a
         BEQ  EventsProcessed                                #     jp nz,Event_MoreEventsDec ; there are multiple events at this point
         # multiple events at the same timepoint             # Event_MoreEventsDec: ; multiple events at the same timepoint

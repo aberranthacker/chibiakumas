@@ -9,7 +9,7 @@
     BNE  .-4
 .endm
 
-.macro .ppudo cmd:req,arg=0
+.macro .ppudo_ensure cmd:req,arg=0
     TST  @$PPUCommand
     BNE  .-4
   .if \arg != 0
@@ -18,6 +18,29 @@
     MOV  \cmd, @$PPUCommand
     TST  @$PPUCommand
     BNE  .-4
+.endm
+
+.macro .ppudo cmd:req,arg=0
+  .if \arg != 0
+    MOV  \arg, @$PPUCommandArg
+  .endif
+    MOV  \cmd, @$PPUCommand
+.endm
+
+.macro .waitKeyThenExit
+    TST  @$KeyboardScanner_KeyPresses + 2
+    BEQ  .-4
+    CLR  @$KeyboardScanner_KeyPresses + 2
+   .ppudo_ensure $PPU_Finalize
+
+    CLR  R0
+    SOB  R0,.
+
+    JSR  R5,PPFREE
+    .word PPU_UserRamStart
+    .word PPU_ModuleSizeWords
+
+   .exit
 .endm
 
 # generic macros

@@ -46,11 +46,11 @@ StarArrayPointer:
        .space 256*3
 
 ObjectArrayPointer: # first ObjectArraySize*2 of each 256 are used - rest (>128) are spare
-       .space 256*4
+       .space (64 * 8) * 2 # 256 * 4
         # First 128 are used by object array
        .equiv PlayerStarArrayPointer, (ObjectArrayPointer + 128)
         # Out the way of the Object array!??
-       .equiv Event_SavedSettings, (256 * 3 + ObjectArrayPointer + 128)
+       .equiv Event_SavedSettings, (ObjectArrayPointer + 256 * 3 + 128)
 
         # -Player 2's data starts XX bytes after player so you can use IY+XX+1 to get
         # a var from player 2 without changing IY
