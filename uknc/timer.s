@@ -10,26 +10,25 @@ RETURN                                                      # ret
 Timer_UpdateTimer:                                          # Timer_UpdateTimer:
         MOV  $srcTimer_TicksOccured,R3                      #     ld hl,Timer_TicksOccured
                                                             #
-        TST  $0x00; Timer_Pause_Plus2:                      #     ld a,0 :Timer_Pause_Plus1
-       .equiv srcTimer_Pause, Timer_Pause_Plus2 - 2         #     or a
+        TST  (PC)+; srcTimer_Pause: .word 0x00              #     ld a,0 :Timer_Pause_Plus1
+                                                            #     or a
         BEQ  NotPaused                                      #     jr z,NotPaused
                                                             #
         CLR  R0                                             #     xor a
-        MOV  R0,(R3) # R3 == srcTimer_TicksOccured          #     ld (hl),a
+        MOV  R0,(R3) # R3 points to srcTimer_TicksOccured   #     ld (hl),a
 RETURN                                                      # ret
                                                             #
 NotPaused:                                                  # NotPaused:
-        MOV  $0x69,R0; Timer_CurrentTick_Plus2: # bootstrap reset the value
-       .equiv  srcTimer_CurrentTick, Timer_CurrentTick_Plus2 - 2
        .global srcTimer_CurrentTick                         #     ld a,&69 :Timer_CurrentTick_Plus1
+        MOV  (PC)+,R0; srcTimer_CurrentTick: .word 0x69     # bootstrap's ResetCore resets the value to 0x69
+
         MOV  R0,R1                                          #     ld b,a
         INC  R0                                             #     inc a
         MOV  R0,@$srcTimer_CurrentTick                      #     ld (Timer_CurrentTick),a
         XOR  R1,R0                                          #     xor b
-        MOV  R0,(R3) # R3 == srcTimer_TicksOccured          #     ld (hl),a
+        MOV  R0,(R3) # R3 points to srcTimer_TicksOccured   #     ld (hl),a
                                                             #
-        MOV  $0x00,R0; SmartBomb_Plus2:                     #     ld a,0 :SmartBomb_Plus1 ; Make the background flash with the smartbomb
-       .equiv srcSmartBomb, SmartBomb_Plus2 - 2 
+        MOV  (PC)+,R0; srcSmartBomb: .word 0x00             #     ld a,0 :SmartBomb_Plus1 ; Make the background flash with the smartbomb
         BNE  SmartBombCountdown$                            #     or a
 RETURN                                                      #     ret z
 SmartBombCountdown$:
@@ -49,8 +48,6 @@ SmartBombCountdown$:
                                                             # Timer_GetTimer:              ; Return current timer in I
                                                             #     ld a,(Timer_CurrentTick) ; and 'Ticks occured' Xor bitmap
                                                             #     ld i,a
-                                                            #
-        MOV  $0x00,R0; Timer_TicksOccured_Plus2:            #     ld a, 0 :Timer_TicksOccured_Plus1
-       .equiv  srcTimer_TicksOccured, Timer_TicksOccured_Plus2 - 2
-       .global srcTimer_TicksOccured
+       .global srcTimer_TicksOccured                        #     ld a, 0 :Timer_TicksOccured_Plus1
+        MOV  $0x00,R0; srcTimer_TicksOccured: .word 0x00    # bootstrap's ResetCore resets the value to 0x00
                                                             # ret

@@ -421,7 +421,7 @@ end: FileEndCore:
 
        .global LevelStart
 LevelStart:
-        JMP  @$LevelStart # - Level start
+        JMP  .
 LevelLoop:
-        JMP  @$LevelLoop  # - Level loop
+        JMP  .
 

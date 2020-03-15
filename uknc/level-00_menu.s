@@ -34,8 +34,6 @@ EventStreamArray_Ep1: #------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 
 EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
-                    # ;defb 1,128,&24,128+64+60       ; Move Static
-
                     # defb 0,%01110000+4          ; 4 Commands
                     #     defb 240,0,6        ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
                     #     defb 1
@@ -140,10 +138,6 @@ LevelInit:
         CLR  @$KeyboardScanner_KeyPresses + 2 # call Keys_WaitForRelease
 
 ShowTitlePic_Loop:
-        CALL Timer_UpdateTimer
-        CALL EventStream_Process
-        WAIT
-
        .ppudo $PPU_SetPalette, $AnyKeyNormalPalette
         CALL glow_delay$
        .ppudo $PPU_SetPalette, $AnyKeyDarkPalette
@@ -163,13 +157,16 @@ ShowTitlePic_Loop:
         RETURN
 
 ShowMenu:
-       .ppudo_ensure $PPU_PrintAt,$TestStr
-        CALL DrawChibi
-
-        MOV  EventStreamArray_Menu_EP1
+    .ifdef CompileEP2
+        MOV  EventStreamArray_Menu_EP2, R3
+    .else
+        MOV  EventStreamArray_Menu_EP1, R3
+    .endif
         CALL ResetEventStream
         # CALL Akuyou_CLS
 
+       .ppudo_ensure $PPU_PrintAt,$TestStr
+        CALL DrawChibi
         JMP  .
 
 DrawChibi:

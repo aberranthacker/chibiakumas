@@ -11,7 +11,8 @@ LD=~/opt/binutils-pdp11/pdp11-dec-aout/bin/ld
 
 common = hwdefs.s core_defs.s macros.s
 
-build/AKU.SAV : build/bootstrap.o \
+build/AKU.SAV : build/bootsector.o \
+	        build/bootstrap.o \
 		build/core.o \
 		build/level-00_menu.o \
 		build/CORE.BIN \
@@ -40,6 +41,10 @@ build/LVL00.BIN : build/core.o \
                   build/level-00_menu.o
 	$(LD) build/level-00_menu.o -R build/core.o -o build/level-00_menu.out -s
 	ruby build_tools/aout2sav.rb build/level-00_menu.out -b -s -o build/LVL00.BIN
+
+build/bootsector.o : $(common) \
+                     bootsector.s
+	$(AS) -al bootsector.s -o build/bootsector.o
 
 build/bootstrap.o : $(common) \
                     bootstrap.s \

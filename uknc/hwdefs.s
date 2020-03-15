@@ -3,7 +3,7 @@
 .equiv PR0, 0       # lowest priority to the processor
                     # MTPS PR0 enables interrupts
 
-# CPU/PPU USER mode intert vectors and priorities
+# CPU/PPU USER mode interrup vectors and priorities
 # vect prty Source
 #   04   1 input/output RPLY timeout
 #   04   2 illegal addressing mode
@@ -14,7 +14,16 @@
 #  024   4 ACLO
 #  030   - EMT  instruction
 #  034   - TRAP instruction
-# 0100   6 EVNT
+#  060     TTY out (channel 0 out)
+#  064     TTY in (channel 0 in)
+# 0100   6 EVNT (Vsync)
+# 0370     serial (C2)
+# 0374     serial (C2)
+# 0380     serial (LAN)
+# 0384     serial (LAN)
+# 0460     channel 1 out 
+# 0464     channel 1 in
+# 0464     channel 2 in
 
 # CPU: bitplanes registers
 .equiv CBPADR, 0176640 # CPU bitplanes address register
@@ -43,6 +52,10 @@
 .equiv CCH0OI, 064     # CPU channel 0 out  state interrupt
 .equiv CCH0OS, 0177564 # CPU channel 0 out  state register
 .equiv CCH0OD, 0177566 # CPU channel 0 out  data register
+.equiv TTYIS, CCH0IS   # TTY in state
+.equiv TTYID, CCH0ID   # TTY in data
+.equiv TTYOS, CCH0OS   # TTY out state
+.equiv TTYOD, CCH0OD   # TTY out data
 # parallel port access channel
 .equiv CCH1II, 0460    # CPU channel 1 in   state interrupt
 .equiv CCH1IS, 0176660 # CPU channel 1 in   state register
