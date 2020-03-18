@@ -2,23 +2,17 @@
 
                 .TITLE BootstrapChibi Akumas loader
 
+                .global start
                 .global Bootstrap_Launch
+                .global BootstrapEnd
                 .global LoadingScreenPalette
 
                 .include "./hwdefs.s"
                 .include "./macros.s"
                 .include "./core_defs.s"
 
-                .=040; .word BootstrapStart   # program’s relative start address
-                .=042; .word SPReset          # initial location of stack pointer
-                .=050; .word BootstrapEnd - 2 # address of the program’s highest word
-
                 .=BootstrapStart
-
-       .cout $TextInit
-       .cout $TitleStr
-       .cout $WebSiteStr
-       .cout $CreditsStr
+start:
 Bootstrap_Launch:
         CLR R3
 
@@ -66,40 +60,29 @@ Bootstrap_StartGame:
        .endr
         SOB  R0, 1$
 #----------------------------------------------------------------------------}}}
-# Load and execute PPU module -----------------------------------------------{{{
-        MOV  $PPU___BIN, @$LookupFileName
-        MOV  $FB1, @$ReadBuffer
-        MOV  $PPU_ModuleSizeWords, @$ReadWordsCount
+# Load core modules ---------------------------------------------------------{{{
+        MOV  $ppu_module.bin,R0
         CALL Bootstrap_LoadDiskFile
+
         # PPU will clear the command code when it ready to execute a new one
         MOV  $PPU_NOP,@$PPUCommand
 
         JSR  R5,PPEXEC
-        .WORD FB1 # PPU module location
-        .WORD PPU_ModuleSizeWords
-#----------------------------------------------------------------------------}}}
+       .word FB1 # PPU module location
+       .word PPU_ModuleSizeWords + 1280 # 2.5KB is a space required for SLTAB
+#-------------------------------------------------------------------------------
         # Load loading screen
-        MOV  $LOADINSCR, @$LookupFileName # ../AkuCPC/BootsStrap_StartGame_CPC.asm:64
-        MOV  $FB1, @$ReadBuffer
-        MOV  $8000, @$ReadWordsCount
+        MOV  $loading_screen.bin,R0
         CALL Bootstrap_LoadDiskFile
 
         # Apply loading screen palette
-        MOV  $LoadingScreenPalette, @$PPUCommandArg
-       .ppudo_ensure $PPU_SetPalette
+       .ppudo_ensure $PPU_SetPalette, $LoadingScreenPalette
 
         # Load the game core - this is always in memory
-        MOV  $CORE__BIN, @$LookupFileName
-        MOV  $FileBeginCore, @$ReadBuffer
-        MOV  $FileSizeCoreWords, @$ReadWordsCount
+        MOV  $core.bin,R0
         CALL Bootstrap_LoadDiskFile
 
-        # Load saved settings
-        MOV  $SAVSETBIN, @$LookupFileName
-        MOV  $SavedSettings, @$ReadBuffer
-        MOV  $FileSizeSettingsWords, @$ReadWordsCount
-        CALL Bootstrap_LoadDiskFile
-
+        # TODO: Load saved settings
         # TODO: player sprites load
         # TODO: Initialize the Sound Effects.
 #----------------------------------------------------------------------------}}}
@@ -110,9 +93,7 @@ Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
         CALL StartANewGame
         CALL LevelReset0000
 
-        MOV  $LVL00_BIN, @$LookupFileName
-        MOV  $Akuyou_LevelStart, @$ReadBuffer
-        MOV  $Level00SizeWords, @$ReadWordsCount
+        MOV  $level_00.bin,R0
         CALL Bootstrap_LoadDiskFile
                                         # ld hl,DiskMap_MainMenu      ;T08-SC1.D01
                                         # ld c,DiskMap_MainMenu_Disk
@@ -342,20 +323,71 @@ RETURN
 #----------------------------------------------------------------------------}}}
 
 Bootstrap_LoadDiskFile: # ../Aku/BootStrap.asm:2795 -------------------------{{{
-        #.LOOKUP $LkpArea  #.LOOKUP area,chan,dblk[,seqnum]
-        MOV  $LookupArea,R0
-        EMT  0375
-        BCS  1$         # return if file not found
+       .list
+        MOV  (R0)+,@$PS.CPU_RAM_Address
+       .nolist
+        MOV  (R0)+,@$PS.WordsCount
+        MOV  (R0),R0
+        CLR  R2     # R2 - most significant word
+        MOV  R0,R3  # R3 - least significant word
+        DIV  $20,R2 # quotient -> R2 , remainder -> R3
+        MOVB R2,@$PS.AddressOnDevice     # track number
+        CLR  R2
+        DIV  $10,R2
+        INC  R3
+        MOVB R3,@$PS.AddressOnDevice + 1 # sector
+        ASH  $7,R2
+        MOVB R2,@$PS.DeviceNumber        # head
 
-        #.READW  $RdArea   #.READW  area,chan,buf,wcnt,blk[,BMODE=strg]
-        MOV  $ReadArea,R0
-        EMT  0375
+        MOVB $-1,@$PS.Status
+        CLC
+        
+        MOV  $ParamsAddr,R0 # R0 - pointer to channel's init sequence array
+        MOV  $8,R1          # R1 - size of the array, 8 bytes
+1$:     MOVB (R0)+,@$CCH2OD # Send a byte to channel 2
 
-        #.Close  $0      #.CLOSE  chan
-        MOV  $0x0600,R0 # operation code 6(MSB), channel 0(LSB)
-        EMT  0374       # close channel
+2$:     TSTB @$CCH2OS       #
+        BPL  2$             # Wait until channel is ready
 
-1$:     RETURN
+        SOB  R1,1$          # Next byte
+
+3$:     TSTB @$PS.Status
+        BMI  3$
+        BEQ  1237$
+        SEC  # set carry flag to indicate that there was an error
+        MOV  @$PS.Status,R0
+1237$:  RETURN
+
+ParamsAddr: .byte 0, 0, 0, 0xFF # init sequence (just in case)
+            .word ParamsStruct
+            .byte 0xFF, 0xFF    # two termination bytes 0xff, 0xff
+ParamsStruct:
+    PS.Status:          .byte -1  # operation status code
+    PS.Command:         .byte 010 # read data from disk
+    PS.DeviceType:      .byte 02       # double sided disk
+    PS.DeviceNumber:    .byte 0x00 | 0 # bit 7: head(0-bottom, 1-top) ∨ drive number 0(0-3)
+    PS.AddressOnDevice: .byte 0,1      # track 0(0-79), sector 1(1-10)
+    PS.CPU_RAM_Address: .word 0
+    PS.WordsCount:      .word 0        # number of words to transfer
+#----------------------------------------------------------------------------}}}
+
+# files related data --------------------------------------------------------{{{
+ppu_module.bin:
+       .word FB1
+       .word PPU_ModuleSizeWords
+       .word PPUModuleBlockNum
+loading_screen.bin:
+       .word FB1
+       .word 8000
+       .word LoadingScreenBlockNum
+core.bin:
+       .word FileBeginCore
+       .word FileSizeCoreWords
+       .word CoreBlockNum
+level_00.bin:
+       .word Akuyou_LevelStart
+       .word Level00SizeWords
+       .word Level00BlockNum
 #----------------------------------------------------------------------------}}}
 
        .include "./ppucmd.s"
@@ -545,29 +577,6 @@ BulletConfigHell: #----------------------------------------------------------{{{
     .byte 0
 BulletConfigHell_End:
 #----------------------------------------------------------------------------}}}
-# files related data --------------------------------------------------------{{{
-LookupArea:         .byte  0,01 # chan, code(.LOOKUP)
-    LookupFileName: .word  0 # dblk
-
-ReadArea:           .byte  0,010 # chan, code(.READ/.READC/.READW)
-                    .word  0 # blk
-    ReadBuffer:     .word  0 # buf
-    ReadWordsCount: .word  0 # wcnt
-                    .word  0 # end of area(.READW=0,.READ=1)
-CORE__BIN:
-    .word 0x1AB8, 0x152A, 0x1F40, 0x0DF6 # .RAD50 "DK CORE  BIN"
-SAVSETBIN: # saved settings bin
-    .word 0x1AB8, 0x76FE, 0x779C, 0x0DF6 # .RAD50 "DK SAVSETBIN"
-PPU___BIN:
-    .word 0x1AB8, 0x6695, 0x0000, 0x0DF6 # .RAD50 "DK PPU   BIN"
-LOADINSCR:
-    .word 0x1AB8, 0x4D59, 0x1A76, 0x774A # .RAD50 "DK LOADINSCR"
-LVL00_BIN:
-    .word 0x1AB8, 0x4E7C, 0xC030, 0x0DF6 # .RAD50 "DK LVL00 BIN"
-
-LookupError: .asciz "File lookup error."
-ReadError:   .asciz "File read error."
-#----------------------------------------------------------------------------}}}
 LoadingScreenPalette: #------------------------------------------------------{{{
     .byte 0       #--line number, last line of the top screen area, *required!*
     .byte 0       #  0 - set cursor/scale/palette, *ignored for the first record*
@@ -596,25 +605,10 @@ LoadingScreenPalette: #------------------------------------------------------{{{
     .byte 201     #--line number, 201 - end of the main screen params
     .even
 #----------------------------------------------------------------------------}}}
-TextInit:    .byte  033, 0240, '2 # symbol color
-             .byte  033, 0241, '0 # symbol background color
-             .byte  033, 0242, '0 # screen color
-             .byte  033,  045, 041, 061            # order screenlines and
-             .byte  033, 0133, 060, 075, 060, 0162 # clear screen
-             .byte  0
-TitleStr:    .asciz "      -= ChibiAkumas  V1.666 =-"
-WebSiteStr:  .asciz "      -= www.chibiakumas.com =-"
-CreditsStr:  .asciz "-= UKNC version by aberrant_hacker =-"
                    #0         1         2         3         4         5         6         7
                    #01234567890123456789012345678901234567890123456789012345678901234567890123456789
         .even # PPU reads strings by word by word, so align
 YahooStr:   .asciz "Yippee! Whoopee! Woo-hoo! Yay! Hurrah!\n"
-        .even
-LongStr:    .asciz "This is a very very very very very very very very very very very long string.\n"
-        .even
-LoadingStr: .asciz "\n\n     Loading"
-        .even
-ExecutingLevelStr: .asciz "Executing level 0 (menu).\n"
         .even
 WarningStr: .asciz "Warning!\n"
         .even

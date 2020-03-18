@@ -490,7 +490,6 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         MOVB R0,@$PBP12D
         INC  @$PBPADR
         MOV  $1,@$PBP12D
-
 1$:     POP  R0
         RTI
 #----------------------------------------------------------------------------}}}
@@ -505,7 +504,5 @@ SYS300:  .word 0175412 # address of default keyboard interrupt hadler
 FBSLTAB: .word 0       # adrress of main screen SLTAB
 
          .balign 8 # scan-lines parameters table, it has to be aligned at 4 words
-SLTAB:   .space 288 * 2 * 4 # space for a 288 four-words entries
-         .space 10 * 2 * 2  # reserve some more space for invisible scanlines
-
+SLTAB:
 end:

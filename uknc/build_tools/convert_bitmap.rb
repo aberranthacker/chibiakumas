@@ -43,4 +43,4 @@ cpc_bmp.each.with_index do |cpc_word, i|
   uknc_bmp[uknc_word_idx] = uknc_word
 end
 
-File.binwrite('build/LOADIN.SCR', uknc_bmp.pack('v*'))
+File.binwrite('build/loading_screen.bin', uknc_bmp.pack('v*'))

@@ -11,36 +11,43 @@ LD=~/opt/binutils-pdp11/pdp11-dec-aout/bin/ld
 
 common = hwdefs.s core_defs.s macros.s
 
-build/AKU.SAV : build/bootsector.o \
-	        build/bootstrap.o \
-		build/core.o \
-		build/level-00_menu.o \
-		build/CORE.BIN \
-		build/PPU.BIN \
-		build/LOADIN.SCR \
-		build/LVL00.BIN \
-		linker_scripts/bootstrap.cmd
+build/chibiakumas.dsk : build/bootsector.bin \
+			build/bootstrap.bin \
+			build/ppu_module.bin \
+			build/loading_screen.bin \
+			build/core.bin \
+			build/level-00.bin
+	build_tools/build_dsk.rb
+
+build/bootsector.bin : build/bootsector.o \
+                       build/bootstrap.o
+	$(LD) -T linker_scripts/bootsector.cmd -R build/bootstrap.o -s
+	chmod -x build/bootsector.bin
+
+build/bootstrap.bin : build/bootstrap.o \
+		      build/ppu.o \
+		      build/loading_screen.bin \
+		      build/core.o \
+		      build/level-00_menu.o
 	$(LD) -T linker_scripts/bootstrap.cmd -R build/core.o -R build/ppu.o -R build/level-00_menu.o -s
-	chmod -x build/AKU.SAV
-	ruby build_tools/add_CCB.rb build/AKU.SAV
+	ruby build_tools/aout2sav.rb build/bootstrap.out -b -s -o build/bootstrap.bin
 
-build/CORE.BIN : build/core.o
-	$(LD) build/core.o -o build/core.out -s
-	ruby build_tools/aout2sav.rb build/core.out -b -s -o build/CORE.BIN
-
-build/PPU.BIN : build/ppu.o \
-		build/core.o
+build/ppu_module.bin : build/ppu.o \
+		       build/core.o
 	$(LD) -T linker_scripts/ppu.cmd -R build/core.o -s
-	ruby build_tools/aout2sav.rb build/ppu.out -b -s -o build/PPU.BIN
+	ruby build_tools/aout2sav.rb build/ppu.out -b -s -o build/ppu_module.bin
 
-build/LOADIN.SCR : ../ResCPC/Old/T38-SC1.D01 \
-		   build_tools/convert_bitmap.rb
+build/core.bin : build/core.o
+	$(LD) build/core.o -o build/core.out -s
+	ruby build_tools/aout2sav.rb build/core.out -b -s -o build/core.bin
+
+build/loading_screen.bin : ../ResCPC/Old/T38-SC1.D01
 	ruby build_tools/convert_bitmap.rb
 
-build/LVL00.BIN : build/core.o \
-                  build/level-00_menu.o
+build/level-00.bin : build/core.o \
+		     build/level-00_menu.o
 	$(LD) build/level-00_menu.o -R build/core.o -o build/level-00_menu.out -s
-	ruby build_tools/aout2sav.rb build/level-00_menu.out -b -s -o build/LVL00.BIN
+	ruby build_tools/aout2sav.rb build/level-00_menu.out -b -s -o build/level-00.bin
 
 build/bootsector.o : $(common) \
                      bootsector.s
@@ -86,4 +93,4 @@ resources/titletex.spr : ../Aku/Sprites/TITLETEX.SPR
 	build_tools/spr_cpc_to_uknc.rb ../Aku/Sprites/TITLETEX.SPR -o resources/titletex.spr
 
 clean :
-	rm -f build/*.o build/*.out build/*.SAV build/*.BIN
+	rm -f build/*
