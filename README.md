@@ -1,6 +1,6 @@
 # Chibi Akumas
 
-This is a port of the [Chibi Akumas](http://www.chibiakumas.com/) game to Soviet PDP-11
+This is a port of the [Chibi Akumas](http://www.chibiakumas.com/) ([github](https://github.com/akuyou/chibiakumas)) game to Soviet PDP-11
 compatible microcomputer [UKNC](https://en.wikipedia.org/wiki/UKNC).
 
 The conversion process is in it's very(very) initial state.
