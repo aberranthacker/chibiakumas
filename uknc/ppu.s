@@ -27,7 +27,7 @@ ClrTextArea: # --------------------------------------------------------------{{{
                 SOB  R0,1$
 #----------------------------------------------------------------------------}}}
 # initialize our scanlines parameters table (SLTAB): ------------------------{{{
-/*
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 312 (1..312) lines is SECAM half-frame
 309 (1..309) SLTAB records in total (lines 4..312 of SECAM's half-frame)
   scanlines   1..19  are not visible due to the vertical blanking interval
@@ -54,17 +54,17 @@ Very first record of the table is 2-word and has fixed address 0270
 bit 0: cursor switching control
        1 - switch cursor state (on/off)
        0 - save cursor state
-       Hardware draws cursor in range of sequential lines.
-       It has to be switched "on" on the first line of the sequence,
+       Hardware draws cursor in a range of sequential lines.
+       The cursor has to be switched "on" on the first line of the sequence,
        saved in between, and turned "off" on the last line of the sequence.
 
 bit 1: size of the next record
-       1 - next is 4-word record
-       0 - next is 2-word record
+       1 - next is a 4-word record
+       0 - next is a 2-word record
 
 bit 2: 1) for 2-word record - bit 2 of address of the next element of the table
        2) for 4-word record - selects register where data will be loaded:
-          0 - cursor, pallete and horizontal scale control register
+          0 - cursor, pallete, and horizontal scale control register
           1 - colors control register
 -----------------------------------------------------------------------------}}}
 cursor, pallete and horizontal scale control registers desription: ----------{{{
@@ -126,7 +126,7 @@ bit 2,1,0
 bitplanes  |      111      |      110      |      101      |      100      |
 bits 2,1,0
 -----------------------------------------------------------------------------}}}
-*/
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 SLTABInit:      MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
                 MOV  R0,R1           # R0 address of current record (2)
 
@@ -345,6 +345,7 @@ PrintAt: #-------------------------------------------------------------------{{{
                 MOVB R0,@$CurrentChar
                 SWAB R0
                 MOVB R0,@$CurrentLine
+                BR   Print
 #----------------------------------------------------------------------------}}}
 Print: #---------------------------------------------------------------------{{{
                .equiv LineWidth, 40
@@ -355,8 +356,8 @@ Print: #---------------------------------------------------------------------{{{
                .equiv BPDataReg, PBP12D
                .equiv Font, CGAFont - (32 * 8 * 2)
 
-                MOV  $StrBuffer,R3
                 MOV  $LineWidth,R2
+                MOV  $StrBuffer,R3
                 MOV  $PBP12D,R4
                 MOV  $PBPADR,R5
 
@@ -366,15 +367,20 @@ Print: #---------------------------------------------------------------------{{{
                 ROR  R0       # divide it by 2 to calculate bitplane address
                 MOV  R0,(R5)  # load address of a string into address register
 
-1$:             MOV  (R4),R0  # load 2 bytes from CPU RAM
+LoadNext2Bytes: MOV  (R4),R0  # load 2 bytes from CPU RAM
                 MOV  R0,(R3)+ # store them into buffer
-                TSTB R0       # end of string?
-                BEQ  3$       # yes, we are done here
+                TSTB R0       #
+                BEQ  3$       # end of text
+                BMI  2$       # end of string
                 SWAB R0       # swap bytes to test most significant one
-                TSTB R0       # end of string?
-                BEQ  3$       # yes, we are done here
+                TSTB R0       #
+                BEQ  3$       # end of text
+                BMI  2$       # end of string
                 INC  (R5)     # next address
-                BR   1$
+                BR   LoadNext2Bytes
+
+2$:             INC  (R5)
+                MOV  (R5),@$NextStringAddr
 
 3$:             MOV  @$CurrentLine,R1 # prepare to calculate relative char address
                 MUL  $CharLineSize,R1 # calculate relative address of the line
@@ -386,8 +392,9 @@ Print: #---------------------------------------------------------------------{{{
 
 NextChar:       MOV  R1,(R5)      # load address of the next char into address register
                 MOVB (R3)+,R0     # load character code from string buffer
-                TSTB R0           # end of string?
-                BEQ  DonePrinting # yes, finish
+                TSTB R0           #
+                BEQ  DonePrinting # end of text
+                BMI  NextString   # end of string
                 CMPB $'\n, R0     # new line?
                 BEQ  NewLine      #
 
@@ -416,11 +423,21 @@ Recalculate:    MOV  @$CurrentLine,R1 #
                 MOV  R1,(R5)          # load screen address of the next char to address register
                 BR   NextChar
 
+NextString:     MOV  $StrBuffer,R3
+                MOV  @$NextStringAddr,(R5)
+                MOV  (R4),R0
+                MOVB R0,@$CurrentChar
+                SWAB R0
+                MOVB R0,@$CurrentLine
+                INC  (R5)
+                BR   LoadNext2Bytes
+
 DonePrinting:   JMP  CommandExecuted
 
-CurrentLine:   .word 0
-CurrentChar:   .word 0
-StrBuffer:     .space 160
+CurrentLine:    .word 0
+CurrentChar:    .word 0
+NextStringAddr: .word 0
+StrBuffer:      .space 160
 #----------------------------------------------------------------------------}}}
 
 VblankIntHandler: #----------------------------------------------------------{{{
@@ -437,60 +454,62 @@ VblankIntHandler: #----------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 KeyboardIntHadler: #---------------------------------------------------------{{{
 # key codes #----------------------------------------------------------------{{{
-# | code |   key   | note   | code |  key  |  note  |
-# |   05 | ,       | NumPad | 0106 | АЛФ   |  Alph  |
-# |   06 | АР2     | Esc    | 0107 | ФИКС  |  Lock  |
-# |   07 | ; / +   |        | 0110 | Ч / ^ |        |
-# |  010 | К1 / К6 |        | 0111 | С / S |        |
-# |  011 | К2 / К7 |        | 0112 | М / M |        |
-# |  012 | КЗ / К8 |        | 0113 | SPACE |        |
-# |  013 | 4 / ¤   |        | 0114 | Т / T |        |
-# |  014 | К4 / К8 |        | 0115 | Ь / X |        |
-# |  015 | К5 / К10|        | 0116 | ←     |        |
-# |  016 | 7 / '   |        | 0117 | , / < |        |
-# |  017 | 8 / (   |        | 0125 | 7     | NumPad |
-# |  025 | -       | NumPad | 0126 | 0     | NumPad |
-# |  026 | ТАБ     | Tab    | 0127 | 1     | NumPad |
-# |  027 | Й / J   |        | 0130 | 4     | NumPad |
-# |  028 | 1 / !   |        | 0131 | +     | NumPad |
-# |  031 | 2 / "   |        | 0132 | ЗБ    | Bkspc  |
-# |  032 | 3 / #   |        | 0133 | →     |        |
-# |  033 | Е / E   |        | 0134 | ↓     |        |
-# |  034 | 5 / %   |        | 0135 | . / > |        |
-# |  035 | 6 / &   |        | 0136 | Э / \ |        |
-# |  036 | Ш / [   |        | 0137 | Ж / V |        |
-# |  037 | Щ / ]   |        | 0145 | 8     | NumPad |
-# |  046 | УПР     | Ctrl   | 0146 | .     | NumPad |
-# |  047 | Ф / F   |        | 0147 | 2     | NumPad |
-# |  050 | Ц / C   |        | 0150 | 5     | NumPad |
-# |  051 | У / U   |        | 0151 | ИСП   |        |
-# |  052 | К / K   |        | 0152 | УСТ   |        |
-# |  053 | П / P   |        | 0153 | ВВОД  | Enter  |
-# |  054 | H / N   |        | 0154 | ↑     |        |
-# |  055 | Г / G   |        | 0155 | : / * |        |
-# |  056 | Л / L   |        | 0156 | Х / H |        |
-# |  057 | Д / D   |        | 0157 | З / Z |        |
-# |  066 | ГРАФ    | Graph  | 0165 | 9     | NumPad |
-# |  067 | Я / Q   |        | 0166 | ВВОД  | NumPad |
-# |  070 | Ы / Y   |        | 0167 | 3     | NumPad |
-# |  071 | В / W   |        | 0170 | 7     | NumPad |
-# |  072 | А / A   |        | 0171 | СБРОС |        |
-# |  073 | И / I   |        | 0172 | ПС    |        |
-# |  074 | Р / R   |        | 0173 | / / ? |        |
-# |  075 | О / O   |        | 0174 | Ъ / } |        |
-# |  076 | Б / B   |        | 0175 | - / = |        |
-# |  077 | Ю / @   |        | 0176 | О / } |        |
-# | 0105 | HP      | Shift  | 0177 | 9 / ) |        |
+# | code |   key   | note     | code |  key  |  note     |
+# |------+---------+----------+------+-------+-----------+
+# |   05 | ,       | NumPad   | 0106 | АЛФ   | Alphabet  |
+# |   06 | АР2     | Esc      | 0107 | ФИКС  | Lock      |
+# |   07 | ; / +   |          | 0110 | Ч / ^ |           |
+# |  010 | К1 / К6 | F1 / F6  | 0111 | С / S |           |
+# |  011 | К2 / К7 | F2 / F7  | 0112 | М / M |           |
+# |  012 | КЗ / К8 | F3 / F8  | 0113 | SPACE |           |
+# |  013 | 4 / ¤   |          | 0114 | Т / T |           |
+# |  014 | К4 / К9 | F4 / F9  | 0115 | Ь / X |           |
+# |  015 | К5 / К10| F5 / F10 | 0116 | ←     |           |
+# |  016 | 7 / '   |          | 0117 | , / < |           |
+# |  017 | 8 / (   |          | 0125 | 7     | NumPad    |
+# |  025 | -       | NumPad   | 0126 | 0     | NumPad    |
+# |  026 | ТАБ     | Tab      | 0127 | 1     | NumPad    |
+# |  027 | Й / J   |          | 0130 | 4     | NumPad    |
+# |  028 | 1 / !   |          | 0131 | +     | NumPad    |
+# |  031 | 2 / "   |          | 0132 | ЗБ    | Backspace |
+# |  032 | 3 / #   |          | 0133 | →     |           |
+# |  033 | Е / E   |          | 0134 | ↓     |           |
+# |  034 | 5 / %   |          | 0135 | . / > |           |
+# |  035 | 6 / &   |          | 0136 | Э / \ |           |
+# |  036 | Ш / [   |          | 0137 | Ж / V |           |
+# |  037 | Щ / ]   |          | 0145 | 8     | NumPad    |
+# |  046 | УПР     | Ctrl     | 0146 | .     | NumPad    |
+# |  047 | Ф / F   |          | 0147 | 2     | NumPad    |
+# |  050 | Ц / C   |          | 0150 | 5     | NumPad    |
+# |  051 | У / U   |          | 0151 | ИСП   | Execute   |
+# |  052 | К / K   |          | 0152 | УСТ   | Settings  |
+# |  053 | П / P   |          | 0153 | ВВОД  | Enter     |
+# |  054 | H / N   |          | 0154 | ↑     |           |
+# |  055 | Г / G   |          | 0155 | : / * |           |
+# |  056 | Л / L   |          | 0156 | Х / H |           |
+# |  057 | Д / D   |          | 0157 | З / Z |           |
+# |  066 | ГРАФ    | Graph    | 0165 | 9     | NumPad    |
+# |  067 | Я / Q   |          | 0166 | ВВОД  | NumPad    |
+# |  070 | Ы / Y   |          | 0167 | 3     | NumPad    |
+# |  071 | В / W   |          | 0170 | 7     | NumPad    |
+# |  072 | А / A   |          | 0171 | СБРОС | Reset     |
+# |  073 | И / I   |          | 0172 | ПОМ   | Help      |
+# |  074 | Р / R   |          | 0173 | / / ? |           |
+# |  075 | О / O   |          | 0174 | Ъ / } |           |
+# |  076 | Б / B   |          | 0175 | - / = |           |
+# |  077 | Ю / @   |          | 0176 | О / } |           |
+# | 0105 | HP      | Shift    | 0177 | 9 / ) |           |
 # ----------------------------------------------------------------------------}}}
         PUSH R0
         MOV  $PPU_KeyboardScanner_KeyPresses,@$PBPADR
         MOVB @$KBDATA,R0
-        BMI  1$
+        BMI  1237$
 
         MOVB R0,@$PBP12D
         INC  @$PBPADR
         MOV  $1,@$PBP12D
-1$:     POP  R0
+
+1237$:  POP  R0
         RTI
 #----------------------------------------------------------------------------}}}
 
