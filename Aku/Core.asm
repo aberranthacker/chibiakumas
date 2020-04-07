@@ -568,8 +568,6 @@ ifdef Debug_Monitor
 ;   read "..\SrcALL\Multiplatform_MonitorSimple.asm"
 endif
 
-list
 Null:ret
 FileEndCore:
     save direct "CORE    .AKU",Akuyou_CoreStart,&3000   ;address,size...}[,exec_address]
-nolist

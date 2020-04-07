@@ -22,8 +22,8 @@ Timer_Stop:
     ret
 
 
-ShowLevelTime:
-    ld a,2      ;Remember to set the font!
+ShowLevelTime: ; SrcALL/Akuyou_Multiplatform_EventStream.asm:77
+    ld a,2     ; Remember to set the font!
     call Akuyou_SpriteBank_Font
 
     ld hl,&1001
