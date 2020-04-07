@@ -1063,18 +1063,6 @@ endif
     call Akuyou_ScreenBuffer_Reset
     call Akuyou_Interrupt_Init
 
-jp ShowTitlePic
-
-LevelInit_Old:
-    call Akuyou_Music_Restart
-
-    ;load player setting for color flipping
-    call AkuYou_Player_GetPlayerVars
-
-    ld a,1
-    ld (PaletteNo_Plus1-1),a
-    call RasterColorsSetPalette1
-
 ShowTitlePic:
     call EnablePlusPalette
     call RasterColorsStartPalleteFlip
@@ -1170,8 +1158,8 @@ endif
     Call CallFade
 
         ld hl,&1518
-        call Akuyou_DrawText_LocateSprite
-        call Akuyou_Player_GetHighscore
+        call Akuyou_DrawText_LocateSprite ; SrcCPC/Akuyou_CPC_TextDriver.asm:104
+        call Akuyou_Player_GetHighscore ; SrcALL/Akuyou_Multiplatform_PlayerDriver.asm:6
         ld de,7
         add hl,de
         ld b,8
@@ -1616,7 +1604,7 @@ MenuScore_NextDigit:
     db  10," "," "+&80
     db  10," "," "+&80
 
-    db  10, "www.xxibiakumas.com"," "+&80
+    db  10, "www.chibiakumas.com"," "+&80
     db  10,""," "+&80
     db  9,"HighScore",":"+&80
     db &0
