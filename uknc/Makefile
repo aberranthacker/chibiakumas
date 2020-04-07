@@ -12,11 +12,11 @@ LD=~/opt/binutils-pdp11/pdp11-dec-aout/bin/ld
 common = hwdefs.s core_defs.s macros.s
 
 build/chibiakumas.dsk : build/bootsector.bin \
-			build/bootstrap.bin \
-			build/ppu_module.bin \
-			build/loading_screen.bin \
-			build/core.bin \
-			build/level-00.bin
+                        build/bootstrap.bin \
+                        build/ppu_module.bin \
+                        build/loading_screen.bin \
+                        build/core.bin \
+                        build/level-00.bin
 	build_tools/build_dsk.rb
 
 build/bootsector.bin : build/bootsector.o \
@@ -25,15 +25,15 @@ build/bootsector.bin : build/bootsector.o \
 	chmod -x build/bootsector.bin
 
 build/bootstrap.bin : build/bootstrap.o \
-		      build/ppu.o \
-		      build/loading_screen.bin \
-		      build/core.o \
-		      build/level-00_menu.o
+                      build/ppu.o \
+                      build/loading_screen.bin \
+                      build/core.o \
+                      build/level-00_menu.o
 	$(LD) -T linker_scripts/bootstrap.cmd -R build/core.o -R build/ppu.o -R build/level-00_menu.o -s
 	ruby build_tools/aout2sav.rb build/bootstrap.out -b -s -o build/bootstrap.bin
 
 build/ppu_module.bin : build/ppu.o \
-		       build/core.o
+                       build/core.o
 	$(LD) -T linker_scripts/ppu.cmd -R build/core.o -s
 	ruby build_tools/aout2sav.rb build/ppu.out -b -s -o build/ppu_module.bin
 
@@ -45,7 +45,7 @@ build/loading_screen.bin : ../ResCPC/Old/T38-SC1.D01
 	ruby build_tools/convert_bitmap.rb
 
 build/level-00.bin : build/core.o \
-		     build/level-00_menu.o
+                     build/level-00_menu.o
 	$(LD) build/level-00_menu.o -R build/core.o -o build/level-00_menu.out -s
 	ruby build_tools/aout2sav.rb build/level-00_menu.out -b -s -o build/level-00.bin
 
@@ -55,29 +55,31 @@ build/bootsector.o : $(common) \
 
 build/bootstrap.o : $(common) \
                     bootstrap.s \
-		    ppucmd.s
-	ruby build_tools/preprocessor.rb -i bootstrap.s
+                    ppucmd.s
+	# ruby build_tools/preprocessor.rb -i bootstrap.s
 	$(AS) -al bootstrap.s -o build/bootstrap.o
 
 build/core.o : $(common) \
                core.s \
-	       disk_driver.s \
-	       do_moves.s \
-	       event_stream.s \
-	       object_driver.s \
-	       player_driver.s \
-	       show_sprite.s \
-	       sfx.s \
-	       stararray.s \
-	       stararray_add.s \
-	       timer.s \
-	       virtual_screen_pos_320.s
+               compiled_sprite_viewer.s \
+               disk_driver.s \
+               do_moves.s \
+               event_stream.s \
+               event_stream_definitions.s \
+               object_driver.s \
+               player_driver.s \
+               show_sprite.s \
+               sfx.s \
+               stararray.s \
+               stararray_add.s \
+               timer.s \
+               virtual_screen_pos_320.s
 	$(AS) core.s -al -o build/core.o
 	build_tools/level_start_update.rb
 
 build/ppu.o : $(common) \
-	      ppu.s \
-	      resources/font.bin
+              ppu.s \
+              resources/font.bin
 	$(AS) ppu.s -al -o build/ppu.o
 build/level-00_menu.o : $(common) \
                         core_defs.s \
