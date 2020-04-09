@@ -131,7 +131,7 @@ Objectloop_NotZero:
         ld (SprShow_SprNum),a
         ld a,iyh
         and %11000000
-        jr z,Objectloop_OneFrameSprite
+        jr z,Objectloop_SpriteBankSet ; Objectloop_OneFrameSprite
         bit 6,a
 
         ld a,(Timer_CurrentTick)
@@ -140,9 +140,9 @@ Objectloop_NotZero:
 
         and %00000011
         jr Objectloop_SpriteBankSet
-Objectloop_OneFrameSprite:
-        xor a
-        jr Objectloop_SpriteBankSet
+; Objectloop_OneFrameSprite:
+;         xor a
+;         jr Objectloop_SpriteBankSet
 Objectloop_TwoFrameSprite:
         cpl
         and %00000010
