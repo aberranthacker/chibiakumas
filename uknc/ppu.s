@@ -523,5 +523,5 @@ SYS300:  .word 0175412 # address of default keyboard interrupt hadler
 FBSLTAB: .word 0       # adrress of main screen SLTAB
 
          .balign 8 # scan-lines parameters table, it has to be aligned at 4 words
-SLTAB:
+SLTAB:   # space for the SLTAB must be reserved when allocating PPU memory
 end:

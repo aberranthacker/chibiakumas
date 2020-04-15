@@ -3,27 +3,27 @@
 .equiv PR0, 0       # lowest priority to the processor
                     # MTPS PR0 enables interrupts
 
-# CPU/PPU USER mode interrup vectors and priorities
-# vect prty Source
-#   04   1 input/output RPLY timeout
-#   04   2 illegal addressing mode
-#  010   2 unknown instruction/HALT mode command in USER mode
-#  014   3 T-bit
-#  014   - BPT instruction
-#  020   - IOT instruction
-#  024   4 ACLO
-#  030   - EMT  instruction
-#  034   - TRAP instruction
-#  060     TTY out (channel 0 out)
-#  064     TTY in (channel 0 in)
-# 0100   6 EVNT (Vsync)
-# 0370     serial (C2)
-# 0374     serial (C2)
-# 0380     serial (LAN)
-# 0384     serial (LAN)
-# 0460     channel 1 out 
-# 0464     channel 1 in
-# 0464     channel 2 in
+# CPU USER mode interrupt vectors and priorities
+# Vect Prty Source
+#   04    1 input/output RPLY timeout
+#   04    2 illegal addressing mode
+#  010    2 unknown instruction/HALT mode command in USER mode
+#  014    3 T-bit
+#  014    - BPT instruction
+#  020    - IOT instruction
+#  024    4 ACLO
+#  030    - EMT  instruction
+#  034    - TRAP instruction
+#  060      TTY out (channel 0 out)
+#  064      TTY in (channel 0 in)
+# 0100    6 EVNT (Vsync)
+# 0370      serial (C2)
+# 0374      serial (C2)
+# 0380      serial (LAN)
+# 0384      serial (LAN)
+# 0460      channel 1 out
+# 0464      channel 1 in
+# 0474      channel 2 in
 
 # CPU: bitplanes registers
 .equiv CBPADR, 0176640 # CPU bitplanes address register

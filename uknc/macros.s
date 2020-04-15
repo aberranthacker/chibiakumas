@@ -16,8 +16,6 @@
     MOV  \arg, @$PPUCommandArg
   .endif
     MOV  \cmd, @$PPUCommand
-    TST  @$PPUCommand
-    BNE  .-4
 .endm
 
 .macro .ppudo cmd:req,arg=0

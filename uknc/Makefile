@@ -9,7 +9,7 @@ LD=~/opt/binutils-pdp11/pdp11-dec-aout/bin/ld
 # --print-map -M
 # --strip-all -s
 
-common = hwdefs.s core_defs.s macros.s
+common = core_defs.s event_stream_definitions.s hwdefs.s macros.s 
 
 build/chibiakumas.dsk : build/bootsector.bin \
                         build/bootstrap.bin \
@@ -65,7 +65,6 @@ build/core.o : $(common) \
                disk_driver.s \
                do_moves.s \
                event_stream.s \
-               event_stream_definitions.s \
                object_driver.s \
                player_driver.s \
                show_sprite.s \
@@ -81,8 +80,8 @@ build/ppu.o : $(common) \
               ppu.s \
               resources/font.bin
 	$(AS) ppu.s -al -o build/ppu.o
+
 build/level-00_menu.o : $(common) \
-                        core_defs.s \
                         level-00_menu.s \
                         resources/titletex.spr
 	$(AS) -al level-00_menu.s -o build/level-00_menu.o

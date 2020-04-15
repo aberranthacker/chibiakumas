@@ -1,9 +1,9 @@
-*.o
-*.SAV
-*.BIN
-*.SCR
-*.out
+uknc/build/*
+
+# vim session files
 default.vim
 default.vim.lock
+# WinAPE breakpoints files
+*.bpt
+# CPC disk for test builds
 RelCPC/disk1_1.dsk
-uknc/build/*
