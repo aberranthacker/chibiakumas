@@ -73,7 +73,7 @@ Bootstrap_StartGame:
 #-------------------------------------------------------------------------------
         # Load loading screen
         MOV  $loading_screen.bin,R0
-        CALL Bootstrap_LoadDiskFile
+       #CALL Bootstrap_LoadDiskFile
 
         # Apply loading screen palette
        .ppudo_ensure $PPU_SetPalette, $LoadingScreenPalette
@@ -87,9 +87,7 @@ Bootstrap_StartGame:
         # TODO: Initialize the Sound Effects.
 #----------------------------------------------------------------------------}}}
 Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
-        # MTPS PR7
-        # MOV  $SPReset,SP # we are not returning, so reset the stack
-        # MTPS PR0
+        MOV  $SPReset,SP # we are not returning, so reset the stack
         CALL StartANewGame
         CALL LevelReset0000
 
@@ -268,9 +266,8 @@ RETURN
 
 LevelReset0000: # ../Aku/BootStrap.asm:2306 ---------------------------------{{{
             # wipe our memory, to clear out any junk from old levels
-       .equiv LevelArraysSizeW, (Akuyou_CoreStart - Akuyou_GameVars) >> 1
-        MOV  $LevelArraysSizeW,R1
-        MOV  $StarArrayPointer,R3
+        MOV  $GameVarsArraySizeWords,R1
+        MOV  $Akuyou_GameVarsStart,R3
         CLR  (R3)+
         SOB  R1, .-2
         # This resets anything the last level may have messed with during
@@ -323,14 +320,13 @@ RETURN
 #----------------------------------------------------------------------------}}}
 
 Bootstrap_LoadDiskFile: # ../Aku/BootStrap.asm:2795 -------------------------{{{
-       .list
         MOV  (R0)+,@$PS.CPU_RAM_Address
-       .nolist
         MOV  (R0)+,@$PS.WordsCount
-        MOV  (R0),R0
+        MOV  (R0),R0 # starting block number
+        # calculate location of a file on a disk from the starting block number
         CLR  R2     # R2 - most significant word
         MOV  R0,R3  # R3 - least significant word
-        DIV  $20,R2 # quotient -> R2 , remainder -> R3
+        DIV  $20,R2 # quotient -> R2, remainder -> R3
         MOVB R2,@$PS.AddressOnDevice     # track number
         CLR  R2
         DIV  $10,R2
@@ -373,9 +369,9 @@ ParamsStruct:
 
 # files related data --------------------------------------------------------{{{
 ppu_module.bin:
-       .word FB1
-       .word PPU_ModuleSizeWords
-       .word PPUModuleBlockNum
+       .word FB1                 # address for the data from a disk
+       .word PPU_ModuleSizeWords # words count to read from a disk
+       .word PPUModuleBlockNum   # starting block of a file
 loading_screen.bin:
        .word FB1
        .word 8000
@@ -404,7 +400,7 @@ BulletConfigHeaven: #--------------------------------------------------------{{{
     .word 0xFFFF
     .word 0xFFFF
     .word 0xFFFF
-    .word 0x1b19
+    .word 0x1B19
     .byte 0
     # Stars_AddBurst_Right #
     .word 0x2725

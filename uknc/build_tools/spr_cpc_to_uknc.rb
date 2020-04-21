@@ -99,9 +99,9 @@ header.each do |md|
   uknc_sprite = []
 
   if options.font
-    meta[:y_offset].times { uknc_words << 0 }
+    md[:y_offset].times { uknc_sprite << 0 }
     uknc_sprite += transform(sprite)
-    (8 - md[:height] - md[:y_offset]).times { uknc_words << 0 }
+    (8 - md[:height] - md[:y_offset]).times { uknc_sprite << 0 }
   else
     uknc_sprite = transform(sprite)
   end

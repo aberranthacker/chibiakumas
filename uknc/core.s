@@ -3,8 +3,11 @@
        .title Chibi Akumas core module
        .global start # make entry point available to linker
 
+       .global Akuyou_GameVarsStart
+       .global Akuyou_GameVarsEnd
        .global ContinueMode
        .global ContinuesReset
+       .global CLS
        .global Event_Stream
        .global EventStream_Process
        .global Event_SavedSettings
@@ -35,22 +38,29 @@
 #******************************************************************************#
 #*                             Main Project Code                              *#
 #******************************************************************************#
-                .=Akuyou_GameVars # Need &700 bytes!
+                .=Akuyou_GameVarsStart # Need about 2136 bytes
 
-       .equiv StarArraySize, 255
-       .equiv ObjectArraySize, 60 # Must be under 64!
-       .equiv PlayerStarArraySize, 128
 
-       .balign 256
+#       .balign 256
+# StarArrayPointer:
+#       .space 256 * 3
+#
+# ObjectArrayPointer: # first ObjectArraySize*2 of each 256 are used - rest (>128) are spare
+#       .space (64 * 8) * 2 # 256 * 4
+#       # First 128 are used by object array
+#       .equiv PlayerStarArrayPointer, (ObjectArrayPointer + 128)
+#        # Out the way of the Object array!??
+#       .equiv Event_SavedSettings, (ObjectArrayPointer + 256 * 3 + 128)
+
+ObjectArrayPointer:
+       .space ObjectArraySize * 8
 StarArrayPointer:
-       .space 256*3
-
-ObjectArrayPointer: # first ObjectArraySize*2 of each 256 are used - rest (>128) are spare
-       .space (64 * 8) * 2 # 256 * 4
-        # First 128 are used by object array
-       .equiv PlayerStarArrayPointer, (ObjectArrayPointer + 128)
-        # Out the way of the Object array!??
-       .equiv Event_SavedSettings, (ObjectArrayPointer + 256 * 3 + 128)
+       .space StarArraySize * 4
+PlayerStarArrayPointer:
+       .space PlayerStarArraySize * 4
+Event_SavedSettings:
+       .space 15 * 8
+Akuyou_GameVarsEnd:
 
         # -Player 2's data starts XX bytes after player so you can use IY+XX+1 to get
         # a var from player 2 without changing IY
@@ -71,33 +81,35 @@ ObjectArrayPointer: # first ObjectArraySize*2 of each 256 are used - rest (>128)
 ################################################################################
 start: FileBeginCore:
 SavedSettings: # {{{
-                     .byte 255          # pos -20 spare
+                     .byte 255          # pos -22 spare
+                     .byte   0          # pos -21 spare
+                     .byte   0          # pos -20 spare
                      .byte   0          # pos -19 spare
-                     .byte   0          # pos -18 spare
-                     .byte   0          # pos -17 spare
-                     .byte 0b00000001   # pos -16 GameOptions (xxxxxxxS) Screen shake
-                     .byte   0          # pos -15 playmode 0 normal / 128 - 4D
-    ContinueMode:    .byte   0          # pos -14 Continue Sharing (0/1)
-    SmartBombsReset: .byte   3          # pos -13 SmartbombsReset
-    ContinuesReset:  .byte  60          # pos -12 Continues Reset
-    GameDifficulty:  .byte   0          # pos -11 Game difficulty
+                     .byte 0b00000001   # pos -18 GameOptions (xxxxxxxS) Screen shake
+                     .byte   0          # pos -17 playmode 0 normal / 128 - 4D
+    ContinueMode:    .byte   0          # pos -16 Continue Sharing (0/1)
+    SmartBombsReset: .byte   3          # pos -15 SmartbombsReset
+    ContinuesReset:  .byte  60          # pos -14 Continues Reset
+    GameDifficulty:  .byte   0          # pos -13 Game difficulty
                                         #         (enemy Fire Speed 0=normal, ;1=easy, 2=hard)
                                         #         +128 = heaven mode , +64 = star Speedup
-                     .byte 0b00000000   # pos -10 Achievements (WPx54321) (W=Won P=Played)
-    MultiplayConfig: .byte 0b00000000   # pos  -9 Joy Config   (xxxxxxFM)
+                     .byte 0b00000000   # pos -12 Achievements (WPx54321) (W=Won P=Played)
+    MultiplayConfig: .byte 0b00000000   # pos -11 Joy Config   (xxxxxxFM)
                                         # M=Multiplay
                                         # F=Swap Fire 1/2
-    TurboMode:       .byte 0b00000000   # pos -8 ------XX = Turbo mode [NoInsults/NoBackground/NoRaster/NoMusic]
-    LivePlayers:     .byte 1            # pos -7 Number of players currently active in the game [2/1/0]
-    TimerTicks:      .byte 0            # pos -6 used for benchmarking
-    BlockHeavyPageFlippedColors: .byte 64   # pos -5 0/255=on  64=off
-    BlockPageFlippedColors:      .byte 255  # pos -4 0/255=on  64=off
-    ScreenBuffer_ActiveScreen:   .byte 0xC0 # pos -3
-    ScreenBuffer_VisibleScreen:  .byte 0xC0 # pos -2
+    TurboMode:       .byte 0b00000000   # pos -10 ------XX = Turbo mode [NoInsults/NoBackground/NoRaster/NoMusic]
+    LivePlayers:     .byte 1            # pos -9 Number of players currently active in the game [2/1/0]
+    TimerTicks:      .byte 0            # pos -8 used for benchmarking
+    BlockHeavyPageFlippedColors: .byte 64   # pos -7 0/255=on  64=off
+    BlockPageFlippedColors:      .byte 255  # pos -6 0/255=on  64=off
     # ;CPC 0  =464 , 128=128 ; 129 = 128 plus ; 192 = 128 plus with 512k; 193 = 128 plus with 512k pos -1
     # ;MSX 1=V9990  4=turbo R
     # ;ZX  0=TAP 1=TRD 2=DSK   128= 128k ;192 = +3 or black +2
-    CPCVer: .byte 00                    # pos  -1
+    CPCVer: .byte 00                    # pos  -5
+
+       .even
+    ScreenBuffer_ActiveScreen:   .word FB1 # pos -3
+    ScreenBuffer_VisibleScreen:  .word FB1 # pos -1
 
     Player_Array:
         P1_P00: .byte 100        #  0 - Y 0x64
@@ -257,19 +269,24 @@ SavedSettings_Last: # 0x80 bytes --------------------------------------------}}}
                                         #     defw &0000
                                         #     defb 0      ;next split }}}
                                         #
-                                        # ; Transparent colors are used by the sprite, if the byte matches it is skipped
-                                        # ; to effect transparency without an 'alpha map'
-                                        # TranspColors:   defb &00, &F0, &0F, &FF, &AC, &53
-                                        # ; Smartbomb effect shows a flashing background, these are the bytes used
-                                        # Background_SmartBombColors: defb &FF, &0, &FF, &0, &FF
+# Transparent colors are used by the sprite, if the byte matches it is skipped
+# to effect transparency without an 'alpha map'
+TranspColors: .byte 0x00 # 0b00000000
+              .byte 0xF0 # 0b11110000
+              .byte 0x0F # 0b00001111
+              .byte 0xFF # 0b11111111
+              .byte 0xAC # 0b10101100
+              .byte 0x53 # 0b10010011
+# Smartbomb effect shows a flashing background, these are the bytes used
+# Background_SmartBombColors: defb &FF, &0, &FF, &0, &FF
                                         #
                                         # ; table/array for screen addresses for each scan line
-                                        # ifdef MinimizeCore
+                                        ##ifdef MinimizeCore
                                         #     scr_addr_tableMajor: ; BYTES -XXXX--- %01111000
                                         #         defw &0000,&0050,&00A0,&00F0,&0140,&0190,&01E0,&0230,&0280,&02D0,&0320,&0370,&03C0,&0410,&0460,&04B0
                                         #     scr_addr_tableMinor: ; BYTES -----XXX ; do not need aligning
                                         #         defb &00,&08,&10,&18,&20,&28,&30,&38
-                                        # endif
+                                        ##endif
                                         #
                                         # ;These are used by Arkostracker
                                         # ;There are two holes in the l ist, because the Volume registers are set relatively to the Frequency of the same Channel (+7, always).
@@ -294,7 +311,7 @@ SavedSettings_Last: # 0x80 bytes --------------------------------------------}}}
                                         #
                                         # StarsOneByteDirs:
                                         #     defb &21,&09,&0C,&0F,&27,&3F,&3C,&39,&61,&49,&4c,&4f,&67,&7f,&7c,&79
-                                        #
+
 Event_ReprogramVector:
        .word Event_CoreReprogram_Palette # 0 # TODO: implement this
        .word NULL # 2                   #     defw null;Event_CoreReprogram_PlusPalette ; 1      ; Obsolete - Reserver for Plus Palette
@@ -312,13 +329,13 @@ Event_ReprogramVector:
        .word NULL #26                   #     defw Event_ReprogramObjectBurstPosition   ;13
        .word NULL #28                   #     defw Event_ObjectFullCustomMoves          ;14
        .word NULL #30                   #     defw Event_SmartBombSpecial               ;15
-                                        #
+
 Event_MoveVector: # 128+
        .word NULL                       #     defw Event_MoveLifeSwitch_0000               ; 0
        .word Event_ProgramSwitch        # 2 # defw Event_ProgramSwitch_0001                ; 1
        .word NULL                       #     defw Event_LifeSwitch_0010                   ; 2
        .word NULL                       #     defw Event_MoveSwitch_0011                   ; 3
-       .word NULL                       #     defw Event_ProgramMoveLifeSwitch_0100        ; 4
+       .word Event_ProgramMoveLifeSwitch# 8 # defw Event_ProgramMoveLifeSwitch_0100        ; 4
        .word NULL                       #     defw Event_SpriteSwitch_0101                 ; 5
        .word NULL                       #     defw Event_AddFront_0110                     ; 6
        .word NULL                       #     defw Event_AddBack_0111                      ; 7
@@ -334,22 +351,22 @@ Event_MoveVector: # 128+
                                         # ; These are the jump-pointes used by the raster color interrupt routine - to
                                         # ; try to save time only one byte is altered, so it must be byte aligned!
 Event_VectorArray:
-       .word NULL  #  0  0              #     defw Event_OneObj                      ;  0
-       .word NULL  # 16  2              #     defw Event_MultiObj                    ; 16
-       .word NULL  # 32  4              #     defw Event_ObjColumn                   ; 32
-       .word NULL  # 48  6              #     defw Event_ObjStrip                    ; 48
-       .word NULL  # 64  8              #     defw Event_StarBust                    ; 64
-       .word NULL                       # 80 10
-       .word NULL                       # 96 12
-       .word Event_CoreMultipleEventsAtOneTime #112 14 0xE
-       .word Event_MoveSwitch           #128 16  #     defw ;128
-       .word NULL  #144 18              #     defw Event_CoreSaveLoadSettings        ;144
-       .word NULL                       #160 20
-       .word NULL  #176 22              #     defw Event_CoreSaveLoadSettings2       ;176
-       .word NULL                       #192 24
-       .word NULL                       #208 26
-       .word NULL                       #224 28
-       .word Event_CoreReprogram        #240 30 # uknc/event_stream.s:210
+       .word Event_OneObj                      #   0  0 0x00
+       .word NULL                              #  16  2 0x02 # defw Event_MultiObj
+       .word NULL                              #  32  4 0x04 # defw Event_ObjColumn
+       .word NULL                              #  48  6 0x06 # defw Event_ObjStrip
+       .word NULL                              #  64  8 0x08 # defw Event_StarBust
+       .word NULL                              #  80 10 0x0A
+       .word NULL                              #  96 12 0x0C
+       .word Event_CoreMultipleEventsAtOneTime # 112 14 0x0E
+       .word Event_MoveSwitch                  # 128 16 0x10
+       .word Event_CoreSaveLoadSettings        # 144 18 0x12
+       .word NULL                              # 160 20 0x14
+       .word NULL                              # 176 22 0x16 # defw Event_CoreSaveLoadSettings2
+       .word NULL                              # 192 24 0x18
+       .word NULL                              # 208 26 0x1A
+       .word NULL                              # 224 28 0x1C
+       .word Event_CoreReprogram               # 240 30 0x1E
                                         #
                                         # read "..\SrcCPC\Akuyou_CPC_InterruptHandler.asm"
 NULL:   RETURN
@@ -391,7 +408,7 @@ PLY_FrequencyTable:
                                         #
        .include "sfx.s"                 # read "../SrcALL/Akuyou_Multiplatform_SFX.asm"
                                         #
-                                        # read "../SrcCPC/Akuyou_CPC_CompiledSpriteViewer.asm"    ;also includes CLS
+       .include "compiled_sprite_viewer.s" # read "../SrcCPC/Akuyou_CPC_CompiledSpriteViewer.asm" ;also includes CLS
                                         # read "../SrcCPC/Akuyou_CPC_BankSwapper.asm"
                                         #
        .include "player_driver.s"       # read "../SrcALL/Akuyou_Multiplatform_PlayerDriver.asm"
@@ -403,7 +420,7 @@ PLY_FrequencyTable:
        .include "event_stream.s"        # read "../SrcALL/Akuyou_Multiplatform_EventStream.asm"
                                         # read "../SrcCPC/Akuyou_CPC_CpcPlus.asm"
                                         # read "../SrcALL/Akuyou_Multiplatform_ArkosTrackerLite.asm"
-                                        # read "../SrcCPC/Akuyou_CPC_ScreenMemory.asm"
+       .include "screen_memory.s"       # read "../SrcCPC/Akuyou_CPC_ScreenMemory.asm"
                                         # read "../SrcALL/Akuyou_Multiplatform_AkuCommandVectorArray.asm"
                                         #
                                         ## ifdef Debug_Monitor

@@ -80,6 +80,14 @@
     MOV  (SP)+,\reg
 .endm
 
+.macro bze dst
+    BEQ  \dst
+.endm
+
+.macro bnz dst
+    BNE  \dst
+.endm
+
 # RT-11 dependent macros
 .macro .exit
     EMT  0350

@@ -1,14 +1,12 @@
 .equiv PPU_UserRamStart, 0x27B6 # 023666 10166
 .equiv PPU_UserRamSize,  0x5844 # 054104 22596
 .equiv PPU_UserRamSizeWords, PPU_UserRamSize >> 1 # 0x2C22 026042 11298
-
-.equiv SPReset,       0x2FA  # 01372   762 Initial stack pointer
-.equiv PPUCommand,    0x2FC  # 01374   764 command for PPU code
-.equiv PPUCommandArg, 0x2FE  # 01376   766 command for PPU argument
 .equiv PPU_PPUCommand,    PPUCommand >> 1
 .equiv PPU_PPUCommandArg, PPUCommandArg >> 1
-.equiv FB0,           0x300  # 01400   768
-.equiv FB1,           0x4180 # 04060 16768
+
+.equiv FB0, 384 # 0600 0x0180
+.equiv FB_gap_start, FB0 + 16000
+.equiv FB1, FB_gap_start + 384
 
 .equiv PPU_NOP,            1
 .equiv PPU_Finalize,       2
@@ -19,12 +17,20 @@
 .equiv PPU_PrintAt,        7
 
 .equiv BootstrapStart,  FB0
-.equiv Akuyou_GameVars, 0x8000 # 0100000 32768
-.equiv Akuyou_CoreStart, (Akuyou_GameVars + 0x700) # Need &700 (1792) bytes!
-                                                   # 0x8700 (34560)
-.equiv Akuyou_LevelStart, 0x8D80 # 0106600 36224 # auto generated during build
-# 0x5900 (22784) bytes of RAM the rest
-# 0xE000 (57344) end of ram
+.equiv Akuyou_GameVarsStart, FB1 + 16000
+
+.equiv StarArraySize, 256
+.equiv ObjectArraySize, 60
+.equiv PlayerStarArraySize, 128
+.equiv GameVarsArraysSize, StarArraySize * 4 + ObjectArraySize * 8 + PlayerStarArraySize * 4 + 15*8
+
+.equiv Akuyou_LevelStart, 0x9390 # 37776 0111620 # auto generated during build
+.equiv LevelSprites, Akuyou_LevelStart + 4
+
+.equiv SPReset,       0157772 # Initial stack pointer
+.equiv PPUCommand,    0157774 # command for PPU code
+.equiv PPUCommandArg, 0157776 # command for PPU argument
+# 0xE000 57344 0160000 end of ram
 
 # PlusSprite_ExtBank equ &C7
 # Akuyou_PlayerSpritePos equ &3800

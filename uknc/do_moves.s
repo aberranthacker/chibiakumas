@@ -1,48 +1,56 @@
-                                                            #
-                                                            # ;See EventStreamDirections for details of how DoMoves works
-DoMoves: .global DoMoves                                    # DoMoves:
-                                                            #     ; B=X C=Y D=Move
-                                                            #     ; SDYYYXXX   S=1 means 'special move'
-                                                            #     ; all others work in the format D = Doubler (speed up move)
-                                                            #     ; YYY Y movement bits
-                                                            #     ; XXX X movement bits
-                                                            #
-                                                            #     bit 7,d         ; See if we are using a SPECIAL move pattern
-                                                            #     jr nz,DoMoves_Spec
+/*
+  See EventStreamDirections for details of how DoMoves works
+*/
+DoMoves: .global DoMoves
+        # SDYYYXXX
+        # S - 'special move'
+        # D - Doubler (speed up move)
+        # YYY - Y movement bits
+        # XXX - X movement bits
+        # B =X, C =Y, D =Move
+        # R4=X, R1=Y, R2 - LSB=Move, MSB=Sprite
+        CLR  R4
+        BISB R1,R4 # R4 = X
+        CLRB R1
+        SWAB R1    # R1 = Y
+
+        BIT  $0x80,R2                                       #     bit 7,d         ; See if we are using a SPECIAL move pattern
+        BNE  DoMoves_Spec$                                  #     jr nz,DoMoves_Spec
                                                             # ;DoMovesStars
-                                                            #     ld a,D
-                                                            #     and %00111000
-                                                            #     rrca
-                                                            #     rrca
+        # Y move ---------------------------------------------------------------
+        MOV  R2,R0                                          #     ld a,D
+        BIC  $0177707,R0                                    #     and %00111000
+        ASR  R0                                             #     rrca
+        ASR  R0                                             #     rrca
                                                             #
-                                                            #     sub 8
-                                                            #     bit 6,d
-                                                            #     jp z,DoMoves_NoMult2
-                                                            #          rlca
-                                                            #     DoMoves_NoMult2:
-                                                            #     add C
+        SUB  $8,R0                                          #     sub 8
+        BIT  $0x40,R2                                       #     bit 6,d
+        BEQ  DoMoves_NoMultY$                               #     jp z,DoMoves_NoMult2
+        ASL  R0                                             #          rlca
+    DoMoves_NoMultY$:                                       #     DoMoves_NoMult2:
+        ADD  R1,R0                                          #     add C
                                                             #
-                                                            #     cp 199+24       ;we are at the bottom of the screen
-                                                            #     jr NC,DoMoves_Kill  ;over the page
-                                                            #     ld c,a
+        CMP  R0,$199+24                                     #     cp 199+24       ;we are at the bottom of the screen
+        BCC  DoMoves_Kill$                                  #     jr NC,DoMoves_Kill  ;over the page
+        MOV  R0,R1                                          #     ld c,a
+        # X move ---------------------------------------------------------------
+        MOV  R2,R0                                          #     ld a,D
+        BIC  $0xFFF8,R0                                     #     and %00000111
+        SUB  $4,R0                                          #     sub 4
+        BIT  $0x40,R2                                       #     bit 6,d
+        BEQ  DoMoves_NoMultX$                               #     jp z,DoMoves_NoMult
+        ASL  R0                                             #          rlca
+    DoMoves_NoMultX$:                                       #     DoMoves_NoMult:
+        ADD  R4,R0                                          #     add b
                                                             #
-                                                            #     ld a,D
-                                                            #     and %00000111
-                                                            #     sub 4
-                                                            #     bit 6,d
-                                                            #     jp z,DoMoves_NoMult
-                                                            #          rlca
-                                                            #     DoMoves_NoMult:
-                                                            #     add b
+        CMP  R0,$160+24                                     #     cp 160+24          ;we are at the bottom of the screen
+        BCC  DoMoves_Kill$                                  #     jr NC,DoMoves_Kill ;over the page
+        MOV  R0,R4                                          #     ld b,a
                                                             #
-                                                            #     cp 160+24          ;we are at the bottom of the screen
-                                                            #     jr NC,DoMoves_Kill ;over the page
-                                                            #     ld b,a
-                                                            #
-                                                            #     ret
-                                                            # DoMoves_Kill:          ; Object has gone offscreen
-                                                            #     ld C,0
-                                                            #     ret
+RETURN                                                      #     ret
+    DoMoves_Kill$:                                          # DoMoves_Kill:          ; Object has gone offscreen
+        CLR  R1                                             #     ld C,0
+RETURN                                                      #     ret
                                                             # DoMoves_Background: ; Background sprites move much more slowly, and only in 1 direction
                                                             #     ld a,d
                                                             #     and %00001111
@@ -59,8 +67,8 @@ DoMoves: .global DoMoves                                    # DoMoves:
                                                             #     cp 160+24+24        ;we are offscreen
                                                             #     jr NC,DoMoves_Kill  ;over the page
                                                             #     ret
-                                                            # DoMoves_Spec:   ;Special moves - various kinds
-                                                            #     ld a,(Timer_TicksOccured)
+DoMoves_Spec$:                                              # DoMoves_Spec:   ;Special moves - various kinds
+        HALT                                                #     ld a,(Timer_TicksOccured)
                                                             #     and %11111111           :SpecialMoveSlowdown_Plus1
                                                             #     ret z
                                                             #     ld a,d

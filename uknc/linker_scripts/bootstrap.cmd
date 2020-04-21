@@ -4,6 +4,9 @@ OUTPUT_ARCH(pdp11)
 INPUT(build/bootstrap.o)
 OUTPUT(build/bootstrap.out)
 
+GameVarsArraySize = (Akuyou_GameVarsEnd - Akuyou_GameVarsStart);
+GameVarsArraySizeWords = (Akuyou_GameVarsEnd - Akuyou_GameVarsStart) / 2;
+
 FileSizeCoreWords = ((FileEndCore - FileBeginCore) / 2);
 FileSizeSettingsWords = ((SavedSettings - SavedSettings_Last) / 2);
 BootstrapSize = (BootstrapEnd - Bootstrap_Launch);

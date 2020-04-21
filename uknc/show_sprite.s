@@ -1,20 +1,22 @@
+/*
+*******************************************************************************
+*                               Show Sprite                                   *
+*******************************************************************************
+ SprShow_W     equ SprShow_W_Plus1 - 1
 
-                                                            # ;*******************************************************************************
-                                                            # ;*                               Show Sprite                                   *
-                                                            # ;*******************************************************************************
-                                                            # SprShow_W     equ SprShow_W_Plus1-1
-                                                            #
-                                                            # SprShow_Xoff  equ SprShow_Xoff_Plus1-1
-                                                            # SprShow_Yoff  equ SprShow_Yoff_Plus1-1
-                                                            #
-                                                            # SprShow_TempX equ ScreenBuffer_ActiveScreenDirectC_Plus1-2
-                                                            # SprShow_TempY equ SprShow_TempY_Plus2-2
-                                                            # SprShow_TempW equ SprShow_TempW_Plus1-1
-                                                            # SprShow_TempH equ SprShow_TempH_Plus1-1
-                                                            # SprShow_OldX  equ SprShow_OldX_Plus1-1
-                                                            #
-                                                            # SprShow_TempAddr equ SprShow_TempAddr_Plus2-2 ; defw &0000
-                                                            #
+ SprShow_Xoff  equ SprShow_Xoff_Plus1 - 1
+ SprShow_Yoff  equ SprShow_Yoff_Plus1 - 1
+
+ SprShow_TempX equ ScreenBuffer_ActiveScreenDirectC_Plus1 - 2
+ SprShow_TempY equ SprShow_TempY_Plus2 - 2
+
+ SprShow_TempW equ SprShow_TempW_Plus1 - 1
+ SprShow_TempH equ SprShow_TempH_Plus1 - 1
+ SprShow_OldX  equ SprShow_OldX_Plus1 - 1
+
+ SprShow_TempAddr equ SprShow_TempAddr_Plus2 - 2 ; defw &0000
+*/
+
                                                             # SpriteBank_Font2:
                                                             #     ld a,2
                                                             # SpriteBank_Font: ;Init the spritefont location - Corrupts HL and now BC
@@ -41,49 +43,50 @@
                                                             # ; We can preread a sprite to get the width/height
                                                             # ; This is used for Direct sprites, and was used by the object loop - the object
                                                             # ; loop now assumes the sprite is 24x24, this was done to save time as 97% of the time - it is
-                                                            # ShowSprite_ReadInfo:
-                                                            #     ld a,&0 :SprShow_SprNum_Plus1
+ShowSprite_ReadInfo:                                        # ShowSprite_ReadInfo:
+        MOV  (PC)+,R0; srcSprShow_SprNum: .word 0           #     ld a,&0 :SprShow_SprNum_Plus1
                                                             #     ld c,a
                                                             #
                                                             #     ld b,0
                                                             #         or a ; only done to clear carry flag
-                                                            #     rl b
+        ASL  R0                                             #     rl b
                                                             #     rl c
                                                             #
-                                                            #     ld hl,&4000 :SprShow_BankAddr_Plus2
-                                                            #     ld d,h
+        MOV  (PC)+,R5; srcSprShow_BankAddr: .word LevelSprites #  ld hl,&4000 :SprShow_BankAddr_Plus2
+        MOV  R5,R3                                          #     ld d,h
                                                             #     ld e,l
-                                                            #     add hl,bc
-                                                            #     add hl,bc ; 6 bytes per sprite
-                                                            #     add hl,bc
+        ADD  R0,R5                                          #     add hl,bc
+        ADD  R0,R5                                          #     add hl,bc ; 6 bytes per sprite
+        ADD  R0,R5                                          #     add hl,bc
                                                             #
-                                                            #     ld a,(hl)
+        MOVB (R5)+,R0 # height of the sprite in lines       #     ld a,(hl)
                                                             #     or a
-                                                            #     jr z,SpriteGiveUp
-                                                            #     ld (SprShow_TempH),a
+        BEQ  SpriteGiveUp$                                  #     jr z,SpriteGiveUp
+        MOVB R0,@$srcSprShow_TempH                          #     ld (SprShow_TempH),a
                                                             #
                                                             #     inc hl
-                                                            #
-                                                            #     ld a,(hl)
-                                                            #     ld (SprShow_TempW),a
-                                                            #     ld (SprShow_W),a
+        MOVB (R5)+,R1 # width in bytes                      #     ld a,(hl)
+        # don't care about sign extension, 80 is a maximum value
+        MOV  R1,@$srcSprShow_TempW                          #     ld (SprShow_TempW),a
+        MOV  R1,@$srcSprShow_W                              #     ld (SprShow_W),a
                                                             #     ld b,a
                                                             #
                                                             #     inc hl
                                                             #     ld a,(hl)
-                                                            #     ld (SprShow_Yoff),a
+        MOVB (R5)+,@$srcSprShow_Yoff                        #     ld (SprShow_Yoff),a
                                                             #     inc hl
-                                                            #
-                                                            #     ld a,(hl)
-                                                            #     ld (SprShow_Xoff),a ; Note Xoffset is never actually used for x-coords
-                                                            #                         ; the mem pos is actually sprite attribs
-                                                            #                         ; such as PSet, Doubleheight and trans color
+        # Note Xoffset is never actually used for x-coords  #
+        # the mem pos is actually sprite attribs
+        # such as PSet, Doubleheight and trans color
+        MOVB (R5)+,R0 # sign extension is irrelevant        #     ld a,(hl)
+        MOV  R0,@$srcSprShow_Xoff                           #     ld (SprShow_Xoff),a ;
+                                                            #                         ;
                                                             #     inc hl
-                                                            #     ;leave with Sprbankaddr in DE
-                                                            #     ;Width in B and Xoff in A
-                                                            # ret
+        # leave with Sprbankaddr in R3                      #     ;leave with Sprbankaddr in DE
+        # Width in R1, and Xoff in R0                       #     ;Width in B and Xoff in A
+RETURN                                                      # ret
                                                             #
-                                                            # SpriteGiveUp:
+SpriteGiveUp$:                                              # SpriteGiveUp:
                                                             #     pop af ;Forcably quit not just getting info - but showing the sprite
                                                             # ret
                                                             #
@@ -155,100 +158,101 @@
                                                             #     ld a,(SprShow_Y)
                                                             #     ld c,a
                                                             # ret
-                                                            # ShowSprite: ; ShowSprite is the main routine of our program!
-                                                            #     ; *********  Get Sprite Details *********
-                                                            #     call ShowSprite_ReadInfo
+#-------------------------------------------------------------------------------
+ShowSprite: # ShowSprite is the main routine of our program!
+        # *********  Get Sprite Details *********
+        CALL @$ShowSprite_ReadInfo                          #     call ShowSprite_ReadInfo
                                                             #     di
-                                                            #
+
                                                             #     ex af,af'
                                                             #     ld a,b
-        CMPB R0,$6; SpriteSizeConfig6_Plus2:                #     cp 6 :SpriteSizeConfig6_Plus1
-       .equiv  SpriteSizeConfig6, SpriteSizeConfig6_Plus2 - 2
+        CMP  R1,(PC)+; cmpSpriteSizeConfig6: .word 6        #     cp 6 :SpriteSizeConfig6_Plus1
         # calls ShowSpriteReconfigure or NULL
-       .CALL NE, ShowSpriteReconfigure; ShowSpriteReconfigureCommand_Plus2: #     call nz,ShowSpriteReconfigure   :ShowSpriteReconfigureCommand_Plus2
-       .equiv  dstShowSpriteReconfigureCommand, ShowSpriteReconfigureCommand_Plus2 - 2
-                                                            #
+       .call NE, @(PC)+                                     #     call nz,ShowSpriteReconfigure   :ShowSpriteReconfigureCommand_Plus2
+        dstShowSpriteReconfigureCommand: .word ShowSpriteReconfigure
+
                                                             #     ld c,(hl)
                                                             #     inc hl
                                                             #     ld b,(hl)
-                                                            #
+
                                                             #     ex de,hl
-                                                            #     add hl,bc
-                                                            #     ld (SprShow_TempAddr),hl
+        ADD  (R5),R3                                        #     add hl,bc
+        MOV  R3,@$srcSprShow_TempAddr                       #     ld (SprShow_TempAddr),hl
                                                             #     ex de,hl
-                                                            #
+
                                                             #     ld bc,TranspColors
                                                             #     ex af,af'
-                                                            #     ;ld a,(SprShow_Xoff) - we are relying on this still being in A
-                                                            #     and %00000111
-                                                            #     add c
+        # we are relying on Xoff still being in R0          #     ;ld a,(SprShow_Xoff) - we are relying on this still being in A
+        BIC  $0xFFF8,R0                                     #     and %00000111
+        MOVB TranspColors(R0),@$srcTranspBitA               #     add c
                                                             #     ld c,a
                                                             #     ld a,(bc)
-                                                            #     ld (TranspBitA_Plus1-1),a
+                                                            #     ld (TranspBitA_Plus1 - 1),a
+
+# *********  show a new sprite *********
                                                             #
-                                                            #     ; *********  show a new sprite *********
-                                                            #
-                                                            # ShowSprite_OK:
-                                                            #     ld a,48 :SprShow_Yoff_Plus1
-        ADD  (PC)+,R0; srcSprShow_Y: .word 48               #     add 48  :SprShow_Y_Plus1
-                                                            #     ld c,a
-                                                            #     ld a,48 :SprShow_Xoff_Plus1
-                       srcSprShow_X: .word 48               #     ld b,48 :SprShow_X_Plus1
-                                                            #
-                                                            #     bit 6,a
-                                                            #     jp z,ShowSprite_OK_NoDoubler
-                                                            #     ; Doubler gives an interlacing effect, used for faux big sprites without
-                                                            #     ; slowdown
-                                                            #     ld hl,SprDrawChooseRenderLineDoubler
-                                                            #
-                                                            #     bit 7,a
-                                                            #     jp z,ShowSprite_OK_Xoff
-                                                            #     ; Double height with Pset (no transparency - much faster)
-                                                            #     ld hl,SprDrawChooseRenderLineDoublerPset
-                                                            #
-                                                            #     jp ShowSprite_OK_Xoff
-                                                            # ShowSprite_OK_NoDoubler:
-                                                            #     ; Normal sprite
-                                                            #     ld hl,SprDrawChooseRender
-                                                            #     bit 7,a
-                                                            #     jp z,ShowSprite_OK_Xoff
-                                                            #     ; PSET sprite - deletes background, fast no transp
-                                                            #     ld hl,SprDrawChooseRenderPset
-                                                            #
-                                                            # ShowSprite_OK_Xoff:
-                                                            #     ; Bit 7 forces "pset" - wipes background but faster
-                                                            #     ; Bit 6 doubles height
-                                                            #     ; 123=transp
+# ShowSprite_OK:
+        MOV  (PC)+,R1; srcSprShow_Yoff: .word 48                      #     ld a,48 :SprShow_Yoff_Plus1
+        ADD  (PC)+,R1; srcSprShow_Y: .word 48 # set from object array #     add 48  :SprShow_Y_Plus1
+                                                                      #     ld c,a
+        MOV  (PC)+,R0; srcSprShow_Xoff: .word 48                      #     ld a,48 :SprShow_Xoff_Plus1
+        MOV  (PC)+,R2; srcSprShow_X: .word 48 # set from object array #     ld b,48 :SprShow_X_Plus1
+                                                                      #
+        BIT  $0x40,R0                                                 #     bit 6,a
+        BZE  ShowSprite_OK_NoDoubler$                                 #     jp z,ShowSprite_OK_NoDoubler
+        # Doubler gives an interlacing effect, used for faux big sprites
+        # without slowdown
+        MOV  $SprDrawChooseRenderLineDoubler,R5                       #     ld hl,SprDrawChooseRenderLineDoubler
+                                                                      #
+        BIT  $0x80,R0                                                 #     bit 7,a
+        BZE  ShowSprite_OK_Xoff$                                      #     jp z,ShowSprite_OK_Xoff
+        # Double height with Pset (no transparency - much faster)
+        MOV  $SprDrawChooseRenderLineDoublerPset,R5                   #     ld hl,SprDrawChooseRenderLineDoublerPset
+                                                                      #
+                                                                      #     jp ShowSprite_OK_Xoff
+    ShowSprite_OK_NoDoubler$: # Normal sprite                         # ShowSprite_OK_NoDoubler:
+        MOV  $SprDrawChooseRender,R5                                  #     ld hl,SprDrawChooseRender
+        BIT  $0x80,R0                                                 #     bit 7,a
+        BZE  ShowSprite_OK_Xoff$                                      #     jp z,ShowSprite_OK_Xoff
+        # PSET sprite - deletes background, fast no transp
+        MOV  $SprDrawChooseRenderPset,R5                              #     ld hl,SprDrawChooseRenderPset
+                                                                      #
+    ShowSprite_OK_Xoff$:                                              # ShowSprite_OK_Xoff:
+        # Bit 7 forces "pset" - wipes background but faster
+        # Bit 6 doubles height
+        # Bits 2,1,0 - transparency
                                                             #     and %00000000
                                                             #     add b
                                                             #     ld b,a
-                                                            #
-                                                            #     ld (ShowSprite_Ready_Return_Plus2-2),hl
-                                                            #         call VirtualPosToScreenByte
-                                                            #         ; H X bytes to skip L   X bytes to remove
-                                                            #         ; D Y bytes to skip E   Y bytes to remove
+
+        MOV  R5,@$jmpShowSprite_Ready_Return                #     ld (ShowSprite_Ready_Return_Plus2 - 2),hl
+        CALL @$VirtualPosToScreenByte                       #         call VirtualPosToScreenByte
+        # R2 Y lines to skip   | R4 X bytes to skip   #     #         ; H X bytes to skip; L X bytes to remove
+        # R3 Y lines to remove | R5 X bytes to remove #     #         ; D Y bytes to skip; E Y bytes to remove
                                                             #         ld A,B
                                                             #         ld (SprShow_TempX),A
                                                             #         ld A,C
                                                             #         ld (SprShow_TempY),A
-                                                            #
-                                                            #         ld a,h
-                                                            #         or l
-                                                            #         or d ; if all are zero, do nothing
-                                                            #         or e
-                                                            #         jp Z,ShowSprite_SkipChanges
-                                                            #
-                                                            #     ifdef Debug
+
+        MOV  R2,R0                                          #         ld a,h
+        BIS  R3,R0                                          #         or l
+        BIS  R4,R0                                          #         or d ; if all are zero, do nothing
+        BIS  R5,R0                                          #         or e
+        BZE  ShowSprite_SkipChanges                         #         jp Z,ShowSprite_SkipChanges
+
+                                                            ##    ifdef Debug
                                                             #         call Debug_NeedEXX
-                                                            #     endif
-                                                            #         exx;push hl
+                                                            ##    endif
+
+                                                            #         exx ;push hl
                                                             #             ld hl,SprDrawLnStartBegin
-                                                            #             ld (ShowSprite_Ready_Return_Plus2-2),hl
-                                                            #
-                                                            #         exx;pop hl
-                                                            #     ifdef Debug
+        MOV  $SprDrawLnStartBegin,@$jmpShowSprite_Ready_Return #          ld (ShowSprite_Ready_Return_Plus2 - 2),hl
+
+                                                            #         exx ;pop hl
+
+                                                            ##    ifdef Debug
                                                             #         call Debug_ReleaseEXX
-                                                            #     endif
+                                                            ##    endif
                                                             #
                                                             #         ld a,h
                                                             #         ld (SprShow_OldX),a
@@ -307,16 +311,18 @@
                                                             #     jp ShowSprite_Ready
                                                             #     ;we have messed with the co-ords, so can only use the basic render not supefast ones
                                                             #
-                                                            # ShowSprite_SkipChanges:
-                                                            #     ; No co-ord tweaks were needed, all sprite is onscreen
+.list
+ShowSprite_SkipChanges:                                     # ShowSprite_SkipChanges:
+        # No co-ord tweaks were needed, all sprite is onscreen
                                                             #     ;pop af         ;restore width
                                                             #     ex af,af'
                                                             #
                                                             # ShowSprite_Ready:
-                                                            #     ld hl,&0000 :SprShow_TempY_Plus2
-                                                            #     add hl,hl       ; table is two bytes so double hl
+        MOV  (PC)+,R5; srcSprShow_TempY: .word 0x0000       #     ld hl,&0000 :SprShow_TempY_Plus2
+.nolist
+        ASL  R5                                             #     add hl,hl       ; table is two bytes so double hl
                                                             #
-                                                            #     ld de,scr_addr_table    ; get table
+        MOV  scr_addr_table(R5),R5                          #     ld de,scr_addr_table    ; get table
                                                             #     add hl,de       ;add line num
                                                             #
                                                             #     ld a,(hl)       ; read the two bytes in
@@ -324,26 +330,29 @@
                                                             #     ld h,(hl)
                                                             #     ld l,a  ; hl now is the memory loc of the line
                                                             #
-                                                            #     ld de,&C069 :ScreenBuffer_ActiveScreenDirectC_Plus1
-                                                            #
-                                                            #     add hl,de   ; hl = memory line, bc = X pos = hl is now the location on screen
+        ADD  (PC)+,R5;                                      #     ld de,&C069 :ScreenBuffer_ActiveScreenDirectC_Plus1
+        srcSprShow_TempX: .byte 0x00                        #     add hl,de   ; hl = memory line, bc = X pos = hl is now the location on screen
+        srcFB_shift:      .byte 0x40 # FB1                  #
+       #srcFB_shift:      .byte 0x40 # FB0
+
                                                             #
                                                             # ;;;;;;;;;;;;;;;;
                                                             #
-                                                            #     ld c,&00 :SprShow_TempH_Plus1
-                                                            #     ld iy,&0000 :SprShow_TempAddr_Plus2
+        MOV  (PC)+,R2; srcSprShow_TempH: .word 0x00         #     ld c,&00 :SprShow_TempH_Plus1
+        # current sprite address
+        MOV  (PC)+,R4; srcSprShow_TempAddr: .word 0x0000    #     ld iy,&0000 :SprShow_TempAddr_Plus2
                                                             #
-                                                            #     jp SprDrawLnStartBegin :ShowSprite_Ready_Return_Plus2
+        JMP  @(PC)+; jmpShowSprite_Ready_Return: .word SprDrawLnStartBegin #     jp SprDrawLnStartBegin :ShowSprite_Ready_Return_Plus2
                                                             #
-                                                            # SprDrawChooseRenderLineDoubler:
-                                                            #     rlc c
+SprDrawChooseRenderLineDoubler:                             # SprDrawChooseRenderLineDoubler:
+        HALT                                                #     rlc c
                                                             #     ld de,Sprdraw24PxVer_Double
                                                             #     jp SprDrawTurboPrep
                                                             #
-                                                            # SprDrawChooseRender:    ; Pick the render based on width
-                                                            #     ld a,(SprShow_TempW)
-                                                            #     cp 6
-                                                            #     jp z,SprDraw24pxInit
+SprDrawChooseRender:                                        # SprDrawChooseRender:    ; Pick the render based on width
+        MOV  @$srcSprShow_TempW,R0                          #     ld a,(SprShow_TempW)
+        CMP  R0,$6                                          #     cp 6
+        BEQ  SprDraw24pxInit                                #     jp z,SprDraw24pxInit
                                                             #     cp 8
                                                             #     jr z,SprDraw32pxInit
                                                             #     cp 4
@@ -359,8 +368,9 @@
                                                             #     cp 18
                                                             #     jr z,SprDraw72pxInit
                                                             #
-                                                            # SprDrawLnStartBegin:            ; This is our most basic render, its slow, but can do any size and clipping
-                                                            #
+# This is our most basic render, its slow, but can do any size and clipping                                                           # SprDrawLnStartBegin:            ; This is our most basic render, its slow, but can do any size and clipping
+SprDrawLnStartBegin:
+        HALT                                                #
                                                             # SprDrawLnStartBeginB:
                                                             #     ld a,(TranspBitA_Plus1-1)
                                                             #     ld (TranspBitB_Plus1-1),a
@@ -383,14 +393,14 @@
                                                             #         ld d,IYH
                                                             #         ld e,IYL
                                                             #
-                                                            #         ld b,&00 :SprShow_TempW_Plus1;a
+        MOV  (PC)+,R1; srcSprShow_TempW: .word 0x00         #         ld b,&00 :SprShow_TempW_Plus1;a
                                                             #         SprDrawPixelLoop:
                                                             #             ld a,(de)
                                                             #             cp 1 :TranspBitB_Plus1
                                                             #             jr z,SprDrawSkipPixelLoop
-                                                            #             ifdef DebugSprite
+                                                            ##            ifdef DebugSprite
                                                             #                 or %11000000 ; test code, marks slow sprites so we can see they will be slow
-                                                            #             endif
+                                                            ##            endif
                                                             #             ld (hl),a
                                                             #         SprDrawSkipPixelLoop:
                                                             #             inc hl
@@ -398,7 +408,7 @@
                                                             #         djnz SprDrawPixelLoop
                                                             #
                                                             #         ld d,0
-                                                            #         ld e,0 :SprShow_W_Plus1
+        MOV  (PC)+,R2; srcSprShow_W: .word 0                #         ld e,0 :SprShow_W_Plus1
                                                             #         add iy,de
                                                             #     pop hl
                                                             #
@@ -424,7 +434,7 @@
                                                             #
                                                             # SprDrawLineEnd2:
                                                             #
-                                                            # ;--------------------Turbo Version! misuse the stack for faster writes ----------------
+# ;--------------------Turbo Version! misuse the stack for faster writes ----------------
                                                             # SprDraw8pxInit:
                                                             #     ld de,Sprdraw8PxVer
                                                             #     jp SprDrawTurboPrep
@@ -437,9 +447,9 @@
                                                             # SprDraw48pxInit:
                                                             #     ld de,Sprdraw48PxVer
                                                             #     jp SprDrawTurboPrep
-                                                            # SprDraw24pxInit:
-                                                            #     ld de,Sprdraw24PxVer
-                                                            #     jp SprDrawTurboPrep
+SprDraw24pxInit:                                            # SprDraw24pxInit:
+        MOV  $Sprdraw24PxVer,R3                             #     ld de,Sprdraw24PxVer
+        BR   SprDrawTurboPrep                               #     jp SprDrawTurboPrep
                                                             # SprDraw40pxInit:
                                                             #     ld de,Sprdraw40PxVer
                                                             #     jp SprDrawTurboPrep
@@ -450,32 +460,34 @@
                                                             #     ld de,Sprdraw96PxVer
                                                             #     jr SprDrawTurboPrep
                                                             #
-                                                            # SprDrawTurboPrep:
-                                                            #     ld (Sprdraw24PxJumpPos_Plus2-2),de
+SprDrawTurboPrep:                                           # SprDrawTurboPrep:
+        MOV  R3,@$dstSprdraw24PxJumpPos                     #     ld (Sprdraw24PxJumpPos_Plus2 - 2),de
                                                             #
                                                             # SprDrawTurboPrep2:
-                                                            # ifndef AdvancedInterrupts
+                                                            #*ifndef AdvancedInterrupts
                                                             #     di
                                                             #     ld (SprDrawTurbo_StackRestore_Plus2-2),sp
                                                             #     ld sp,iy
-                                                            # else
+                                                            #*else
                                                             #     di
                                                             #     ld (SprDrawTurbo_StackRestore_Plus2-2),sp
                                                             #     ld sp,iy
-                                                            #     dec sp      ;Preload DE in case an interrupt read occurs before we start!
+                                                            #     dec sp ;Preload DE in case an interrupt read occurs before we start!
                                                             #     dec sp
                                                             #     pop de
                                                             #     ei
-                                                            # endif
+                                                            #*endif
                                                             #
-                                                            # SprDrawTurbo_StartLine:
-                                                            #     ld (SprDrawTurbo_HLrestore_Plus2-2),hl
-                                                            #
-                                                            #         Ld a,0  :TranspBitA_Plus1 ; Set A to ZERO / Transp byte
-                                                            #         jp  Sprdraw24PxVer :Sprdraw24PxJumpPos_Plus2    ; we change the jump here to alter the width of the sprite quickly
+    SprDrawTurbo_StartLine$:                                # SprDrawTurbo_StartLine:
+        MOV  R5,@$srcSprDrawTurbo_HLrestore                 #     ld (SprDrawTurbo_HLrestore_Plus2 - 2),hl
+        # Set A to ZERO / Transp byte                       #
+        MOV  (PC)+,R0; srcTranspBitA: .word 0               #         Ld a,0  :TranspBitA_Plus1 ; Set A to ZERO / Transp byte
+                                                            #         ; we change the jump here to alter the width of the sprite quickly
+        JMP  @(PC)+; dstSprdraw24PxJumpPos: .word Sprdraw24PxVer #    jp  Sprdraw24PxVer :Sprdraw24PxJumpPos_Plus2
                                                             #
                                                             #         ; ********** A MUST BE the transparent byte for THIS WHOLE LOOP! ***********
                                                             #
+# {{{
                                                             # Sprdraw24PxVer_Double:  ;Line doubler - does two nextlines each time
                                                             #         bit 0,C
                                                             #         jp z,SprDrawTurbo_LineSkip
@@ -609,8 +621,8 @@
                                                             #         SprDraw24pxW_SkipB:
                                                             #         inc hl
                                                             #
-                                                            # Sprdraw24PxVer:
-                                                            #         pop de
+Sprdraw24PxVer:                                             # Sprdraw24PxVer:
+        MOV  (R4)+,(R5)+                                    #         pop de
                                                             #         cp e
                                                             #         jr z,SprDraw24pxW_Skip1
                                                             #         ld (hl),e
@@ -625,7 +637,7 @@
                                                             #         inc hl
                                                             #
                                                             # Sprdraw16PxVer:
-                                                            #         pop de
+        MOV  (R4)+,(R5)+                                    #         pop de
                                                             #         cp e
                                                             #         jr z,SprDraw24pxW_Skip3
                                                             #         ld (hl),e
@@ -640,7 +652,7 @@
                                                             #         inc hl
                                                             #
                                                             # Sprdraw8PxVer:
-                                                            #         pop de
+        MOV  (R4)+,(R5)+                                    #         pop de
                                                             #         cp e
                                                             #         jr z,SprDraw24pxW_Skip5
                                                             #         ld (hl),e
@@ -651,12 +663,13 @@
                                                             #         jr z,SprDraw24pxW_Skip6
                                                             #         ld (hl),d
                                                             #         SprDraw24pxW_Skip6:
+# }}}
                                                             # SprDrawTurbo_LineSkip:
-                                                            #     dec c
-                                                            #     jr z,SprDrawTurbo_Done
+        DEC  R2                                             #     dec c
+        BZE  SprDrawTurbo_Done$                             #     jr z,SprDrawTurbo_Done
                                                             #
-                                                            #     ld hl,&6969 :SprDrawTurbo_HLrestore_Plus2
-                                                            #     ld a,h
+        MOV  (PC)+,R5; srcSprDrawTurbo_HLrestore: .word 0x4180 #     ld hl,&6969 :SprDrawTurbo_HLrestore_Plus2
+        ADD  $80,R5                                         #     ld a,h
                                                             #     add a,&08
                                                             #     ld h,a
                                                             # TurboScreenLoopCheck_Minus1:
@@ -685,21 +698,21 @@
                                                             #     ld sp,&6969 :SprDrawTurbo_StackRestore_Plus2
                                                             #     di
                                                             #     ld sp,&6969 :SprDrawTurbo_StackRestoreSprite_Plus2
-                                                            #     jp SprDrawTurbo_StartLine
+        JMP @$SprDrawTurbo_StartLine$                       #     jp SprDrawTurbo_StartLine
                                                             # endif
                                                             #
-                                                            # SprDrawTurbo_Done:
+    SprDrawTurbo_Done$:                                     # SprDrawTurbo_Done:
                                                             # ifndef AdvancedInterrupts
                                                             #     ld sp,(SprDrawTurbo_StackRestore_Plus2-2)
                                                             #     ei
                                                             # else
                                                             #     ld sp,&6969 :SprDrawTurbo_StackRestore_Plus2
                                                             # endif
-                                                            #     ret
+RETURN                                                      #     ret
                                                             #
                                                             # ;--------------------Pset Version! no transparentcy, so fast! ----------------
-                                                            # SprDrawChooseRenderLineDoublerPset:
-                                                            #     di
+SprDrawChooseRenderLineDoublerPset:                         # SprDrawChooseRenderLineDoublerPset:
+        HALT                                                #     di
                                                             #
                                                             #     ex af,af';push af
                                                             #     ld a,c
@@ -709,8 +722,8 @@
                                                             #     ld de,SprdrawPset_Double
                                                             #     jp SprDrawPsetPrep
                                                             #
-                                                            # SprDrawChooseRenderPset:        ; Can do any size between 8-48 pixels
-                                                            #     ld a,(SprShow_TempW)
+SprDrawChooseRenderPset:                                    # SprDrawChooseRenderPset:        ; Can do any size between 8-48 pixels
+        HALT                                                #     ld a,(SprShow_TempW)
                                                             #     cp 6
                                                             #     jp z,SprDrawPset24pxInit
                                                             #     cp 8

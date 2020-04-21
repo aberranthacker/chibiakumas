@@ -12,7 +12,7 @@
 
                .=Akuyou_LevelStart
 
-start:  JMP  LevelInit
+start:  JMP  @$LevelInit
 
 TITLETEX: .incbin "resources/titletex.spr"
 
@@ -24,7 +24,7 @@ EventStreamArray_Ep1: #------------------------------------------------------{{{
     # event MSB->R0, argument LSB->R1
     .word evtMultipleCommands | 1 # Event_CoreMultipleEventsAtOneTime; 1 -> srcEvent_MultipleEventCount
     .word evtCoreReprogram | prgPalette # Event_CoreReprogram; Event_CoreReprogram_Palette
-    .word MenuPalette # palette data address
+    .word TitleScreenPalette # palette data address
 
     .word 4 # -> srcEvent_NextEventTime
     # Jump to a different level point
@@ -34,89 +34,123 @@ EventStreamArray_Ep1: #------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 
 EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
-                    # defb 0,%01110000+4          ; 4 Commands
-                    #     defb 240,0,6        ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
-                    #     defb 1
-                    #     defb 1
-                    #     defb &54,&54,&54,&54
+        # defb 0,evtCallAddress
+        # defw SetFaderEP1Menu
 
-                    #     defb 240,26*0+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
-                    #     defb 1
-                    #     defb 1
-                    #     defb &54,&54,&54,&54
+        # ; We will use 4 Paralax layers
+        # ;  ---------()- (sky)        %11001000
+        # ;  ------------ (Far)        %11000100
+        # ;  -----X---X-- (mid)        %11000010   Bank 1
+        # ;  []=====[]=== (foreground) %11000001   Bank 0
 
-                    #     defb 240,26*1+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
-                    #     defb 0
-                    #     defb 1
-                    #     defb &54,&54,&54,&54
+    .word 0 # time
+    .word evtCoreReprogram | prgPalette # Event_CoreReprogram; Event_CoreReprogram_Palette
+    .word MenuPalette # palette data address
 
-                    #     defb 240,26*2+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
-                    #     defb 1
-                    #     defb 1
-                    #     defb &54,&54,&54,&54
+        # ; Background L
+        # defb 0
+        # defb 128+4     ; SrcALL/Akuyou_Multiplatform_EventStream.asm:182
+        #                ; CALL Event_ProgramMoveLifeSwitch_0100
+        # defb 1         ; Program - Bitshift Sprite
+        # defb %11000001 ; Move - dir Left Slow
+        # defb 0         ; Life - immortal
+    .word 0 # time
+    .word evtMove | mvSetProgMoveLife # CALL Event_ProgramMoveLifeSwitch
+    .word 1          # program - bitshift sprite
+    .word 0b11000001 # move    - dir left, slow
+    .word 0          # life    - immortal
+        # defb 0,%10010000+15,0      ; Save Object settings to Bank 0
+    .word 0 # time
+    .word evtLoadSaveObjSettings | 0x0F # CALL Event_CoreSaveLoadSettings
+    .word 0 # Save Object settings to the Slot 0
 
-                    #     defb 0,evtCallAddress
-                    #     defw SetFaderEP1Menu
+        # defb 0
+        # defb 128+4      ; SrcALL/Akuyou_Multiplatform_EventStream.asm:182
+        #                 ; CALL Event_ProgramMoveLifeSwitch_0100
+        # defb 1          ; Program - Bitshift Sprite
+        # defb %11000010  ; Move    - dir Left Slow
+        # defb 0          ; Life    - immortal
+    .word 0 # time
+    .word evtMove | mvSetProgMoveLife # CALL Event_ProgramMoveLifeSwitch
+    .word 1          # program - bitshift sprite
+    .word 0b11000010 # move    - dir left, slow
+    .word 0          # life    - immortal
+        # defb 0,%10010000+15,1      ; Save Object settings to Bank 1
+    .word 0 # time
+    .word evtLoadSaveObjSettings | 0x0F # CALL Event_CoreSaveLoadSettings
+    .word 1 # Save Object settings to the Slot 1
 
-                    # ; We will use 4 Paralax layers
-                    # ;  ---------()- (sky)        %11001000
-                    # ;  ------------ (Far)        %11000100
-                    # ;  -----X---X-- (mid)        %11000010   Bank 1
-                    # ;  []=====[]=== (foreground) %11000001   Bank 0
+        # defb 0,128+4,0,&24,0       ; Static object
+    .word 0 # time
+    .word evtMove | mvSetProgMoveLife # CALL Event_ProgramMoveLifeSwitch
+    .word 0          # program - bitshift sprite
+    .word 0x24       # 0b100100 move - dir left, slow
+    .word 0          # life immortal
+        # defb 0,%10010000+15,2      ; Save Object settings to Bank 2
+    .word 0 # time
+    .word evtLoadSaveObjSettings | 0x0F # CALL Event_CoreSaveLoadSettings
+    .word 2 # Save Object settings to the Slot 2
 
-                    # ; Background L
-                    # defb 0,128+4,1,%11000001,0 ; Program - Bitshift Sprite... Move - dir Left Slow ... Life - immortal
-                    # defb 0,%10010000+15,0      ; Save Object settings to Bank 0
+        # ;Title
+        # defb 0,%01110000+7          ; 7 commands at the same timepoint
+    .word 0 # time
+    .word evtMultipleCommands | 7 # Event_CoreMultipleEventsAtOneTime; 7 -> srcEvent_MultipleEventCount
+        # defb %10010000+0+2          ; Load Settings from bank 2
+    .word evtLoadSaveObjSettings | 0x02 # Load Object settings from the Slot 2
+        # defb 0, 12, 12*0+ 24+44, 24+16 ; Single Object sprite 11 (animated)
+    .word evtSingleSprite
+    .word 12 # sprite
+    .byte 24+16, 12*0 + 24+44 # Y, X
+        # defb 0, 13, 12*1+ 24+44, 24+16 ; Single Object sprite 11 (animated)
+    .word evtSingleSprite
+    .word 13 # sprite
+    .byte 24+16, 12*1 + 24+44 # Y, X
+        # defb 0, 14, 12*2+ 24+44, 24+16 ; Single Object sprite 11 (animated)
+    .word evtSingleSprite
+    .word 14 # sprite
+    .byte 24+16, 12*2 + 24+44 # Y, X
+        # defb 0, 15, 12*3+ 24+44, 24+16 ; Single Object sprite 11 (animated)
+    .word evtSingleSprite
+    .word 15 # sprite
+    .byte 24+16, 12*3 + 24+44 # Y, X
+        # defb 0, 16, 12*4+ 24+44, 24+16 ; Single Object sprite 11 (animated)
+    .word evtSingleSprite
+    .word 16 # sprite
+    .byte 24+16, 12*4 + 24+44 # Y, X
+        # defb 0, 17, 12*5+ 24+44, 24+16 ; Single Object sprite 11 (animated)
+    .word evtSingleSprite
+    .word 17 # sprite
+    .byte 24+16, 12*5 + 24+44 # Y, X
 
-                    # defb 0,128+4,1,%11000010,0 ; Program - Bitshift Sprite... Move - dir Left Slow ... Life - immortal
-                    # defb 0,%10010000+15,1      ; Save Object settings to Bank 1
+        # ;Chibiko
+        # defb 0,%01110000+3      ; 3 commands at the same timepoint
+    .word 0 # time
+    .word evtMultipleCommands | 3 # Event_CoreMultipleEventsAtOneTime; 7 -> srcEvent_MultipleEventCount
+        # defb %10010000+0+2      ; Load Settings from bank 2
+    .word evtLoadSaveObjSettings | 0x02 # Load Object settings from the Slot 2
+        # defb 0,0,12*0+ 24,24+64 ; Single Object sprite 11 (animated)
+    .word evtSingleSprite
+    .word 0                # sprite
+    .byte 24+64, 12*0 + 24 # Y, X
+        # defb 0,1,12*1+ 24,24+64 ; Single Object sprite 11 (animated)
+    .word evtSingleSprite
+    .word 1                # sprite
+    .byte 24+64, 12*1 + 24 # Y, X
 
-                    # defb 0,128+4,0,&24,0       ; Static object
-                    # defb 0,%10010000+15,2      ; Save Object settings to Bank 2
-
-                    # ;Title
-                    # defb 0,%01110000+7          ; 3 commands at the same timepoint
-                    # defb %10010000+0+2          ; Load Settings from bank 2
-                    # defb 0,12,12*0+ 24+44,24+16 ; Single Object sprite 11 (animated)
-                    # defb 0,13,12*1+ 24+44,24+16 ; Single Object sprite 11 (animated)
-                    # defb 0,14,12*2+ 24+44,24+16 ; Single Object sprite 11 (animated)
-                    # defb 0,15,12*3+ 24+44,24+16 ; Single Object sprite 11 (animated)
-                    # defb 0,16,12*4+ 24+44,24+16 ; Single Object sprite 11 (animated)
-                    # defb 0,17,12*5+ 24+44,24+16 ; Single Object sprite 11 (animated)
-
-                    # ;Chibiko
-                    # defb 0,%01110000+3      ; 3 commands at the same timepoint
-                    # defb %10010000+0+2      ; Load Settings from bank 2
-                    # defb 0,0,12*0+ 24,24+64 ; Single Object sprite 11 (animated)
-                    # defb 0,1,12*1+ 24,24+64 ; Single Object sprite 11 (animated)
-
-                    # ;Bochan!
-                    # defb 0,%01110000+3                 ; 3 commands at the same timepoint
-                    # defb %10010000+0+2                 ; Load Settings from bank 2
-                    # defb 0,2,12*0+ 24+160-24,24+200-64 ; Single Object sprite 11 (animated)
-                    # defb 0,3,12*1+ 24+160-24,24+200-64 ; Single Object sprite 11 (animated)
-
-                    # ;Palette Change
-                    # defb 1,%01110000+4      ; 4 Commands
-                    #     defb 240,0,6        ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
-                    #     defb 1
-                    #     defb 1
-                    #     defb &54,&54,&44,&40
-
-                    #     defb 240,26*0+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
-                    #     defb 1
-                    #     defb 1
-                    #     defb &54,&54,&44,&40
-
-                    #     defb 240,26*1+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
-                    #     defb 0
-                    #     defb 1
-                    #     defb &54,&54,&44,&40
-
-                    #     defb 240,26*2+6,6   ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
-                    #     defb 1
-                    #     defb 1
-                    #     defb &54,&54,&44,&40
+        # ;Bochan!
+        # defb 0,%01110000+3                 ; 3 commands at the same timepoint
+    .word 0 # time
+    .word evtMultipleCommands | 3 # Event_CoreMultipleEventsAtOneTime; 7 -> srcEvent_MultipleEventCount
+        # defb %10010000+0+2                 ; Load Settings from bank 2
+    .word evtLoadSaveObjSettings | 0x02 # Load Object settings from the Slot 2
+        # defb 0,2,12*0+ 24+160-24,24+200-64 ; Single Object sprite 11 (animated)
+    .word evtSingleSprite
+    .word 2               # sprite
+    .byte 24+200-64, 12*0 + 24+160-24 # Y, X
+        # defb 0,3,12*1+ 24+160-24,24+200-64 ; Single Object sprite 11 (animated)
+    .word evtSingleSprite
+    .word 3               # sprite
+    .byte 24+200-64, 12*1 + 24+160-24 # Y, X
 #----------------------------------------------------------------------------}}}
 PauseLoop:
     .word 4 # -> srcEvent_NextEventTime
@@ -127,47 +161,65 @@ PauseLoop:
 LevelInit:
         MOV  $EventStreamArray_Ep1,R3 # Event Stream
         MOV  $Event_SavedSettings,R2  # Saved Settings
-        CALL Event_StreamInit # uknc/event_stream.s:90
+        CALL @$Event_StreamInit
+
+        MOV  $EventStreamArray_Ep1,R3 # Event Stream
+        MOV  $Event_SavedSettings,R2  # Saved Settings
+        CALL @$ResetEventStream
 
        .ppudo_ensure $PPU_PrintAt,$TitleText1 # Aku/Level00-Menu.asm:1101
         # Aku/Level00-Menu.asm:1103
-        CALL Timer_UpdateTimer
-        CALL EventStream_Process
-        CALL ObjectArray_Redraw # uknc/object_driver.s:74
+        CALL @$Timer_UpdateTimer
+        CALL @$EventStream_Process
+        CALL @$ObjectArray_Redraw
 
         CLR  @$KeyboardScanner_KeyPresses + 2 # call Keys_WaitForRelease
 
+        BR   ShowMenu
+
 ShowTitlePic_Loop:
-       .ppudo $PPU_SetPalette, $AnyKeyNormalPalette
-        CALL glow_delay$
-       .ppudo $PPU_SetPalette, $AnyKeyDarkPalette
-        CALL glow_delay$
-       .ppudo $PPU_SetPalette, $AnyKeyBlackPalette
-        CALL glow_delay$
-       .ppudo $PPU_SetPalette, $AnyKeyDarkPalette
-        CALL glow_delay$
+       .ppudo $PPU_SetPalette, $FireKeyNormalPalette
+        CALL @$glow_delay$
+       .ppudo $PPU_SetPalette, $FireKeyDarkPalette
+        CALL @$glow_delay$
+       .ppudo $PPU_SetPalette, $FireKeyBrightPalette
+        CALL @$glow_delay$
+       .ppudo $PPU_SetPalette, $FireKeyDarkPalette
+        CALL @$glow_delay$
 
         TST  @$KeyboardScanner_KeyPresses + 2
         BNE  ShowMenu
 
-        JMP  ShowTitlePic_Loop
+        JMP  @$ShowTitlePic_Loop
     glow_delay$:
-        MOV  $0x6FFF, R0
+        MOV  $0xAFFF, R0
         SOB  R0,.
         RETURN
 
 ShowMenu:
     .ifdef CompileEP2
-        MOV  EventStreamArray_Menu_EP2, R3
+        MOV  $EventStreamArray_Menu_EP2, R3
     .else
-        MOV  EventStreamArray_Menu_EP1, R3
+        MOV  $EventStreamArray_Menu_EP1, R3
     .endif
-        CALL ResetEventStream
-        # CALL Akuyou_CLS
+        .list
+        CALL @$ResetEventStream
 
-       .ppudo_ensure $PPU_PrintAt,$TestStr
-        CALL DrawChibi
-        JMP  .
+        CALL @$CLS
+       .ppudo_ensure $PPU_PrintAt,$MenuText1
+
+        # CALL CallFade # Aku/Level00-Menu.asm:1170
+
+        # TODO: show hiscore value
+        CALL @$Timer_UpdateTimer # Aku/Level00-Menu.asm:1180
+        CALL @$EventStream_Process
+        CALL @$ObjectArray_Redraw
+        .nolist
+
+       # .ppudo_ensure $PPU_PrintAt,$TestStr
+
+        BR   .
+        JMP  @$DrawChibi
 
 DrawChibi:
        .equiv SprDst, FB1+(80*64)
@@ -192,15 +244,18 @@ DrawChibi:
        .endr
         ADD  R1,R5
         SOB  R0,2$
-RETURN
+
+        BR   .
 
 ResetEventStream:
-        MOV  $256*4>>2,R1
-        MOV  $StarArrayPointer,R2
-1$:     CLR  (R2)+
-        CLR  (R2)+
-        SOB  R1,1$
-        MOV  $Event_SavedSettings,R2
+        MOV  $GameVarsArraysSize>>2,R0
+        MOV  $Akuyou_GameVarsStart,R1
+100$:   CLR  (R1)+
+        CLR  (R1)+
+        SOB  R0,100$
+
+        MOV  $Event_SavedSettings,R2  # Saved Settings
+        CALL @$Event_StreamInit
 RETURN
 
 WaitKey: #-------------------------------------------------------------------{{{
@@ -209,7 +264,7 @@ WaitKey: #-------------------------------------------------------------------{{{
         CLR  @$KeyboardScanner_KeyPresses + 2
 #----------------------------------------------------------------------------}}}
 
-MenuPalette: #---------------------------------------------------------------{{{
+TitleScreenPalette: #---------------------------------------------------------------{{{
     .byte 1       #--line number, first line of the main screen area
     .byte 1       #  set colors
     .word 0xCC00  #  colors 011 010 001 000 (YRGB) | br.red   | black   |
@@ -241,26 +296,101 @@ MenuPalette: #---------------------------------------------------------------{{{
     .byte 201     #--line number, 201 - end of the main screen params
     .even
 #----------------------------------------------------------------------------}}}
-AnyKeyNormalPalette: #-------------------------------------------------------{{{
+    # 1 blue      9 br.blue
+    # 2 green     A br.green
+    # 3 cyan      B br.cyan
+    # 4 red       C br.red
+    # 5 magenta   D br.magenta
+    # 6 yellow    E br.yellow
+    # 7 gray      F white
+MenuPalette: #---------------------------------------------------------------{{{
+    .byte 0       #--line number, last line of the top screen area, *required!*
+    .byte 0       #  0 - set cursor/scale/palette, *ignored for the first record*
+    .word 0b10000 #  graphical cursor
+    .word 0b10111 #  320 dots per line, pallete 7
+    .byte 1       #--line number, first line of the main screen area
+    .byte 1       #  set colors
+    .word 0xEE00  #  colors 011 010 001 000 (YRGB)
+    .word 0xFFDD  #  colors 111 110 101 100 (YRGB)
+    .byte 40      #--line number (201 if there is no more parameters)
+    .byte 1       #  set colors
+    .word 0xBB00  #
+    .word 0xFFCC  #
+    .byte 58      #--line number (201 if there is no more parameters)
+    .byte 1       #  set colors
+    .word 0xBB00  #
+    .word 0xFF44  #
+    .byte 67      #--line number (201 if there is no more parameters)
+    .byte 1       #  set colors
+    .word 0xCC00  #
+    .word 0xFF55  #
+    .byte 87      #--line number (201 if there is no more parameters)
+    .byte 1       #  set colors
+    .word 0xBB00  #
+    .word 0xFF55  #
+    .byte 117     #--line number (201 if there is no more parameters)
+    .byte 1       #  set colors
+    .word 0xBB00  #
+    .word 0xFF77  #
+    .byte 120     #--line number (201 if there is no more parameters)
+    .byte 1       #  set colors
+    .word 0x9900  #
+    .word 0xFF77  #
+    .byte 136     #--line number (201 if there is no more parameters)
+    .byte 1       #  set colors
+    .word 0xCC00  #
+    .word 0xAA77  #
+    .byte 190     #--line number, last line of the top screen area, *required!*
+    .byte 0       #  0 - set cursor/scale/palette, *ignored for the first record*
+    .word 0b10000 #  graphical cursor
+    .word 025     #  320 dots per line, pallete 5
+    .byte 191     #--line number (201 if there is no more parameters)
+    .byte 1       #  set colors
+    .word 0xEE00  #
+    .word 0xEE66  #
+    .byte 201     #--line number, 201 - end of the main screen params
+    .even
+#----------------------------------------------------------------------------}}}
+FireKeyBrightPalette: #------------------------------------------------------{{{
+    .byte 185, 1  # starting line 185 setup palette
+    .word 0xFF00
+    .word 0xFFFF
+    .byte 192, -1 # until line 192
+FireKeyNormalPalette:
     .byte 185, 1
     .word 0xCC00
     .word 0xFF44
     .byte 192, -1
-AnyKeyDarkPalette:
+FireKeyDarkPalette:
     .byte 185, 1
     .word 0xEE00
     .word 0xFF66
-    .byte 192, -1
-AnyKeyBlackPalette:
-    .byte 185, 1
-    .word 0xFF00
-    .word 0xFFFF
     .byte 192, -1
 #----------------------------------------------------------------------------}}}
 
 TitleText1: .byte 9,23
             .asciz "Press Fire to Continue"
             .even
+MenuText1:
+                        #0         1         2         3         4
+                        #01234567890123456789012345678901234567890
+    .byte 10,10; .ascii "Hit ESC to set controls"; .byte 0xFF
+
+    .byte 11,12; .ascii "Start Game as Chibiko"  ; .byte 0xFF
+    .byte 11,13; .ascii "Start Game as Bochan "  ; .byte 0xFF
+    .byte 11,14; .ascii "Start 2 Player game"    ; .byte 0xFF
+    .byte 11,15; .ascii "Watch the Intro"        ; .byte 0xFF
+    .byte 11,16; .ascii "Configure Settings "    ; .byte 0xFF
+  .ifdef CompileEP2
+    .byte 11,17; .ascii "Special Content"        ; .byte 0xFF
+    .byte 11,18; .ascii "Credits & Thanks "      ; .byte 0xFF
+  .else
+    .byte 11,17; .ascii "Credits & Thanks "      ; .byte 0xFF
+  .endif
+
+    .byte 10,22; .ascii "www.chibiakumas.com"    ; .byte 0xFF
+
+    .byte  9,24; .ascii "HighScore: "            ; .byte 0x00
 
 TestStr:    .byte 20,10
             .asciz "Test string"

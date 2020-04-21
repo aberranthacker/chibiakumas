@@ -67,6 +67,7 @@ build/core.o : $(common) \
                event_stream.s \
                object_driver.s \
                player_driver.s \
+               screen_memory.s \
                show_sprite.s \
                sfx.s \
                stararray.s \

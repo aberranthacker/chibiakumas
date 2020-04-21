@@ -514,8 +514,9 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 
 SingleProcessFlag: .word 0
-#CGAFont: .incbin "cga8x8b.raw"
-CGAFont: .space 8*2, 0 # whitespace symbol
+#CGAFont: .space 8 # whitespace symbol
+#         .incbin "resources/font.bin"
+CGAFont: .space 8*2 # whitespace symbol
          .incbin "resources/font.bin"
 SYS100:  .word 0174612 # address of default vertical blank interrupt handler
 SYS272:  .word 02270   # address of default scanlines table

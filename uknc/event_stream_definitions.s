@@ -9,23 +9,39 @@
                                                             # evtSettingsBankEXT_Save equ %10110000+15 ;Save ExtraBank settings to bank b1
                                                             # evtSettingsBankEXT_Load equ %10110000;+V ;Load ExtraBank settings from bank V
                                                             #
-# evtMultipleCommands equ %01110000;+V     ;Multiple commands... V commands will follow
-.equiv evtMultipleCommands, 0x0E << 8 # 14
-                                                            #
-.equiv evtMove, 0x10 << 8 # 16
-                                                            # evtSetMoveLife     equ 128 ; Set Move to b1, Set Life to b2
-# evtSetProg         equ 129 ; Set Prog to b1
-.equiv mvProgramSwitch, 0x02
-                                                            # evtSetLife         equ 130 ; set Life to b1
-                                                            # evtSetMove         equ 131 ; set Move to b1
-                                                            # evtSetProgMoveLife equ 132 ; Set prog to b1, Set move to b2, set life to b3
-                                                            # evtSetSprite       equ 133 ; set sprite to b1
-                                                            # evtAddToForeground equ 135 ; Add oject to foreground (back of object array)
-                                                            # evtAddToBackground equ 134 ; Add oject to foreground (back of object array)
-# evtJumpToNewTime   equ 136 ; Change event stream position to w1 , and levetime
-#                            ; to b2... time in b2 must be lower than first event
-#                            ; at w1
-.equiv mvChangeStreamTime, 0x1C # 28
+# evtMultipleCommands equ %01110000 ;+V  ;Multiple commands, V commands will follow
+.equiv evtMultipleCommands, 0x0E << 8 # (0b01110000 >> 4) * 2 = 14
+#-------------------------------------------------------------------------------
+.equiv evtMove, 0x10 << 8 # 128 >> 4 * 2 = 16
+
+# evtSetMoveLife     equ 128+0 ; Set Move to b1, Set Life to b2
+#.equiv mvLife,             0x00 * 2 #  0
+
+# evtSetProg         equ 128+1 ; Set Prog to b1
+#.equiv mvProgramSwitch,    0x01 * 2 #  2
+
+# evtSetLife         equ 128+2 ; set Life to b1
+#.equiv mvSetLife,          0x02 * 2 #  4
+
+# evtSetMove         equ 128+3 ; set Move to b1
+#.equiv mvSetMove,           0x03 * 2 #  6
+
+# evtSetProgMoveLife equ 128+4 ; Set prog to b1, Set move to b2, set life to b3
+.equiv mvSetProgMoveLife,  0x04 * 2 #  8
+
+# evtSetSprite       equ 128+5 ; set sprite to b1
+#.equiv mvSetSprite,        0x05 * 2 # 10
+
+# evtAddToBackground equ 128+6 ; Add oject to background (back of object array)
+#.equiv mvAddRoBackground,  0x06 * 2 # 12
+
+# evtAddToForeground equ 128+7 ; Add oject to foreground (back of object array)
+#.equiv mvAddToForeground,  0x07 * 2 # 14
+
+# evtJumpToNewTime   equ 128+8 ; Change event stream position to w1 , and levetime
+#                              ; to b2... time in b2 must be lower than first event
+#                              ; at w1
+.equiv mvChangeStreamTime, 0x08 * 2 # 16
                                                             # evtCallAddress     equ 137 ; Call a memory address w1... make sure you don't
                                                             #                            ; change any registers (other than A)
                                                             # evtSaveLstObjToAdd equ 138 ; Save the memory position of last added object in
@@ -40,6 +56,7 @@
                                                             #
                                                             # evtStarburt             equ %01000000 ; 0100xxxx X Y   = (64) add stars to X,Y
                                                             #                                       ; (pattern xxxx) - is this ever used???
+#-------------------------------------------------------------------------------
 .equiv evtCoreReprogram, 0x1E << 8 # 30
 # evtReprogramPalette     equ %11110000 ; Reprogram the CPC palette - no effect on
 #                                       ; other systems
@@ -74,10 +91,11 @@
                                                             #
                                                             # evtReprogramSmartBombSpecial      equ %11111111   ;Smart bomb event calls to w1... used by omega array to wipe omega stars
                                                             #
-                                                            # evtSingleSprite equ 0 ; Single sprite... multiple options depending on V
-                                                            #                       ; 0+0        add one object...sprite b1.. at pos (b2,b3)
-                                                            #                       ; 0+1        Add one sprite to pos b1 Far right (sprite predefined)
-                                                            #                       ; 0+(2-13)   add one 24 pixel object far right X=160+24 Y=v*16 -8 (sprite predefined)
+# evtSingleSprite equ 0 ; Single sprite... multiple options depending on V
+#                       ; 0+0        add one object...sprite b1.. at pos (b2,b3)
+#                       ; 0+1        Add one sprite to pos b1 Far right (sprite predefined)
+#                       ; 0+(2-13)   add one 24 pixel object far right X=160+24 Y=v*16 -8 (sprite predefined)
+.equiv evtSingleSprite, 0
                                                             #
                                                             # evtBurstSprite equ 14 ; Add an object to the burst position
                                                             # evtTileSprite  equ 48 ; add  V objects... all on column b1 starting at row b2..
@@ -110,8 +128,11 @@
                                                             # ;     10001000 L H T (136) = Load HL as next event pointer, change time to T
                                                             # ;     10001001 L H   (137) = Call HL
                                                             # ;     10001010 L H   (138) = Load last added object address to address HL
-                                                            # ;     10011111 B = Save to bank B
-                                                            # ;     1001XXXX  Load object settings (Prog, Move,Life,Spritesize,Animator,BG/FG layer) from XXXX bank (0-14 - see above 15 is save command)
+
+# 10011111 B = Save to bank B
+# 1001XXXX Load object settings (Prog, Move, Life, Spritesize, Animator,
+# BG/FG layer) from XXXX bank (0-14 - see above 15 is save command)
+.equiv evtLoadSaveObjSettings, ((0b10010000 >> 4) * 2) << 8 # 18
                                                             # ;       Use this function to create template enemy moves and background object types
                                                             # ;     1010       Unused
                                                             # ;     1011       Unused

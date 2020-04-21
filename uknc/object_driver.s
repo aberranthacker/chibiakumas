@@ -15,22 +15,23 @@
 # P = Object Program (6)
 # R = Resolution     (7) bytes #XXXX1111
 # A = Animator       (8)
-                                                            # ObjectArray_reConfigureForSize:
-                                                            #     or a
-                                                            #     ret z
-                                                            # ObjectArray_ConfigureForSizeB:
-                                                            #     ld (ObjectSpriteSizeCurrent_Plus1-1),a
-                                                            #     ld (SpriteSizeShiftFull_Plus1-1),a
-                                                            #     ld (SpriteSizeShiftFullB_Plus1-1),a
-                                                            #     ld (SpriteSizeShiftFullC_Plus1-1),a
-                                                            #     srl a
+ObjectArray_reConfigureForSize:                             # ObjectArray_reConfigureForSize:
+        TSTB R0                                             #     or a
+        BEQ  ConfigureForSize_Return$                       #     ret z
+ObjectArray_ConfigureForSizeB:                              # ObjectArray_ConfigureForSizeB:
+        BIC  $0xFF00,R0
+        MOV  R0,@$srcObjectSpriteSizeCurrent                #     ld (ObjectSpriteSizeCurrent_Plus1 - 1),a
+        MOV  R0,@$srcSpriteSizeShiftFull                    #     ld (SpriteSizeShiftFull_Plus1 - 1),a
+        MOV  R0,@$srcSpriteSizeShiftFullB                   #     ld (SpriteSizeShiftFullB_Plus1 - 1),a
+        MOV  R0,@$srcSpriteSizeShiftFullC                   #     ld (SpriteSizeShiftFullC_Plus1 - 1),a
+        ASR  R0                                             #     srl a
                                                             #
-                                                            #     ld (SpriteSizeShiftHalfB_Plus1-1),a
-                                                            #     ld (SpriteSizeShiftHalfD_Plus1-1),a
+        MOV  R0,@$srcSpriteSizeShiftHalfB                   #     ld (SpriteSizeShiftHalfB_Plus1 - 1),a
+        MOV  R0,@$srcSpriteSizeShiftHalfD                   #     ld (SpriteSizeShiftHalfD_Plus1 - 1),a
                                                             #
-                                                            #     or %00000011
-                                                            #     ld (SpriteSizeShiftHalfH_Plus1-1),a
-                                                            #
+        BIS  $0b00000011,R0                                 #     or %00000011
+        MOV  R0,@$srcSpriteSizeShiftHalfH                   #     ld (SpriteSizeShiftHalfH_Plus1 - 1),a
+
 ObjectArray_ConfigureForSize:                               # ObjectArray_ConfigureForSize:
         # We update player location in advance for fast collision detection
         # Define player 1's hitbox
@@ -38,7 +39,7 @@ ObjectArray_ConfigureForSize:                               # ObjectArray_Config
         BISB @$P1_P00,R0                                    #     ld a,(P1_P00)   ;PlayerY
         MOV  R0,@$srcPlayerY2                               #     ld (PlayerY2_Plus1 - 1),a
         SUB  (PC)+,R0; srcSpriteSizeShiftFull: .word 24     #     sub 24  :SpriteSizeShiftFull_Plus1
-        BCC  1$                                             #     call C,ZeroA
+        BHIS 1$                                             #     call C,ZeroA
         CLR  R0                                             #     ld (PlayerY1_Plus1 - 1),a
 1$:     MOV  R0,@$srcPlayerY1                               #
                                                             #
@@ -46,7 +47,7 @@ ObjectArray_ConfigureForSize:                               # ObjectArray_Config
         BISB @$P1_P01,R0                                    #     ld a,(P1_P01)   ;PlayerX
         MOV  R0,@$srcPlayerX2                               #     ld (PlayerX2_Plus1 - 1),a
         SUB  (PC)+,R0; srcSpriteSizeShiftHalfB: .word 12    #     sub 12  :SpriteSizeShiftHalfB_Plus1
-        BCC  2$                                             #     call C,ZeroA
+        BHIS 2$                                             #     call C,ZeroA
         CLR  R0                                             #     ld (PlayerX1_Plus1 - 1),a
 2$:     MOV  R0,@$srcPlayerX1                               #
 
@@ -55,7 +56,7 @@ ObjectArray_ConfigureForSize:                               # ObjectArray_Config
         BISB @$P2_P00,R0                                    #     ld a,(P2_P00)   ;PlayerY
         MOV  R0,@$srcPlayer2Y2                              #     ld (Player2Y2_Plus1 - 1),a
         SUB  (PC)+,R0; srcSpriteSizeShiftFullB: .word 24    #     sub 24  :SpriteSizeShiftFullB_Plus1
-        BCC  3$                                             #     call C,ZeroA
+        BHIS 3$                                             #     call C,ZeroA
         CLR  R0                                             #     ld (Player2Y1_Plus1 - 1),a
 3$:     MOV  R0,@$srcPlayer2Y1                              #
                                                             #
@@ -63,10 +64,12 @@ ObjectArray_ConfigureForSize:                               # ObjectArray_Config
         BISB @$P1_P01,R0                                    #     ld a,(P2_P01)   ;PlayerX
         MOV  R0,@$srcPlayer2X2                              #     ld (Player2X2_Plus1 - 1),a
         SUB  (PC)+,R0; srcSpriteSizeShiftHalfD: .word 12    #     sub 12  :SpriteSizeShiftHalfD_Plus1
-        BCC  4$                                             #     call C,ZeroA
+        BHIS 4$                                             #     call C,ZeroA
         CLR  R0                                             #     ld (Player2X1_Plus1 - 1),a
 4$:     MOV  R0,@$srcPlayer2X1                              #
-RETURN                                                      # ret
+
+    ConfigureForSize_Return$:
+        RETURN                                              # ret
                                                             # ZeroA:
                                                             #     xor a
                                                             # ret
@@ -77,33 +80,33 @@ ObjectArray_Redraw:                                         # ObjectArray_Redraw
         BEQ  game_paused$                                   #     ret z   ; see if game is paused (TicksOccurred = 0 )
                                                             #
         CALL ObjectArray_ConfigureForSize                   #     call ObjectArray_ConfigureForSize
-        #?                                                  #
-        MOV  $ObjectArraySize,R1 # uknc/core.s:41           #     ld B,ObjectArraySize ;00ObjectArray_Size_Plus1
-        MOV  $ObjectArrayPointer,R3 # uknc/core.s:48        #     ld hl,ObjectArrayPointer;(ObjectArrayAddress)
+                                                            #
+        MOV  $ObjectArraySize,R4                            #     ld B,ObjectArraySize ;00ObjectArray_Size_Plus1
+        MOV  $ObjectArrayPointer,R5                         #     ld hl,ObjectArrayPointer;(ObjectArrayAddress)
                                                             #
                                                             #     xor a ; Zero
     object_loop$:                                           # Objectloop2:
-        CLR  R0
-        BISB (R3),R0 # Screen Y co-ordinate (one byte),     #     ld c,(hl)   ; Y
-                     # 0 means this object is unused        #     cp c
+        MOV  (R5)+,R1 # Screen Y=LSB co-ordinate (one byte) #     ld c,(hl)   ; Y
+        TSTB R1       # 0 means this object is unused       #     cp c
         BNE  object_present$                                #     jr NZ,Objectloop_NotZero ;if object Y =0 the object is dead
-                                                            # ObjectArray_Turbo:
-        INC  R3                                             #     inc l
-        SOB  R1,object_loop$                                #     djnz Objectloop2
+
+ObjectArray_Turbo:                                          # ObjectArray_Turbo:
+        ADD  $6,R5                                          #     inc l
+        SOB  R4,object_loop$                                #     djnz Objectloop2
     game_paused$:                                           #
         RETURN                                              #     ret
                                                             #
     object_present$:                                        # Objectloop_NotZero:
-                                                            #     ld a,c
-        MOV  R0,@$srcSprShow_Y # uknc/show_sprite.s:193     #     ld (SprShow_Y),a
-        PUSH R1                                             #     push bc
-        PUSH R3                                             #     push hl
-                                                            #     ;1
-                                                            #         inc h
-                                                            #         ld a,(hl) ; X
+        PUSH R4                                             #     ld a,c
+        PUSH R5                                             #     ld (SprShow_Y),a
+                                                            #     push bc
+                                                            #     push hl
+        MOVB R1,@$srcSprShow_Y # Y                          #     ;1
+        SWAB R1                                             #         inc h
+        MOVB R1,@$srcSprShow_X # X                          #         ld a,(hl) ; X
                                                             #         ld (SprShow_X),a
                                                             #         ld b,a
-                                                            #     ;2
+        MOV  (R5)+,R2 # Move=LSB, Sprite=MSB                #     ;2
                                                             #         inc h
                                                             #         ld a,(hl) ; Move
                                                             #         ld ixh,a
@@ -113,7 +116,7 @@ ObjectArray_Redraw:                                         # ObjectArray_Redraw
                                                             #         ld iyh,a
                                                             #
                                                             #         set 6,l ;Flip to the second half
-                                                            #     ;4  ---
+        MOV  (R5)+,R3 # R3 Life=LSB, Program=MSB            #     ;4  ---
                                                             #         ld a,(hl) ; Life etc
                                                             #         ld ixl,a
                                                             #     ;5
@@ -122,40 +125,40 @@ ObjectArray_Redraw:                                         # ObjectArray_Redraw
                                                             #         ld iyl,a
                                                             #     ;6
                                                             #         dec h
-                                                            #         ld a,(hl) ; Sprite Size
-                                                            #         cp 0    :ObjectSpriteSizeCurrent_Plus1
-                                                            #         call nz,ObjectArray_reConfigureForSize      ;Code to change sprite size!
+        MOV  (R5),R4 # Sprite Size=LSB, Animator=MSB        #         ld a,(hl) ; Sprite Size
+        MOV  R4,R0 # ObjectArray_reConfigureForSize expects value in R0
+        CMPB (PC)+,R4; srcObjectSpriteSizeCurrent: .word 0  #         cp 0    :ObjectSpriteSizeCurrent_Plus1
+       .call NE, @$ObjectArray_reConfigureForSize           #         call nz,ObjectArray_reConfigureForSize      ;Code to change sprite size!
                                                             #     ;7
-                                                            #         dec h
-                                                            #         ld a,(hl) ; animator
+        SWAB R4                                             #         dec h
+        TSTB R4                                             #         ld a,(hl) ; animator
                                                             #         or a
-                                                            #         call nz,ObjectAnimator
+       .call NE, @$ObjectAnimator                           #         call nz,ObjectAnimator
                                                             #
+        SWAB R2                                             #         ld a,iyh
+        MOV  R2,R0
+        BIC  $0xFFC0,R0                                     #         and %00111111
+        MOV  R0,@$srcSprShow_SprNum                         #         ld (SprShow_SprNum),a
                                                             #         ld a,iyh
-                                                            #         and %00111111
-                                                            #         ld (SprShow_SprNum),a
-                                                            #         ld a,iyh
-                                                            #         and %11000000
-                                                            #         jr z,Objectloop_OneFrameSprite
-                                                            #         bit 6,a
-                                                            #
-                                                            #         ld a,(Timer_CurrentTick)
-                                                            #         jr z,Objectloop_TwoFrameSprite
+        BIT  $0xC0,R2                                       #         and %11000000
+        BEQ  Objectloop_SpriteBankSet$ # one frame sprite   #         jr z,Objectloop_SpriteBankSet
+        BIT  $0x40,R2                                       #         bit 6,a
+        BEQ  Objectloop_TwoFrameSprite$                     #         jr z,Objectloop_TwoFrameSprite
+
                                                             #         ;if we got here it's a FourFrameSprite
-                                                            #
                                                             #         and %00000011
                                                             #         jr Objectloop_SpriteBankSet
-                                                            # Objectloop_OneFrameSprite:
-                                                            #         xor a
-                                                            #         jr Objectloop_SpriteBankSet
-                                                            # Objectloop_TwoFrameSprite:
+
+Objectloop_TwoFrameSprite$:                                 # Objectloop_TwoFrameSprite:
+        HALT                                                #         ld a,(Timer_CurrentTick)
                                                             #         cpl
                                                             #         and %00000010
                                                             #
-                                                            # Objectloop_SpriteBankSet:
-                                                            #     ld a,ixl
+Objectloop_SpriteBankSet$:                                  # Objectloop_SpriteBankSet:
+        # Life BPxxxxx B=hurt by bullets, P=hurts player, xxxxxx = hit points (if not B then ages over time)
+        BIT  0x40,R3 # R3 Life=LSB, Program=MSB             #     ld a,ixl
                                                             #     bit 6,a
-                                                            #     jr z,ObjectLoopBothPlayerSkip   ; Doesn't hurt player
+        BZE  ObjectLoopBothPlayerSkip                       #     jr z,ObjectLoopBothPlayerSkip ; Doesn't hurt player
                                                             #
                                                             #     ;used to modify this, but now we assume the player is alway vunurable
                                                             #     ; we check anyway before deducting a life
@@ -221,14 +224,14 @@ ObjectArray_Redraw:                                         # ObjectArray_Redraw
                                                             #             jr z,ObjectLoop_SaveChanges
                                                             #
                                                             # ObjectLoopP2Skip:
-                                                            # ObjectLoopBothPlayerSkip:
-                                                            #     ;if the object is dead, there is no point checking if its shot
+ObjectLoopBothPlayerSkip:                                   # ObjectLoopBothPlayerSkip:
+# when the object is dead, there is no point checking if its shot
                                                             #
-                                                            #     ; Life BPxxxxx      B=hurt by bullets, P=hurts player, xxxxxx = hit points (if not B then ages over time)
-                                                            #
-                                                            #     ld a,ixl
+# Life BPxxxxx B=hurt by bullets, P=hurts player,
+#        xxxxx = hit points (if not B then ages over time)
+        TSTB R3 # R3 Life=LSB, Program=MSB                  #     ld a,ixl
                                                             #     or a
-                                                            #     jr z,ObjectLoopP1StarSkip   ; immortal object (background)
+        BEQ  ObjectLoopP1StarSkip                           #     jr z,ObjectLoopP1StarSkip   ; immortal object (background)
                                                             #     bit 7,a
                                                             #     jr nz,ObjectLoop_AgelessIXLCheck    ; If it can be shot, it doesn't auto age
                                                             #
@@ -253,13 +256,13 @@ ObjectArray_Redraw:                                         # ObjectArray_Redraw
                                                             #     ld a,b
                                                             #     ;sub 6  ;SpriteSizeShiftQuarterC_Plus1
                                                             #     ld (ObjectHitXA_Plus1-1),a
-                                                            #     add 12  :SpriteSizeShiftHalfH_Plus1
+        ADD  (PC)+,R0; srcSpriteSizeShiftHalfH: .word 12    #     add 12  :SpriteSizeShiftHalfH_Plus1
                                                             #     ld (ObjectHitXB_Plus1-1),a
                                                             #
                                                             #     ld a,c
                                                             #     ;sub 12 ;SpriteSizeShiftHalfG_Plus1
                                                             #     ld (ObjectHitYA_Plus1-1),a
-                                                            #     add 24  :SpriteSizeShiftFullC_Plus1
+        ADD  (PC)+,R0; srcSpriteSizeShiftFullC: .word 24    #     add 24  :SpriteSizeShiftFullC_Plus1
                                                             #     ld (ObjectHitYB_Plus1-1),a
                                                             #
                                                             #     ifdef Debug
@@ -304,7 +307,7 @@ ObjectArray_Redraw:                                         # ObjectArray_Redraw
                                                             #         inc a
                                                             #         ld (ObjectShotShooter_Plus1-1),a
                                                             #         xor a
-                                                            #         ld (ObjectLoop_IFShot_Plus1-1),a
+        MOV  $0400,@$ObjectLoopP1StarSkip # BR 0            #         ld (ObjectLoop_IFShot_Plus1-1),a
                                                             #         ld (hl),0 ; star hit so lets remove it
                                                             #
                                                             #     ObjectLoop_PlayerStarEnd:
@@ -313,51 +316,51 @@ ObjectArray_Redraw:                                         # ObjectArray_Redraw
                                                             #     pop de
                                                             #     pop bc
                                                             #
-                                                            #     ifdef Debug
+                                                            ##    ifdef Debug
                                                             #         call Debug_ReleaseEXX
-                                                            #     endif
+                                                            ##    endif
                                                             #
-                                                            # ObjectLoopP1StarSkip:
-                                                            #         jr $+10 :ObjectLoop_IFShot_Plus1
-        CALL Object_DecreaseLifeShot; ObjectShotOverride_Plus2: #         call Object_DecreaseLifeShot :ObjectShotOverride_Plus2 ;3 bytes
+ObjectLoopP1StarSkip:                                       # ObjectLoopP1StarSkip:
+        BR   ObjectLoop_NotShot$                            #         jr $+10 :ObjectLoop_IFShot_Plus1 ; 18 08 = JR 8
+        CALL @$Object_DecreaseLifeShot; ObjectShotOverride_Plus2: #   call Object_DecreaseLifeShot :ObjectShotOverride_Plus2 ;3 bytes
        .equiv  dstObjectShotOverride, ObjectShotOverride_Plus2 - 2
        .global dstObjectShotOverride
-                                                            #         ld a,8                           ;2 bytes
-                                                            #         ld (ObjectLoop_IFShot_Plus1-1),a ;3 bytes
+                                                            #         ld a,8                             ;2 bytes
+        MOV  $0405,@$ObjectLoopP1StarSkip                   #         ld (ObjectLoop_IFShot_Plus1 -1 ),a ;3 bytes
                                                             #
-                                                            # ObjectLoop_NotShot:
-                                                            #         ld d,ixh
-        CALL DoMoves; ObjectDoMovesOverride_Plus2:          #         call DoMoves    :ObjectDoMovesOverride_Plus2
+ObjectLoop_NotShot$:                                        # ObjectLoop_NotShot:
+        SWAB R2                                             #         ld d,ixh
+        CALL @$DoMoves; ObjectDoMovesOverride_Plus2:        #         call DoMoves :ObjectDoMovesOverride_Plus2
        .equiv  dstObjectDoMovesOverride, ObjectDoMovesOverride_Plus2 - 2
        .global dstObjectDoMovesOverride
 
                                                             #         ld ixh,d
                                                             #
-                                                            # ObjectLoop_SaveChanges:
+ObjectLoop_SaveChanges$:                                    # ObjectLoop_SaveChanges:
                                                             #         inc h;dec h ;    Animator
                                                             #         inc h;dec h ;    Spritesize never changes
                                                             #
-                                                            #         ld a,iyl
-                                                            #         ld (hl),a ; Program Code
+        # Animator and Spritesize never changes             #         ld a,iyl
+        MOV  R3,-(R5)                                       #         ld (hl),a ; Program Code
                                                             #         inc h ;dec h
                                                             #         ld a,ixl
                                                             #         ld (hl),a ;Life
                                                             #         res 6,l ;dec h
                                                             #         ld a,iyh
-                                                            #         ld (hl),a ;spr
+        MOV  R2,-(R5)                                       #         ld (hl),a ;spr
                                                             #         dec h
                                                             #         ld a,ixh
                                                             #         ld (hl),a ;Move
                                                             #         dec h
-                                                            #         ld (hl),b ;X
+        MOVB R4,-(R5)                                       #         ld (hl),b ;X
                                                             #         dec h
-                                                            #         ld (hl),c ;Y
+        MOVB R1,-(R5)                                       #         ld (hl),c ;Y
                                                             #
                                                             #         ld a,iyl
-                                                            #         or a
-                                                            #         call nz, ObjectProgram
+        BIT  R3,$0xFF00                                     #         or a
+       .call NE,@$ObjectProgram                             #         call nz, ObjectProgram
                                                             #
-                                                            # ObjectLoop_ShowSprite:
+ObjectLoop_ShowSprite:                                      # ObjectLoop_ShowSprite:
                                                             #         ld b,Akuyou_LevelStart_Bank;&C0
                                                             #         ld hl,Akuyou_LevelStart;&4000   ;ObjectSpritePointer_Plus2
                                                             #
@@ -367,14 +370,14 @@ ObjectArray_Redraw:                                         # ObjectArray_Redraw
                                                             # ObjectLoop_ShowSprite_BankSetA:
                                                             #         call BankSwitch_C0_SetCurrent
                                                             #         ld (SprShow_BankAddr),hl
-                                                            #         call ShowSprite
+        CALL @$ShowSprite                                   #         call ShowSprite
                                                             #         call BankSwitch_C0_SetCurrentToC0
                                                             #
                                                             # ObjectArray_Next:
-                                                            #     pop hl
-                                                            #     pop bc
-                                                            #     xor a ; Zero
-                                                            #     jp ObjectArray_Turbo
+        POP  R5                                             #     pop hl
+        POP  R4                                             #     pop bc
+       #CLR  R0                                             #     xor a ; Zero
+        JMP  @$ObjectArray_Turbo                            #     jp ObjectArray_Turbo
                                                             #
                                                             # Animator_VectorArray:
                                                             # defw ObjectAnimator_Update         ; 1
@@ -403,7 +406,8 @@ ObjectArray_Redraw:                                         # ObjectArray_Redraw
                                                             #     call ObjectAnimator_IncreaseTick
                                                             #
                                                             #     exx
-                                                            # ObjectAnimator:
+ObjectAnimator:                                             # ObjectAnimator:
+        HALT
                                                             #     ;our animator is in A
                                                             #     ;format is
                                                             #     ;TTTTAAAA
@@ -589,8 +593,8 @@ ObjectArray_Redraw:                                         # ObjectArray_Redraw
                                                             # ld hl,(Objects_LastAdded_Plus2-2)
                                                             # ret
                                                             #
-                                                            # ObjectProgram:
-                                                            #     ret z       ; return if zero
+ObjectProgram:                                              # ObjectProgram:
+        HALT                                                #     ret z       ; return if zero
                                                             #     cp %00000001
                                                             #     jp z,ObjectProgram_BitShiftSprite   ; Used by background, sprite bank based on X co-ord
                                                             #     and %11111000           ;00000XXX = Powerup
