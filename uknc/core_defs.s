@@ -1,3 +1,5 @@
+.equiv ShowLoadingScreen, 1
+
 .equiv PPU_UserRamStart, 0x27B6 # 023666 10166
 .equiv PPU_UserRamSize,  0x5844 # 054104 22596
 .equiv PPU_UserRamSizeWords, PPU_UserRamSize >> 1 # 0x2C22 026042 11298
@@ -5,8 +7,8 @@
 .equiv PPU_PPUCommandArg, PPUCommandArg >> 1
 
 .equiv FB0, 384 # 0600 0x0180
-.equiv FB_gap_start, FB0 + 16000
-.equiv FB1, FB_gap_start + 384
+.equiv FB_gap, FB0 + 16000
+.equiv FB1, FB_gap + 384
 
 .equiv PPU_NOP,            1
 .equiv PPU_Finalize,       2
@@ -24,7 +26,7 @@
 .equiv PlayerStarArraySize, 128
 .equiv GameVarsArraysSize, StarArraySize * 4 + ObjectArraySize * 8 + PlayerStarArraySize * 4 + 15*8
 
-.equiv Akuyou_LevelStart, 0x9380 # 37760 0111600 # auto generated during build
+.equiv Akuyou_LevelStart, 0x9380 # 37760 0111600 # auto-generated during a build
 .equiv LevelSprites, Akuyou_LevelStart + 4
 
 .equiv SPReset,       0157772 # Initial stack pointer

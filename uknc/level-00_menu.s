@@ -175,16 +175,15 @@ LevelInit:
 
         CLR  @$KeyboardScanner_KeyPresses + 2 # call Keys_WaitForRelease
 
-        BR   ShowMenu
-
+.ifdef ShowLoadingScreen
 ShowTitlePic_Loop:
-       .ppudo $PPU_SetPalette, $FireKeyNormalPalette
-        CALL @$glow_delay$
        .ppudo $PPU_SetPalette, $FireKeyDarkPalette
+        CALL @$glow_delay$
+       .ppudo $PPU_SetPalette, $FireKeyNormalPalette
         CALL @$glow_delay$
        .ppudo $PPU_SetPalette, $FireKeyBrightPalette
         CALL @$glow_delay$
-       .ppudo $PPU_SetPalette, $FireKeyDarkPalette
+       .ppudo $PPU_SetPalette, $FireKeyNormalPalette
         CALL @$glow_delay$
 
         TST  @$KeyboardScanner_KeyPresses + 2
@@ -195,6 +194,7 @@ ShowTitlePic_Loop:
         MOV  $0xAFFF, R0
         SOB  R0,.
         RETURN
+.endif
 
 ShowMenu:
     .ifdef CompileEP2
@@ -221,7 +221,7 @@ ShowMenu:
         BR   .
         JMP  @$DrawChibi
 
-DrawChibi:
+DrawChibi: #------------------------------------------------------------------{{{
        .equiv SprDst, FB1+(80*64)
         MOV  $80-6,R1
 
@@ -246,6 +246,7 @@ DrawChibi:
         SOB  R0,2$
 
         BR   .
+#----------------------------------------------------------------------------}}}
 
 ResetEventStream:
         MOV  $GameVarsArraysSize>>2,R0
@@ -285,8 +286,8 @@ TitleScreenPalette: #-----------------------------------------------------------
     .byte 1       #  set colors
     .word 0xCC00  #  | br.red   | black   |
     .word 0xFF44  #  | br.white | red     |
-    .byte 192
-    .byte 1
+    .byte 192     #--line number
+    .byte 1       #  set colors
     .word 0xBB00  #  | br.cyan  | black   |
     .word 0xFF22  #  | br.white | green   |
     .byte 196     #--line number
@@ -296,75 +297,71 @@ TitleScreenPalette: #-----------------------------------------------------------
     .byte 201     #--line number, 201 - end of the main screen params
     .even
 #----------------------------------------------------------------------------}}}
-    # 1 blue      9 br.blue
-    # 2 green     A br.green
-    # 3 cyan      B br.cyan
-    # 4 red       C br.red
-    # 5 magenta   D br.magenta
-    # 6 yellow    E br.yellow
-    # 7 gray      F white
+
+# 9 br.     # A br.     # B br.     # C br.     # D br.     # E br.     # F white
+# 1 blue    # 2 green   # 3 cyan    # 4 red     # 5 magenta # 6 yellow  # 7 gray
 MenuPalette: #---------------------------------------------------------------{{{
-    .byte 0       #--line number, last line of the top screen area, *required!*
-    .byte 0       #  0 - set cursor/scale/palette, *ignored for the first record*
+    .byte 0       #--line number, last line of the top screen area
+    .byte 0       #  0 - set cursor/scale/palette *always 0 for the first record*
     .word 0b10000 #  graphical cursor
     .word 0b10111 #  320 dots per line, pallete 7
     .byte 1       #--line number, first line of the main screen area
     .byte 1       #  set colors
     .word 0xEE00  #  colors 011 010 001 000 (YRGB)
     .word 0xFFDD  #  colors 111 110 101 100 (YRGB)
-    .byte 40      #--line number (201 if there is no more parameters)
+    .byte 40      #--line number
     .byte 1       #  set colors
     .word 0xBB00  #
     .word 0xFFCC  #
-    .byte 58      #--line number (201 if there is no more parameters)
+    .byte 58      #--line number
     .byte 1       #  set colors
     .word 0xBB00  #
     .word 0xFF44  #
-    .byte 67      #--line number (201 if there is no more parameters)
+    .byte 67      #--line number
     .byte 1       #  set colors
     .word 0xCC00  #
     .word 0xFF55  #
-    .byte 87      #--line number (201 if there is no more parameters)
+    .byte 88      #--line number
     .byte 1       #  set colors
     .word 0xBB00  #
     .word 0xFF55  #
-    .byte 117     #--line number (201 if there is no more parameters)
+    .byte 117     #--line number
     .byte 1       #  set colors
     .word 0xBB00  #
     .word 0xFF77  #
-    .byte 120     #--line number (201 if there is no more parameters)
+    .byte 121     #--line number
     .byte 1       #  set colors
     .word 0x9900  #
     .word 0xFF77  #
-    .byte 136     #--line number (201 if there is no more parameters)
+    .byte 137     #--line number
     .byte 1       #  set colors
     .word 0xCC00  #
     .word 0xAA77  #
-    .byte 190     #--line number, last line of the top screen area, *required!*
-    .byte 0       #  0 - set cursor/scale/palette, *ignored for the first record*
+    .byte 190     #--line number
+    .byte 0       #  0 - set cursor/scale/palette
     .word 0b10000 #  graphical cursor
     .word 025     #  320 dots per line, pallete 5
-    .byte 191     #--line number (201 if there is no more parameters)
+    .byte 191     #--line number
     .byte 1       #  set colors
     .word 0xEE00  #
-    .word 0xEE66  #
+    .word 0xFF66  #
     .byte 201     #--line number, 201 - end of the main screen params
     .even
 #----------------------------------------------------------------------------}}}
 FireKeyBrightPalette: #------------------------------------------------------{{{
     .byte 185, 1  # starting line 185 setup palette
-    .word 0xFF00
-    .word 0xFFFF
+    .word 0xEE00
+    .word 0xFF22
     .byte 192, -1 # until line 192
 FireKeyNormalPalette:
     .byte 185, 1
     .word 0xCC00
-    .word 0xFF44
+    .word 0xFF22
     .byte 192, -1
 FireKeyDarkPalette:
     .byte 185, 1
-    .word 0xEE00
-    .word 0xFF66
+    .word 0x4400
+    .word 0xFF22
     .byte 192, -1
 #----------------------------------------------------------------------------}}}
 

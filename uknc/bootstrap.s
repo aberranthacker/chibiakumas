@@ -72,11 +72,12 @@ Bootstrap_StartGame:
        .word PPU_ModuleSizeWords + 1280 # 2.5KB is a space required for SLTAB
 #-------------------------------------------------------------------------------
         # Load loading screen
+     .ifdef ShowLoadingScreen
         MOV  $loading_screen.bin,R0
-       #CALL Bootstrap_LoadDiskFile
-
+        CALL Bootstrap_LoadDiskFile
         # Apply loading screen palette
        .ppudo_ensure $PPU_SetPalette, $LoadingScreenPalette
+     .endif
 
         # Load the game core - this is always in memory
         MOV  $core.bin,R0
@@ -337,7 +338,7 @@ Bootstrap_LoadDiskFile: # ../Aku/BootStrap.asm:2795 -------------------------{{{
 
         MOVB $-1,@$PS.Status
         CLC
-        
+
         MOV  $ParamsAddr,R0 # R0 - pointer to channel's init sequence array
         MOV  $8,R1          # R1 - size of the array, 8 bytes
 1$:     MOVB (R0)+,@$CCH2OD # Send a byte to channel 2

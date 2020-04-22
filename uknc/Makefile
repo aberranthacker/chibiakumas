@@ -79,7 +79,8 @@ build/core.o : $(common) \
 
 build/ppu.o : $(common) \
               ppu.s \
-              resources/font.bin
+              resources/font.raw \
+              resources/cga8x8b.raw
 	$(AS) ppu.s -al -o build/ppu.o
 
 build/level-00_menu.o : $(common) \
@@ -87,10 +88,18 @@ build/level-00_menu.o : $(common) \
                         resources/titletex.spr
 	$(AS) -al level-00_menu.s -o build/level-00_menu.o
 
-#resources/font.bin : ../Aku/Sprites/T07-SC1.SPR
-#	build_tools/spr_cpc_to_uknc.rb ../Aku/Sprites/T07-SC1.SPR --font -o resources/font.bin
-resources/font.bin : ../ResCPC/font.bin
-	build_tools/spr_cpc_to_uknc.rb ../ResCPC/font.bin --font -o resources/font.bin
+#resources/font.raw : ../Aku/Sprites/T07-SC1.SPR \
+#                     build_tools/spr_cpc_to_uknc.rb
+#	build_tools/spr_cpc_to_uknc.rb ../Aku/Sprites/T07-SC1.SPR --font -o resources/font.raw
+
+resources/font.raw : ../ResCPC/font.bin \
+                     build_tools/spr_cpc_to_uknc.rb
+	build_tools/spr_cpc_to_uknc.rb ../ResCPC/font.bin --font -o resources/font.raw
+
+resources/cga8x8b.raw : resources/cga8x8b.bmp.raw \
+                         build_tools/prepare_font.rb
+	ruby build_tools/prepare_font.rb resources/cga8x8b.bmp.raw
+
 resources/titletex.spr : ../Aku/Sprites/TITLETEX.SPR
 	build_tools/spr_cpc_to_uknc.rb ../Aku/Sprites/TITLETEX.SPR -o resources/titletex.spr
 

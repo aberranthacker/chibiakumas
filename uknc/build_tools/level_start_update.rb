@@ -13,6 +13,6 @@ return if addr == defs_addr
 hex = "0x#{addr.to_s(16).upcase.rjust(4, '0')}"
 oct = "0#{addr.to_s(8)}"
 dec = addr
-lines[idx] = ".equiv Akuyou_LevelStart, #{hex} # #{dec} #{oct} # auto generated during build\n"
+lines[idx] = ".equiv Akuyou_LevelStart, #{hex} # #{dec} #{oct} # auto-generated during a build\n"
 
 File.write('core_defs.s', lines.join)

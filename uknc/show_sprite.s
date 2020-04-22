@@ -40,10 +40,12 @@
                                                             #     ld (SprShow_BankAddr),hl
                                                             # ret
                                                             #
-                                                            # ; We can preread a sprite to get the width/height
-                                                            # ; This is used for Direct sprites, and was used by the object loop - the object
-                                                            # ; loop now assumes the sprite is 24x24, this was done to save time as 97% of the time - it is
-ShowSprite_ReadInfo:                                        # ShowSprite_ReadInfo:
+# We can preread a sprite to get the width/height
+# This is used for Direct sprites, and was used by the object loop
+# The object loop now assumes the sprite is 24x24, this was done to save time
+# as 97% of the time - it is
+ShowSprite_ReadInfo: # ------------------------------------------------------{{{
+                                                            # ShowSprite_ReadInfo:
         MOV  (PC)+,R0; srcSprShow_SprNum: .word 0           #     ld a,&0 :SprShow_SprNum_Plus1
                                                             #     ld c,a
                                                             #
@@ -84,12 +86,14 @@ ShowSprite_ReadInfo:                                        # ShowSprite_ReadInf
                                                             #     inc hl
         # leave with Sprbankaddr in R3                      #     ;leave with Sprbankaddr in DE
         # Width in R1, and Xoff in R0                       #     ;Width in B and Xoff in A
-RETURN                                                      # ret
+    SpriteGiveUp$:
+        RETURN                                              # ret
                                                             #
-SpriteGiveUp$:                                              # SpriteGiveUp:
+                                                            # SpriteGiveUp:
                                                             #     pop af ;Forcably quit not just getting info - but showing the sprite
                                                             # ret
-                                                            #
+#----------------------------------------------------------------------------}}}
+
                                                             # ;ShowSpriteDirect is a cruder version of ShowSprite, it does not use the
                                                             # ;'virtual' screen res of (160x200) and cannot do clipping - it was designed for
                                                             # ;the UI objects which never moved and never needed clipping

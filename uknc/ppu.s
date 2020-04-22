@@ -1,7 +1,7 @@
                .nolist
 
                .TITLE Chibi Akumas PPU module
-               .GLOBAL start # make entry point available to linker
+               .GLOBAL start # make the entry point available to a linker
 
                .include "./macros.s"
                .include "./hwdefs.s"
@@ -220,18 +220,21 @@ SLTABInit:      MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
                 CLR  (R0)+           #--address of line 308
                 MOV  R1,(R0)         #--pointer back to record 308
 #----------------------------------------------------------------------------}}}
-Setup:          #------------------------------------------------------------{{{
+Setup: #---------------------------------------------------------------------{{{
                 MOV  @$0100, @$SYS100
                 MOV  $VblankIntHandler,@$0100
 
                 MOV  @$0300, @$SYS300
                 MOV  $KeyboardIntHadler,@$0300
 
+                MOV  $0b001,@$PBPMSK  # disable writes to bitplane 0
+
                 MOV  @$0272, @$SYS272 # store address of system SLTAB (186; 0xBA)
                 MOV  $SLTAB, @$0272   # use our SLTAB
 
                 MOV  $PGM, @$07124    # add PGM to PPU's processes table
                 MOV  $1, @$07100      # add PGM to PPU's processes execution table
+
                 RETURN                # end of the init subroutine
 #----------------------------------------------------------------------------}}}
 PGM: #--------------------------------------------------------------------------
@@ -241,7 +244,7 @@ ShortLoop:      MOV  $PPU_PPUCommand, @$PBPADR
                 MOV  @$PBP12D,R0
                 ASL  R0 # multiply by 2 to calculate word offset
                 JMP  @JMPTable(R0)
-JMPTable:      .word EventLoop
+JMPTable:      .word EventLoop            # do nothing
                .word CommandExecuted      # PPU_NOP
                .word Teardown             # PPU_Finalize
                .word SetSingleProcessFlag # PPU_SingleProcess
@@ -253,7 +256,7 @@ JMPTable:      .word EventLoop
 CommandExecuted: #-----------------------------------------------------------{{{
                 MOV  $PPU_PPUCommand, @$PBPADR
                 CLR  @$PBP12D        # inform CPU's program that we are done
-EventLoop:      TST  @$SingleProcessFlag
+EventLoop:      TST  (PC)+; SingleProcessFlag: .word 0
                 BNE  ShortLoop       # non-zero, flag is set, loop
 
                 MOV  $PGM, @$07124   # add to processes table
@@ -342,9 +345,9 @@ PrintAt: #-------------------------------------------------------------------{{{
                 ROR  R0
                 MOV  R0,(R5)
                 MOV  (R4),R0
-                MOVB R0,@$CurrentChar
+                MOVB R0,@$srcCurrentChar
                 SWAB R0
-                MOVB R0,@$CurrentLine
+                MOVB R0,@$srcCurrentLine
                 BR   Print
 #----------------------------------------------------------------------------}}}
 Print: #---------------------------------------------------------------------{{{
@@ -353,15 +356,16 @@ Print: #---------------------------------------------------------------------{{{
                .equiv CharHeight, 8
                .equiv CharLineSize, LineWidth * CharHeight
                .equiv FbStart, FB1 >> 1
-               .equiv BPDataReg, PBP12D
-               .equiv Font, CGAFont - (32 * 8 * 2)
+               .equiv Font, FontBitmap - (32 * 8)
+               .equiv BPDataReg, DTSOCT
 
+                MOV  $01<<1,@$DTSCOL # foreground color
                 MOV  $LineWidth,R2
                 MOV  $StrBuffer,R3
                 MOV  $PBP12D,R4
                 MOV  $PBPADR,R5
 
-                MOV  $PPU_PPUCommandArg, (R5) # load address register
+                MOV  $PPU_PPUCommandArg, (R5) # setup address register
                 MOV  (R4),R0  # get address of a string from CPU RAM
                 CLC
                 ROR  R0       # divide it by 2 to calculate bitplane address
@@ -380,11 +384,11 @@ LoadNext2Bytes: MOV  (R4),R0  # load 2 bytes from CPU RAM
                 BR   LoadNext2Bytes
 
 2$:             INC  (R5)
-                MOV  (R5),@$NextStringAddr
+                MOV  (R5),@$srcNextStringAddr
 
-3$:             MOV  @$CurrentLine,R1 # prepare to calculate relative char address
+3$:             MOV  @$srcCurrentLine,R1         # prepare to calculate relative char address
                 MUL  $CharLineSize,R1 # calculate relative address of the line
-                ADD  @$CurrentChar,R1 # calculate relative address of the char
+                ADD  @$srcCurrentChar,R1         # calculate relative address of the char
                 ADD  $FbStart,R1      # calculate absolute address of the next char
 
                 MOV  $StrBuffer,R3
@@ -398,45 +402,43 @@ NextChar:       MOV  R1,(R5)      # load address of the next char into address r
                 CMPB $'\n, R0     # new line?
                 BEQ  NewLine      #
 
-Draw:           ASH  $4,R0        # shift left by 4(multiply by 16)
+                ASH  $3,R0        # shift left by 3(multiply by 8)
                 ADD  $Font,R0     # calculate char bitmap address
 
                .rept 8
-                MOV  (R0)+,(R4) #
+                MOVB (R0)+,(R4) #
                 ADD  R2,(R5)    # advance the address register to the next line
                .endr
 
                 INC  R1
-                INC  @$CurrentChar
-                CMP  @$CurrentChar,R2 # end of screen line? (R2 == 40)
+                INC  (PC)+; srcCurrentChar: .word 0
+                CMP  @$srcCurrentChar,R2 # end of screen line? (R2 == 40)
                 BNE  NextChar         # no, print another character
-NewLine:        CLR  @$CurrentChar
-                INC  @$CurrentLine
-                CMP  @$CurrentLine,$TextLinesCount # next line out of screen?
+NewLine:        CLR  @$srcCurrentChar
+                INC  (PC)+; srcCurrentLine: .word 0
+                CMP  @$srcCurrentLine,$TextLinesCount # next line out of screen?
                 BNE  Recalculate      # no, recalculate screen address
-                CLR  @$CurrentLine    # yes, print from the beginning
+                CLR  @$srcCurrentLine    # yes, print from the beginning
 
-Recalculate:    MOV  @$CurrentLine,R1 #
+Recalculate:    MOV  @$srcCurrentLine,R1 #
                 MUL  $CharLineSize,R1 # calculate relative line address
-                ADD  @$CurrentChar,R1 # calculate relative char dst address
+                ADD  @$srcCurrentChar,R1 # calculate relative char dst address
                 ADD  $FbStart,R1      # calculate screen address of the next char
                 MOV  R1,(R5)          # load screen address of the next char to address register
                 BR   NextChar
 
 NextString:     MOV  $StrBuffer,R3
-                MOV  @$NextStringAddr,(R5)
+                MOV  (PC)+,(R5); srcNextStringAddr: .word 0
+                MOV  $PBP12D,R4
                 MOV  (R4),R0
-                MOVB R0,@$CurrentChar
+                MOVB R0,@$srcCurrentChar
                 SWAB R0
-                MOVB R0,@$CurrentLine
+                MOVB R0,@$srcCurrentLine
                 INC  (R5)
                 BR   LoadNext2Bytes
 
-DonePrinting:   JMP  CommandExecuted
+DonePrinting:   JMP  @$CommandExecuted
 
-CurrentLine:    .word 0
-CurrentChar:    .word 0
-NextStringAddr: .word 0
 StrBuffer:      .space 160
 #----------------------------------------------------------------------------}}}
 
@@ -513,16 +515,16 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         RTI
 #----------------------------------------------------------------------------}}}
 
-SingleProcessFlag: .word 0
-#CGAFont: .space 8 # whitespace symbol
-#         .incbin "resources/font.bin"
-CGAFont: .space 8*2 # whitespace symbol
-         .incbin "resources/font.bin"
+FontBitmap: .space 8 # whitespace symbol
+            .incbin "resources/font.raw"
+# FontBitmap: .incbin "resources/cga8x8b.raw"
+
 SYS100:  .word 0174612 # address of default vertical blank interrupt handler
 SYS272:  .word 02270   # address of default scanlines table
-SYS300:  .word 0175412 # address of default keyboard interrupt hadler
-FBSLTAB: .word 0       # adrress of main screen SLTAB
+SYS300:  .word 0175412 # address of default keyboard interrupt handler
 
-         .balign 8 # scan-lines parameters table, it has to be aligned at 4 words
+FBSLTAB: .word 0       # adrress of main screen SLTAB
+         .balign 4*2   # scan-lines parameters table, it has to be aligned at 4 words
 SLTAB:   # space for the SLTAB must be reserved when allocating PPU memory
+         .space 2*2    # .balign has no effect without this
 end:

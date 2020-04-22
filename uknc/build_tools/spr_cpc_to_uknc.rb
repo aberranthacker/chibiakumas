@@ -88,6 +88,8 @@ header.each do |rec|
   new_file << values.pack('CCCCv')
 end
 
+new_file = '' if options.font
+
 header.each do |md|
   print "i: #{md[:idx].to_s.rjust(3, '0')} "
   print "h: #{md[:height].to_s.rjust(3, '0')} "
@@ -102,11 +104,15 @@ header.each do |md|
     md[:y_offset].times { uknc_sprite << 0 }
     uknc_sprite += transform(sprite)
     (8 - md[:height] - md[:y_offset]).times { uknc_sprite << 0 }
+
+    bytes = uknc_sprite.map { |word| (word & 0xFF) | (word >> 8) }
+
+    new_file << bytes.pack('C*')
   else
     uknc_sprite = transform(sprite)
-  end
 
-  new_file << uknc_sprite.pack('v*')
+    new_file << uknc_sprite.pack('v*')
+  end
 end
 
 File.binwrite(options.out_filename, new_file)

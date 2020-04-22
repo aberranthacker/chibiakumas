@@ -1,6 +1,6 @@
 require_relative 'reverse_tables'
 
-bmp = File.binread('./cga8x8b.bmp.raw').bytes.reverse
+bmp = File.binread('./resources/cga8x8b.bmp.raw').bytes.reverse
 
 (0...bmp.length).step(32).each do |idx|
   line = bmp[idx,32].reverse
@@ -16,5 +16,5 @@ font = []
   end
 end
 
-File.binwrite('./cga8x8b.raw', font.join)
+File.binwrite('./resources/cga8x8b.raw', font.join)
 
