@@ -344,32 +344,9 @@ ShowSprite_SkipChanges:                                     # ShowSprite_SkipCha
                                                             #
         JMP  @(PC)+; jmpShowSprite_Ready_Return: .word SprDrawLnStartBegin #     jp SprDrawLnStartBegin :ShowSprite_Ready_Return_Plus2
                                                             #
-SprDrawChooseRenderLineDoubler:                             # SprDrawChooseRenderLineDoubler:
-        HALT                                                #     rlc c
-                                                            #     ld de,Sprdraw24PxVer_Double
-                                                            #     jp SprDrawTurboPrep
-                                                            #
-SprDrawChooseRender:                                        # SprDrawChooseRender:    ; Pick the render based on width
-        MOV  @$srcSprShow_TempW,R0                          #     ld a,(SprShow_TempW)
-        CMP  R0,$6                                          #     cp 6
-        BEQ  SprDraw24pxInit                                #     jp z,SprDraw24pxInit
-                                                            #     cp 8
-                                                            #     jr z,SprDraw32pxInit
-                                                            #     cp 4
-                                                            #     jr z,SprDraw16pxInit
-                                                            #     cp 2
-                                                            #     jr z,SprDraw8pxInit
-                                                            #     cp 12
-                                                            #     jr z,SprDraw48pxInit
-                                                            #     cp 10
-                                                            #     jr z,SprDraw40pxInit
-                                                            #     cp 24
-                                                            #     jr z,SprDraw96pxInit
-                                                            #     cp 18
-                                                            #     jr z,SprDraw72pxInit
                                                             #
 # This is our most basic render, its slow, but can do any size and clipping                                                           # SprDrawLnStartBegin:            ; This is our most basic render, its slow, but can do any size and clipping
-SprDrawLnStartBegin:
+SprDrawLnStartBegin: #------------------------------------------------------{{{
         HALT                                                #
                                                             # SprDrawLnStartBeginB:
                                                             #     ld a,(TranspBitA_Plus1-1)
@@ -433,25 +410,52 @@ SprDrawLnStartBegin:
                                                             #     jr SprDrawLnStart2
                                                             #
                                                             # SprDrawLineEnd2:
+#----------------------------------------------------------------------------}}}
+# SprDrawChooseRender: turbo version ----------------------------------------{{{
+SprDrawChooseRenderLineDoubler:                             # SprDrawChooseRenderLineDoubler:
+        HALT                                                #     rlc c
+                                                            #     ld de,Sprdraw24PxVer_Double
+                                                            #     jp SprDrawTurboPrep
+SprDrawChooseRender:                                        # SprDrawChooseRender:    ; Pick the render based on width
+        MOV  @$srcSprShow_TempW,R0                          #     ld a,(SprShow_TempW)
+        CMP  R0,$6                                          #     cp 6
+        BEQ  SprDraw24pxInit$                               #     jp z,SprDraw24pxInit
+                                                            #     cp 8
+                                                            #     jr z,SprDraw32pxInit
+                                                            #     cp 4
+                                                            #     jr z,SprDraw16pxInit
+                                                            #     cp 2
+                                                            #     jr z,SprDraw8pxInit
+                                                            #     cp 12
+                                                            #     jr z,SprDraw48pxInit
+                                                            #     cp 10
+                                                            #     jr z,SprDraw40pxInit
+                                                            #     cp 24
+                                                            #     jr z,SprDraw96pxInit
+                                                            #     cp 18
+                                                            #     jr z,SprDraw72pxInit
                                                             #
-# ;--------------------Turbo Version! misuse the stack for faster writes ----------------
+
                                                             # SprDraw8pxInit:
                                                             #     ld de,Sprdraw8PxVer
                                                             #     jp SprDrawTurboPrep
                                                             # SprDraw16pxInit:
                                                             #     ld de,Sprdraw16PxVer
                                                             #     jp SprDrawTurboPrep
+    SprDraw24pxInit$:                                       # SprDraw24pxInit:
+        # Set A to ZERO / Transp byte
+        MOV  (PC)+,R0; srcTranspBitA: .word 0
+        MOV  $80-6,R1
+        MOV  $Sprdraw24PxVer$,R3                            #     ld de,Sprdraw24PxVer
+        JMP  (R3)                                           #     jp SprDrawTurboPrep
                                                             # SprDraw32pxInit:
                                                             #     ld de,Sprdraw32PxVer
                                                             #     jp SprDrawTurboPrep
-                                                            # SprDraw48pxInit:
-                                                            #     ld de,Sprdraw48PxVer
-                                                            #     jp SprDrawTurboPrep
-SprDraw24pxInit:                                            # SprDraw24pxInit:
-        MOV  $Sprdraw24PxVer,R3                             #     ld de,Sprdraw24PxVer
-        BR   SprDrawTurboPrep                               #     jp SprDrawTurboPrep
                                                             # SprDraw40pxInit:
                                                             #     ld de,Sprdraw40PxVer
+                                                            #     jp SprDrawTurboPrep
+                                                            # SprDraw48pxInit:
+                                                            #     ld de,Sprdraw48PxVer
                                                             #     jp SprDrawTurboPrep
                                                             # SprDraw72pxInit:
                                                             #     ld de,Sprdraw72PxVer
@@ -460,34 +464,10 @@ SprDraw24pxInit:                                            # SprDraw24pxInit:
                                                             #     ld de,Sprdraw96PxVer
                                                             #     jr SprDrawTurboPrep
                                                             #
-SprDrawTurboPrep:                                           # SprDrawTurboPrep:
-        MOV  R3,@$dstSprdraw24PxJumpPos                     #     ld (Sprdraw24PxJumpPos_Plus2 - 2),de
-                                                            #
-                                                            # SprDrawTurboPrep2:
-                                                            #*ifndef AdvancedInterrupts
-                                                            #     di
-                                                            #     ld (SprDrawTurbo_StackRestore_Plus2-2),sp
-                                                            #     ld sp,iy
-                                                            #*else
-                                                            #     di
-                                                            #     ld (SprDrawTurbo_StackRestore_Plus2-2),sp
-                                                            #     ld sp,iy
-                                                            #     dec sp ;Preload DE in case an interrupt read occurs before we start!
-                                                            #     dec sp
-                                                            #     pop de
-                                                            #     ei
-                                                            #*endif
-                                                            #
-    SprDrawTurbo_StartLine$:                                # SprDrawTurbo_StartLine:
-        MOV  R5,@$srcSprDrawTurbo_HLrestore                 #     ld (SprDrawTurbo_HLrestore_Plus2 - 2),hl
-        # Set A to ZERO / Transp byte                       #
-        MOV  (PC)+,R0; srcTranspBitA: .word 0               #         Ld a,0  :TranspBitA_Plus1 ; Set A to ZERO / Transp byte
-                                                            #         ; we change the jump here to alter the width of the sprite quickly
-        JMP  @(PC)+; dstSprdraw24PxJumpPos: .word Sprdraw24PxVer #    jp  Sprdraw24PxVer :Sprdraw24PxJumpPos_Plus2
-                                                            #
-                                                            #         ; ********** A MUST BE the transparent byte for THIS WHOLE LOOP! ***********
-                                                            #
-# {{{
+
+        # ********** A MUST BE the transparent byte for THIS WHOLE LOOP! ***********
+
+# draw chain {{{
                                                             # Sprdraw24PxVer_Double:  ;Line doubler - does two nextlines each time
                                                             #         bit 0,C
                                                             #         jp z,SprDrawTurbo_LineSkip
@@ -621,7 +601,7 @@ SprDrawTurboPrep:                                           # SprDrawTurboPrep:
                                                             #         SprDraw24pxW_SkipB:
                                                             #         inc hl
                                                             #
-Sprdraw24PxVer:                                             # Sprdraw24PxVer:
+    Sprdraw24PxVer$:                                        # Sprdraw24PxVer:
         MOV  (R4)+,(R5)+                                    #         pop de
                                                             #         cp e
                                                             #         jr z,SprDraw24pxW_Skip1
@@ -668,47 +648,12 @@ Sprdraw24PxVer:                                             # Sprdraw24PxVer:
         DEC  R2                                             #     dec c
         BZE  SprDrawTurbo_Done$                             #     jr z,SprDrawTurbo_Done
                                                             #
-        MOV  (PC)+,R5; srcSprDrawTurbo_HLrestore: .word 0x4180 #     ld hl,&6969 :SprDrawTurbo_HLrestore_Plus2
-        ADD  $80,R5                                         #     ld a,h
-                                                            #     add a,&08
-                                                            #     ld h,a
-                                                            # TurboScreenLoopCheck_Minus1:
-                                                            #     bit 7,h
-                                                            #
-                                                            # SprDrawTurbo_AllowInterrupts:   ; We need to allow interrupts every few lines to keep the raster colors consistant
-                                                            # ifdef AdvancedInterrupts
-                                                            #     jp nz,SprDrawTurbo_StartLine
-                                                            # SprDrawTurbo_AllowInterruptsB:
-                                                            #         ld (SPAdv_DERest_Plus2-2),bc
-                                                            #         ld bc,&c050
-                                                            #         add hl,bc
-                                                            #         ld bc,&0000 :SPAdv_DERest_Plus2
-                                                            #     jp SprDrawTurbo_StartLine
-                                                            # else
-                                                            #     jp nz,SprDrawTurbo_AllowInterrupts
-                                                            # SprDrawTurbo_AllowInterruptsB:
-                                                            #     ld de,&c050
-                                                            #     add hl,de
-                                                            #     ld a,c
-                                                            #     and %00000011
-                                                            #     jp nz,SprDrawTurbo_StartLine
-                                                            #
-                                                            #     ld (SprDrawTurbo_StackRestoreSprite_Plus2-2),sp
-                                                            #     ei
-                                                            #     ld sp,&6969 :SprDrawTurbo_StackRestore_Plus2
-                                                            #     di
-                                                            #     ld sp,&6969 :SprDrawTurbo_StackRestoreSprite_Plus2
-        JMP @$SprDrawTurbo_StartLine$                       #     jp SprDrawTurbo_StartLine
-                                                            # endif
-                                                            #
-    SprDrawTurbo_Done$:                                     # SprDrawTurbo_Done:
-                                                            # ifndef AdvancedInterrupts
-                                                            #     ld sp,(SprDrawTurbo_StackRestore_Plus2-2)
-                                                            #     ei
-                                                            # else
-                                                            #     ld sp,&6969 :SprDrawTurbo_StackRestore_Plus2
-                                                            # endif
-RETURN                                                      #     ret
+        ADD  R1,R5
+        JMP  (R3)
+
+    SprDrawTurbo_Done$:
+        RETURN
+#----------------------------------------------------------------------------}}}
                                                             #
                                                             # ;--------------------Pset Version! no transparentcy, so fast! ----------------
 SprDrawChooseRenderLineDoublerPset:                         # SprDrawChooseRenderLineDoublerPset:
