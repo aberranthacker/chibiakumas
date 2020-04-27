@@ -242,6 +242,10 @@ PGM: #--------------------------------------------------------------------------
                                # function correctly
 ShortLoop:      MOV  $PPU_PPUCommand, @$PBPADR
                 MOV  @$PBP12D,R0
+            .ifdef DebugMode
+                CMP  R0,$8
+                BHIS .
+            .endif
                 ASL  R0 # multiply by 2 to calculate word offset
                 JMP  @JMPTable(R0)
 JMPTable:      .word EventLoop            # do nothing
@@ -446,12 +450,11 @@ VblankIntHandler: #----------------------------------------------------------{{{
         # we do not need firmware interrupt handler except for this small
         # procedure
         TST  @$07130 # is floppy drive spindle rotating?
-        BEQ  1$      # no
+        BZE  1237$   # no
         DEC  @$07130 # decrease spindle rotation counter
-        BNE  1$      # continue rotation unless the counter reaches zero
+        BNZ  1237$   # continue rotation unless the counter reaches zero
         CALL @07132  # stop floppy drive spindle
-1$:
-
+1237$:
         RTI
 #----------------------------------------------------------------------------}}}
 KeyboardIntHadler: #---------------------------------------------------------{{{
@@ -502,16 +505,25 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
 # |  077 | Ю / @   |          | 0176 | О / } |           |
 # | 0105 | HP      | Shift    | 0177 | 9 / ) |           |
 # ----------------------------------------------------------------------------}}}
-        PUSH R0
+        # F, Y, Spc, Arrows, Crtl - Pause
+#      654 3210
+# F    010 0111
+# Y    011 1000
+# Spc  100 1011
+# Ctrl 110 1010
+# ←    100 1110
+# →    101 1011
+# ↓    101 1100
+# ↑    110 1100
+        MOV  @$PBPADR,-(SP)
         MOV  $PPU_KeyboardScanner_KeyPresses,@$PBPADR
-        MOVB @$KBDATA,R0
+        MOVB @$KBDATA,@$PBP12D
         BMI  1237$
 
-        MOVB R0,@$PBP12D
         INC  @$PBPADR
         MOV  $1,@$PBP12D
-
-1237$:  POP  R0
+1237$:
+        MOV  (SP)+,@$PBPADR
         RTI
 #----------------------------------------------------------------------------}}}
 
