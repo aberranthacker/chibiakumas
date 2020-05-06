@@ -161,12 +161,12 @@ PauseLoop:
 LevelInit:
         MTPS $PR0 # enable interrupts
 
-        MOV  $EventStreamArray_Ep1,R3 # Event Stream
-        MOV  $Event_SavedSettings,R2  # Saved Settings
+        MOV  $EventStreamArray_Ep1,R5 # Event Stream
+        MOV  $Event_SavedSettings,R3  # Saved Settings
         CALL @$Event_StreamInit
 
-        MOV  $EventStreamArray_Ep1,R3 # Event Stream
-        MOV  $Event_SavedSettings,R2  # Saved Settings
+        MOV  $EventStreamArray_Ep1,R5 # Event Stream
+        MOV  $Event_SavedSettings,R3  # Saved Settings
         CALL @$ResetEventStream
 
        .ppudo_ensure $PPU_PrintAt,$PressFireKeyStr # Aku/Level00-Menu.asm:1101
@@ -215,9 +215,9 @@ ShowMenu:
         CALL Fader
 
     .ifdef CompileEP2
-        MOV  $EventStreamArray_Menu_EP2, R3
+        MOV  $EventStreamArray_Menu_EP2, R5
     .else
-        MOV  $EventStreamArray_Menu_EP1, R3
+        MOV  $EventStreamArray_Menu_EP1, R5
     .endif
 
         CALL @$ResetEventStream
@@ -273,7 +273,7 @@ ResetEventStream: #----------------------------------------------------------{{{
         CLR  (R1)+
         SOB  R0,100$
 
-        MOV  $Event_SavedSettings,R2  # Saved Settings
+        MOV  $Event_SavedSettings,R3  # Saved Settings
         CALL @$Event_StreamInit
 RETURN
 #----------------------------------------------------------------------------}}}

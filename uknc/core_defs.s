@@ -27,7 +27,7 @@
 .equiv PlayerStarArraySize, 128
 .equiv GameVarsArraysSize, StarArraySize * 4 + ObjectArraySize * 8 + PlayerStarArraySize * 4 + 15*8
 
-.equiv Akuyou_LevelStart, 0x9276 # 37494 0111166 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x926C # 37484 0111154 # auto-generated during a build
 .equiv LevelSprites, Akuyou_LevelStart + 4
 
 .equiv SPReset,       0157772 # Initial stack pointer
