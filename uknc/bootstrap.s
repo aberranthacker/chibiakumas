@@ -14,39 +14,44 @@
                 .=BootstrapStart
 start:
 Bootstrap_Launch:
-        CLR R3
+        CLR  R5
 
 Bootstrap_FromHL:                  # HL is used as the bootstrap command
-        MOV  R3,R0                 # H=1 means levels
-        SWAB R0                    # H=0 means system events (Menu etc)
-                                   # SWAB sets Z flag if low-order byte of result = 0
-        BEQ  Bootstrap_SystemEvent
-        CMPB R3,$1
-        BEQ  Bootstrap_Level
+                                   # H=1 means levels
+                                   # H=0 means system events (Menu etc)
+        SWAB R5                    # SWAB sets Z flag if low-order byte of result = 0
+        BZE  Bootstrap_SystemEvent
+        BR   Bootstrap_Level
 RETURN
 
 Bootstrap_SystemEvent:
-        MOV  R3,R0                      #     ld a,l
-        TSTB R0                         #     cp 0
-        BEQ  Bootstrap_StartGame        #     jp z,BootsStrap_StartGame
+        CLRB R5                         #     ld a,l
+        SWAB R5                         #     cp 0
+    .ifdef DebugMode
+        CMP  R5,$9
+        BHIS .
+    .endif
+        ASL  R5
+        JMP  @SystemEventsJmpTable(R5)
+    SystemEventsJmpTable:
+       .word Bootstrap_StartGame        #     jp z,BootsStrap_StartGame
                                         #     cp 1
-                                        #     jp z,BootsStrap_ContinueScreen
+       .word 0                          #     jp z,BootsStrap_ContinueScreen
                                         #     cp 2
-                                        #     jp z,BootsStrap_ConfigureControls
+       .word 0                          #     jp z,BootsStrap_ConfigureControls
                                         #     cp 3
-                                        #     jp z,BootStrap_SaveSettings
+       .word 0                          #     jp z,BootStrap_SaveSettings
                                         #     cp 4
-                                        #     jp z,GameOverWin
+       .word 0                          #     jp z,GameOverWin
                                         #     cp 5
-                                        #     jp z,NewGame_EP2_1UP
+       .word 0                          #     jp z,NewGame_EP2_1UP
                                         #     cp 6
-                                        #     jp z,NewGame_EP2_2UP
+       .word 0                          #     jp z,NewGame_EP2_2UP
                                         #     cp 7
-                                        #     jp z,NewGame_EP2_2P
+       .word 0                          #     jp z,NewGame_EP2_2P
                                         #     cp 8
-                                        #     jp z,NewGame_CheatStart
+       .word 0                          #     jp z,NewGame_CheatStart
 RETURN                                  # ret
-Finish: .exit
 
 Bootstrap_Level:
 # some missing code...
@@ -60,6 +65,7 @@ Bootstrap_StartGame:
        .endr
         SOB  R0, 1$
 #----------------------------------------------------------------------------}}}
+
 # Load core modules ---------------------------------------------------------{{{
         MOV  $ppu_module.bin,R0
         CALL Bootstrap_LoadDiskFile
@@ -71,12 +77,12 @@ Bootstrap_StartGame:
        .word FB1 # PPU module location
        .word PPU_ModuleSizeWords + 1280 # 2.5KB is a space required for SLTAB
 #-------------------------------------------------------------------------------
-        # Load loading screen
      .ifdef ShowLoadingScreen
-        MOV  $loading_screen.bin,R0
-        CALL Bootstrap_LoadDiskFile
         # Apply loading screen palette
        .ppudo_ensure $PPU_SetPalette, $LoadingScreenPalette
+        # Load loading screen
+        MOV  $loading_screen.bin,R0
+        CALL Bootstrap_LoadDiskFile
      .endif
 
         # Load the game core - this is always in memory
@@ -87,6 +93,7 @@ Bootstrap_StartGame:
         # TODO: player sprites load
         # TODO: Initialize the Sound Effects.
 #----------------------------------------------------------------------------}}}
+
 Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
         MOV  $SPReset,SP # we are not returning, so reset the stack
         CALL StartANewGame
@@ -589,12 +596,20 @@ LoadingScreenPalette: #------------------------------------------------------{{{
     .word 0xFF55  #  | br.white | magenta |
     .byte 63      #--line number
     .byte 1       #  set colors
-    .word 0xAA00  #  | br.green | black   |
+    .word 0xDD00  #  | br.green | black   |
     .word 0xFF55  #  | br.white | magenta |
     .byte 95      #--line number
     .byte 1       #  set colors
     .word 0xBB00  #  | br.cyan  | black   |
     .word 0xFF22  #  | br.white | green   |
+    .byte 185     #--line number
+    .byte 1       #  set colors
+    .word 0x0000  #
+    .word 0xFF22  #
+    .byte 192     #--line number
+    .byte 1       #  set colors
+    .word 0xBB00  #
+    .word 0xFF22  #
     .byte 196     #--line number
     .byte 1       #  set colors
     .word 0xCC00  #  | br.red   | black   |
@@ -609,7 +624,8 @@ YahooStr:   .asciz "Yippee! Whoopee! Woo-hoo! Yay! Hurrah!\n"
         .even
 WarningStr: .asciz "Warning!\n"
         .even
-TestStr: .byte        '!,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F
+TestStr: .byte 0,10
+         .byte        '!,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F
          .byte 0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x3A,0x3B,0x3C,0x3D,0x3E,0x3F
          .byte 0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F
          .byte 0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A,0x5B,0x5C,0x5D,0x5E,0x5F

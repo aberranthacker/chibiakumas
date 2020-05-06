@@ -159,6 +159,8 @@ PauseLoop:
     .word 60        # new time
 
 LevelInit:
+        MTPS $PR0 # enable interrupts
+
         MOV  $EventStreamArray_Ep1,R3 # Event Stream
         MOV  $Event_SavedSettings,R2  # Saved Settings
         CALL @$Event_StreamInit
@@ -167,90 +169,106 @@ LevelInit:
         MOV  $Event_SavedSettings,R2  # Saved Settings
         CALL @$ResetEventStream
 
-       .ppudo_ensure $PPU_PrintAt,$TitleText1 # Aku/Level00-Menu.asm:1101
+       .ppudo_ensure $PPU_PrintAt,$PressFireKeyStr # Aku/Level00-Menu.asm:1101
         # Aku/Level00-Menu.asm:1103
         CALL @$Timer_UpdateTimer
         CALL @$EventStream_Process
         CALL @$ObjectArray_Redraw
 
-        CLR  @$KeyboardScanner_KeyPresses + 2 # call Keys_WaitForRelease
+        CLR  @$KeyboardScanner_P1 # call Keys_WaitForRelease
 
 .ifdef ShowLoadingScreen
-ShowTitlePic_Loop:
+       .wait_ppu
+ShowTitlePic_Loop: #---------------------------------------------------------{{{
        .ppudo $PPU_SetPalette, $FireKeyDarkPalette
-        CALL @$glow_delay$
+        CALL glow_delay_and_wait_key$
        .ppudo $PPU_SetPalette, $FireKeyNormalPalette
-        CALL @$glow_delay$
+        CALL glow_delay_and_wait_key$
        .ppudo $PPU_SetPalette, $FireKeyBrightPalette
-        CALL @$glow_delay$
+        CALL glow_delay_and_wait_key$
        .ppudo $PPU_SetPalette, $FireKeyNormalPalette
-        CALL @$glow_delay$
+        CALL glow_delay_and_wait_key$
+       .ppudo $PPU_SetPalette, $FireKeyDarkPalette
+        CALL glow_delay_and_wait_key$
+       .ppudo $PPU_SetPalette, $FireKeyBlackPalette
+        CALL glow_delay_and_wait_key$
 
-        TST  @$KeyboardScanner_KeyPresses + 2
-        BNE  ShowMenu
+        BR   ShowTitlePic_Loop
 
-        JMP  @$ShowTitlePic_Loop
-    glow_delay$:
-        MOV  $0xAFFF, R0
-        SOB  R0,.
+    glow_delay_and_wait_key$:
+        MOV  $5,R0
+    100$:
+        WAIT
+        BITB @$KeyboardScanner_P1,$Keymap_AnyFire
+        BNZ  finalize_title_pic_loop$
+
+        SOB  R0,100$
         RETURN
+
+    finalize_title_pic_loop$:
+        TST  (SP)+ # remove return address from the stack
+#----------------------------------------------------------------------------}}}
 .endif
 
 ShowMenu:
+        # CALL CallFade # Aku/Level00-Menu.asm:1170
+        CALL Fader
+
     .ifdef CompileEP2
         MOV  $EventStreamArray_Menu_EP2, R3
     .else
         MOV  $EventStreamArray_Menu_EP1, R3
     .endif
-        .list
+
         CALL @$ResetEventStream
-
-        CALL @$CLS
-       .ppudo_ensure $PPU_PrintAt,$MenuText1
-
-        # CALL CallFade # Aku/Level00-Menu.asm:1170
-
         # TODO: show hiscore value
         CALL @$Timer_UpdateTimer # Aku/Level00-Menu.asm:1180
         CALL @$EventStream_Process
+        WAIT
+       .ppudo_ensure $PPU_PrintAt,$MenuText1
         CALL @$ObjectArray_Redraw
-        .nolist
 
-       # .ppudo_ensure $PPU_PrintAt,$TestStr
+        JSR  R5,@$OnscreenCursorDefine
+       .byte 0x09,0x0C # startpos   ld hl,&090C ; hl = startpos
+       .word 0x0001    # movespeed  ld bc,&0001 ; bc = movespeed
+       .byte 0x02,0x26 # MinX,MaxX  ld ix,&2602 ; ix = MinX,MaxX
+    .ifdef CompileEP2
+       .byte 0x0C,0x12 # MinY,MaxY  ld iy,&120C ; iy = MinY,MaxY
+    .else
+       .byte 0x0C,0x11 # MinY,MaxY  ld iy,&110C ; iy = MinY,MaxY
+    .endif
 
-        BR   .
-        JMP  @$DrawChibi
+ShowMenu_Loop: #-------------------------------------------------------------{{{
+        CALL @$ShowKeysBitmap
+        CALL @$Timer_UpdateTimer
 
-DrawChibi: #------------------------------------------------------------------{{{
-       .equiv SprDst, FB1+(80*64)
-        MOV  $80-6,R1
+        CALL @$EventStream_Process
 
-        MOV  $62,R0
-        MOV  $TITLETEX,R4
-        ADD  4(R4),R4
-        MOV  $SprDst,R5
-1$:    .rept 3
-        MOV  (R4)+,(R5)+
-       .endr
-        ADD  R1,R5
-        SOB  R0,1$
+        WAIT
 
-        MOV  $62,R0
-        MOV  $TITLETEX,R4
-        ADD  10(R4),R4
-        MOV  $SprDst+6,R5
-2$:    .rept 3
-        MOV  (R4)+,(R5)+
-       .endr
-        ADD  R1,R5
-        SOB  R0,2$
-
-        BR   .
+        BIT  $Keymap_AnyFire,@$KeyboardScanner_P1
+        BNZ  MainMenuSelection
+                                                            #    push hl
+                                                            #        call OnscreenCursor
+                                                            #    pop ix
+                                                            #    ld a,(ix+8)
+                                                            #    bit 2,a
+                                                            #    jp z,ConfigureControls
+                                                            #
+                                                            #ifdef Debug_ShowLevelTime
+                                                            #    call ShowLevelTime
+                                                            #endif
+                                                            #    call CallFade
+                                                            #
+        JMP  @$ShowMenu_Loop                                #    jp ShowMenu_Loop
 #----------------------------------------------------------------------------}}}
+MainMenuSelection:
+        JMP  @$ShowMenu_Loop
 
-ResetEventStream:
+ResetEventStream: #----------------------------------------------------------{{{
         MOV  $GameVarsArraysSize>>2,R0
         MOV  $Akuyou_GameVarsStart,R1
+
 100$:   CLR  (R1)+
         CLR  (R1)+
         SOB  R0,100$
@@ -258,48 +276,167 @@ ResetEventStream:
         MOV  $Event_SavedSettings,R2  # Saved Settings
         CALL @$Event_StreamInit
 RETURN
-
-WaitKey: #-------------------------------------------------------------------{{{
-        TST  @$KeyboardScanner_KeyPresses + 2
-        BEQ  .-4
-        CLR  @$KeyboardScanner_KeyPresses + 2
 #----------------------------------------------------------------------------}}}
+OnscreenCursorDefine: #------------------------------------------------------{{{
+        MOV  (R5)+,@$CursorCurrentPosXY
+        MOV  (R5)+,@$CursorMoveSpeedXY
 
-TitleScreenPalette: #---------------------------------------------------------------{{{
-    .byte 1       #--line number, first line of the main screen area
-    .byte 1       #  set colors
-    .word 0xCC00  #  colors 011 010 001 000 (YRGB) | br.red   | black   |
-    .word 0xFF99  #  colors 111 110 101 100 (YRGB) | br.white | br.blue |
-    .byte 49      #--line number (201 if there is no more parameters)
-    .byte 1       #  set colors
-    .word 0x1100  #  | blue     | black   |
-    .word 0xFF55  #  | br.white | magenta |
-    .byte 63      #--line number
-    .byte 1       #  set colors
-    .word 0xDD00  #  | br.magenta| black  |
-    .word 0xFF55  #  | br.white | magenta |
-    .byte 95      #--line number
-    .byte 1       #  set colors
-    .word 0xBB00  #  | br.cyan  | black   |
-    .word 0xFF22  #  | br.white | green   |
-    .byte 185     #--line number
-    .byte 1       #  set colors
-    .word 0xCC00  #  | br.red   | black   |
-    .word 0xFF44  #  | br.white | red     |
-    .byte 192     #--line number
-    .byte 1       #  set colors
-    .word 0xBB00  #  | br.cyan  | black   |
-    .word 0xFF22  #  | br.white | green   |
-    .byte 196     #--line number
-    .byte 1       #  set colors
-    .word 0xCC00  #  | br.red   | black   |
-    .word 0xFF22  #  | br.white | green   |
-    .byte 201     #--line number, 201 - end of the main screen params
-    .even
+        MOVB (R5)+,@$CursorMinX
+        MOVB (R5)+,@$CursorMaxX
+
+        MOVB (R5)+,@$CursorMinY
+        MOVB (R5)+,@$CursorMaxY
+
+        RTS  R5
+#----------------------------------------------------------------------------}}}
+OnscreenCursor: #------------------------------------------------------------{{{
+        MOV  (PC)+,R5; CursorCurrentPosXY: .word 0x0101
+
+        MOV  (PC)+,R1; CursorMoveSpeedXY: .word 0x0202
+        CursorMaxY: .word 24
+        CursorMinY: .word 2
+        CursorMaxX: .word 39
+        CursorMinX: .word 2
+RETURN
+#----------------------------------------------------------------------------}}}
+ClearChar: #-----------------------------------------------------------------{{{
+# c = 12 * 4 (48)
+# b =  9 * 2 (18)
+RETURN
+#----------------------------------------------------------------------------}}}
+Fader: #---------------------------------------------------------------------{{{
+        MOV  R0,-(SP)
+        MOV  R1,-(SP)
+        MOV  R2,-(SP)
+        MOV  R3,-(SP)
+        MOV  R5,-(SP)
+
+        CLR  R0
+        MOV  $FB1+16000,R5
+        MOV  $8,R3
+    8$:
+        MOV  $25,R2
+        SUB  $16000+80,R5
+       .rept 1
+        WAIT
+       .endr
+        25$:
+             ADD  $80*9,R5
+             MOV  $4,R1
+             4$:
+                 .rept 10
+                  MOV  R0,-(R5)
+                 .endr
+             SOB  R1,4$
+        SOB  R2,25$
+    SOB  R3,8$
+
+        MOV  (SP)+,R5
+        MOV  (SP)+,R3
+        MOV  (SP)+,R2
+        MOV  (SP)+,R1
+        MOV  (SP)+,R0
+RETURN
+#----------------------------------------------------------------------------}}}
+ShowKeysBitmap: # -----------------------------------------------------------{{{
+        MOV  @$KeyboardScanner_P1,R3
+        CMP  R3,(PC)+; LastKeysBitmap: .word 0
+        BEQ  1237$
+        MOV  @$KeyboardScanner_P1,@$LastKeysBitmap
+
+        MOV  R0,-(SP)
+        MOV  R1,-(SP)
+        MOV  R2,-(SP)
+        MOV  R3,-(SP)
+        MOV  R5,-(SP)
+
+        MOV  $FB1,R5
+        MOV  $40*8>>2,R1
+    100$:
+       .rept 4
+        CLR  (R5)+
+       .endr
+        SOB  R1,100$
+
+        MOV  $ScanCodeStr+2,R1
+        CALL @$NumToStr
+       .ppudo_ensure $PPU_PrintAt,$ScanCodeStr
+        MOV  (SP)+,R5
+        MOV  (SP)+,R3
+        MOV  (SP)+,R2
+        MOV  (SP)+,R1
+        MOV  (SP)+,R0
+       .wait_ppu
+
+1237$:
+        RETURN
+
+NumToStr: #------------------------------------------------------------------{{{
+        MOV  $8,R0      # R0 - length of the number
+                        # R1 - position of number in str (first argument)
+                        # R3 - number (second argument)
+        ADD  R0,R1
+
+100$:   CLR  R2         # R2 - most, R3 - least significant word
+        DIV  $2,R2
+                        # R2 contains quotient, R3 - remainder
+        ADD  $'0,R3 # add ASCII code for "0" to the remainder
+        MOVB R3,-(R1)
+        MOV  R2,R3
+
+        SOB  R0,100$
+
+        RETURN
+#----------------------------------------------------------------------------}}}
+ScanCodeStr:
+        .byte 0,0
+        .asciz "76543210"
+        .even
+#----------------------------------------------------------------------------}}}
+WaitKey: #-------------------------------------------------------------------{{{
+        TST  @$KeyboardScanner_P1
+        BEQ  .-4
+        CLR  @$KeyboardScanner_P1
 #----------------------------------------------------------------------------}}}
 
 # 9 br.     # A br.     # B br.     # C br.     # D br.     # E br.     # F white
 # 1 blue    # 2 green   # 3 cyan    # 4 red     # 5 magenta # 6 yellow  # 7 gray
+TitleScreenPalette: #--------------------------------------------------------{{{
+    .byte 0       #--line number, last line of the top screen area
+    .byte 0       #  0 - set cursor/scale/palette
+    .word 0b10000 #  graphical cursor
+    .word 0b10101 #  320 dots per line, pallete 5
+    .byte 1       #--line number, first line of the main screen area
+    .byte 1       #  set colors
+    .word 0xCC00  #
+    .word 0xFF99  #
+    .byte 49      #--line number (201 if there is no more parameters)
+    .byte 1       #  set colors
+    .word 0x1100  #
+    .word 0xFF55  #
+    .byte 63      #--line number
+    .byte 1       #  set colors
+    .word 0xDD00  #
+    .word 0xFF55  #
+    .byte 95      #--line number
+    .byte 1       #  set colors
+    .word 0xBB00  #
+    .word 0xFF22  #
+    .byte 185     #--line number
+    .byte 1       #  set colors
+    .word 0x0000  #
+    .word 0xFF22  #
+    .byte 192     #--line number
+    .byte 1       #  set colors
+    .word 0xBB00  #
+    .word 0xFF22  #
+    .byte 196     #--line number
+    .byte 1       #  set colors
+    .word 0xCC00  #
+    .word 0xFF22  #
+    .byte 201     #--line number, 201 - end of the main screen params
+    .even
+#----------------------------------------------------------------------------}}}
 MenuPalette: #---------------------------------------------------------------{{{
     .byte 0       #--line number, last line of the top screen area
     .byte 0       #  0 - set cursor/scale/palette *always 0 for the first record*
@@ -349,7 +486,7 @@ MenuPalette: #---------------------------------------------------------------{{{
     .even
 #----------------------------------------------------------------------------}}}
 FireKeyBrightPalette: #------------------------------------------------------{{{
-    .byte 185, 1  # starting line 185 setup palette
+    .byte 185, 1  # starting line 185, setup palette
     .word 0xEE00
     .word 0xFF22
     .byte 192, -1 # until line 192
@@ -363,11 +500,16 @@ FireKeyDarkPalette:
     .word 0x4400
     .word 0xFF22
     .byte 192, -1
+FireKeyBlackPalette:
+    .byte 185, 1
+    .word 0x0000
+    .word 0xFF22
+    .byte 192, -1
 #----------------------------------------------------------------------------}}}
 
-TitleText1: .byte 9,23
-            .asciz "Press Fire to Continue"
-            .even
+PressFireKeyStr: .byte 9,23
+                 .asciz "Press Fire to Continue"
+                 .even
 MenuText1:
                         #0         1         2         3         4
                         #01234567890123456789012345678901234567890
@@ -389,7 +531,30 @@ MenuText1:
 
     .byte  9,24; .ascii "HighScore: "            ; .byte 0x00
 
-TestStr:    .byte 20,10
-            .asciz "Test string"
-            .even
+DrawChibi: #------------------------------------------------------------------{{{
+       .equiv SprDst, FB1+(80*64)
+        MOV  $80-6,R1
+
+        MOV  $62,R0
+        MOV  $TITLETEX,R4
+        ADD  4(R4),R4
+        MOV  $SprDst,R5
+1$:    .rept 3
+        MOV  (R4)+,(R5)+
+       .endr
+        ADD  R1,R5
+        SOB  R0,1$
+
+        MOV  $62,R0
+        MOV  $TITLETEX,R4
+        ADD  10(R4),R4
+        MOV  $SprDst+6,R5
+2$:    .rept 3
+        MOV  (R4)+,(R5)+
+       .endr
+        ADD  R1,R5
+        SOB  R0,2$
+
+        BR   .
+#----------------------------------------------------------------------------}}}
 end:

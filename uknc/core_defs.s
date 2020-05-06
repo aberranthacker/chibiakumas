@@ -1,3 +1,4 @@
+.equiv DebugMode, 1
 .equiv ShowLoadingScreen, 1
 
 .equiv PPU_UserRamStart, 0x27B6 # 023666 10166
@@ -10,15 +11,15 @@
 .equiv FB_gap, FB0 + 16000
 .equiv FB1, FB_gap + 384
 
-.equiv PPU_NOP,            1
-.equiv PPU_Finalize,       2
-.equiv PPU_SingleProcess,  3
-.equiv PPU_MultiProcess,   4
-.equiv PPU_SetPalette,     5
-.equiv PPU_Print,          6
-.equiv PPU_PrintAt,        7
+.equiv PPU_NOP,            2 #  1
+.equiv PPU_Finalize,       4 #  2
+.equiv PPU_SingleProcess,  6 #  3
+.equiv PPU_MultiProcess,   8 #  4
+.equiv PPU_SetPalette,    10 #  5
+.equiv PPU_Print,         12 #  6
+.equiv PPU_PrintAt,       14 #  7
 
-.equiv BootstrapStart,  FB0
+.equiv BootstrapStart,  512
 .equiv Akuyou_GameVarsStart, FB1 + 16000
 
 .equiv StarArraySize, 256
@@ -26,13 +27,33 @@
 .equiv PlayerStarArraySize, 128
 .equiv GameVarsArraysSize, StarArraySize * 4 + ObjectArraySize * 8 + PlayerStarArraySize * 4 + 15*8
 
-.equiv Akuyou_LevelStart, 0x9380 # 37760 0111600 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9276 # 37494 0111166 # auto-generated during a build
 .equiv LevelSprites, Akuyou_LevelStart + 4
 
 .equiv SPReset,       0157772 # Initial stack pointer
 .equiv PPUCommand,    0157774 # command for PPU code
 .equiv PPUCommandArg, 0157776 # command for PPU argument
 # 0xE000 57344 0160000 end of ram
+
+.equiv TextScreen_MaxX, 39
+.equiv TextScreen_MinX, 0
+.equiv TextScreen_MaxY, 24
+.equiv TextScreen_MinY, 0
+
+# -Player 2's data starts XX bytes after player so you can use IY+XX+1 to get
+# a var from player 2 without changing IY
+.equiv Akuyou_PlayerSeparator, 16
+
+.equiv Keymap_D,     0x01
+.equiv Keymap_U,     0x02
+.equiv Keymap_R,     0x04
+.equiv Keymap_L,     0x08
+.equiv Keymap_F1,    0x10
+.equiv Keymap_F2,    0x20
+.equiv Keymap_F3,    0x40
+.equiv Keymap_Pause, 0x80
+.equiv Keymap_AnyFire, 0b01110000
+
 
 # PlusSprite_ExtBank equ &C7
 # Akuyou_PlayerSpritePos equ &3800

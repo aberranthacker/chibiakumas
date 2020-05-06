@@ -243,10 +243,9 @@ PGM: #--------------------------------------------------------------------------
 ShortLoop:      MOV  $PPU_PPUCommand, @$PBPADR
                 MOV  @$PBP12D,R0
             .ifdef DebugMode
-                CMP  R0,$8
+                CMP  R0,$15
                 BHIS .
             .endif
-                ASL  R0 # multiply by 2 to calculate word offset
                 JMP  @JMPTable(R0)
 JMPTable:      .word EventLoop            # do nothing
                .word CommandExecuted      # PPU_NOP
@@ -261,7 +260,7 @@ CommandExecuted: #-----------------------------------------------------------{{{
                 MOV  $PPU_PPUCommand, @$PBPADR
                 CLR  @$PBP12D        # inform CPU's program that we are done
 EventLoop:      TST  (PC)+; SingleProcessFlag: .word 0
-                BNE  ShortLoop       # non-zero, flag is set, loop
+                BNZ  ShortLoop       # non-zero, flag is set, loop
 
                 MOV  $PGM, @$07124   # add to processes table
                 MOV  $1, @$07100     # require execution
@@ -459,71 +458,165 @@ VblankIntHandler: #----------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 KeyboardIntHadler: #---------------------------------------------------------{{{
 # key codes #----------------------------------------------------------------{{{
-# | code |   key   | note     | code |  key  |  note     |
-# |------+---------+----------+------+-------+-----------+
-# |   05 | ,       | NumPad   | 0106 | АЛФ   | Alphabet  |
-# |   06 | АР2     | Esc      | 0107 | ФИКС  | Lock      |
-# |   07 | ; / +   |          | 0110 | Ч / ^ |           |
-# |  010 | К1 / К6 | F1 / F6  | 0111 | С / S |           |
-# |  011 | К2 / К7 | F2 / F7  | 0112 | М / M |           |
-# |  012 | КЗ / К8 | F3 / F8  | 0113 | SPACE |           |
-# |  013 | 4 / ¤   |          | 0114 | Т / T |           |
-# |  014 | К4 / К9 | F4 / F9  | 0115 | Ь / X |           |
-# |  015 | К5 / К10| F5 / F10 | 0116 | ←     |           |
-# |  016 | 7 / '   |          | 0117 | , / < |           |
-# |  017 | 8 / (   |          | 0125 | 7     | NumPad    |
-# |  025 | -       | NumPad   | 0126 | 0     | NumPad    |
-# |  026 | ТАБ     | Tab      | 0127 | 1     | NumPad    |
-# |  027 | Й / J   |          | 0130 | 4     | NumPad    |
-# |  028 | 1 / !   |          | 0131 | +     | NumPad    |
-# |  031 | 2 / "   |          | 0132 | ЗБ    | Backspace |
-# |  032 | 3 / #   |          | 0133 | →     |           |
-# |  033 | Е / E   |          | 0134 | ↓     |           |
-# |  034 | 5 / %   |          | 0135 | . / > |           |
-# |  035 | 6 / &   |          | 0136 | Э / \ |           |
-# |  036 | Ш / [   |          | 0137 | Ж / V |           |
-# |  037 | Щ / ]   |          | 0145 | 8     | NumPad    |
-# |  046 | УПР     | Ctrl     | 0146 | .     | NumPad    |
-# |  047 | Ф / F   |          | 0147 | 2     | NumPad    |
-# |  050 | Ц / C   |          | 0150 | 5     | NumPad    |
-# |  051 | У / U   |          | 0151 | ИСП   | Execute   |
-# |  052 | К / K   |          | 0152 | УСТ   | Settings  |
-# |  053 | П / P   |          | 0153 | ВВОД  | Enter     |
-# |  054 | H / N   |          | 0154 | ↑     |           |
-# |  055 | Г / G   |          | 0155 | : / * |           |
-# |  056 | Л / L   |          | 0156 | Х / H |           |
-# |  057 | Д / D   |          | 0157 | З / Z |           |
-# |  066 | ГРАФ    | Graph    | 0165 | 9     | NumPad    |
-# |  067 | Я / Q   |          | 0166 | ВВОД  | NumPad    |
-# |  070 | Ы / Y   |          | 0167 | 3     | NumPad    |
-# |  071 | В / W   |          | 0170 | 7     | NumPad    |
-# |  072 | А / A   |          | 0171 | СБРОС | Reset     |
-# |  073 | И / I   |          | 0172 | ПОМ   | Help      |
-# |  074 | Р / R   |          | 0173 | / / ? |           |
-# |  075 | О / O   |          | 0174 | Ъ / } |           |
-# |  076 | Б / B   |          | 0175 | - / = |           |
-# |  077 | Ю / @   |          | 0176 | О / } |           |
-# | 0105 | HP      | Shift    | 0177 | 9 / ) |           |
+# | oct | hex|  key    | note     | oct | hex|  key  |  note     |
+# |-----+----+---------+----------+-----+----+-------+-----------|
+# |   5 | 05 | ,       | NumPad   | 106 | 46 | АЛФ   | Alphabet  |
+# |   6 | 06 | АР2     | Esc      | 107 | 47 | ФИКС  | Lock      |
+# |   7 | 07 | ; / +   |          | 110 | 48 | Ч / ^ |           |
+# |  10 | 08 | К1 / К6 | F1 / F6  | 111 | 49 | С / S |           |
+# |  11 | 09 | К2 / К7 | F2 / F7  | 112 | 4A | М / M |           |
+# |  12 | 0A | КЗ / К8 | F3 / F8  | 113 | 4B | SPACE |           |
+# |  13 | 0B | 4 / ¤   |          | 114 | 4C | Т / T |           |
+# |  14 | 0C | К4 / К9 | F4 / F9  | 115 | 4D | Ь / X |           |
+# |  15 | 0D | К5 / К10| F5 / F10 | 116 | 4E | ←     |           |
+# |  16 | 0E | 7 / '   |          | 117 | 4F | , / < |           |
+# |  17 | 0F | 8 / (   |          | 125 | 55 | 7     | NumPad    |
+# |  25 | 15 | -       | NumPad   | 126 | 56 | 0     | NumPad    |
+# |  26 | 16 | ТАБ     | Tab      | 127 | 57 | 1     | NumPad    |
+# |  27 | 17 | Й / J   |          | 130 | 58 | 4     | NumPad    |
+# |  30 | 18 | 1 / !   |          | 131 | 59 | +     | NumPad    |
+# |  31 | 19 | 2 / "   |          | 132 | 5A | ЗБ    | Backspace |
+# |  32 | 1A | 3 / #   |          | 133 | 5B | →     |           |
+# |  33 | 1B | Е / E   |          | 134 | 5C | ↓     |           |
+# |  34 | 1C | 5 / %   |          | 135 | 5D | . / > |           |
+# |  35 | 1D | 6 / &   |          | 136 | 5E | Э / \ |           |
+# |  36 | 1E | Ш / [   |          | 137 | 5F | Ж / V |           |
+# |  37 | 1F | Щ / ]   |          | 145 | 65 | 8     | NumPad    |
+# |  46 | 26 | УПР     | Ctrl     | 146 | 66 | .     | NumPad    |
+# |  47 | 27 | Ф / F   |          | 147 | 67 | 2     | NumPad    |
+# |  50 | 28 | Ц / C   |          | 150 | 68 | 5     | NumPad    |
+# |  51 | 29 | У / U   |          | 151 | 69 | ИСП   | Execute   |
+# |  52 | 2A | К / K   |          | 152 | 6A | УСТ   | Settings  |
+# |  53 | 2B | П / P   |          | 153 | 6B | ВВОД  | Enter     |
+# |  54 | 2C | H / N   |          | 154 | 6C | ↑     |           |
+# |  55 | 2D | Г / G   |          | 155 | 6D | : / * |           |
+# |  56 | 2E | Л / L   |          | 156 | 6E | Х / H |           |
+# |  57 | 2F | Д / D   |          | 157 | 6F | З / Z |           |
+# |  66 | 36 | ГРАФ    | Graph    | 165 | 75 | 9     | NumPad    |
+# |  67 | 37 | Я / Q   |          | 166 | 76 | ВВОД  | NumPad    |
+# |  70 | 38 | Ы / Y   |          | 167 | 77 | 3     | NumPad    |
+# |  71 | 39 | В / W   |          | 170 | 78 | 7     | NumPad    |
+# |  72 | 3A | А / A   |          | 171 | 79 | СБРОС | Reset     |
+# |  73 | 3B | И / I   |          | 172 | 7A | ПОМ   | Help      |
+# |  74 | 3C | Р / R   |          | 173 | 7B | / / ? |           |
+# |  75 | 3D | О / O   |          | 174 | 7C | Ъ / } |           |
+# |  76 | 3E | Б / B   |          | 175 | 7D | - / = |           |
+# |  77 | 3F | Ю / @   |          | 176 | 7E | О / } |           |
+# | 105 | 45 | HP      | Shift    | 177 | 7F | 9 / ) |           |
 # ----------------------------------------------------------------------------}}}
-        # F, Y, Spc, Arrows, Crtl - Pause
-#      654 3210
-# F    010 0111
-# Y    011 1000
-# Spc  100 1011
-# Ctrl 110 1010
-# ←    100 1110
-# →    101 1011
-# ↓    101 1100
-# ↑    110 1100
+# P  FS FL FR Lt Rt Up Dn
+        MOV  R0,-(SP)
         MOV  @$PBPADR,-(SP)
-        MOV  $PPU_KeyboardScanner_KeyPresses,@$PBPADR
-        MOVB @$KBDATA,@$PBP12D
-        BMI  1237$
 
-        INC  @$PBPADR
-        MOV  $1,@$PBP12D
+        MOV  $PPU_KeyboardScanner_P1,@$PBPADR
+
+        MOVB @$KBDATA,R0
+        BMI  key_released$
+
+    key_pressed$: #------------------{{{
+        CMPB R0,$0134 # Down
+        BEQ  down_pressed$
+        CMPB R0,$0154 # Up
+        BEQ  up_pressed$
+        CMPB R0,$0133 # Right
+        BEQ  right_pressed$
+        CMPB R0,$0116 # Left
+        BEQ  left_pressed$
+        CMPB R0,$070  # Y
+        BEQ  fire_right_pressed$
+        CMPB R0,$047  # F
+        BEQ  fire_left_pressed$
+        CMPB R0,$046  # УПР
+        BEQ  fire_smartbomb_pressed$
+        CMPB R0,$015  # К5
+        BEQ  pause_pressed$
+        BR   1237$
+    #--------------------------------}}}
+
+    key_released$: #-----------------{{{
+        CMPB R0,$0214 # Down or Up
+        BNE  not_up_down$
+
+        BITB @$PBP12D,$1
+        BZE  up_released$
+        BR   down_released$
+    not_up_down$:
+        CMPB R0,$0213 # Right
+        BEQ  right_released$
+        CMPB R0,$0216 # Left
+        BEQ  left_released$
+        CMPB R0,$0210  # Y
+        BEQ  fire_right_released$
+        CMPB R0,$0207  # F
+        BEQ  fire_left_released$
+        CMPB R0,$0206  # УПР
+        BEQ  fire_smartbomb_released$
+        CMPB R0,$0215  # К5
+        BEQ  pause_released$
+        BR   1237$
+    #--------------------------------}}}
+
+    down_pressed$: #-----------------{{{
+        MOV  $0x01,R0
+        BR   set_bit$
+    up_pressed$:
+        MOV  $0x02,R0
+        BR   set_bit$
+    right_pressed$:
+        MOV  $0x04,R0
+        BR   set_bit$
+    left_pressed$:
+        MOV  $0x08,R0
+        BR   set_bit$
+    fire_right_pressed$:
+        MOV  $0x10,R0
+        BR   set_bit$
+    fire_left_pressed$:
+        MOV  $0x20,R0
+        BR   set_bit$
+    fire_smartbomb_pressed$:
+        MOV  $0x40,R0
+        BR   set_bit$
+    pause_pressed$:
+        MOV  $0x80,R0
+        BR   set_bit$
+    #--------------------------------}}}
+
+    down_released$: #----------------{{{
+        MOV  $0x01,R0
+        BR   clear_bit$
+    up_released$:
+        MOV  $0x02,R0
+        BR   clear_bit$
+    right_released$:
+        MOV  $0x04,R0
+        BR   clear_bit$
+    left_released$:
+        MOV  $0x08,R0
+        BR   clear_bit$
+    fire_right_released$:
+        MOV  $0x10,R0
+        BR   clear_bit$
+    fire_left_released$:
+        MOV  $0x20,R0
+        BR   clear_bit$
+    fire_smartbomb_released$:
+        MOV  $0x40,R0
+        BR   clear_bit$
+    pause_released$:
+        MOV  $0x80,R0
+        BR   clear_bit$
+    #--------------------------------}}}
+
+    set_bit$:
+        BIS  R0,@$PBP12D
+        BR   1237$
+    clear_bit$:
+        BIC  R0,@$PBP12D
+
 1237$:
         MOV  (SP)+,@$PBPADR
+        MOV  (SP)+,R0
         RTI
 #----------------------------------------------------------------------------}}}
 

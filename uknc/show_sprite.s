@@ -315,7 +315,6 @@ ShowSprite: # ShowSprite is the main routine of our program!
                                                             #     jp ShowSprite_Ready
                                                             #     ;we have messed with the co-ords, so can only use the basic render not supefast ones
                                                             #
-.list
 ShowSprite_SkipChanges:                                     # ShowSprite_SkipChanges:
         # No co-ord tweaks were needed, all sprite is onscreen
                                                             #     ;pop af         ;restore width
@@ -323,7 +322,6 @@ ShowSprite_SkipChanges:                                     # ShowSprite_SkipCha
                                                             #
                                                             # ShowSprite_Ready:
         MOV  (PC)+,R5; srcSprShow_TempY: .word 0x0000       #     ld hl,&0000 :SprShow_TempY_Plus2
-.nolist
         ASL  R5                                             #     add hl,hl       ; table is two bytes so double hl
                                                             #
         MOV  scr_addr_table(R5),R5                          #     ld de,scr_addr_table    ; get table

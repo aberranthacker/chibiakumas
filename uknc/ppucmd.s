@@ -30,26 +30,26 @@ PPFREE:         #------------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 # Error messages ------------------------------------------------------------{{{
 MAError:
-        .cout $sMAError
+       .cout $sMAError
         CALL Info
-        JMP  Finish
+        BR   .
 MCpError:
-        .cout $sMCpError
+       .cout $sMCpError
         CALL Info
-        JMP  Finish
+        BR   .
 ExError:
-        .cout $sExError
+       .cout $sExError
         CALL Info
-        JMP  Finish
+        BR   .
 MFrError:
-        .cout $sMFrError
+       .cout $sMFrError
         CALL Info
-        JMP  Finish
+        BR   .
 
-sMAError:  .ASCIZ  "?PPU-F-memory allocation error"
-sMCpError: .ASCIZ  "?PPU-F-memory copy error"
-sExError:  .ASCIZ  "?PPU-F-execution error"
-sMFrError: .ASCIZ  "?PPU-F-memory freeing error"
+sMAError:  .asciz  "?PPU-F-memory allocation error"
+sMCpError: .asciz  "?PPU-F-memory copy error"
+sExError:  .asciz  "?PPU-F-execution error"
+sMFrError: .asciz  "?PPU-F-memory freeing error"
 
         .Even
 #----------------------------------------------------------------------------}}}
@@ -102,9 +102,9 @@ Info:           #------------------------------------------------------------{{{
         RETURN
                 #0         1         2         3         4         5         6         7
                 #01234567890123456789012345678901234567890123456789012345678901234567890123456789
-Arg1:   .ASCIZ  "PS.A1: 123456"
-Arg2:   .ASCIZ  "PS.A2: 123456"
-Arg3:   .ASCIZ  "PS.A3: 123456"
+Arg1:   .asciz  "PS.A1: 123456"
+Arg2:   .asciz  "PS.A2: 123456"
+Arg3:   .asciz  "PS.A3: 123456"
         .Even
 #----------------------------------------------------------------------------}}}
 InsDecStr:      #------------------------------------------------------------{{{

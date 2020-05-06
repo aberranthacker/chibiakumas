@@ -29,14 +29,20 @@
                .include "./core_defs.s"
 
        .=0
-        NOP # Bootable disk marker
-        BR   32$
+        NOP  # Bootable disk marker
+        BR   68$
+
        .=040
-32$:
+        RTI                 # dummy interrupt handler
+       .=0104
+68$:    MOV  $040,@$0100    # set dummy Vblank int handler
         MOV  $SPReset,SP
 
+        BIC  $0x0080, @$CCH1OS # disable channel 1 output interrupt
+        BIC  $0x0080, @$CCH2OS # disable channel 2 outpup interrupt
+
         MOV  $TitleStr,R0
-        CALL PrintStr
+        CALL @$PrintStr
 load_bootstrap:
         MOV  $ParamsAddr,R0 # R0 - pointer to channel's init sequence array
         MOV  $8,R1          # R1 - size of the array, 8 bytes
@@ -51,7 +57,7 @@ load_bootstrap:
         BMI  3$
         BNE  PrintErrorCode
 
-        JMP  BootstrapStart
+        JMP  @$BootstrapStart
 
 PrintErrorCode:
         CLR  R3
@@ -69,7 +75,7 @@ PrintErrorCode:
         SOB  R0,1$
 
         MOV  $ErrorCode,R0
-        CALL PrintStr
+        CALL @$PrintStr
         BR  .
 ErrorCode:   .asciz "1234"
        .even
@@ -97,45 +103,17 @@ ParamsStruct:
     PS.WordsCount:      .word  BootstrapSizeWords # number of words to transfer
 
 TitleStr:    #---------------------------------------------------------------{{{
-        .byte  033,0240,'1  # character color
-        .byte  033,0241,'0  # character background color
-        .byte  033,0242,'0  # screen background color
-        .byte  033,0247,'0  # cursor color
-        .byte  014          # clear screen
+      #.byte  033,0240,'2  # character color
+      #.byte  033,0241,'7  # character background color
+      #.byte  033,0242,'7  # screen background color
+      #.byte  033,0247,'0  # cursor color
+      #.byte  014          # clear screen
 
-        .byte  033,'Y, 32+ 9,32+20
-        .ascii "*****************************************"
+       .byte  033,'Y, 32+1,32+0
+       .byte  033,0240,'7; .ascii "ChibiAkumas  V1.666"
 
-        .byte  033,'Y, 32+10,32+20
-        .ascii "*"
-        .byte  033,0240,'5; .ascii "          ChibiAkumas  V1.666          "
-        .byte  033,0240,'1; .ascii "*"
-
-        .byte  033,'Y, 32+11,32+20
-        .ascii "*"
-        .byte  033,0240,'4; .ascii "          www.chibiakumas.com          "
-        .byte  033,0240,'1; .ascii "*"
-
-        .byte  033,'Y, 32+12,32+20
-        .ascii "*"
-        .byte  033,0240,'3; .ascii "    UKNC version"
-        .byte  033,0240,'7; .ascii " by "
-        .byte  033,0240,'2; .ascii "aberrant_hacker    "
-        .byte  033,0240,'1; .ascii "*"
-
-        .byte  033,'Y, 32+13,32+20
-        .ascii "*"
-        .byte  033,0240,'6; .ascii " github.com"
-        .byte  033,0240,'7; .ascii "/"
-        .byte  033,0240,'2; .ascii "aberranthacker"
-        .byte  033,0240,'7; .ascii "/"
-        .byte  033,0240,'5; .ascii "chibiakumas "
-        .byte  033,0240,'1; .ascii "*"
-
-        .byte  033,'Y, 32+14,32+20
-        .ascii "*****************************************"
-        .byte  033,'H
-        .byte  033,0240,'7
-        .byte  0
+       .byte  033,'H # move curor to "home" position
+      #.byte  033,0240,'7
+       .byte  0
 #----------------------------------------------------------------------------}}}
-        .=0x200
+       .=0x200

@@ -1,8 +1,9 @@
        .nolist
 
        .title Chibi Akumas core module
-       .global start # make entry point available to linker
+       .global start # make entry point available to a linker
 
+# Global symbols ------------------------------------------------------------{{{
        .global Akuyou_GameVarsStart
        .global Akuyou_GameVarsEnd
        .global ContinueMode
@@ -13,7 +14,9 @@
        .global Event_SavedSettings
        .global FileBeginCore
        .global FileEndCore
-       .global KeyboardScanner_KeyPresses
+       .global KeyboardScanner_P1
+       .global KeyboardScanner_P2
+       .global LevelStart
        .global MultiplayConfig
        .global NULL
        .global ObjectArray_Redraw
@@ -26,60 +29,28 @@
        .global SmartBombsReset
        .global StarArrayPointer
        .global Timer_UpdateTimer
+#----------------------------------------------------------------------------}}}
 
        .include "macros.s"
        .include "core_defs.s"
-
-       .equiv TextScreen_MaxX, 39
-       .equiv TextScreen_MinX, 0
-       .equiv TextScreen_MaxY, 24
-       .equiv TextScreen_MinY, 0
 
 #******************************************************************************#
 #*                             Main Project Code                              *#
 #******************************************************************************#
                 .=Akuyou_GameVarsStart # Need about 2136 bytes
 
+        ObjectArrayPointer:     .space ObjectArraySize * 8
+        StarArrayPointer:       .space StarArraySize * 4
+        PlayerStarArrayPointer: .space PlayerStarArraySize * 4
+        Event_SavedSettings:    .space 15 * 8
 
-#       .balign 256
-# StarArrayPointer:
-#       .space 256 * 3
-#
-# ObjectArrayPointer: # first ObjectArraySize*2 of each 256 are used - rest (>128) are spare
-#       .space (64 * 8) * 2 # 256 * 4
-#       # First 128 are used by object array
-#       .equiv PlayerStarArrayPointer, (ObjectArrayPointer + 128)
-#        # Out the way of the Object array!??
-#       .equiv Event_SavedSettings, (ObjectArrayPointer + 256 * 3 + 128)
+        KeyboardScanner_P1: .word 0
+        KeyboardScanner_P2: .word 0
 
-ObjectArrayPointer:
-       .space ObjectArraySize * 8
-StarArrayPointer:
-       .space StarArraySize * 4
-PlayerStarArrayPointer:
-       .space PlayerStarArraySize * 4
-Event_SavedSettings:
-       .space 15 * 8
 Akuyou_GameVarsEnd:
 
-        # -Player 2's data starts XX bytes after player so you can use IY+XX+1 to get
-        # a var from player 2 without changing IY
-       .equiv Akuyou_PlayerSeparator, 16
-
-       .equiv Keymap_U,     0
-       .equiv Keymap_D,     1
-       .equiv Keymap_L,     2
-       .equiv Keymap_R,     3
-       .equiv Keymap_F1,    4
-       .equiv Keymap_F2,    5
-       .equiv Keymap_F3,    6
-       .equiv Keymap_Pause, 7
-       .equiv Keymap_AnyFire, 0b11001111
-
-################################################################################
-#                                 Aligned Code                                 #
-################################################################################
-start: FileBeginCore:
+start:
+FileBeginCore:
 SavedSettings: # {{{
                      .byte 255          # pos -22 spare
                      .byte   0          # pos -21 spare
@@ -166,8 +137,6 @@ SavedSettings: # {{{
        .byte 0xFE,       0x01 # Left      15
        .byte 0xFB,       0x00 # Down      14
        .byte 0xFE,       0x00 # Up        13
-
-    KeyboardScanner_KeyPresses: .space 10,0 # This is the raw keypress data
 
        .balign 8,0
     Player_ScoreBytes:  .space 8,0 # Player 2 current score
@@ -367,32 +336,18 @@ Event_VectorArray:
        .word NULL                              # 208 26 0x1A
        .word NULL                              # 224 28 0x1C
        .word Event_CoreReprogram               # 240 30 0x1E
-                                        #
+
                                         # read "..\SrcCPC\Akuyou_CPC_InterruptHandler.asm"
 NULL:   RETURN
 ################################################################################
 #                            End of aligned code                               #
 ################################################################################
 
-PLY_FrequencyTable:
-    .word 3822, 3608, 3405, 3214, 3034, 2863, 2703, 2551, 2408, 2273, 2145, 2025
-    .word 1911, 1804, 1703, 1607, 1517, 1432, 1351, 1276, 1204, 1136, 1073, 1012
-    .word  956,  902,  851,  804,  758,  716,  676,  638,  602,  568,  536,  506
-    .word  478,  451,  426,  402,  379,  358,  338,  319,  301,  284,  268,  253
-    .word  239,  225,  213,  201,  190,  179,  169,  159,  150,  142,  134,  127
-    .word  119,  113,  106,  100,   95,   89,   84,   80,   75,   71,   67,   63
-    .word   60,   56,   53,   50,   47,   45,   42,   40,   38,   36,   34,   32
-    .word   30,   28,   27,   25,   24,   22,   21,   20,   19,   18,   17,   16
-    .word   15,   14,   13,   13,   12,   11,   11,   10,    9,    9,    8,    8
-    .word    7,    7,    7,    6,    6,    6,    5,    5,    5,    4,    4,    4
-    .word    4,    4,    3,    3,    3,    3,    3,    2,    2,    2,    2,    2
-    .word    2,    2,    2,    2,    1,    1,    1,    1,    1,    1,    1,    1
-                                        #
-                                        #   # ifdef CPC320
-       .include "virtual_screen_pos_320.s" #     read "../SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm"
-                                        #   # else
-                                        #   #     read "../SrcCPC/Akuyou_CPC_VirtualScreenPos_256.asm"
-                                        #   # endif
+                                        ## ifdef CPC320
+       .include "virtual_screen_pos_320.s" #   read "../SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm"
+                                        ## else
+                                        ##     read "../SrcCPC/Akuyou_CPC_VirtualScreenPos_256.asm"
+                                        ## endif
        .include "show_sprite.s"         # read "../SrcCPC/Akuyou_CPC_ShowSprite.asm"
                                         #
        .include "stararray.s"           # read "../SrcALL/Akuyou_Multiplatform_Stararray.asm"
@@ -428,17 +383,8 @@ PLY_FrequencyTable:
                                         ## ;   read "../SrcALL/Multiplatform_MonitorMemdump.asm"
                                         ## ;   read "../SrcALL/Multiplatform_MonitorSimple.asm"
                                         ## endif
-                                        #
-                                        # list
-                                        # Null:ret
-                                        # FileEndCore:
-                                        #     save direct "CORE    .AKU",Akuyou_CoreStart,&3001   ;address,size...}[,exec_address]
-                                        # nolist
 end: FileEndCore:
 
-       .global LevelStart
 LevelStart:
-        JMP  .
-LevelLoop:
         JMP  .
 

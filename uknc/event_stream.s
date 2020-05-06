@@ -283,19 +283,15 @@ RETURN # JMP @$Event_LoadNextEvt                            #     ret;    jp Eve
                                                             # Event_CoreReprogram_ObjectHitHandler:
                                                             #     ld de,ObjectShotOverride_Plus2-2
                                                             #     jr SetCustMove
-                                                            #
+
                                                             # ;Event_CoreReprogram_PlusPalette            ; Set background (41 byte max)
                                                             # ;   ld de,PlusRasterPalette
                                                             # ;di
                                                             # ;halt ;this is deprecated
                                                             # ;   jr Event_CoreReprogram_DataCopy
-                                                            #
-# ; Program raster palette - careful - this can cause all nasty crashes if you
-# ; do it wrong, as you have to specify bytes, offsets and loop counters,
-# ; it's best to copy existing ones from levels and modify them
-                                                            #
-Event_CoreReprogram_Palette:                                # Event_CoreReprogram_Palette:
-        MOV  (R3)+,@$PPUCommandArg                          #     ld de,RasterColors_ColorArray1 :RasterColors_ColorArray1PointerB_Plus2
+
+Event_CoreReprogram_Palette:
+        MOV  (R3)+,@$PPUCommandArg
        .ppudo_ensure $PPU_SetPalette
 RETURN # JMP @$Event_LoadNextEvt
                                                             # Event_CoreReprogram_DataCopy:

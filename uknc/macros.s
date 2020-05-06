@@ -1,21 +1,8 @@
 # vim: set fileformat=unix filetype=gas tabstop=8 expandtab shiftwidth=4 autoindent :
 
-.macro .putstr str_addr
+.macro .wait_ppu
     TST  @$PPUCommand
     BNE  .-4
-    MOV  \str_addr, @$PPUCommandArg
-    MOV  $PPU_Print,@$PPUCommand
-    TST  @$PPUCommand
-    BNE  .-4
-.endm
-
-.macro .ppudo_ensure cmd:req,arg=0
-    TST  @$PPUCommand
-    BNE  .-4
-  .if \arg != 0
-    MOV  \arg, @$PPUCommandArg
-  .endif
-    MOV  \cmd, @$PPUCommand
 .endm
 
 .macro .ppudo cmd:req,arg=0
@@ -25,20 +12,16 @@
     MOV  \cmd, @$PPUCommand
 .endm
 
-.macro .waitKeyThenExit
-    TST  @$KeyboardScanner_KeyPresses + 2
-    BEQ  .-4
-    CLR  @$KeyboardScanner_KeyPresses + 2
-   .ppudo_ensure $PPU_Finalize
+.macro .ppudo_ensure cmd:req,arg=0
+   .wait_ppu
+   .ppudo \cmd, \arg
+.endm
 
-    CLR  R0
-    SOB  R0,.
-
-    JSR  R5,PPFREE
-    .word PPU_UserRamStart
-    .word PPU_ModuleSizeWords
-
-   .exit
+.macro .putstr str_addr
+   .wait_ppu
+    MOV  \str_addr, @$PPUCommandArg
+    MOV  $PPU_Print,@$PPUCommand
+   .wait_ppu
 .endm
 
 # generic macros
