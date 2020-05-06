@@ -1155,7 +1155,7 @@ endif
     ld bc,MenuText1
     call ShowText
 
-    Call CallFade
+    call CallFade
 
         ld hl,&1518
         call Akuyou_DrawText_LocateSprite ; SrcCPC/Akuyou_CPC_TextDriver.asm:104
@@ -1178,6 +1178,7 @@ else
     ld iy,&110C ; iy = MinY,MaxY
 endif
     call OnscreenCursorDefine
+
 ShowMenu_Loop:
     call Akuyou_Timer_UpdateTimer
 
@@ -1240,7 +1241,7 @@ SetFaderEP1Menu:
     pop hl
 ret
 
-PlusPalette_Black:
+PlusPalette_Black: ; {{{
         defb 30
     defw &0000 ; 1  -GRB
     defw &0000 ; 5  -GRB
@@ -1281,8 +1282,8 @@ PlusPalette_Black:
     defw &0000 ; 5  -GRB
     defw &0000 ; 6  -GRB
     defw &0000 ; 4  -GRB
-
-PlusPalette_Regular:
+; }}}
+PlusPalette_Regular: ; {{{
         defb 25
     defw &0000 ; 1  -GRB
     defw &0088 ; 5  -GRB
@@ -1323,8 +1324,8 @@ PlusPalette_Regular:
     defw &0088 ; 5  -GRB
     defw &0F8F ; 6  -GRB
     defw &0FFF ; 4  -GRB
-
-PlusPalette_EP1Menu:
+; }}}
+PlusPalette_EP1Menu: ; {{{
     defb 30
     defw &0000
     defw &03F8
@@ -1365,6 +1366,7 @@ PlusPalette_EP1Menu:
     defw &0666
     defw &06F0
     defw &0FF0
+; }}}
 
 MainMenuSelection:
     ld a,(CursorCurrentPosXY_Plus2-2)
@@ -1423,7 +1425,6 @@ OnscreenCursorDefine:
 OnscreenCursor:
         ld hl,&0101 :CursorCurrentPosXY_Plus2   ;current pos
         push hl
-
             call ClearChar
         pop hl
 
