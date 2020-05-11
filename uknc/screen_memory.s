@@ -2,17 +2,16 @@
 GetMemPos:
     # Input  R1 = XY (x=bytes - so 80 across)
     # output R5 = screen mem pos
-    CLR  R5
-    BISB R1,R5
-    ASL  R5
+    MOV  R4,R5
+    ASH  $4,R5
 
     MOV  scr_addr_table(R5),R5
 
-    CLRB R1
-    SWAB R1
-    BIS  (PC)+,R1; ScreenBuffer_ActiveScreenDirect: .word 0x4000
+    MOV  R3,R0
+    ASL  R0
+    BIS  (PC)+,R0; ScreenBuffer_ActiveScreenDirect: .word 0x4000
 
-    ADD  R1,R5
+    ADD  R0,R5
 RETURN
 
 scr_addr_table:

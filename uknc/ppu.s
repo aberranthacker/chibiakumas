@@ -193,8 +193,8 @@ SLTABInit:      MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
 #------------------------------------- main screen area
                 MOV  $FB1 >> 1,R2    # address of second frame-buffer
                 MOV  $200,R3         # number of lines on main screen area
-3$:             MOV  $0xCC00,(R0)+   #  colors  011  010  001  000 (YRGB)
-                MOV  $0xFF99,(R0)+   #  colors  111  110  101  100 (YRGB)
+3$:             MOV  $0x0000,(R0)+   #  colors  011  010  001  000 (YRGB)
+                MOV  $0x0000,(R0)+   #  colors  111  110  101  100 (YRGB)
                 MOV  R2,(R0)+        #--main RAM address of a scanline
                 ADD  $8,R1           #  calc address of next record of SLTAB
                 MOV  R1,(R0)+        #--pointer to the next record of SLTAB
@@ -514,45 +514,60 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         BMI  key_released$
 
     key_pressed$: #------------------{{{
-        CMPB R0,$0134 # Down
-        BEQ  down_pressed$
-        CMPB R0,$0154 # Up
-        BEQ  up_pressed$
-        CMPB R0,$0133 # Right
-        BEQ  right_pressed$
-        CMPB R0,$0116 # Left
-        BEQ  left_pressed$
         CMPB R0,$070  # Y
         BEQ  fire_right_pressed$
+
         CMPB R0,$047  # F
         BEQ  fire_left_pressed$
+
+        CMPB R0,$0134 # Down
+        BEQ  down_pressed$
+
+        CMPB R0,$0154 # Up
+        BEQ  up_pressed$
+
+        CMPB R0,$0133 # Right
+        BEQ  right_pressed$
+
+        CMPB R0,$0116 # Left
+        BEQ  left_pressed$
+
         CMPB R0,$046  # УПР
         BEQ  fire_smartbomb_pressed$
+
         CMPB R0,$015  # К5
         BEQ  pause_pressed$
+
         BR   1237$
     #--------------------------------}}}
 
     key_released$: #-----------------{{{
-        CMPB R0,$0214 # Down or Up
+        CMPB R0,$0210  # Y
+        BEQ  fire_right_released$
+
+        CMPB R0,$0207  # F
+        BEQ  fire_left_released$
+
+        CMPB R0,$0214 # Up? or Down?
         BNE  not_up_down$
 
         BITB @$PBP12D,$1
         BZE  up_released$
         BR   down_released$
+
     not_up_down$:
         CMPB R0,$0213 # Right
         BEQ  right_released$
+
         CMPB R0,$0216 # Left
         BEQ  left_released$
-        CMPB R0,$0210  # Y
-        BEQ  fire_right_released$
-        CMPB R0,$0207  # F
-        BEQ  fire_left_released$
+
         CMPB R0,$0206  # УПР
         BEQ  fire_smartbomb_released$
+
         CMPB R0,$0215  # К5
         BEQ  pause_released$
+
         BR   1237$
     #--------------------------------}}}
 

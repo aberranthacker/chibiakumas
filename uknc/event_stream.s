@@ -103,7 +103,7 @@ Event_MoreEventsDec: #multiple events at the same timepoint # Event_MoreEventsDe
 
 EventStream_Process:                                        # Event_Stream:
         BIT  (PC)+,@(PC)+                                   #     ld a,(Timer_TicksOccured)
-        srcEvent_LevelSpeed:                                #     and %00000100:Event_LevelSpeed_Plus1    ; how often ticks occur
+             srcEvent_LevelSpeed:                           #     and %00000100:Event_LevelSpeed_Plus1    ; how often ticks occur
        .word 0x04
        .word srcTimer_TicksOccured
 
@@ -119,7 +119,7 @@ Event_Stream_ForceNow:                                      # Event_Stream_Force
 Event_MoreEvents:                                           # Event_MoreEvents:
         # compare NextEventTime with LevelTime              #     ld a,1 :Event_NextEventTime_Plus1 ;The time the event should occur
         CMP  (PC)+, @(PC)+
-        srcEvent_NextEventTime:
+             srcEvent_NextEventTime:
        .word 0x01
        .word srcEvent_LevelTime
 
@@ -591,10 +591,11 @@ RETURN                                                      #     ret
 Event_CoreSaveLoadSettings2:
 # 1001XXXX Save/Load object settings XXXX bank
 # (0-15 = load . 16 = Save (to bank marked by next byte))
-        MOV   (PC)+,@(PC)+
-        srcEvent_SavedSettings:
+        MOV  (PC)+,@(PC)+
+             srcEvent_SavedSettings:
        .word 0
        .word srcEvent_SavedSettingsFinal
+
         BR    Event_CoreSaveLoadSettingsStart$
 
 Event_CoreSaveLoadSettings:

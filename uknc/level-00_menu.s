@@ -229,13 +229,13 @@ ShowMenu:
         CALL @$ObjectArray_Redraw
 
         JSR  R5,@$OnscreenCursorDefine
-       .byte 0x09,0x0C # startpos   ld hl,&090C ; hl = startpos
-       .word 0x0001    # movespeed  ld bc,&0001 ; bc = movespeed
-       .byte 0x02,0x26 # MinX,MaxX  ld ix,&2602 ; ix = MinX,MaxX
+       .byte 0x0A,0x0C # startpos  X,Y ; hl = startpos
+       .byte 0x00,0x01 # movespeed X,Y ; bc = movespeed
+       .byte 0x02,0x26 # MinX,MaxX     ; ix = MinX,MaxX
     .ifdef CompileEP2
-       .byte 0x0C,0x12 # MinY,MaxY  ld iy,&120C ; iy = MinY,MaxY
+       .byte 0x0C,0x12 # MinY,MaxY     ; iy = MinY,MaxY
     .else
-       .byte 0x0C,0x11 # MinY,MaxY  ld iy,&110C ; iy = MinY,MaxY
+       .byte 0x0C,0x11 # MinY,MaxY     ; iy = MinY,MaxY
     .endif
 
 ShowMenu_Loop: #-------------------------------------------------------------{{{
@@ -249,7 +249,7 @@ ShowMenu_Loop: #-------------------------------------------------------------{{{
         BIT  $Keymap_AnyFire,@$KeyboardScanner_P1
         BNZ  MainMenuSelection
                                                             #    push hl
-                                                            #        call OnscreenCursor
+        CALL OnscreenCursor                                 #        call OnscreenCursor
                                                             #    pop ix
                                                             #    ld a,(ix+8)
                                                             #    bit 2,a
@@ -263,7 +263,47 @@ ShowMenu_Loop: #-------------------------------------------------------------{{{
         JMP  @$ShowMenu_Loop                                #    jp ShowMenu_Loop
 #----------------------------------------------------------------------------}}}
 MainMenuSelection:
+        MOV  @$CursorCurrentPosY,R0
+        CMP  R0,$0x0C
+        BEQ  StartGame_1UP
+        CMP  R0,$0x0D
+        BEQ  StartGame_2UP
+        CMP  R0,0x0E
+        BEQ  StartGame_2P
+        CMP  R0,0x0F
+        BEQ  Introduction
+        CMP  R0,0x10
+        BEQ  doGameplaySettings
+   .ifdef CompileEP2
+        CMP  R0,0x11
+        BEQ  EyeCatches
+        CMP  R0,0x12
+        BEQ  DoShowCredits
+   .else
+        CMP  R0,0x11
+        BEQ  DoShowCredits
+   .endif
+
         JMP  @$ShowMenu_Loop
+#----------------------------------------------------------------------------}}}
+StartGame_1UP: #-------------------------------------------------------------{{{
+        JMP  @$ShowMenu_Loop
+#----------------------------------------------------------------------------}}}
+StartGame_2UP: #-------------------------------------------------------------{{{
+        JMP  @$ShowMenu_Loop
+#----------------------------------------------------------------------------}}}
+StartGame_2P: #--------------------------------------------------------------{{{
+        JMP  @$ShowMenu_Loop
+#----------------------------------------------------------------------------}}}
+Introduction: #--------------------------------------------------------------{{{
+        JMP  @$ShowMenu_Loop
+#----------------------------------------------------------------------------}}}
+doGameplaySettings: #--------------------------------------------------------{{{
+        JMP  @$ShowMenu_Loop
+#----------------------------------------------------------------------------}}}
+DoShowCredits: #-------------------------------------------------------------{{{
+        JMP  @$ShowMenu_Loop
+#----------------------------------------------------------------------------}}}
 
 ResetEventStream: #----------------------------------------------------------{{{
         MOV  $GameVarsArraysSize>>2,R0
@@ -277,9 +317,13 @@ ResetEventStream: #----------------------------------------------------------{{{
         CALL @$Event_StreamInit
 RETURN
 #----------------------------------------------------------------------------}}}
+
 OnscreenCursorDefine: #------------------------------------------------------{{{
-        MOV  (R5)+,@$CursorCurrentPosXY
-        MOV  (R5)+,@$CursorMoveSpeedXY
+        MOVB (R5)+,@$CursorCurrentPosX
+        MOVB (R5)+,@$CursorCurrentPosY
+
+        MOVB (R5)+,@$CursorMoveSpeedX
+        MOVB (R5)+,@$CursorMoveSpeedY
 
         MOVB (R5)+,@$CursorMinX
         MOVB (R5)+,@$CursorMaxX
@@ -290,20 +334,92 @@ OnscreenCursorDefine: #------------------------------------------------------{{{
         RTS  R5
 #----------------------------------------------------------------------------}}}
 OnscreenCursor: #------------------------------------------------------------{{{
-        MOV  (PC)+,R5; CursorCurrentPosXY: .word 0x0101
+        MOV  (PC)+,R3; CursorCurrentPosX: .word 0x09
+        MOV  (PC)+,R4; CursorCurrentPosY: .word 0x0C
 
-        MOV  (PC)+,R1; CursorMoveSpeedXY: .word 0x0202
-        CursorMaxY: .word 24
-        CursorMinY: .word 2
-        CursorMaxX: .word 39
-        CursorMinX: .word 2
+        CALL ClearChar
+
+        MOVB (PC)+,R1; CursorMoveSpeedX: .word 0x00
+        MOVB (PC)+,R2; CursorMoveSpeedY: .word 0x01
+
+        MOV  @$KeyboardScanner_P1,R0
+        CMP  R0,(PC)+; LastKeyMapChange: .word 0
+        BEQ  draw_cursor$
+        MOV  R0,@$LastKeyMapChange
+    # is down pressed?
+        ROR  R0
+        BCC  not_down$
+
+        CMP  R4,(PC)+; CursorMaxY: .word 0x11
+        BHIS draw_cursor$
+        ADD  R2,R4
+
+        CMP  R4,$0x0E
+        BNE  not_down$
+        INC  R4
+
+    not_down$:
+        ROR  R0
+        BCC  not_up$
+
+        CMP  R4,(PC)+; CursorMinY: .word 0x0C
+        BLOS draw_cursor$
+        SUB  R2,R4
+
+        CMP  R4,$0x0E
+        BNE  not_up$
+        DEC  R4
+
+    not_up$:
+        ROR  R0
+        BCC  not_right$
+
+        CMP  R3,(PC)+; CursorMaxX: .word 0x26
+        BHIS draw_cursor$
+        ADD  R1,R3
+
+    not_right$:
+        ROR  R0
+        BCC  not_left$
+
+        CMP  R3,(PC)+; CursorMinX: .word 0x02
+        BLOS draw_cursor$
+        SUB  R1,R3
+
+    not_left$:
+    draw_cursor$:
+        MOV  R3,@$CursorCurrentPosX
+        MOV  R4,@$CursorCurrentPosY
+
+        CALL @$GetMemPos
+
+        INC  @$CursorFrame
+        MOV  (PC)+,R1; CursorFrame: .word 0
+        BIC  $0xFFF3,R1
+        ASL  R1
+        ASL  R1
+        ADD  $CursorSpr,R1
+
+        MOV  $8,R0
+    100$:
+        MOV  (R1)+,(R5)
+        ADD  $80,R5
+        SOB  R0,100$
 RETURN
 #----------------------------------------------------------------------------}}}
 ClearChar: #-----------------------------------------------------------------{{{
 # c = 12 * 4 (48)
 # b =  9 * 2 (18)
+        CALL @$GetMemPos
+        MOV  $8,R0
+
+    100$:
+        CLR  (R5)
+        ADD  $80,R5
+        SOB  R0,100$
 RETURN
 #----------------------------------------------------------------------------}}}
+
 Fader: #---------------------------------------------------------------------{{{
         MOV  R0,-(SP)
         MOV  R1,-(SP)
@@ -338,6 +454,7 @@ Fader: #---------------------------------------------------------------------{{{
         MOV  (SP)+,R0
 RETURN
 #----------------------------------------------------------------------------}}}
+
 ShowKeysBitmap: # -----------------------------------------------------------{{{
         MOV  @$KeyboardScanner_P1,R3
         CMP  R3,(PC)+; LastKeysBitmap: .word 0
@@ -393,6 +510,7 @@ ScanCodeStr:
         .asciz "76543210"
         .even
 #----------------------------------------------------------------------------}}}
+
 WaitKey: #-------------------------------------------------------------------{{{
         TST  @$KeyboardScanner_P1
         BEQ  .-4
@@ -450,7 +568,7 @@ MenuPalette: #---------------------------------------------------------------{{{
     .byte 1       #  set colors
     .word 0xBB00  #
     .word 0xFFCC  #
-    .byte 58      #--line number
+    .byte 60      #--line number
     .byte 1       #  set colors
     .word 0xBB00  #
     .word 0xFF44  #
@@ -462,14 +580,26 @@ MenuPalette: #---------------------------------------------------------------{{{
     .byte 1       #  set colors
     .word 0xBB00  #
     .word 0xFF55  #
+    .byte 113     #--line number
+    .byte 1       #  set colors
+    .word 0x3300  #
+    .word 0xFF55  #
     .byte 117     #--line number
     .byte 1       #  set colors
-    .word 0xBB00  #
+    .word 0x3300  #
     .word 0xFF77  #
+    .byte 120     #--line number
+    .byte 0       #  0 - set cursor/scale/palette
+    .word 0b10000 #  graphical cursor
+    .word 0b10011 #  320 dots per line, pallete 7
     .byte 121     #--line number
     .byte 1       #  set colors
-    .word 0x9900  #
+    .word 0xDD00  #
     .word 0xFF77  #
+    .byte 136     #--line number
+    .byte 0       #  0 - set cursor/scale/palette
+    .word 0b10000 #  graphical cursor
+    .word 0b10111 #  320 dots per line, pallete 7
     .byte 137     #--line number
     .byte 1       #  set colors
     .word 0xCC00  #
@@ -530,6 +660,10 @@ MenuText1:
     .byte 10,22; .ascii "www.chibiakumas.com"    ; .byte 0xFF
 
     .byte  9,24; .ascii "HighScore: "            ; .byte 0x00
+
+    .even
+
+CursorSpr: .incbin "resources/menu_cursor.spr"
 
 DrawChibi: #------------------------------------------------------------------{{{
        .equiv SprDst, FB1+(80*64)

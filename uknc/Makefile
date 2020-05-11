@@ -85,7 +85,8 @@ build/ppu.o : $(common) \
 
 build/level-00_menu.o : $(common) \
                         level-00_menu.s \
-                        resources/titletex.spr
+                        resources/titletex.spr \
+                        resources/menu_cursor.spr
 	$(AS) -al level-00_menu.s -o build/level-00_menu.o
 
 #resources/font.raw : ../Aku/Sprites/T07-SC1.SPR \
@@ -102,6 +103,10 @@ resources/cga8x8b.raw : resources/cga8x8b.bmp.raw \
 
 resources/titletex.spr : ../Aku/Sprites/TITLETEX.SPR
 	build_tools/spr_cpc_to_uknc.rb ../Aku/Sprites/TITLETEX.SPR -o resources/titletex.spr
+
+resources/menu_cursor.spr : build_tools/bmp_to_uknc_raw.rb \
+                            resources/menu_cursor-Sheet.bmp
+	build_tools/bmp_to_uknc_raw.rb
 
 clean :
 	rm -f build/*

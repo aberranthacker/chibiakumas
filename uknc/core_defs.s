@@ -1,5 +1,5 @@
 .equiv DebugMode, 1
-.equiv ShowLoadingScreen, 1
+#.equiv ShowLoadingScreen, 1
 
 .equiv PPU_UserRamStart, 0x27B6 # 023666 10166
 .equiv PPU_UserRamSize,  0x5844 # 054104 22596
@@ -44,10 +44,10 @@
 # a var from player 2 without changing IY
 .equiv Akuyou_PlayerSeparator, 16
 
-.equiv Keymap_D,     0x01
-.equiv Keymap_U,     0x02
-.equiv Keymap_R,     0x04
-.equiv Keymap_L,     0x08
+.equiv Keymap_Down,  0x01
+.equiv Keymap_Up,    0x02
+.equiv Keymap_Right, 0x04
+.equiv Keymap_Left,  0x08
 .equiv Keymap_F1,    0x10
 .equiv Keymap_F2,    0x20
 .equiv Keymap_F3,    0x40

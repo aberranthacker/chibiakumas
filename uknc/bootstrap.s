@@ -14,6 +14,43 @@
                 .=BootstrapStart
 start:
 Bootstrap_Launch:
+# Load core modules ---------------------------------------------------------{{{
+        MOV  $ppu_module.bin,R0
+        CALL Bootstrap_LoadDiskFile
+
+        # PPU will clear the command code when it ready to execute a new one
+       .ppudo $PPU_NOP
+
+        JSR  R5,PPEXEC
+       .word FB1 # PPU module location
+       .word PPU_ModuleSizeWords + 1280 # 2.5KB is a space required for SLTAB
+#-------------------------------------------------------------------------------
+     .ifdef ShowLoadingScreen
+        # Apply loading screen palette
+       .ppudo_ensure $PPU_SetPalette, $LoadingScreenPalette
+        # Load loading screen
+        MOV  $loading_screen.bin,R0
+        CALL Bootstrap_LoadDiskFile
+     .else
+        # clear main screen area
+        MOV  $8000>>3, R0
+        MOV  $FB1, R1
+        CLR  R3
+1$:    .rept 1<<3
+        MOV  R3, (R1)+
+       .endr
+        SOB  R0, 1$
+     .endif
+
+        # Load the game core - this is always in memory
+        MOV  $core.bin,R0
+        CALL Bootstrap_LoadDiskFile
+
+        # TODO: Load saved settings
+        # TODO: player sprites load
+        # TODO: Initialize the Sound Effects.
+#----------------------------------------------------------------------------}}}
+
         CLR  R5
 
 Bootstrap_FromHL:                  # HL is used as the bootstrap command
@@ -56,43 +93,7 @@ RETURN                                  # ret
 Bootstrap_Level:
 # some missing code...
 Bootstrap_StartGame:
-# clear main screen area ----------------------------------------------------{{{
-        MOV  $2000, R0
-        MOV  $FB1, R1
-        CLR  R3
-1$:    .rept 4
-        MOV  R3, (R1)+
-       .endr
-        SOB  R0, 1$
-#----------------------------------------------------------------------------}}}
 
-# Load core modules ---------------------------------------------------------{{{
-        MOV  $ppu_module.bin,R0
-        CALL Bootstrap_LoadDiskFile
-
-        # PPU will clear the command code when it ready to execute a new one
-        MOV  $PPU_NOP,@$PPUCommand
-
-        JSR  R5,PPEXEC
-       .word FB1 # PPU module location
-       .word PPU_ModuleSizeWords + 1280 # 2.5KB is a space required for SLTAB
-#-------------------------------------------------------------------------------
-     .ifdef ShowLoadingScreen
-        # Apply loading screen palette
-       .ppudo_ensure $PPU_SetPalette, $LoadingScreenPalette
-        # Load loading screen
-        MOV  $loading_screen.bin,R0
-        CALL Bootstrap_LoadDiskFile
-     .endif
-
-        # Load the game core - this is always in memory
-        MOV  $core.bin,R0
-        CALL Bootstrap_LoadDiskFile
-
-        # TODO: Load saved settings
-        # TODO: player sprites load
-        # TODO: Initialize the Sound Effects.
-#----------------------------------------------------------------------------}}}
 
 Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
         MOV  $SPReset,SP # we are not returning, so reset the stack
@@ -114,7 +115,7 @@ Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
 
        .ppudo_ensure $PPU_SingleProcess
         JMP  @$Akuyou_LevelStart
-       .putstr $WarningStr
+       .ppudo_ensure $PPU_PrintAt,$TestStr
         JMP  .
         RETURN                         # ret
 #----------------------------------------------------------------------------
@@ -581,6 +582,14 @@ BulletConfigHell: #----------------------------------------------------------{{{
     .byte 0
 BulletConfigHell_End:
 #----------------------------------------------------------------------------}}}
+BlackPalette: #------------------------------------------------------{{{
+    .byte 1       #--line number
+    .byte 1       #  set colors
+    .word 0x0000  #
+    .word 0x0000  #
+    .byte 201     #--line number, 201 - end of the main screen params
+    .even
+#----------------------------------------------------------------------------}}}
 LoadingScreenPalette: #------------------------------------------------------{{{
     .byte 0       #--line number, last line of the top screen area, *required!*
     .byte 0       #  0 - set cursor/scale/palette, *ignored for the first record*
@@ -619,11 +628,9 @@ LoadingScreenPalette: #------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
                    #0         1         2         3         4         5         6         7
                    #01234567890123456789012345678901234567890123456789012345678901234567890123456789
-        .even # PPU reads strings by word by word, so align
+       .even # PPU reads strings by word by word, so align
 YahooStr:   .asciz "Yippee! Whoopee! Woo-hoo! Yay! Hurrah!\n"
-        .even
-WarningStr: .asciz "Warning!\n"
-        .even
+       .even
 TestStr: .byte 0,10
          .byte        '!,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F
          .byte 0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x3A,0x3B,0x3C,0x3D,0x3E,0x3F
@@ -633,5 +640,5 @@ TestStr: .byte 0,10
          .byte 0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77,0x78,0x79,0x7A,0x7B,0x7C,0x7D,0x7E,0x7F
          .byte 0x80,0x81,0x82,0x83,0x84,0x85
          .byte 0x00
-        .even
+       .even
 BootstrapEnd:

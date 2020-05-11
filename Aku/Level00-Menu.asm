@@ -1483,7 +1483,6 @@ OnscreenCursorAbandon:
 
         call ShowCursorPos
 
-
         call Akuyou_DrawText_LocateSprite
 
         ld hl,OnscreenCursor_anim :OnscreenCursor_animNext_Plus2
@@ -1495,7 +1494,7 @@ OnscreenCursorAbandon:
 OnscreenCursorOk:
         inc hl
         ld (OnscreenCursor_animNext_Plus2-2),hl
-        call Akuyou_DrawText_CharSprite
+        call Akuyou_DrawText_CharSprite ; SrcCPC/Akuyou_CPC_TextDriver.asm:119
         ei
         halt
         halt

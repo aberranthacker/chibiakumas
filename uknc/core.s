@@ -14,6 +14,7 @@
        .global Event_SavedSettings
        .global FileBeginCore
        .global FileEndCore
+       .global GetMemPos
        .global KeyboardScanner_P1
        .global KeyboardScanner_P2
        .global LevelStart

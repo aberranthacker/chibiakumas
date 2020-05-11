@@ -50,7 +50,7 @@ def transform(sprite_words)
       q3 = REVERSE_TABLE_4BIT[(word & 0b1111_0000_0000) >> 8]
       q4 = REVERSE_TABLE_4BIT[(word & 0b1111_0000_0000_0000) >> 12]
 
-      words << (q1 | q2 << 8 | q3 << 4 | q4 << 12)
+      words << (q4 << 12 | q2 << 8 | q3 << 4 | q1)
     end
   end
 end
