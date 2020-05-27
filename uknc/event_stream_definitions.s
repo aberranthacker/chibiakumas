@@ -28,15 +28,16 @@
 
 # evtSetProgMoveLife equ 128+4 ; Set prog to b1, Set move to b2, set life to b3
 .equiv mvSetProgMoveLife,  0x04 * 2 #  8
+.equiv evtSetProgMoveLife, (0x14 * 2) << 8 # 40
 
 # evtSetSprite       equ 128+5 ; set sprite to b1
 #.equiv mvSetSprite,        0x05 * 2 # 10
 
 # evtAddToBackground equ 128+6 ; Add oject to background (back of object array)
-#.equiv mvAddRoBackground,  0x06 * 2 # 12
+.equiv mvAddToBackground,  0x06 * 2 # 12
 
 # evtAddToForeground equ 128+7 ; Add oject to foreground (back of object array)
-#.equiv mvAddToForeground,  0x07 * 2 # 14
+.equiv mvAddToForeground,  0x07 * 2 # 14
 
 # evtJumpToNewTime   equ 128+8 ; Change event stream position to w1 , and levetime
 #                              ; to b2... time in b2 must be lower than first event
@@ -44,14 +45,17 @@
 .equiv mvChangeStreamTime, 0x08 * 2 # 16
                                                             # evtCallAddress     equ 137 ; Call a memory address w1... make sure you don't
                                                             #                            ; change any registers (other than A)
-                                                            # evtSaveLstObjToAdd equ 138 ; Save the memory position of last added object in
-                                                            #                            ; the object array to memory location w1... used for
-                                                            #                            ; boss sprites
+# evtSaveLstObjToAdd equ 138 ; Save the memory position of last added object in
+#                            ; the object array to memory location w1... used for
+#                            ; boss sprites
+.equiv mvSaveLstObjToAdd, 0x0A * 2 # 20
                                                             # evtResetPowerup    equ 139 ; Take away the player powerups... how mean!
                                                             # evtSetLevelSpeed   equ 140 ; Change the speed of the object array to b1...
                                                             #                            ; %00000100 is default.. .%00000010 is faster
-                                                            # evtSetObjectSize   equ 141 ; set Object sprite size to b1... default is 24
-                                                            # evtSetAnimator     equ 142 ; set animator to b1... 0 means no animator
+# evtSetObjectSize   equ 128+13 ; set Object sprite size to b1... default is 24
+.equiv evtSetObjectSize, (0x1D * 2) << 8 # 58
+# evtSetAnimator     equ 128+14 ; set animator to b1... 0 means no animator
+.equiv evtSetAnimator,   (0x1E * 2) << 8 # 60
                                                             # evtSetAnimatorPointers  equ 143 ; set address of array of animators to w1
                                                             #
                                                             # evtStarburt             equ %01000000 ; 0100xxxx X Y   = (64) add stars to X,Y
@@ -132,7 +136,8 @@
 # 10011111 B = Save to bank B
 # 1001XXXX Load object settings (Prog, Move, Life, Spritesize, Animator,
 # BG/FG layer) from XXXX bank (0-14 - see above 15 is save command)
-.equiv evtLoadSaveObjSettings, ((0b10010000 >> 4) * 2) << 8 # 18
+.equiv evtSaveObjSettings, (0x09 * 2) << 8 # 18
+.equiv evtLoadObjSettings, (0x0A * 2) << 8 # 20
                                                             # ;       Use this function to create template enemy moves and background object types
                                                             # ;     1010       Unused
                                                             # ;     1011       Unused
@@ -167,8 +172,8 @@
                                                             # ;8 = 96 px
                                                             # ;9 = 128 px
                                                             #
-                                                            # prgNothing  equ 0 ; PrgSpare
-                                                            # PrgBitShift equ 1 ; Change sprite bank according to X
+.equiv prgNone, 0                                           # prgNothing  equ 0 ; PrgSpare
+.equiv prgBitShift, 1                                       # prgBitShift equ 1 ; Change sprite bank according to X
                                                             # prgSpecial  equ 2
                                                             # prgBonus    equ 3
                                                             # prgMovePlayer   equ 4
@@ -256,9 +261,15 @@
                                                             # specMoveChibiko equ 255
                                                             #
                                                             #
+.equiv mvRegular, 0 
+.equiv mvSpecial, 0x80
+.equiv spdNormal, 0
+.equiv spdFast, 0x40
+
                                                             # mveMisc       equ 0 ;used for visual clarity!
-                                                            # mveStatic     equ &24
-                                                            # mveBackground equ %11000000
+# mveStatic     equ &24
+.equiv mveStatic, 0x24
+.equiv mveBackground, 0xC0                                  # mveBackground equ %11000000
                                                             # mveSeaker_P1  equ %10000100
                                                             # mveSeaker_P2  equ %10010000
                                                             # mveSeaker     equ %10001000 ;seek! I can't spel!
@@ -270,45 +281,43 @@
                                                             # mveCustom4    equ %10110000
                                                             #
                                                             # ;   Moves - Regular
-                                                            # ;       0   1   2   3   4   5   6   7
-                                                            # ;       -4  -3  -2  -1  0   1   2   3
-                                                            # ;-4 0   00  01  02  03   04 05  06  07
-                                                            # ;-3 1   08  09  0A  0B   0C 0D  0E  0F
-                                                            # ;-2 2   10  11  12  13   14 15  16  17
-                                                            # ;-1 3   18  19  1A  1B   1C 1D  1E  1F
-                                                            #
-                                                            # ;0  4   20  21  22  23  [24]    25  26  27
-                                                            #
-                                                            # ;1  5   28  29  2A  2B   2C 2D  2E  2F
-                                                            # ;2  6   30  31  32  33   34 35  36  37
-                                                            # ;3  7   38  39  3A  3B   3C 3D  3E  3F
+                                                            # ;        0   1   2   3   4   5   6   7
+                                                            # ;       -4  -3  -2  -1  0    1   2   3
+                                                            # ;-4  0  00  01  02  03  04  05  06  07
+                                                            # ;-3  1  08  09  0A  0B  0C  0D  0E  0F
+                                                            # ;-2  2  10  11  12  13  14  15  16  17
+                                                            # ;-1  3  18  19  1A  1B  1C  1D  1E  1F
+                                                            # ; 0  4  20  21  22  23 [24] 25  26  27
+                                                            # ; 1  5  28  29  2A  2B  2C  2D  2E  2F
+                                                            # ; 2  6  30  31  32  33  34  35  36  37
+                                                            # ; 3  7  38  39  3A  3B  3C  3D  3E  3F
                                                             #
                                                             # mveFast equ &40
                                                             # ;   Moves - Fast
                                                             # ;       0   1   2   3   4   5   6   7
                                                             # ;       -4  -3  -2  -1  0   1   2   3
-                                                            # ;-4 0   40  41  42  43   44 45  46  47
-                                                            # ;-3 1   48  49  4A  4B   4C 4D  4E  4F
-                                                            # ;-2 2   50  51  52  53   54 55  56  57
-                                                            # ;-1 3   58  59  5A  5B   5C 5D  5E  5F
-                                                            #
-                                                            # ;0  4   60  61  62  63  [64]    65  66  67
-                                                            #
-                                                            # ;1  5   68  69  6A  6B   6C 6D  6E  6F
-                                                            # ;2  6   70  71  72  73   74 75  76  77
-                                                            # ;3  7   78  79  7A  7B   7C 7D  7E  7F
+                                                            # ;-4  0  40  41  42  43  44  45  46  47
+                                                            # ;-3  1  48  49  4A  4B  4C  4D  4E  4F
+                                                            # ;-2  2  50  51  52  53  54  55  56  57
+                                                            # ;-1  3  58  59  5A  5B  5C  5D  5E  5F
+                                                            # ; 0  4  60  61  62  63 [64] 65  66  67
+                                                            # ; 1  5  68  69  6A  6B  6C  6D  6E  6F
+                                                            # ; 2  6  70  71  72  73  74  75  76  77
+                                                            # ; 3  7  78  79  7A  7B  7C  7D  7E  7F
                                                             #
                                                             # lifCustom       equ 255       ; We use 63 as a marker for custom code's INIT -
                                                             #                               ; a real life will be set by the custom code
                                                             # lifEnemy        equ %11000000 ; HurtByBullets,Hurts Player
                                                             # lifTimed        equ %00000000 ; Doesnt hurt, dies automatically
                                                             # lifDeadly       equ %01000000 ; Deadly and cant be shot
-                                                            # lifImmortal     equ 0
+# lifImmortal     equ 0
+.equiv lifeImmortal, 0
                                                             # TwoFrameSprite  equ 128    ; sequence is 1,2 1,2 etc
                                                             # FourFrameSprite equ 128+64 ; sequence is 1,3,2,4 ,1,3,2,4 etc
                                                             #
                                                             # ;Animators 4 bytes... Animator,X,Y,Z
-                                                            # anmEmpty          equ 00 ; do nothing
+# anmEmpty          equ 00 ; do nothing
+.equiv anmNone, 0
                                                             # anmSprite         equ 01 ; Set object Sprite=X
                                                             # anmMove           equ 02 ; Set object Move=X
                                                             # anmProgram        equ 03 ; Set object program=X

@@ -5,14 +5,15 @@
                .include "./core_defs.s"
                .include "./event_stream_definitions.s"
 
-               .global start # make entry point available to linker
+               .global start # make entry point available to a linker
 
                .equiv  Level00SizeWords, (end - start) >> 1
                .global Level00SizeWords
 
                .=Akuyou_LevelStart
 
-start:  JMP  @$LevelInit
+start:
+        JMP  @$LevelInit
 
 TITLETEX: .incbin "resources/titletex.spr"
 
@@ -55,14 +56,13 @@ EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
         # defb %11000001 ; Move - dir Left Slow
         # defb 0         ; Life - immortal
     .word 0 # time
-    .word evtMove | mvSetProgMoveLife # CALL Event_ProgramMoveLifeSwitch
-    .word 1          # program - bitshift sprite
-    .word 0b11000001 # move    - dir left, slow
-    .word 0          # life    - immortal
+    .word evtSetProgMoveLife # CALL Event_ProgramMoveLifeSwitch
+    .word prgBitShift # program - bitshift sprite
+    .word 0b11000001  # move    - dir left, slow
+    .word lifeImmortal
         # defb 0,%10010000+15,0      ; Save Object settings to Bank 0
     .word 0 # time
-    .word evtLoadSaveObjSettings | 0x0F # CALL Event_CoreSaveLoadSettings
-    .word 0 # Save Object settings to the Slot 0
+    .word evtSaveObjSettings | 0 # Save Object settings to the Slot 0
 
         # defb 0
         # defb 128+4      ; SrcALL/Akuyou_Multiplatform_EventStream.asm:182
@@ -71,32 +71,30 @@ EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
         # defb %11000010  ; Move    - dir Left Slow
         # defb 0          ; Life    - immortal
     .word 0 # time
-    .word evtMove | mvSetProgMoveLife # CALL Event_ProgramMoveLifeSwitch
-    .word 1          # program - bitshift sprite
+    .word evtSetProgMoveLife # CALL Event_ProgramMoveLifeSwitch
+    .word prgBitShift          # program - bitshift sprite
     .word 0b11000010 # move    - dir left, slow
-    .word 0          # life    - immortal
+    .word lifeImmortal
         # defb 0,%10010000+15,1      ; Save Object settings to Bank 1
     .word 0 # time
-    .word evtLoadSaveObjSettings | 0x0F # CALL Event_CoreSaveLoadSettings
-    .word 1 # Save Object settings to the Slot 1
+    .word evtSaveObjSettings | 1 # Save Object settings to the Slot 1
 
         # defb 0,128+4,0,&24,0       ; Static object
     .word 0 # time
-    .word evtMove | mvSetProgMoveLife # CALL Event_ProgramMoveLifeSwitch
-    .word 0          # program - bitshift sprite
-    .word 0x24       # 0b100100 move - dir left, slow
-    .word 0          # life immortal
+    .word evtSetProgMoveLife # CALL Event_ProgramMoveLifeSwitch
+    .word prgNone
+    .word mveStatic
+    .word lifeImmortal
         # defb 0,%10010000+15,2      ; Save Object settings to Bank 2
     .word 0 # time
-    .word evtLoadSaveObjSettings | 0x0F # CALL Event_CoreSaveLoadSettings
-    .word 2 # Save Object settings to the Slot 2
+    .word evtSaveObjSettings | 2 # Save Object settings to the Slot 2
 
         # ;Title
         # defb 0,%01110000+7          ; 7 commands at the same timepoint
     .word 0 # time
     .word evtMultipleCommands | 7 # Event_CoreMultipleEventsAtOneTime; 7 -> srcEvent_MultipleEventCount
         # defb %10010000+0+2          ; Load Settings from bank 2
-    .word evtLoadSaveObjSettings | 0x02 # Load Object settings from the Slot 2
+    .word evtLoadObjSettings | 2 # Load Object settings from the Slot 2
         # defb 0, 12, 12*0+ 24+44, 24+16 ; Single Object sprite 11 (animated)
     .word evtSingleSprite
     .word 12 # sprite
@@ -127,7 +125,7 @@ EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
     .word 0 # time
     .word evtMultipleCommands | 3 # Event_CoreMultipleEventsAtOneTime; 7 -> srcEvent_MultipleEventCount
         # defb %10010000+0+2      ; Load Settings from bank 2
-    .word evtLoadSaveObjSettings | 0x02 # Load Object settings from the Slot 2
+    .word evtLoadObjSettings | 2 # Load Object settings from the Slot 2
         # defb 0,0,12*0+ 24,24+64 ; Single Object sprite 11 (animated)
     .word evtSingleSprite
     .word 0                # sprite
@@ -142,7 +140,7 @@ EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
     .word 0 # time
     .word evtMultipleCommands | 3 # Event_CoreMultipleEventsAtOneTime; 7 -> srcEvent_MultipleEventCount
         # defb %10010000+0+2                 ; Load Settings from bank 2
-    .word evtLoadSaveObjSettings | 0x02 # Load Object settings from the Slot 2
+    .word evtLoadObjSettings | 2 # Load Object settings from the Slot 2
         # defb 0,2,12*0+ 24+160-24,24+200-64 ; Single Object sprite 11 (animated)
     .word evtSingleSprite
     .word 2               # sprite
@@ -165,15 +163,15 @@ LevelInit:
         MOV  $Event_SavedSettings,R3  # Saved Settings
         CALL @$Event_StreamInit
 
-        MOV  $EventStreamArray_Ep1,R5 # Event Stream
-        MOV  $Event_SavedSettings,R3  # Saved Settings
-        CALL @$ResetEventStream
+       #MOV  $EventStreamArray_Ep1,R5 # Event Stream
+       #MOV  $Event_SavedSettings,R3  # Saved Settings
+       #CALL @$ResetEventStream
 
        .ppudo_ensure $PPU_PrintAt,$PressFireKeyStr # Aku/Level00-Menu.asm:1101
         # Aku/Level00-Menu.asm:1103
-        CALL @$Timer_UpdateTimer
-        CALL @$EventStream_Process
-        CALL @$ObjectArray_Redraw
+       #CALL @$Timer_UpdateTimer
+       #CALL @$EventStream_Process
+       #CALL @$ObjectArray_Redraw
 
         CLR  @$KeyboardScanner_P1 # call Keys_WaitForRelease
 
@@ -219,8 +217,9 @@ ShowMenu:
     .else
         MOV  $EventStreamArray_Menu_EP1, R5
     .endif
-
+.list
         CALL @$ResetEventStream
+        .nolist
         # TODO: show hiscore value
         CALL @$Timer_UpdateTimer # Aku/Level00-Menu.asm:1180
         CALL @$EventStream_Process
@@ -262,30 +261,32 @@ ShowMenu_Loop: #-------------------------------------------------------------{{{
                                                             #
         JMP  @$ShowMenu_Loop                                #    jp ShowMenu_Loop
 #----------------------------------------------------------------------------}}}
-MainMenuSelection:
+
+MainMenuSelection: #---------------------------------------------------------{{{
         MOV  @$CursorCurrentPosY,R0
         CMP  R0,$0x0C
         BEQ  StartGame_1UP
         CMP  R0,$0x0D
         BEQ  StartGame_2UP
-        CMP  R0,0x0E
+        CMP  R0,$0x0E
         BEQ  StartGame_2P
-        CMP  R0,0x0F
+        CMP  R0,$0x0F
         BEQ  Introduction
-        CMP  R0,0x10
+        CMP  R0,$0x10
         BEQ  doGameplaySettings
    .ifdef CompileEP2
-        CMP  R0,0x11
+        CMP  R0,$0x11
         BEQ  EyeCatches
-        CMP  R0,0x12
+        CMP  R0,$0x12
         BEQ  DoShowCredits
    .else
-        CMP  R0,0x11
+        CMP  R0,$0x11
         BEQ  DoShowCredits
    .endif
 
         JMP  @$ShowMenu_Loop
 #----------------------------------------------------------------------------}}}
+
 StartGame_1UP: #-------------------------------------------------------------{{{
         JMP  @$ShowMenu_Loop
 #----------------------------------------------------------------------------}}}
@@ -296,7 +297,8 @@ StartGame_2P: #--------------------------------------------------------------{{{
         JMP  @$ShowMenu_Loop
 #----------------------------------------------------------------------------}}}
 Introduction: #--------------------------------------------------------------{{{
-        JMP  @$ShowMenu_Loop
+        MOV  $0,R5
+        CALL ExecuteBootstrap
 #----------------------------------------------------------------------------}}}
 doGameplaySettings: #--------------------------------------------------------{{{
         JMP  @$ShowMenu_Loop
@@ -691,4 +693,7 @@ DrawChibi: #------------------------------------------------------------------{{
 
         BR   .
 #----------------------------------------------------------------------------}}}
+# for some reason GAS replaces the last byte with 0
+# so we add the dummy word to avoid data/code corruption
+        .word 0xFFFF
 end:

@@ -17,7 +17,7 @@
    .ppudo \cmd, \arg
 .endm
 
-.macro .putstr str_addr
+.macro .puts str_addr
    .wait_ppu
     MOV  \str_addr, @$PPUCommandArg
     MOV  $PPU_Print,@$PPUCommand
@@ -76,7 +76,7 @@
     EMT  0350
 .endm
 
-.macro .cout addr
+.macro .tty_print addr
     MOV  \addr,R0
     EMT  0351
 .endm

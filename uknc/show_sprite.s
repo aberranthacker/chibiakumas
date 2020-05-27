@@ -171,7 +171,7 @@ ShowSprite: # ShowSprite is the main routine of our program!
                                                             #     ex af,af'
                                                             #     ld a,b
         CMP  R1,(PC)+; cmpSpriteSizeConfig6: .word 6        #     cp 6 :SpriteSizeConfig6_Plus1
-        # calls ShowSpriteReconfigure or NULL
+        # calls ShowSpriteReconfigure or null
        .call NE, @(PC)+                                     #     call nz,ShowSpriteReconfigure   :ShowSpriteReconfigureCommand_Plus2
         dstShowSpriteReconfigureCommand: .word ShowSpriteReconfigure
 
@@ -333,9 +333,10 @@ ShowSprite_SkipChanges:                                     # ShowSprite_SkipCha
                                                             #     ld l,a  ; hl now is the memory loc of the line
                                                             #
         ADD  (PC)+,R5;                                      #     ld de,&C069 :ScreenBuffer_ActiveScreenDirectC_Plus1
+        srcFB_shift: 
         srcSprShow_TempX: .byte 0x00                        #     add hl,de   ; hl = memory line, bc = X pos = hl is now the location on screen
-        srcFB_shift:      .byte 0x40 # FB1                  #
-       #srcFB_shift:      .byte 0x40 # FB0
+                          .byte 0x40 # FB1                  #
+                         #.byte 0x00 # FB0
 
                                                             #
                                                             # ;;;;;;;;;;;;;;;;

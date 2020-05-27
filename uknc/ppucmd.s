@@ -30,19 +30,19 @@ PPFREE:         #------------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 # Error messages ------------------------------------------------------------{{{
 MAError:
-       .cout $sMAError
+       .tty_print $sMAError
         CALL Info
         BR   .
 MCpError:
-       .cout $sMCpError
+       .tty_print $sMCpError
         CALL Info
         BR   .
 ExError:
-       .cout $sExError
+       .tty_print $sExError
         CALL Info
         BR   .
 MFrError:
-       .cout $sMFrError
+       .tty_print $sMFrError
         CALL Info
         BR   .
 
@@ -90,15 +90,15 @@ Info:           #------------------------------------------------------------{{{
         MOV  $Arg1+7, R1
         MOV  @$PS.A1,R3
         CALL InsDecStr
-        .cout $Arg1
+        .tty_print $Arg1
         MOV  $Arg2+7, R1
         MOV  @$PS.A2,R3
         CALL InsDecStr
-        .cout $Arg2
+        .tty_print $Arg2
         MOV  $Arg3+7, R1
         MOV  @$PS.A3,R3
         CALL InsDecStr
-        .cout $Arg3
+        .tty_print $Arg3
         RETURN
                 #0         1         2         3         4         5         6         7
                 #01234567890123456789012345678901234567890123456789012345678901234567890123456789

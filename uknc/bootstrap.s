@@ -4,6 +4,7 @@
 
                 .global start
                 .global Bootstrap_Launch
+                .global Bootstrap_FromR5
                 .global BootstrapEnd
                 .global LoadingScreenPalette
 
@@ -11,9 +12,27 @@
                 .include "./macros.s"
                 .include "./core_defs.s"
 
+                .equiv BootstrapSizeWords, (end - start) >> 1
+                .global BootstrapSizeWords
+
+                .equiv BootstrapSizeDWords, BootstrapSizeWords >> 1
+                .global BootstrapSizeDWords
+
                 .=BootstrapStart
 start:
 Bootstrap_Launch:
+        MOV  $BootstrapSizeDWords,R0
+        MOV  $CBPADR,R1
+        MOV  $CBP12D,R2
+        MOV  $BootstrapStart,R3
+        MOV  $0x8000,(R1)
+
+  100$:.rept 2
+        MOV  (R3)+,(R2)
+        INC  (R1)
+       .endr
+        SOB  R0,100$
+
 # Load core modules ---------------------------------------------------------{{{
         MOV  $ppu_module.bin,R0
         CALL Bootstrap_LoadDiskFile
@@ -51,19 +70,16 @@ Bootstrap_Launch:
         # TODO: Initialize the Sound Effects.
 #----------------------------------------------------------------------------}}}
 
-        CLR  R5
+        MOV  $0x8000,R5
 
-Bootstrap_FromHL:                  # HL is used as the bootstrap command
-                                   # H=1 means levels
-                                   # H=0 means system events (Menu etc)
-        SWAB R5                    # SWAB sets Z flag if low-order byte of result = 0
-        BZE  Bootstrap_SystemEvent
-        BR   Bootstrap_Level
-RETURN
+Bootstrap_FromR5:
+       .ppudo_ensure $PPU_MultiProcess
+        TST  R5                    # R5 is used as the bootstrap command
+        BMI  Bootstrap_SystemEvent # negative means system events (Menu etc)
+        BR   Bootstrap_Level       # positive means levels
 
 Bootstrap_SystemEvent:
-        CLRB R5                         #     ld a,l
-        SWAB R5                         #     cp 0
+        BIC  $0x8000,R5
     .ifdef DebugMode
         CMP  R5,$9
         BHIS .
@@ -71,32 +87,30 @@ Bootstrap_SystemEvent:
         ASL  R5
         JMP  @SystemEventsJmpTable(R5)
     SystemEventsJmpTable:
-       .word Bootstrap_StartGame        #     jp z,BootsStrap_StartGame
-                                        #     cp 1
-       .word 0                          #     jp z,BootsStrap_ContinueScreen
-                                        #     cp 2
-       .word 0                          #     jp z,BootsStrap_ConfigureControls
-                                        #     cp 3
-       .word 0                          #     jp z,BootStrap_SaveSettings
-                                        #     cp 4
-       .word 0                          #     jp z,GameOverWin
-                                        #     cp 5
-       .word 0                          #     jp z,NewGame_EP2_1UP
-                                        #     cp 6
-       .word 0                          #     jp z,NewGame_EP2_2UP
-                                        #     cp 7
-       .word 0                          #     jp z,NewGame_EP2_2P
-                                        #     cp 8
-       .word 0                          #     jp z,NewGame_CheatStart
-RETURN                                  # ret
+       .word Bootstrap_StartGame        # 0; BootsStrap_StartGame
+       .word 0                          # 1; BootsStrap_ContinueScreen
+       .word 0                          # 2; BootsStrap_ConfigureControls
+       .word 0                          # 3; BootStrap_SaveSettings
+       .word 0                          # 4; GameOverWin
+       .word 0                          # 5; NewGame_EP2_1UP
+       .word 0                          # 6; NewGame_EP2_2UP
+       .word 0                          # 7; NewGame_EP2_2P
+       .word 0                          # 8; NewGame_CheatStart
 
 Bootstrap_Level:
-# some missing code...
+    .ifdef DebugMode
+        CMP  R5,$1
+        BHIS .
+    .endif
+        ASL  R5
+        JMP  @LevelsJmpTable(R5)
+    LevelsJmpTable:
+       .word Bootstrap_Level_Intro
+
 Bootstrap_StartGame:
 
 
 Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
-        MOV  $SPReset,SP # we are not returning, so reset the stack
         CALL StartANewGame
         CALL LevelReset0000
 
@@ -112,20 +126,31 @@ Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
                                         #
                                         # ;need to use Specail MSX version - no extra tilemaps
                                         # jp Bootstrap_LoadEP2Level_1PartOnly # ../Aku/BootStrap.asm:724
+       .ppudo_ensure $PPU_SingleProcess
+        MOV  $SPReset,SP # we are not returning, so reset the stack
+        JMP  @$Akuyou_LevelStart
+#----------------------------------------------------------------------------
+Bootstrap_Level_Intro:
+        # TODO: show loadnig screen
+        # call Akuyou_ShowCompiledSprite
+        CALL LevelReset0000
+
+        # TODO: load music Aku/BootStrap.asm:1185
+        MOV  $ep1_intro.bin,R0
+        CALL Bootstrap_LoadDiskFile
 
        .ppudo_ensure $PPU_SingleProcess
+        MOV  $SPReset,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
-       .ppudo_ensure $PPU_PrintAt,$TestStr
-        JMP  .
-        RETURN                         # ret
 #----------------------------------------------------------------------------
+
 Player_Dead_ResumeB: # ../Aku/BootStrap.asm:1411
         SpendCreditSelfMod2:
             MOV  $Player_Array,R5 # ld iy,Player_Array ; All credits are (currently) stored in player 1's var!
 
 # StartANewGame -------------------------------------------------------------{{{
 FireMode_Normal: # ../Aku/BootStrap.asm:2116
-        MOV  $NULL,R3
+        MOV  $null,R3
         MOV  R3,@$dstFireUpHandler
         MOV  R3,@$dstFireDownHandler
         MOV  R3,@$dstFireLeftHandler
@@ -277,8 +302,8 @@ LevelReset0000: # ../Aku/BootStrap.asm:2306 ---------------------------------{{{
             # wipe our memory, to clear out any junk from old levels
         MOV  $GameVarsArraySizeWords,R1
         MOV  $Akuyou_GameVarsStart,R3
-        CLR  (R3)+
-        SOB  R1, .-2
+  100$: CLR  (R3)+
+        SOB  R1, 100$
         # This resets anything the last level may have messed with during
         # play so we can start a new level with everything back to normal
 ResetCore: # ../Aku/BootStrap.asm:2318
@@ -307,7 +332,7 @@ ResetCore: # ../Aku/BootStrap.asm:2318
 
         MOV  $DoMoves,@$dstObjectDoMovesOverride
 
-        MOV  $NULL,R3
+        MOV  $null,R3
         MOV  R3,@$dstSmartBombSpecial
         MOV  R3,@$dstCustomSmartBombEnemy
         MOV  R3,@$dstCustomPlayerHitter
@@ -328,7 +353,7 @@ ResetCore: # ../Aku/BootStrap.asm:2318
 RETURN
 #----------------------------------------------------------------------------}}}
 
-Bootstrap_LoadDiskFile: # ../Aku/BootStrap.asm:2795 -------------------------{{{
+Bootstrap_LoadDiskFile: # ---------------------------------------------------{{{
         MOV  (R0)+,@$PS.CPU_RAM_Address
         MOV  (R0)+,@$PS.WordsCount
         MOV  (R0),R0 # starting block number
@@ -393,6 +418,10 @@ level_00.bin:
        .word Akuyou_LevelStart
        .word Level00SizeWords
        .word Level00BlockNum
+ep1_intro.bin:
+       .word Akuyou_LevelStart
+       .word Ep1IntroSizeWords
+       .word Ep1IntroBlockNum
 #----------------------------------------------------------------------------}}}
 
        .include "./ppucmd.s"
@@ -628,7 +657,7 @@ LoadingScreenPalette: #------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
                    #0         1         2         3         4         5         6         7
                    #01234567890123456789012345678901234567890123456789012345678901234567890123456789
-       .even # PPU reads strings by word by word, so align
+       .even # PPU reads strings word by word, so align
 YahooStr:   .asciz "Yippee! Whoopee! Woo-hoo! Yay! Hurrah!\n"
        .even
 TestStr: .byte 0,10
@@ -641,4 +670,8 @@ TestStr: .byte 0,10
          .byte 0x80,0x81,0x82,0x83,0x84,0x85
          .byte 0x00
        .even
+# for some reason gas replaces the last byte with 0
+# so we add dummy word to avoid data/code corruption
+        .word 0xFFFF
+end:
 BootstrapEnd:

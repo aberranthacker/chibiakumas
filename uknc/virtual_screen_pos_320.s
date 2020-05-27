@@ -100,7 +100,7 @@ RETURN                                                      #     ret
 
 ShowSpriteReconfigureEnableDisable:                         # ShowSpriteReconfigureEnableDisable:
        .global ShowSpriteReconfigureEnableDisable
-        MOV  $NULL,R5                                       #     ld hl,null
+        MOV  $null,R5                                       #     ld hl,null
         TST  R0                                             #     or a
         BEQ  ShowSpriteReconfigureEnableDisableB            #     jr z,ShowSpriteReconfigureEnableDisableB
         MOV  $ShowSpriteReconfigure,R5                      #     ld hl,ShowSpriteReconfigure

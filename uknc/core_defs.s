@@ -18,6 +18,9 @@
 .equiv PPU_SetPalette,    10 #  5
 .equiv PPU_Print,         12 #  6
 .equiv PPU_PrintAt,       14 #  7
+.equiv PPU_FlipFB,        16 #  8
+.equiv PPU_ShowFB0,       18 #  9
+.equiv PPU_ShowFB1,       20 # 10
 
 .equiv BootstrapStart,  512
 .equiv Akuyou_GameVarsStart, FB1 + 16000
@@ -27,7 +30,7 @@
 .equiv PlayerStarArraySize, 128
 .equiv GameVarsArraysSize, StarArraySize * 4 + ObjectArraySize * 8 + PlayerStarArraySize * 4 + 15*8
 
-.equiv Akuyou_LevelStart, 0x926C # 37484 0111154 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x92EE # 37614 0111356 # auto-generated during a build
 .equiv LevelSprites, Akuyou_LevelStart + 4
 
 .equiv SPReset,       0157772 # Initial stack pointer

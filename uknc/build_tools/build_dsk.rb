@@ -12,7 +12,8 @@ files = [
   'build/ppu_module.bin',
   'build/loading_screen.bin',
   'build/core.bin',
-  'build/level-00.bin'
+  'build/level-00.bin',
+  'build/ep1-intro.bin'
 ]
 
 dsk = []

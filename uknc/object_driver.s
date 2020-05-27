@@ -800,7 +800,7 @@ Object_DecreaseLifeShot: .global Object_DecreaseLifeShot    #  Object_DecreaseLi
                                                             # Object_DecreaseShotToDeathB:
                                                             #     ;object has been shot to death
         # check if address mode is right                                                    #
-        CALL NULL; CustomShotToDeathCall_Plus2:             #     call null :CustomShotToDeathCall_Plus2
+        CALL null; CustomShotToDeathCall_Plus2:             #     call null :CustomShotToDeathCall_Plus2
        .equiv  dstCustomShotToDeathCall, CustomShotToDeathCall_Plus2 - 2
        .global dstCustomShotToDeathCall
                                                             #

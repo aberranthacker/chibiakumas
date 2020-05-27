@@ -7,15 +7,23 @@ etc screens we run them from here to allow the 64k override to be standardised
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 CLS:
+        MOV  R0,-(SP)
+        MOV  R1,-(SP)
+        MOV  R2,-(SP)
+
         # clear the screen
         CLR  R0
-        MOV  $8000>>1,R1
+        MOV  $8000>>4,R1
         MOV  @$ScreenBuffer_ActiveScreen,R2
 100$: 
-       .rept 2
+       .rept 1<<4
         MOV  R0,(R2)+
        .endr
         SOB  R1,100$
+
+        MOV  (SP)+,R2
+        MOV  (SP)+,R1
+        MOV  (SP)+,R0
 RETURN
                                                             # CLS:
                                                             #   ld a,(ScreenBuffer_ActiveScreen)

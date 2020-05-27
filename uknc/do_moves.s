@@ -88,7 +88,7 @@ DoMoves_Spec$:                                              # DoMoves_Spec:   ;S
                                                             #     jp z,null   :LevelSpecificMoveB_Plus2
                                                             #     cp %11110000    ;1111XXXX ; Level Specific 1
         BNE  .+6
-        JMP  @$NULL; LevelSpecificMove_Plus2:               #     jp z,null   :LevelSpecificMove_Plus2
+        JMP  @$null; LevelSpecificMove_Plus2:               #     jp z,null   :LevelSpecificMove_Plus2
        .equiv  dstLevelSpecificMove, LevelSpecificMove_Plus2 - 2
                                                             #
                                                             #     ld a,d        ;1000XXXX

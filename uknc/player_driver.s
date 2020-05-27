@@ -226,7 +226,7 @@ Players_Dead:                                               # Players_Dead:     
                                                             #     sub e
                                                             #     ld C,a
                                                             #
-        CALL NULL; FireUpHandler_Plus2:                     #     call null  :FireUpHandler_Plus2
+        CALL null; FireUpHandler_Plus2:                     #     call null  :FireUpHandler_Plus2
        .equiv  dstFireUpHandler, FireUpHandler_Plus2 - 2
        .global dstFireUpHandler
                                                             #
@@ -244,7 +244,7 @@ Players_Dead:                                               # Players_Dead:     
                                                             #     add e
                                                             #     ld C,a
                                                             #
-        CALL NULL; FireDownHandler_Plus2:                   #     call null   :FireDownHandler_Plus2
+        CALL null; FireDownHandler_Plus2:                   #     call null   :FireDownHandler_Plus2
        .equiv  dstFireDownHandler, FireDownHandler_Plus2 - 2
        .global dstFireDownHandler
                                                             #
@@ -265,7 +265,7 @@ Players_Dead:                                               # Players_Dead:     
                                                             #     sub e
                                                             #     ld B,a
                                                             #
-        CALL NULL; FireLeftHandler_Plus2:                   #     call null   :FireLeftHandler_Plus2
+        CALL null; FireLeftHandler_Plus2:                   #     call null   :FireLeftHandler_Plus2
        .equiv  dstFireLeftHandler, FireLeftHandler_Plus2 - 2
        .global dstFireLeftHandler
                                                             #
@@ -286,7 +286,7 @@ Players_Dead:                                               # Players_Dead:     
                                                             #     add e
                                                             #     ld B,a
                                                             #
-        CALL NULL; FireRightHandler_Plus2:                  #     call null   :FireRightHandler_Plus2
+        CALL null; FireRightHandler_Plus2:                  #     call null   :FireRightHandler_Plus2
        .equiv  dstFireRightHandler, FireRightHandler_Plus2 - 2
        .global dstFireRightHandler
                                                             #
@@ -717,7 +717,7 @@ RETURN                                                      # ret
                                                             #
                                                             #     call MemoryFlushLDIR
                                                             #
-        CALL NULL; SmartBombSpecial_Plus2:                  #     call null :SmartBombSpecial_Plus2 ; We can hack in our own smartbomb handler
+        CALL null; SmartBombSpecial_Plus2:                  #     call null :SmartBombSpecial_Plus2 ; We can hack in our own smartbomb handler
        .equiv  dstSmartBombSpecial, SmartBombSpecial_Plus2  - 2
        .global dstSmartBombSpecial
                                                             #                                       ; this is needed to wipe omega array for
@@ -746,7 +746,7 @@ RETURN                                                      # ret
                                                             #
                                                             #         dec h
                                                             #
-        CALL NULL; CustomSmartBombEnemy_Plus2:              #         call null : CustomSmartBombEnemy_Plus2
+        CALL null; CustomSmartBombEnemy_Plus2:              #         call null : CustomSmartBombEnemy_Plus2
        .equiv  dstCustomSmartBombEnemy, CustomSmartBombEnemy_Plus2 - 2
        .global dstCustomSmartBombEnemy
                                                             #
@@ -819,7 +819,7 @@ RETURN                                                      # ret
                                                             #
                                                             #         ld a,iyl
                                                             #         cp 16+2
-       .CALL EQ,NULL; CustomPlayerHitter_Plus2:             #         call z,null :customPlayerHitter_Plus2
+       .CALL EQ,null; CustomPlayerHitter_Plus2:             #         call z,null :customPlayerHitter_Plus2
        .equiv  dstCustomPlayerHitter, CustomPlayerHitter_Plus2 - 2
        .global dstCustomPlayerHitter
                                                             #

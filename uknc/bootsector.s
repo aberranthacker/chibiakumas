@@ -1,29 +1,7 @@
                .nolist
 
-               .TITLE Chibi Akumas bootsector
+               .TITLE Chibi Akumas Bootsector
 
-# CPU/PPU USER mode interrup vectors and priorities -------------------------{{{
-# Vect Prty Source
-#   04    1 input/output RPLY timeout
-#   04    2 illegal addressing mode
-#  010    2 unknown instruction/HALT mode command in USER mode
-#  014    3 T-bit
-#  014    - BPT instruction
-#  020    - IOT instruction
-#  024    4 ACLO
-#  030    - EMT  instruction
-#  034    - TRAP instruction
-#  060      TTY out (channel 0 out)
-#  064      TTY in (channel 0 in)
-# 0100    6 EVNT (Vsync)
-# 0370      serial (C2)
-# 0374      serial (C2)
-# 0380      serial (LAN)
-# 0384      serial (LAN)
-# 0460      channel 1 out
-# 0464      channel 1 in
-# 0474      channel 2 in
-#----------------------------------------------------------------------------}}}
                .include "./hwdefs.s"
                .include "./macros.s"
                .include "./core_defs.s"
@@ -39,22 +17,23 @@
         MOV  $SPReset,SP
 
         BIC  $0x0080, @$CCH1OS # disable channel 1 output interrupt
-        BIC  $0x0080, @$CCH2OS # disable channel 2 outpup interrupt
+        BIC  $0x0080, @$CCH2OS # disable channel 2 output interrupt
 
         MOV  $TitleStr,R0
         CALL @$PrintStr
+
 load_bootstrap:
         MOV  $ParamsAddr,R0 # R0 - pointer to channel's init sequence array
         MOV  $8,R1          # R1 - size of the array, 8 bytes
-1$:     MOVB (R0)+,@$CCH2OD # Send a byte to channel 2
+10$:    MOVB (R0)+,@$CCH2OD # Send a byte to the channel 2
 
-2$:     TSTB @$CCH2OS       #
-        BPL  2$             # Wait until channel is ready
+20$:    TSTB @$CCH2OS       #
+        BPL  20$            # Wait until channel is ready
 
-        SOB  R1,1$          # Next byte
+        SOB  R1,10$         # Next byte
 
-3$:     TSTB @$PS.Reply
-        BMI  3$
+30$:    TSTB @$PS.Reply
+        BMI  30$
         BNE  PrintErrorCode
 
         JMP  @$BootstrapStart
@@ -67,12 +46,12 @@ PrintErrorCode:
         MOV  $ErrorCode,R1
         ADD  R0,R1
 
-1$:     CLR  R2      # R2 - most, R3 - least significant word
+10$:    CLR  R2      # R2 - most, R3 - least significant word
         DIV  $010,R2 # quotient -> R2 , remainder -> R3
         ADD  $'0, R3 # add ASCII code for "0" to the remainder
         MOVB R3,-(R1)
         MOV  R2,R3
-        SOB  R0,1$
+        SOB  R0,10$
 
         MOV  $ErrorCode,R0
         CALL @$PrintStr
@@ -81,13 +60,16 @@ ErrorCode:   .asciz "1234"
        .even
 
 PrintStr:
-1$:     BIT  $0x80, @$TTYOS
-        BEQ  1$
-        MOVB (R0)+,R1
-        BEQ  2$
-        MOVB R1, @$TTYOD
-        BR   1$
-2$:     RETURN
+10$:    MOVB (R0)+,R1
+        BZE  1237$
+
+20$:    BIT  $0x80, @$TTYOS
+        BZE  20$
+
+        MOV  R1, @$TTYOD
+        BR   10$
+
+1237$:  RETURN
 
 ParamsAddr: .byte  0, 0, 0, 0xFF # init sequence (just in case)
             .word  ParamsStruct
@@ -110,10 +92,9 @@ TitleStr:    #---------------------------------------------------------------{{{
       #.byte  014          # clear screen
 
        .byte  033,'Y, 32+1,32+0
-       .byte  033,0240,'7; .ascii "ChibiAkumas  V1.666"
+       .ascii "ChibiAkumas  V1.666"
 
        .byte  033,'H # move curor to "home" position
-      #.byte  033,0240,'7
        .byte  0
 #----------------------------------------------------------------------------}}}
        .=0x200

@@ -16,7 +16,8 @@ build/chibiakumas.dsk : build/bootsector.bin \
                         build/ppu_module.bin \
                         build/loading_screen.bin \
                         build/core.bin \
-                        build/level-00.bin
+                        build/level-00.bin \
+                        build/ep1-intro.bin
 	build_tools/build_dsk.rb
 
 build/bootsector.bin : build/bootsector.o \
@@ -28,8 +29,9 @@ build/bootstrap.bin : build/bootstrap.o \
                       build/ppu.o \
                       build/loading_screen.bin \
                       build/core.o \
-                      build/level-00_menu.o
-	$(LD) -T linker_scripts/bootstrap.cmd -R build/core.o -R build/ppu.o -R build/level-00_menu.o -s
+                      build/level-00_menu.o \
+                      build/ep1-intro.o
+	$(LD) -T linker_scripts/bootstrap.cmd -R build/core.o -R build/ppu.o -R build/level-00_menu.o -R build/ep1-intro.o -s
 	ruby build_tools/aout2sav.rb build/bootstrap.out -b -s -o build/bootstrap.bin
 
 build/ppu_module.bin : build/ppu.o \
@@ -37,8 +39,9 @@ build/ppu_module.bin : build/ppu.o \
 	$(LD) -T linker_scripts/ppu.cmd -R build/core.o -s
 	ruby build_tools/aout2sav.rb build/ppu.out -b -s -o build/ppu_module.bin
 
-build/core.bin : build/core.o
-	$(LD) build/core.o -o build/core.out -s
+build/core.bin : build/core.o \
+                 build/bootstrap.o
+	$(LD) build/core.o -o build/core.out -R build/bootstrap.o -s
 	ruby build_tools/aout2sav.rb build/core.out -b -s -o build/core.bin
 
 build/loading_screen.bin : ../ResCPC/Old/T38-SC1.D01
@@ -48,6 +51,11 @@ build/level-00.bin : build/core.o \
                      build/level-00_menu.o
 	$(LD) build/level-00_menu.o -R build/core.o -o build/level-00_menu.out -s
 	ruby build_tools/aout2sav.rb build/level-00_menu.out -b -s -o build/level-00.bin
+
+build/ep1-intro.bin : build/core.o \
+                      build/ep1-intro.o
+	$(LD) build/ep1-intro.o -R build/core.o -o build/ep1-intro.out -s
+	ruby build_tools/aout2sav.rb build/ep1-intro.out -b -s -o build/ep1-intro.bin
 
 build/bootsector.o : $(common) \
                      bootsector.s
@@ -65,6 +73,7 @@ build/core.o : $(common) \
                disk_driver.s \
                do_moves.s \
                event_stream.s \
+               execute_bootstrap.s \
                object_driver.s \
                player_driver.s \
                screen_memory.s \
@@ -89,6 +98,11 @@ build/level-00_menu.o : $(common) \
                         resources/menu_cursor.spr
 	$(AS) -al level-00_menu.s -o build/level-00_menu.o
 
+build/ep1-intro.o : $(common) \
+                    ep1-intro.s \
+                    resources/ep1-intro.spr
+	$(AS) -al ep1-intro.s -o build/ep1-intro.o
+
 #resources/font.raw : ../Aku/Sprites/T07-SC1.SPR \
 #                     build_tools/spr_cpc_to_uknc.rb
 #	build_tools/spr_cpc_to_uknc.rb ../Aku/Sprites/T07-SC1.SPR --font -o resources/font.raw
@@ -98,7 +112,7 @@ resources/font.raw : ../ResCPC/font.bin \
 	build_tools/spr_cpc_to_uknc.rb ../ResCPC/font.bin --font -o resources/font.raw
 
 resources/cga8x8b.raw : resources/cga8x8b.bmp.raw \
-                         build_tools/prepare_font.rb
+                        build_tools/prepare_font.rb
 	ruby build_tools/prepare_font.rb resources/cga8x8b.bmp.raw
 
 resources/titletex.spr : ../Aku/Sprites/TITLETEX.SPR
@@ -107,6 +121,9 @@ resources/titletex.spr : ../Aku/Sprites/TITLETEX.SPR
 resources/menu_cursor.spr : build_tools/bmp_to_uknc_raw.rb \
                             resources/menu_cursor-Sheet.bmp
 	build_tools/bmp_to_uknc_raw.rb
+
+resources/ep1-intro.spr : ../ResCPC/LEVEL252A.SPR
+	build_tools/spr_cpc_to_uknc.rb ../ResCPC/LEVEL252A.SPR -o resources/ep1-intro.spr
 
 clean :
 	rm -f build/*

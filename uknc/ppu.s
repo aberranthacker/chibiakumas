@@ -190,6 +190,9 @@ SLTABInit:      MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
                 ADD  $8,R1           #  calc address of next record of SLTAB
                 BIS  $0b110,R1       #  next record is 4-word, color settings
                 MOV  R1,(R0)+        #--pointer to record 64
+
+                MOV  R0,@$FirstLineAddress
+                ADD  $4,@$FirstLineAddress
 #------------------------------------- main screen area
                 MOV  $FB1 >> 1,R2    # address of second frame-buffer
                 MOV  $200,R3         # number of lines on main screen area
@@ -243,7 +246,7 @@ PGM: #--------------------------------------------------------------------------
 ShortLoop:      MOV  $PPU_PPUCommand, @$PBPADR
                 MOV  @$PBP12D,R0
             .ifdef DebugMode
-                CMP  R0,$15
+                CMP  R0,$21
                 BHIS .
             .endif
                 JMP  @JMPTable(R0)
@@ -255,6 +258,9 @@ JMPTable:      .word EventLoop            # do nothing
                .word SetPalette           # PPU_SetPalette
                .word Print                # PPU_Print
                .word PrintAt              # PPU_PrintAt
+               .word FlipFB               # PPU_FlipFB
+               .word ShowFB0              # PPU_ShowFB0
+               .word ShowFB1              # PPU_ShowFB1
 #-------------------------------------------------------------------------------
 CommandExecuted: #-----------------------------------------------------------{{{
                 MOV  $PPU_PPUCommand, @$PBPADR
@@ -280,7 +286,7 @@ Teardown: #------------------------------------------------------------------{{{
                 JMP  @$0174170        # jump back to the process manager (63608; 0xF878)
 #----------------------------------------------------------------------------}}}
 SetSingleProcessFlag: #------------------------------------------------------{{{
-                MOV  $1,@$SingleProcessFlag
+                MOV  $1,@$SingleProcessFlag # skip firmware processes
                 JMP  CommandExecuted
 #----------------------------------------------------------------------------}}}
 ClrSingleProcessFlag: #------------------------------------------------------{{{
@@ -444,6 +450,44 @@ DonePrinting:   JMP  @$CommandExecuted
 
 StrBuffer:      .space 160
 #----------------------------------------------------------------------------}}}
+FlipFB: #--------------------------------------------------------------------{{{
+                TST  (PC)+; ActiveFrameBuffer: .word 0xFFFF
+                BNZ  10$
+
+                COM  @$ActiveFrameBuffer
+                BR   ShowFB1
+
+        10$:    CLR  @$ActiveFrameBuffer
+                BR   ShowFB0
+#----------------------------------------------------------------------------}}}
+ShowFB0: #-------------------------------------------------------------------{{{
+                MOV  $0x2000,R0
+                MOV  $8,R1
+                MOV  $200>>1,R2
+                MOV  @$FirstLineAddress,R5
+
+        100$:  .rept 1<<1
+                BIC  R0,(R5)
+                ADD  R1,R5
+               .endr
+                SOB  R2,100$
+
+                JMP  CommandExecuted
+#----------------------------------------------------------------------------}}}
+ShowFB1: #-------------------------------------------------------------------{{{
+                MOV  $0x2000,R0
+                MOV  $8,R1
+                MOV  $200>>1,R2
+                MOV  @$FirstLineAddress,R5
+
+        100$:  .rept 1<<1
+                BIS  R0,(R5)
+                ADD  R1,R5
+               .endr
+                SOB  R2,100$
+
+                JMP  CommandExecuted
+#----------------------------------------------------------------------------}}}
 
 VblankIntHandler: #----------------------------------------------------------{{{
         # we do not need firmware interrupt handler except for this small
@@ -504,7 +548,6 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
 # |  77 | 3F | Ю / @   |          | 176 | 7E | О / } |           |
 # | 105 | 45 | HP      | Shift    | 177 | 7F | 9 / ) |           |
 # ----------------------------------------------------------------------------}}}
-# P  FS FL FR Lt Rt Up Dn
         MOV  R0,-(SP)
         MOV  @$PBPADR,-(SP)
 
@@ -643,7 +686,8 @@ SYS100:  .word 0174612 # address of default vertical blank interrupt handler
 SYS272:  .word 02270   # address of default scanlines table
 SYS300:  .word 0175412 # address of default keyboard interrupt handler
 
-FBSLTAB: .word 0       # adrress of main screen SLTAB
+FBSLTAB: .word 0          # adrress of main screen SLTAB
+FirstLineAddress: .word 0 #
          .balign 4*2   # scan-lines parameters table, it has to be aligned at 4 words
 SLTAB:   # space for the SLTAB must be reserved when allocating PPU memory
          .space 2*2    # .balign has no effect without this

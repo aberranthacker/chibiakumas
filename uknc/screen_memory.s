@@ -14,6 +14,15 @@ GetMemPos:
     ADD  R0,R5
 RETURN
 
+ScreenBuffer_Reset:
+        MOV  $0x4000,@$ScreenBuffer_ActiveScreenDirect
+        MOV  $0x4000,@$srcFB_shift
+        MOV  $FB1,@$ScreenBuffer_ActiveScreen
+        MOV  $FB1,@$ScreenBuffer_VisibleScreen
+       .ppudo_ensure $PPU_ShowFB1
+        CALL CLS
+RETURN
+
 scr_addr_table:
   .word 0x0180, 0x01D0, 0x0220, 0x0270, 0x02C0, 0x0310, 0x0360, 0x03B0 #  0
   .word 0x0400, 0x0450, 0x04A0, 0x04F0, 0x0540, 0x0590, 0x05E0, 0x0630 #  1
