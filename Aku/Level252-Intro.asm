@@ -23,11 +23,9 @@ read "CoreDefs.asm"
 
 ZXS_CopiedBlockStart equ &F800
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;                Start writing to disk for ZXS and MSX (Cpc ver is at EOF)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;         Start writing to disk for ZXS and MSX (Cpc ver is at EOF)          ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ifdef buildENT
         write "..\BldENT\T56-SC1.D02"
@@ -38,22 +36,22 @@ org Akuyou_LevelStart
 FileBeginLevel:
         incbin "..\ResCPC\Level252A.SPR"
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;                   Animators
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                               Animators                                    ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 AnimatorPointers:
     defw AnimatorData
 AnimatorData:
     ; First byte is the 'Tick map' which defines when the animation should update
-    defb %00000010      ;Anim Freq
+    defb %00000010     ;Anim Freq
     ; all remaining bytes are anim frames in the form Command-Var-Var-Var
-    defb 01,128+01,0,0  ;Sprite Anim
-    defb 01,128+02,0,0  ;Sprite Anim
-    defb 00             ;End of loop
+    defb 01,128+01,0,0 ;Sprite Anim
+    defb 01,128+02,0,0 ;Sprite Anim
+    defb 00            ;End of loop
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;                   Data Allocations
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                            Data Allocations                                ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Event_SavedSettingsB:   ;2nd bank Saved settings array
     defs 128,&00
 
@@ -65,7 +63,6 @@ DiskMap_Intro               equ &10C1+&2800 ; T56-SC1.D03
 ;DiskMap_Intro_Screens2_Size equ 32
 DiskMap_Intro_Disk      equ 2
 
-;
 ;Rastercolor buffer - 80 bytes (&50
 
 CustomRam:
@@ -103,37 +100,36 @@ EventStreamArray:
     defw        charnikohime
     defb evtAddToBackground
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;               Start of fade in block
 
 FadeStartPoint equ 0    ;Start of fade point
             ; Fade lasts two timers - ends FadeStartPoint+2
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 if buildCPCv+buildENTv
     defb FadeStartPoint+1,evtCallAddress
     defw     EnablePlusPalette
 
-
     ;BLUE COLORS - 6128
     defb FadeStartPoint+1,evtMultipleCommands+4         ; 4 Commands
-    defb 240,0,6            ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,0,6      ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&44,&40
 
-    defb 240,26*0+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,6 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1
     defb 1
     defb &54,&54,&44,&40
 
-    defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,6 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 0
     defb 1
     defb &54,&54,&44,&40
 
-    defb 240,26*2+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,26*2+6,6 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 1
     defb &54,&54,&44,&40
@@ -142,42 +138,30 @@ if buildCPCv+buildENTv
 
     defb FadeStartPoint+2,evtMultipleCommands+4         ; 4 Commands
 
-    defb 240,0,6            ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
+    defb 240,0,6         ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
     defb 1
     defb 0
     defb &54,&4D,&4F,&4B;defb &54,&58,&5F,&4B
 
-    defb 240,26*0+6,5*1+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*0+6,5*1+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1  ; Switches
     defb 255        ;delay
     defb &54,&47,&52,&4B    ;   defb &54,&4D,&4F,&4B
 
-    defb 240,26*1+6,5*1+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*1+6,5*1+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1
     defb 0
     defb &54,&47,&52,&4B
 
-    defb 240,26*2+6,5*1+1       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
+    defb 240,26*2+6,5*1+1 ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
     defb 1 ; no of switches
     defb 0  ;delays
     defb &54,&47,&52,&4B
-
-    ;defb 4
-    ;defb 136               ; Jump to a different level point
-    ;defw TestPos               ; pointer
-    ;defb 115
 endif
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;               End of fade in block
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;TEST;;;;;;;;;;;;;
-;   defb 10
-;   defb 136                ; Jump to a different level point
-;   defw SpeedUpI
-;   defb 154
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 defb 10,evtCallAddress          ;Call a memory location
 defw    ShowText1Init
@@ -1013,21 +997,21 @@ if buildCPCv+buildENTv
     and %00000001
     jr z,LevelNotPlus
     ld a,&76
-ifdef BuildCPC
+  ifdef BuildCPC
     ld (CPCPlusSlowdown),a
-endif
+  endif
 
 LevelNotPlus:
     ld a,(iy-1)
 
-ifdef BuildCPC
+  ifdef BuildCPC
     and %10000000
     jr z,Level64k
     ld a,LevelData128kpos_C_Bank
-endif
-ifdef BuildENT
+  endif
+  ifdef BuildENT
     ld a,Akuyou_ScreenBufferB
-endif
+  endif
 
     ld (LoadBankA_Plus1-1),a
     ld (LoadBankB_Plus1-1),a
@@ -1045,16 +1029,17 @@ endif
 
     ;Load up the extra data - over the Bootstrap
 if BuildCPCv+BuildEntv
-ifdef BuildCPC
+  ifdef BuildCPC
     ld a,Akuyou_LevelStart_Bank :LoadBankA_Plus1
-endif
-ifdef BuildENT
+  endif
+  ifdef BuildENT
     ld a,Akuyou_ScreenBufferB   :LoadBankA_Plus1
-endif
+  endif
+
 
     ld hl,DiskMap_Intro
     ld c,DiskMap_Intro_Disk
-    ld l,&C3
+    ld l,&C3 ; Level252-Intro_Screens1.asm
     ld de,&C000     :LoadBankDest3A_Plus2
     ld ix,&C000+&3F00   :LoadBankDest2A_Plus2
 
@@ -1064,7 +1049,7 @@ endif
     di
 
 if BuildCPCv+BuildENTv
-    call    ScreenFirmwareReset
+    call ScreenFirmwareReset
 endif
     call Akuyou_Music_Restart
 
@@ -1132,7 +1117,7 @@ endif
 
     call ShowBossText   :ShowBossTextCommand_Plus2
 
-    ld a,(BossCharNum_Plus1-1)
+    ld a,(BossCharNum_Plus1 - 1)
     ld b,a
     ld a,255
     sub b
@@ -1150,8 +1135,6 @@ CPCPlusSlowdown:    nop
 endif
 
     djnz PauseLoopB
-
-;   call Akuyou_ScreenBuffer_Flip
 
     ld a,0 :ShowTextUpdate_Plus1
     or a
@@ -1650,7 +1633,7 @@ if BuildCPCv+BuildENTv
     ld a,Akuyou_ScreenBufferA       :LoadBankB_Plus1
     ld ix,&C000+&3F00   :LoadBankDest2B_Plus2
     ld hl,DiskMap_Intro
-    ld l,&C4
+    ld l,&C4 ; Level252-Intro_Screens2.asm
     ld c,DiskMap_Intro_Disk
     ld de,&C000     :LoadBankDest3B_Plus2
 
@@ -1977,7 +1960,7 @@ ShowBossText_StartText:
     pop hl
 
     ld l,&14 :OnscreenTextPos_Plus1
-    ld a,1:BossCharNum_Plus1
+    ld a,1 :BossCharNum_Plus1
     ld i,a  ; show up to 255 chars
 
 ShowBossText_MoreText:
