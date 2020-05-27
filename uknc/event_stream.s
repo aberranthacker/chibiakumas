@@ -130,9 +130,10 @@ Event_GetEventsNow: # ../SrcALL/Akuyou_Multiplatform_EventStream.asm:121
         MOV  $Event_LoadNextEvt,-(SP) # We do a dirty trick to save space, all these actions end in a RET
 
         MOV  (PC)+,R5; srcEvent_NextEventPointer: .word 0x0000 # mem pointer of next byte
+
         CLR  R1
         BISB (R5)+,R1
-        MOVB (R5)+,R0 # there is less than 48 events, sign extension clears MSB
+        MOVB (R5)+,R0 # there are less than 48 events, sign extension clears MSB
 
         JMP  @Event_VectorArray(R0)
 
@@ -208,9 +209,9 @@ RETURN                                                      #
                                                             #     ld (de),a   ; put it at DE
                                                             #     ret
                                                             #
-        # Reconfigure the core for custom actions this level
-Event_CoreReprogram: # 0b1111???? 240 0xF0                  # Event_CoreReprogram:    ;1111????
-        JMP  @Event_ReprogramVector(R1)                     #     ld a,b
+                                                            # Reconfigure the core for custom actions this level
+# Event_CoreReprogram: # not used, legacy                   # Event_CoreReprogram:    ;1111????
+#         JMP  @Event_ReprogramVector(R1)                    #     ld a,b
                                                             #     push hl
                                                             #     ld hl,Event_ReprogramVector
         #JMP  VectorJump_PushHlFirst # uknc/stararray_add.s:149 #     jp VectorJump_PushHlFirst
@@ -315,8 +316,8 @@ RETURN # JMP @$Event_LoadNextEvt
                                                             #     ldir
 RETURN                                                      #     ret
                                                             #
-Event_MoveSwitch:                                           # Event_MoveSwitch:
-        JMP  @Event_MoveVector(R1)                          #     jp VectorJump_PushHlFirst
+# Event_MoveSwitch: # not used, legacy                      # Event_MoveSwitch:
+#         JMP  @Event_MoveVector(R1)                        #     jp VectorJump_PushHlFirst
                                                             #
 # Used to remember boss objects and apply custom animation etc by hacking the object array.
 Event_LoadLastAddedObjectToAddress:

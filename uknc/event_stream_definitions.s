@@ -12,7 +12,7 @@
 # evtMultipleCommands equ %01110000 ;+V  ;Multiple commands, V commands will follow
 .equiv evtMultipleCommands, 0x0E << 8 # (0b01110000 >> 4) * 2 = 14
 #-------------------------------------------------------------------------------
-.equiv evtMove, 0x10 << 8 # 128 >> 4 * 2 = 16
+#.equiv evtMove, 0x10 << 8 # 128 >> 4 * 2 = 16
 
 # evtSetMoveLife     equ 128+0 ; Set Move to b1, Set Life to b2
 #.equiv mvLife,             0x00 * 2 #  0
@@ -27,28 +27,27 @@
 #.equiv mvSetMove,           0x03 * 2 #  6
 
 # evtSetProgMoveLife equ 128+4 ; Set prog to b1, Set move to b2, set life to b3
-.equiv mvSetProgMoveLife,  0x04 * 2 #  8
 .equiv evtSetProgMoveLife, (0x14 * 2) << 8 # 40
 
 # evtSetSprite       equ 128+5 ; set sprite to b1
 #.equiv mvSetSprite,        0x05 * 2 # 10
 
 # evtAddToBackground equ 128+6 ; Add oject to background (back of object array)
-.equiv mvAddToBackground,  0x06 * 2 # 12
+.equiv evtAddToBackground, (0x16 * 2) << 8 # 44
 
 # evtAddToForeground equ 128+7 ; Add oject to foreground (back of object array)
-.equiv mvAddToForeground,  0x07 * 2 # 14
+.equiv evtAddToForeground, (0x17 * 2) << 8 # 46
 
 # evtJumpToNewTime   equ 128+8 ; Change event stream position to w1 , and levetime
 #                              ; to b2... time in b2 must be lower than first event
 #                              ; at w1
-.equiv mvChangeStreamTime, 0x08 * 2 # 16
+.equiv evtChangeStreamTime, (0x18 * 2) << 8 # 48
                                                             # evtCallAddress     equ 137 ; Call a memory address w1... make sure you don't
                                                             #                            ; change any registers (other than A)
 # evtSaveLstObjToAdd equ 138 ; Save the memory position of last added object in
 #                            ; the object array to memory location w1... used for
 #                            ; boss sprites
-.equiv mvSaveLstObjToAdd, 0x0A * 2 # 20
+.equiv evtSaveLstObjToAdd, (0x1A * 2) << 8 # 52
                                                             # evtResetPowerup    equ 139 ; Take away the player powerups... how mean!
                                                             # evtSetLevelSpeed   equ 140 ; Change the speed of the object array to b1...
                                                             #                            ; %00000100 is default.. .%00000010 is faster
@@ -61,10 +60,10 @@
                                                             # evtStarburt             equ %01000000 ; 0100xxxx X Y   = (64) add stars to X,Y
                                                             #                                       ; (pattern xxxx) - is this ever used???
 #-------------------------------------------------------------------------------
-.equiv evtCoreReprogram, 0x1E << 8 # 30
+# .equiv evtCoreReprogram, 0x1E << 8 # 30
 # evtReprogramPalette     equ %11110000 ; Reprogram the CPC palette - no effect on
 #                                       ; other systems
-.equiv prgPalette, 0
+.equiv evtSetPalette, (0x20 * 2) << 8 # 64
                                                             # evtReprogramPlusPalette equ %11110001 ; Reprogram the CPC PLUS palette
                                                             #
                                                             # evtReprogramHitHandler  equ %11110010 ; Define Custom hit handler as call to w1,
@@ -261,14 +260,14 @@
                                                             # specMoveChibiko equ 255
                                                             #
                                                             #
-.equiv mvRegular, 0 
+.equiv mvRegular, 0
 .equiv mvSpecial, 0x80
 .equiv spdNormal, 0
 .equiv spdFast, 0x40
 
                                                             # mveMisc       equ 0 ;used for visual clarity!
 # mveStatic     equ &24
-.equiv mveStatic, 0x24
+.equiv mvStatic, 0x24
 .equiv mveBackground, 0xC0                                  # mveBackground equ %11000000
                                                             # mveSeaker_P1  equ %10000100
                                                             # mveSeaker_P2  equ %10010000

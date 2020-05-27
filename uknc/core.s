@@ -295,16 +295,15 @@ Event_VectorArray:
        .word null                              # 0x05 0x0A 10  80
        .word null                              # 0x06 0x0C 12  96
        .word Event_CoreMultipleEventsAtOneTime # 0x07 0x0E 14 112
-       .word Event_MoveSwitch                  # 0x08 0x10 16 128
+       .word null                              # 0x08 0x10 16 128 Event_MoveSwitch, legacy
        .word Event_SaveObjSettings             # 0x09 0x12 18 144
        .word Event_LoadObjSettings             # 0x0A 0x14 20 160
        .word NotImplemented                    # 0x0B 0x16 22 176 # defw Event_CoreSaveLoadSettings2
        .word null                              # 0x0C 0x18 24 192
        .word null                              # 0x0D 0x1A 26 208
        .word null                              # 0x0E 0x1C 28 224
-       .word Event_CoreReprogram               # 0x0F 0x1E 30 240
-
-Event_MoveVector:
+       .word null                              # 0x0F 0x1E 30 240 Event_CoreReprogram, legacy
+# Event_MoveVector:
        .word NotImplemented                    # 0x10 0x20      defw Event_MoveLifeSwitch_0000
        .word Event_SetProgram                  # 0x11 0x22  2 # defw Event_ProgramSwitch_0001
        .word NotImplemented                    # 0x12 0x24      defw Event_LifeSwitch_0010
@@ -321,8 +320,7 @@ Event_MoveVector:
        .word Event_SetSpriteSize               # 0x1D 0x3A 26 mvSetObjectSize
        .word Event_SetAnimator                 # 0x1E 0x3C 28 mvSetAnimator
        .word NotImplemented                    # 0x1F 0x3E      defw Event_CoreReprogram_AnimatorPointer
-
-Event_ReprogramVector:
+# Event_ReprogramVector:
        .word Event_CoreReprogram_Palette       # 0x20 0x40 0
        .word null                              # 0x21 0x42    Obsolete - Reserver for Plus Palette
        .word NotImplemented                    # 0x22 0x44    defw Event_CoreReprogram_ObjectHitHandler

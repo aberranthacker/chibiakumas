@@ -25,7 +25,7 @@ EventStreamArray:
     .word         lifeImmortal
     .word     evtSetObjectSize | 0             # 2
     .word     evtSetAnimator | anmNone # 3
-    .word     evtMove | mvAddToBackground      # 4
+    .word     evtAddToBackground      # 4
     .word     evtSaveObjSettings | 0           # 5
 
     .word 0 # time
@@ -36,14 +36,14 @@ EventStreamArray:
     .word         lifeImmortal
     .word     evtSetObjectSize | 0             # 2
     .word     evtSetAnimator | anmNone         # 3
-    .word     evtMove | mvAddToBackground      # 4
+    .word     evtAddToBackground      # 4
     .word     evtSaveObjSettings | 1           # 5
 
     .word 0 # time
     .word evtMultipleCommands | 2
     .word     evtSetProgMoveLife               # 1
     .word         prgNone
-    .word         mveStatic
+    .word         mvStatic
     .word         lifeImmortal
     .word     evtSaveObjSettings | 2           # 2
 
@@ -65,13 +65,13 @@ EventStreamArray:
 
     .word 0 # time
     .word evtMultipleCommands | 5
-    .word     evtMove | mvAddToForeground      # 1
+    .word     evtAddToForeground               # 1
     .word     evtLoadObjSettings | 2           # 2
     .word     evtSingleSprite, 3               # 3
     .byte         24+80-16 ,24+80+6 # Y, X
-    .word     mvSaveLstObjToAdd                # 4
-    .word         charnikohime 
-    .word     evtMove | mvAddToBackground      # 5
+    .word     evtSaveLstObjToAdd               # 4
+    .word         charnikohime
+    .word     evtAddToBackground               # 5
 
 
 LevelInit:

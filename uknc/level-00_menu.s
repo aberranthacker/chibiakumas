@@ -24,14 +24,14 @@ EventStreamArray_Ep1: #------------------------------------------------------{{{
     .word 0 # -> srcEvent_NextEventTime
     # event MSB->R0, argument LSB->R1
     .word evtMultipleCommands | 1 # Event_CoreMultipleEventsAtOneTime; 1 -> srcEvent_MultipleEventCount
-    .word evtCoreReprogram | prgPalette # Event_CoreReprogram; Event_CoreReprogram_Palette
-    .word TitleScreenPalette # palette data address
+    .word     evtSetPalette # Event_CoreReprogram; Event_CoreReprogram_Palette
+    .word         TitleScreenPalette # palette data address
 
     .word 4 # -> srcEvent_NextEventTime
     # Jump to a different level point
-    .word evtMove | mvChangeStreamTime # Event_MoveSwitch; Event_ChangeStreamTime
-    .word PauseLoop # pointer
-    .word 60        # new time
+    .word evtChangeStreamTime # Event_MoveSwitch; Event_ChangeStreamTime
+    .word     PauseLoop # pointer
+    .word     60        # new time
 #----------------------------------------------------------------------------}}}
 
 EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
@@ -45,8 +45,8 @@ EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
         # ;  []=====[]=== (foreground) %11000001   Bank 0
 
     .word 0 # time
-    .word evtCoreReprogram | prgPalette # Event_CoreReprogram; Event_CoreReprogram_Palette
-    .word MenuPalette # palette data address
+    .word evtSetPalette  # Event_CoreReprogram_Palette
+    .word     MenuPalette # palette data address
 
         # ; Background L
         # defb 0
@@ -83,7 +83,7 @@ EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
     .word 0 # time
     .word evtSetProgMoveLife # CALL Event_ProgramMoveLifeSwitch
     .word prgNone
-    .word mveStatic
+    .word mvStatic
     .word lifeImmortal
         # defb 0,%10010000+15,2      ; Save Object settings to Bank 2
     .word 0 # time
@@ -152,7 +152,7 @@ EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 PauseLoop:
     .word 4 # -> srcEvent_NextEventTime
-    .word evtMove | mvChangeStreamTime # Jump to a different level point
+    .word evtChangeStreamTime # Jump to a different level point
     .word PauseLoop # pointer
     .word 60        # new time
 
