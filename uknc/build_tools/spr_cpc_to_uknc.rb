@@ -45,12 +45,12 @@ end.parse!
 def transform(sprite_words)
   [].tap do |words|
     sprite_words.each do |word|
-      q1 = REVERSE_TABLE_4BIT[(word & 0b1111)]
-      q2 = REVERSE_TABLE_4BIT[(word & 0b1111_0000) >> 4]
-      q3 = REVERSE_TABLE_4BIT[(word & 0b1111_0000_0000) >> 8]
-      q4 = REVERSE_TABLE_4BIT[(word & 0b1111_0000_0000_0000) >> 12]
+      nibble1 = REVERSE_TABLE_4BIT[(word & 0x000F)]
+      nibble2 = REVERSE_TABLE_4BIT[(word & 0x00F0) >> 4]
+      nibble3 = REVERSE_TABLE_4BIT[(word & 0x0F00) >> 8]
+      nibble4 = REVERSE_TABLE_4BIT[(word & 0xF000) >> 12]
 
-      words << (q4 << 12 | q2 << 8 | q3 << 4 | q1)
+      words << (nibble4 << 12 | nibble2 << 8 | nibble3 << 4 | nibble1)
     end
   end
 end
@@ -58,7 +58,7 @@ end
 file = File.binread(options.in_filename)
 file = file[0x80, file.size - 0x80] if file[0].ord.zero?
 
-data_offset = file[4, 2].unpack('v').first
+data_offset = file[4, 2].unpack1('v')
 header = []
 
 0.step(data_offset - 6, 6).each.with_index do |i, idx|
@@ -68,7 +68,7 @@ header = []
     width: file[i + 1].ord,
     y_offset: file[i + 2].ord,
     settings: file[i + 3].ord,
-    offset: file[i + 4, 2].unpack('v').first
+    offset: file[i + 4, 2].unpack1('v')
   }
   rec[:y_offset] = 7 if rec[:y_offset] == 255
 

@@ -32,13 +32,13 @@ bitmap.each.with_index do |byte_pixel, idx|
   bit_number = idx % 8
 
   bit1 = byte_pixel & 1
-  bit2 = (byte_pixel >> 1) & 1
+  bit2 = byte_pixel >> 1 & 1
 
-  lsb = lsb | (bit2 << bit_number)
-  msb = msb | (bit1 << bit_number)
+  lsb |= bit2 << bit_number
+  msb |= bit1 << bit_number
 
   if bit_number == 7
-    dst_bitmap << ((msb << 8) | lsb)
+    dst_bitmap.push(msb << 8 | lsb)
     lsb = 0
     msb = 0
   end

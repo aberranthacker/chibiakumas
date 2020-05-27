@@ -1,7 +1,7 @@
 
 sav = File.binread(ARGV[0])
-entry = sav[040, 2].unpack('v')[0]
-eof = sav[050, 2].unpack('v')[0] + 2
+entry = sav[040, 2].unpack1('v')
+eof = sav[050, 2].unpack1('v') + 2
 
 puts "Entry point: #{entry}"
 puts "Code size: #{eof - entry} bytes"
