@@ -45,9 +45,8 @@ Bootstrap_Launch:
        .word PPU_ModuleSizeWords + 1280 # 2.5KB is a space required for SLTAB
 #-------------------------------------------------------------------------------
      .ifdef ShowLoadingScreen
-        # Apply loading screen palette
        .ppudo_ensure $PPU_SetPalette, $LoadingScreenPalette
-        # Load loading screen
+
         MOV  $loading_screen.bin,R0
         CALL Bootstrap_LoadDiskFile
      .else
@@ -70,7 +69,8 @@ Bootstrap_Launch:
         # TODO: Initialize the Sound Effects.
 #----------------------------------------------------------------------------}}}
 
-        MOV  $0x8000,R5
+       #MOV  $0x8000,R5
+        MOV  $0x0000,R5
 
 Bootstrap_FromR5:
        .ppudo_ensure $PPU_MultiProcess
@@ -81,8 +81,8 @@ Bootstrap_FromR5:
 Bootstrap_SystemEvent:
         BIC  $0x8000,R5
     .ifdef DebugMode
-        CMP  R5,$9
-        BHIS .
+        CMP  R5,$8
+        BHI  .
     .endif
         ASL  R5
         JMP  @SystemEventsJmpTable(R5)
@@ -99,8 +99,8 @@ Bootstrap_SystemEvent:
 
 Bootstrap_Level:
     .ifdef DebugMode
-        CMP  R5,$1
-        BHIS .
+        CMP  R5,$0
+        BHI  .
     .endif
         ASL  R5
         JMP  @LevelsJmpTable(R5)
@@ -127,6 +127,11 @@ Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
                                         # ;need to use Specail MSX version - no extra tilemaps
                                         # jp Bootstrap_LoadEP2Level_1PartOnly # ../Aku/BootStrap.asm:724
        .ppudo_ensure $PPU_SingleProcess
+
+# .ppudo_ensure $PPU_SetPalette, $LoadingScreenPalette
+# .ppudo_ensure $PPU_PrintAt, $TestStr
+# br .
+
         MOV  $SPReset,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
@@ -672,6 +677,6 @@ TestStr: .byte 0,10
        .even
 # for some reason gas replaces the last byte with 0
 # so we add dummy word to avoid data/code corruption
-        .word 0xFFFF
+       .word 0xFFFF
 end:
 BootstrapEnd:

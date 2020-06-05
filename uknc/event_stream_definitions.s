@@ -42,8 +42,9 @@
 #                              ; to b2... time in b2 must be lower than first event
 #                              ; at w1
 .equiv evtChangeStreamTime, (0x18 * 2) << 8 # 48
-                                                            # evtCallAddress     equ 137 ; Call a memory address w1... make sure you don't
-                                                            #                            ; change any registers (other than A)
+# evtCallAddress     equ 137 ; Call a memory address w1... make sure you don't
+#                            ; change any registers (other than A)
+.equiv evtCallAddress, (0x19 * 2) << 8 # 50
 # evtSaveLstObjToAdd equ 138 ; Save the memory position of last added object in
 #                            ; the object array to memory location w1... used for
 #                            ; boss sprites

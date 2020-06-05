@@ -12,7 +12,7 @@ Timer_UpdateTimer:                                          # Timer_UpdateTimer:
                                                             #
         TST  (PC)+; srcTimer_Pause: .word 0x00              #     ld a,0 :Timer_Pause_Plus1
                                                             #     or a
-        BEQ  NotPaused                                      #     jr z,NotPaused
+        BZE  NotPaused                                      #     jr z,NotPaused
                                                             #
         CLR  R0                                             #     xor a
         MOV  R0,(R3) # R3 points to srcTimer_TicksOccured   #     ld (hl),a
@@ -29,7 +29,7 @@ NotPaused:                                                  # NotPaused:
         MOV  R0,(R3) # R3 points to srcTimer_TicksOccured   #     ld (hl),a
                                                             #
         MOV  (PC)+,R0; srcSmartBomb: .word 0x00             #     ld a,0 :SmartBomb_Plus1 ; Make the background flash with the smartbomb
-        BNE  SmartBombCountdown$                            #     or a
+        BNZ  SmartBombCountdown$                            #     or a
 RETURN                                                      #     ret z
 SmartBombCountdown$:
         DEC  R0                                             #     dec a                   ; Smartbomb timer down one

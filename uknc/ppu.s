@@ -246,8 +246,8 @@ PGM: #--------------------------------------------------------------------------
 ShortLoop:      MOV  $PPU_PPUCommand, @$PBPADR
                 MOV  @$PBP12D,R0
             .ifdef DebugMode
-                CMP  R0,$21
-                BHIS .
+                CMP  R0,$20
+                BHI  .
             .endif
                 JMP  @JMPTable(R0)
 JMPTable:      .word EventLoop            # do nothing
@@ -261,6 +261,7 @@ JMPTable:      .word EventLoop            # do nothing
                .word FlipFB               # PPU_FlipFB
                .word ShowFB0              # PPU_ShowFB0
                .word ShowFB1              # PPU_ShowFB1
+               .word LoadText             # PPU_LoadText
 #-------------------------------------------------------------------------------
 CommandExecuted: #-----------------------------------------------------------{{{
                 MOV  $PPU_PPUCommand, @$PBPADR
@@ -383,11 +384,11 @@ Print: #---------------------------------------------------------------------{{{
 LoadNext2Bytes: MOV  (R4),R0  # load 2 bytes from CPU RAM
                 MOV  R0,(R3)+ # store them into buffer
                 TSTB R0       #
-                BEQ  3$       # end of text
+                BZE  3$       # end of text
                 BMI  2$       # end of string
                 SWAB R0       # swap bytes to test most significant one
                 TSTB R0       #
-                BEQ  3$       # end of text
+                BZE  3$       # end of text
                 BMI  2$       # end of string
                 INC  (R5)     # next address
                 BR   LoadNext2Bytes
@@ -395,10 +396,10 @@ LoadNext2Bytes: MOV  (R4),R0  # load 2 bytes from CPU RAM
 2$:             INC  (R5)
                 MOV  (R5),@$srcNextStringAddr
 
-3$:             MOV  @$srcCurrentLine,R1         # prepare to calculate relative char address
-                MUL  $CharLineSize,R1 # calculate relative address of the line
-                ADD  @$srcCurrentChar,R1         # calculate relative address of the char
-                ADD  $FbStart,R1      # calculate absolute address of the next char
+3$:             MOV  @$srcCurrentLine,R1 # prepare to calculate relative char address
+                MUL  $CharLineSize,R1    # calculate relative address of the line
+                ADD  @$srcCurrentChar,R1 # calculate relative address of the char
+                ADD  $FbStart,R1         # calculate absolute address of the next char
 
                 MOV  $StrBuffer,R3
                 MOV  $BPDataReg,R4
@@ -406,7 +407,7 @@ LoadNext2Bytes: MOV  (R4),R0  # load 2 bytes from CPU RAM
 NextChar:       MOV  R1,(R5)      # load address of the next char into address register
                 MOVB (R3)+,R0     # load character code from string buffer
                 TSTB R0           #
-                BEQ  DonePrinting # end of text
+                BZE  DonePrinting # end of text
                 BMI  NextString   # end of string
                 CMPB $'\n, R0     # new line?
                 BEQ  NewLine      #
@@ -448,7 +449,6 @@ NextString:     MOV  $StrBuffer,R3
 
 DonePrinting:   JMP  @$CommandExecuted
 
-StrBuffer:      .space 160
 #----------------------------------------------------------------------------}}}
 FlipFB: #--------------------------------------------------------------------{{{
                 TST  (PC)+; ActiveFrameBuffer: .word 0xFFFF
@@ -487,6 +487,29 @@ ShowFB1: #-------------------------------------------------------------------{{{
                 SOB  R2,100$
 
                 JMP  CommandExecuted
+#----------------------------------------------------------------------------}}}
+LoadText: #------------------------------------------------------------------{{{
+                MOV  $StrBuffer,R3
+                MOV  $PBP12D,R4
+                MOV  $PBPADR,R5
+
+                MOV  $PPU_PPUCommandArg, (R5) # setup address register
+                MOV  (R4),R0  # get address of a string from CPU RAM
+                CLC
+                ROR  R0       # divide it by 2 to calculate bitplane address
+                MOV  R0,(R5)  # load address of a string into address register
+
+        10$:    MOV  (R4),R0  # load 2 bytes from CPU RAM
+                MOV  R0,(R3)+ # store them into the buffer
+                TSTB R0       #
+                BZE  1237$    # end of the text
+                SWAB R0       # swap bytes to test most significant one
+                TSTB R0       #
+                BZE  1237$    # end of the text
+                INC  (R5)     # next address
+                BR   10$
+
+1237$:          JMP  @$CommandExecuted
 #----------------------------------------------------------------------------}}}
 
 VblankIntHandler: #----------------------------------------------------------{{{
@@ -678,6 +701,7 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         RTI
 #----------------------------------------------------------------------------}}}
 
+StrBuffer:  .space 320
 FontBitmap: .space 8 # whitespace symbol
             .incbin "resources/font.raw"
 # FontBitmap: .incbin "resources/cga8x8b.raw"

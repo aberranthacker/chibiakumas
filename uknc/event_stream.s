@@ -135,6 +135,11 @@ Event_GetEventsNow: # ../SrcALL/Akuyou_Multiplatform_EventStream.asm:121
         BISB (R5)+,R1
         MOVB (R5)+,R0 # there are less than 48 events, sign extension clears MSB
 
+    .ifdef DebugMode
+        CMP  R0,0x5E
+        BHI  .
+    .endif
+
         JMP  @Event_VectorArray(R0)
 
 # Read in the next object
@@ -157,6 +162,7 @@ Event_LoadNextEvt:                                          # Event_LoadNextEvt:
 
 
 Event_StarBust:                                             # Event_StarBust:
+        .inform_and_hang "Event_StarBust is not implemented"
                                                             #     ld d,(hl)   ;X
                                                             #     inc hl
                                                             #     ld c,(hl)   ;Y
@@ -166,7 +172,7 @@ Event_StarBust:                                             # Event_StarBust:
                                                             #         call Stars_AddObjectBatchDefault
                                                             #     pop iy
                                                             #     pop hl
-HALT #RETURN                                                #     ret
+RETURN                                                      #     ret
                                                             #
 # By default each time can only have ONE event, but we can use this commend to declare
 # XX events will occur at this time to save memory!
@@ -325,11 +331,11 @@ Event_LoadLastAddedObjectToAddress:
         srcObjects_LastAdded: .word 0
 RETURN
                                                             #
-                                                            # ; call a function - be very careful what you do, as registers must be pretty
-                                                            # ; much untouched otherwise a crash will occur on return. it's best to set a flag
-                                                            # ; and do some action in your level loop, as that won't corrupt any registers.
-                                                            # Event_Call_1001:
-                                                            #     ld c,(hl)
+# call a function - be very careful what you do, as registers must be pretty
+# much untouched otherwise a crash will occur on return. it's best to set a flag
+# and do some action in your level loop, as that won't corrupt any registers.
+Event_Call:                                                 # Event_Call_1001:
+        JMP @(R5)+ # Event_LoadNextEvt is on top of the stack #     ld c,(hl)
                                                             #     inc hl
                                                             #     ld b,(hl)
                                                             #     inc hl

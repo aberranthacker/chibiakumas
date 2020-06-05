@@ -63,7 +63,7 @@ ShowSprite_ReadInfo: # ------------------------------------------------------{{{
                                                             #
         MOVB (R5)+,R0 # height of the sprite in lines       #     ld a,(hl)
                                                             #     or a
-        BEQ  SpriteGiveUp$                                  #     jr z,SpriteGiveUp
+        BZE  SpriteGiveUp$                                  #     jr z,SpriteGiveUp
         MOVB R0,@$srcSprShow_TempH                          #     ld (SprShow_TempH),a
                                                             #
                                                             #     inc hl
@@ -164,37 +164,21 @@ ShowSprite_ReadInfo: # ------------------------------------------------------{{{
                                                             # ret
 #-------------------------------------------------------------------------------
 ShowSprite: # ShowSprite is the main routine of our program!
-        # *********  Get Sprite Details *********
-        CALL @$ShowSprite_ReadInfo                          #     call ShowSprite_ReadInfo
-                                                            #     di
+        CALL @$ShowSprite_ReadInfo # Get Sprite Details
 
-                                                            #     ex af,af'
-                                                            #     ld a,b
-        CMP  R1,(PC)+; cmpSpriteSizeConfig6: .word 6        #     cp 6 :SpriteSizeConfig6_Plus1
-        # calls ShowSpriteReconfigure or null
-       .call NE, @(PC)+                                     #     call nz,ShowSpriteReconfigure   :ShowSpriteReconfigureCommand_Plus2
+        CMP  R1,(PC)+; cmpSpriteSizeConfig6: .word 6
+       .call NE, @(PC)+ # calls ShowSpriteReconfigure or null
         dstShowSpriteReconfigureCommand: .word ShowSpriteReconfigure
 
-                                                            #     ld c,(hl)
-                                                            #     inc hl
-                                                            #     ld b,(hl)
+        ADD  (R5),R3 # calculate sprite address
+        MOV  R3,@$srcSprShow_TempAddr
 
-                                                            #     ex de,hl
-        ADD  (R5),R3                                        #     add hl,bc
-        MOV  R3,@$srcSprShow_TempAddr                       #     ld (SprShow_TempAddr),hl
-                                                            #     ex de,hl
-
-                                                            #     ld bc,TranspColors
-                                                            #     ex af,af'
-        # we are relying on Xoff still being in R0          #     ;ld a,(SprShow_Xoff) - we are relying on this still being in A
-        BIC  $0xFFF8,R0                                     #     and %00000111
-        MOVB TranspColors(R0),@$srcTranspBitA               #     add c
-                                                            #     ld c,a
-                                                            #     ld a,(bc)
-                                                            #     ld (TranspBitA_Plus1 - 1),a
+        # we are relying on Xoff still being in R0
+        BIC  $0xFFF8,R0 # Bits 2,1,0 - transparency
+        MOVB TranspColors(R0),@$srcTranspBitA
 
 # *********  show a new sprite *********
-                                                            #
+
 # ShowSprite_OK:
         MOV  (PC)+,R1; srcSprShow_Yoff: .word 48                      #     ld a,48 :SprShow_Yoff_Plus1
         ADD  (PC)+,R1; srcSprShow_Y: .word 48 # set from object array #     add 48  :SprShow_Y_Plus1
@@ -243,10 +227,6 @@ ShowSprite: # ShowSprite is the main routine of our program!
         BIS  R4,R0                                          #         or d ; if all are zero, do nothing
         BIS  R5,R0                                          #         or e
         BZE  ShowSprite_SkipChanges                         #         jp Z,ShowSprite_SkipChanges
-
-                                                            ##    ifdef Debug
-                                                            #         call Debug_NeedEXX
-                                                            ##    endif
 
                                                             #         exx ;push hl
                                                             #             ld hl,SprDrawLnStartBegin
@@ -333,7 +313,7 @@ ShowSprite_SkipChanges:                                     # ShowSprite_SkipCha
                                                             #     ld l,a  ; hl now is the memory loc of the line
                                                             #
         ADD  (PC)+,R5;                                      #     ld de,&C069 :ScreenBuffer_ActiveScreenDirectC_Plus1
-        srcFB_shift: 
+        srcFB_shift:
         srcSprShow_TempX: .byte 0x00                        #     add hl,de   ; hl = memory line, bc = X pos = hl is now the location on screen
                           .byte 0x40 # FB1                  #
                          #.byte 0x00 # FB0
@@ -350,7 +330,7 @@ ShowSprite_SkipChanges:                                     # ShowSprite_SkipCha
                                                             #
 # This is our most basic render, its slow, but can do any size and clipping                                                           # SprDrawLnStartBegin:            ; This is our most basic render, its slow, but can do any size and clipping
 SprDrawLnStartBegin: #------------------------------------------------------{{{
-        HALT                                                #
+        .inform_and_hang "SprDrawLnStartBegin is not implemented"#
                                                             # SprDrawLnStartBeginB:
                                                             #     ld a,(TranspBitA_Plus1-1)
                                                             #     ld (TranspBitB_Plus1-1),a
@@ -414,68 +394,57 @@ SprDrawLnStartBegin: #------------------------------------------------------{{{
                                                             #
                                                             # SprDrawLineEnd2:
 #----------------------------------------------------------------------------}}}
-# SprDrawChooseRender: turbo version ----------------------------------------{{{
-SprDrawChooseRenderLineDoubler:                             # SprDrawChooseRenderLineDoubler:
-        HALT                                                #     rlc c
-                                                            #     ld de,Sprdraw24PxVer_Double
-                                                            #     jp SprDrawTurboPrep
-SprDrawChooseRender:                                        # SprDrawChooseRender:    ; Pick the render based on width
-        MOV  @$srcSprShow_TempW,R0                          #     ld a,(SprShow_TempW)
-        CMP  R0,$6                                          #     cp 6
-        BEQ  SprDraw24pxInit$                               #     jp z,SprDraw24pxInit
-                                                            #     cp 8
-                                                            #     jr z,SprDraw32pxInit
-                                                            #     cp 4
-                                                            #     jr z,SprDraw16pxInit
-                                                            #     cp 2
-                                                            #     jr z,SprDraw8pxInit
-                                                            #     cp 12
-                                                            #     jr z,SprDraw48pxInit
-                                                            #     cp 10
-                                                            #     jr z,SprDraw40pxInit
-                                                            #     cp 24
-                                                            #     jr z,SprDraw96pxInit
-                                                            #     cp 18
-                                                            #     jr z,SprDraw72pxInit
-                                                            #
 
-                                                            # SprDraw8pxInit:
-                                                            #     ld de,Sprdraw8PxVer
-                                                            #     jp SprDrawTurboPrep
-                                                            # SprDraw16pxInit:
-                                                            #     ld de,Sprdraw16PxVer
-                                                            #     jp SprDrawTurboPrep
-    SprDraw24pxInit$:                                       # SprDraw24pxInit:
-        # Set A to ZERO / Transp byte
-        MOV  (PC)+,R0; srcTranspBitA: .word 0
+# SprDrawChooseRender: turbo version ----------------------------------------{{{
+SprDrawChooseRenderLineDoubler:
         MOV  $80-6,R1
-        MOV  $Sprdraw24PxVer$,R3                            #     ld de,Sprdraw24PxVer
-        JMP  (R3)                                           #     jp SprDrawTurboPrep
-                                                            # SprDraw32pxInit:
-                                                            #     ld de,Sprdraw32PxVer
-                                                            #     jp SprDrawTurboPrep
-                                                            # SprDraw40pxInit:
-                                                            #     ld de,Sprdraw40PxVer
-                                                            #     jp SprDrawTurboPrep
-                                                            # SprDraw48pxInit:
-                                                            #     ld de,Sprdraw48PxVer
-                                                            #     jp SprDrawTurboPrep
-                                                            # SprDraw72pxInit:
-                                                            #     ld de,Sprdraw72PxVer
-                                                            #     jr SprDrawTurboPrep
-                                                            # SprDraw96pxInit:
-                                                            #     ld de,Sprdraw96PxVer
-                                                            #     jr SprDrawTurboPrep
-                                                            #
+        ASL  R2
+        MOV  $SprDraw24pxVer_Double$,R3
+        JMP  (R3)
+SprDrawChooseRender: # Pick the render based on width
+        MOV  (PC)+,R0; srcTranspBitA: .word 0 # Set A to ZERO / Transp byte
+        MOV  @$srcSprShow_TempW,R1
+    .ifdef DebugMode
+        CMP  R1,$24
+        BHI  .
+    .endif
+        JMP  @SprDrawJumpTable(R1)
+    SprDrawJumpTable:
+       .word NotImplemented      #  0
+       .word SprDraw8pxInit$     #  2
+       .word SprDraw16pxInit$    #  4
+       .word SprDraw24pxInit$    #  6
+       .word SprDraw32pxInit$    #  8
+       .word SprDraw40pxInit$    # 10
+       .word SprDraw48pxInit$    # 12
+       .word SprDrawLnStartBegin # 14 56
+       .word SprDrawLnStartBegin # 16 64
+       .word SprDraw72pxInit$    # 18
+       .word SprDrawLnStartBegin # 20 80
+       .word SprDrawLnStartBegin # 22 88
+       .word SprDraw96pxInit$    # 24
+
+    SprDraw8pxInit$: .inform_and_hang "SprDraw8pxInit is not implemented"
+    SprDraw16pxInit$: .inform_and_hang "SprDraw16pxInit is not implemented"
+    SprDraw24pxInit$:
+        MOV  $80-6,R1
+        MOV  $SprDraw24pxVer$,R3
+        JMP  (R3)
+    SprDraw32pxInit$: .inform_and_hang "SprDraw32pxInit is not implemented"
+    SprDraw40pxInit$: .inform_and_hang "SprDraw40pxInit is not implemented"
+    SprDraw48pxInit$: .inform_and_hang "SprDraw48pxInit is not implemented"
+    SprDraw72pxInit$: .inform_and_hang "SprDraw72pxInit is not implemented"
+    SprDraw96pxInit$: .inform_and_hang "SprDraw96pxInit is not implemented"
 
         # ********** A MUST BE the transparent byte for THIS WHOLE LOOP! ***********
 
 # draw chain {{{
-                                                            # Sprdraw24PxVer_Double:  ;Line doubler - does two nextlines each time
-                                                            #         bit 0,C
-                                                            #         jp z,SprDrawTurbo_LineSkip
-                                                            #         jp Sprdraw24PxVer
-                                                            # Sprdraw96PxVer:
+    SprDraw24pxVer_Double$:                                 # SprDraw24pxVer_Double:  ;Line doubler - does two nextlines each time
+        BIT  $1,R2                                          #         bit 0,C
+        BNZ  SprDraw24pxVer$                                #         jp z,SprDrawTurbo_LineSkip
+        ADD  $6,R5
+        BR   SprDrawTurbo_LineSkip$                         #         jp SprDraw24pxVer
+                                                            # SprDraw96pxVer:
                                                             #         pop de
                                                             #         cp e
                                                             #         jr z,SprDraw24pxW_SkipFb
@@ -489,7 +458,7 @@ SprDrawChooseRender:                                        # SprDrawChooseRende
                                                             #         ld (hl),d
                                                             #         SprDraw24pxW_SkipEb:
                                                             #         inc hl
-                                                            # Sprdraw88PxVer:
+                                                            # SprDraw88pxVer:
                                                             #         pop de
                                                             #         cp e
                                                             #         jr z,SprDraw24pxW_SkipCb
@@ -503,7 +472,7 @@ SprDrawChooseRender:                                        # SprDrawChooseRende
                                                             #         ld (hl),d
                                                             #         SprDraw24pxW_SkipDb:
                                                             #         inc hl
-                                                            # Sprdraw80PxVer:
+                                                            # SprDraw80pxVer:
                                                             #         pop de
                                                             #         cp e
                                                             #         jr z,SprDraw24pxW_SkipAb
@@ -518,7 +487,7 @@ SprDrawChooseRender:                                        # SprDrawChooseRende
                                                             #         SprDraw24pxW_SkipBb:
                                                             #         inc hl
                                                             #
-                                                            # Sprdraw72PxVer:
+                                                            # SprDraw72pxVer:
                                                             #         pop de
                                                             #         cp e
                                                             #         jr z,SprDraw24pxW_Skip1b
@@ -533,7 +502,7 @@ SprDrawChooseRender:                                        # SprDrawChooseRende
                                                             #         SprDraw24pxW_Skip2b:
                                                             #         inc hl
                                                             #
-                                                            # Sprdraw64PxVer:
+                                                            # SprDraw64pxVer:
                                                             #         pop de
                                                             #         cp e
                                                             #         jr z,SprDraw24pxW_Skip3b
@@ -548,7 +517,7 @@ SprDrawChooseRender:                                        # SprDrawChooseRende
                                                             #         SprDraw24pxW_Skip4b:
                                                             #         inc hl
                                                             #
-                                                            # Sprdraw56PxVer:
+                                                            # SprDraw56pxVer:
                                                             #         pop de
                                                             #         cp e
                                                             #         jr z,SprDraw24pxW_Skip5b
@@ -561,7 +530,7 @@ SprDrawChooseRender:                                        # SprDrawChooseRende
                                                             #         ld (hl),d
                                                             #         SprDraw24pxW_Skip6b:
                                                             #         inc hl
-                                                            # Sprdraw48PxVer:
+                                                            # SprDraw48pxVer:
                                                             #         pop de
                                                             #         cp e
                                                             #         jr z,SprDraw24pxW_SkipF
@@ -575,7 +544,7 @@ SprDrawChooseRender:                                        # SprDrawChooseRende
                                                             #         ld (hl),d
                                                             #         SprDraw24pxW_SkipE:
                                                             #         inc hl
-                                                            # Sprdraw40PxVer:
+                                                            # SprDraw40pxVer:
                                                             #         pop de
                                                             #         cp e
                                                             #         jr z,SprDraw24pxW_SkipC
@@ -589,7 +558,7 @@ SprDrawChooseRender:                                        # SprDrawChooseRende
                                                             #         ld (hl),d
                                                             #         SprDraw24pxW_SkipD:
                                                             #         inc hl
-                                                            # Sprdraw32PxVer:
+                                                            # SprDraw32pxVer:
                                                             #         pop de
                                                             #         cp e
                                                             #         jr z,SprDraw24pxW_SkipA
@@ -604,7 +573,7 @@ SprDrawChooseRender:                                        # SprDrawChooseRende
                                                             #         SprDraw24pxW_SkipB:
                                                             #         inc hl
                                                             #
-    Sprdraw24PxVer$:                                        # Sprdraw24PxVer:
+    SprDraw24pxVer$:                                        # SprDraw24pxVer:
         MOV  (R4)+,(R5)+                                    #         pop de
                                                             #         cp e
                                                             #         jr z,SprDraw24pxW_Skip1
@@ -619,7 +588,7 @@ SprDrawChooseRender:                                        # SprDrawChooseRende
                                                             #         SprDraw24pxW_Skip2:
                                                             #         inc hl
                                                             #
-                                                            # Sprdraw16PxVer:
+                                                            # SprDraw16pxVer:
         MOV  (R4)+,(R5)+                                    #         pop de
                                                             #         cp e
                                                             #         jr z,SprDraw24pxW_Skip3
@@ -634,7 +603,7 @@ SprDrawChooseRender:                                        # SprDrawChooseRende
                                                             #         SprDraw24pxW_Skip4:
                                                             #         inc hl
                                                             #
-                                                            # Sprdraw8PxVer:
+                                                            # SprDraw8pxVer:
         MOV  (R4)+,(R5)+                                    #         pop de
                                                             #         cp e
                                                             #         jr z,SprDraw24pxW_Skip5
@@ -647,174 +616,138 @@ SprDrawChooseRender:                                        # SprDrawChooseRende
                                                             #         ld (hl),d
                                                             #         SprDraw24pxW_Skip6:
 # }}}
-                                                            # SprDrawTurbo_LineSkip:
-        DEC  R2                                             #     dec c
-        BZE  SprDrawTurbo_Done$                             #     jr z,SprDrawTurbo_Done
-                                                            #
+    SprDrawTurbo_LineSkip$:
+        DEC  R2
+        BZE  SprDrawTurbo_Done$
+
         ADD  R1,R5
         JMP  (R3)
 
     SprDrawTurbo_Done$:
         RETURN
 #----------------------------------------------------------------------------}}}
-                                                            #
-                                                            # ;--------------------Pset Version! no transparentcy, so fast! ----------------
-SprDrawChooseRenderLineDoublerPset:                         # SprDrawChooseRenderLineDoublerPset:
-        HALT                                                #     di
-                                                            #
-                                                            #     ex af,af';push af
-                                                            #     ld a,c
-                                                            #     add c
-                                                            #     ld c,a
-                                                            #     ex af,af';pop af
-                                                            #     ld de,SprdrawPset_Double
-                                                            #     jp SprDrawPsetPrep
-                                                            #
-SprDrawChooseRenderPset:                                    # SprDrawChooseRenderPset:        ; Can do any size between 8-48 pixels
-        HALT                                                #     ld a,(SprShow_TempW)
-                                                            #     cp 6
-                                                            #     jp z,SprDrawPset24pxInit
-                                                            #     cp 8
-                                                            #     jr z,SprDrawPset32pxInit
-                                                            #     cp 4
-                                                            #     jr z,SprDrawPset16pxInit
-                                                            #     cp 2
-                                                            #     jr z,SprDrawPset8pxInit
-                                                            #     cp 12
-                                                            #     jr z,SprDrawPset48pxInit
-                                                            #     cp 16
-                                                            #     jr z,SprDrawPset64pxInit
-                                                            #     cp 20
-                                                            #     jr z,SprDrawPset80pxInit
-                                                            #     cp 24
-                                                            #     jr z,SprDrawPset96pxInit
-                                                            #     cp 32
-                                                            #     jr z,SprDrawPset128pxInit
-                                                            #     cp 18
-                                                            #     jr z,SprDrawPset72pxInit
-                                                            #     cp 10
-                                                            #     jr z,SprDrawPset40pxInit
-                                                            #     jp SprDrawLnStartBeginB
-                                                            # SprDrawPset8pxInit:
-                                                            #     ld de,SprDrawPset8PxVer
-                                                            #     jr SprDrawPsetPrep
-                                                            # SprDrawPset16pxInit:
-                                                            #     ld de,SprDrawPset16PxVer
-                                                            #     jr SprDrawPsetPrep
-                                                            # SprDrawPset32pxInit:
-                                                            #     ld de,SprDrawPset32PxVer
-                                                            #     jr SprDrawPsetPrep
-                                                            # SprDrawPset40pxInit:
-                                                            #     ld de,SprDrawPset40PxVer
-                                                            #     jr SprDrawPsetPrep
-                                                            # SprDrawPset48pxInit:
-                                                            #     ld de,SprDrawPset48PxVer
-                                                            #     jr SprDrawPsetPrep
-                                                            # SprDrawPset64pxInit:
-                                                            #     ld de,SprDrawPset64PxVer
-                                                            #     jr SprDrawPsetPrep
-                                                            # SprDrawPset72pxInit:
-                                                            #     ld de,SprDrawPset72PxVer
-                                                            #     jr SprDrawPsetPrep
-                                                            # SprDrawPset80pxInit:
-                                                            #     ld de,SprDrawPset80PxVer
-                                                            #     jr SprDrawPsetPrep
-                                                            # SprDrawPset96pxInit:
-                                                            #     ld de,SprDrawPset96PxVer
-                                                            #     jr SprDrawPsetPrep
-                                                            # SprDrawPset128pxInit:
-                                                            #     ld de,SprDrawPset128PxVer
-                                                            #     jr SprDrawPsetPrep
-                                                            # SprDrawPset24pxInit:
-                                                            #     ld de,SprDrawPset24PxVer
-                                                            # SprDrawPsetPrep:
-                                                            #
-                                                            #     ld (SprDrawPset24PxJumpPos_Plus2-2),de
-                                                            #
-                                                            # SprDrawPsetPrep2:
-                                                            #     ei
-                                                            #     ex hl,de
-                                                            #
-                                                            #     push iy
-                                                            #     pop hl
-                                                            #
-                                                            #     ld iyl,c
-                                                            # SprDrawPset_StartLine:
-                                                            #     ld (SprDrawPset_HLrestore_Plus2-2),de
-                                                            #
-                                                            #         jp  SprDrawPset24PxVer :SprDrawPset24PxJumpPos_Plus2
-                                                            #
-                                                            #         ; ********** A MUST BE ZERO THIS WHOLE LOOP! ***********
-                                                            #
-                                                            # SprdrawPset_Double:             ;Line doubler, moves down two lines instead of one
-                                                            #         ld a,iyl
-                                                            #         bit 0,a
-                                                            #         jr z,SprDrawPset_LineSkip
-                                                            #         jp SprDrawPset24PxVer
-                                                            # SprDrawPset128PxVer:
-                                                            #         ldi
-                                                            #         ldi
-                                                            #
-                                                            #         ldi
-                                                            #         ldi
-                                                            #
-                                                            #         ldi
-                                                            #         ldi
-                                                            #
-                                                            #         ldi
-                                                            #         ldi
-                                                            # SprDrawPset96PxVer:
-                                                            #         ldi
-                                                            #         ldi
-                                                            #
-                                                            #         ldi
-                                                            #         ldi
-                                                            # SprDrawPset80PxVer:
-                                                            #         ldi
-                                                            #         ldi
-                                                            # SprDrawPset72PxVer:
-                                                            #         ldi
-                                                            #         ldi
-                                                            # SprDrawPset64PxVer:
-                                                            #         ldi
-                                                            #         ldi
-                                                            #
-                                                            #         ldi
-                                                            #         ldi
-                                                            # SprDrawPset48PxVer:
-                                                            #         ldi
-                                                            #         ldi
-                                                            # SprDrawPset40PxVer:
-                                                            #         ldi
-                                                            #         ldi
-                                                            # SprDrawPset32PxVer:
-                                                            #         ldi
-                                                            #         ldi
-                                                            # SprDrawPset24PxVer:
-                                                            #         ldi
-                                                            #         ldi
-                                                            # SprDrawPset16PxVer:
-                                                            #         ldi
-                                                            #         ldi
-                                                            # SprDrawPset8PxVer:
-                                                            #         ldi
-                                                            #         ldi
-                                                            #
-                                                            # SprDrawPset_LineSkip:
-                                                            #     dec iyl
-                                                            #     ret z
-                                                            #     ld de,&6969 :SprDrawPset_HLrestore_Plus2
-                                                            #
-                                                            #     ld a,d
-                                                            #     add &08
-                                                            #     ld d,a
-                                                            #
-                                                            # PsetScreenLoopCheck_Minus1:
-                                                            #     bit 7,d
-                                                            #     jp nz,SprDrawPset_StartLine
-                                                            #     push hl
-                                                            #         ld hl,&c050
-                                                            #         add hl,de
-                                                            #         ex hl,de
-                                                            #     pop hl
-                                                            # jp SprDrawPset_StartLine
+
+#--------------------- Pset Version! no transparentcy, so fast! ----------------
+# SprDrawChooseRenderPset: --------------------------------------------------{{{
+SprDrawChooseRenderLineDoublerPset:
+        MOV  $80-6,R1
+        ASL  R2
+        MOV  $SOBToEndOfPsetDrawChain+20,@$SprDrawPset_SOB$
+        BR   SprDrawPset_Double$
+
+SprDrawChooseRenderPset:
+        MOV  @$srcSprShow_TempW,R1
+    .ifdef DebugMode
+        CMP  R1,$32
+        BHI  .
+    .endif
+        JMP  @SprDrawPsetJumpTable(R1)
+    SprDrawPsetJumpTable: #--------------------------------------------------{{{
+       .word NotImplemented        #  0
+       .word SprDrawPset8pxInit$   #  2
+       .word SprDrawPset16pxInit$  #  4
+       .word SprDrawPset24pxInit$  #  6
+       .word SprDrawPset32pxInit$  #  8
+       .word SprDrawPset40pxInit$  # 10
+       .word SprDrawPset48pxInit$  # 12
+       .word SprDrawLnStartBegin   # 14 56
+       .word SprDrawPset64pxInit$  # 16
+       .word SprDrawPset72pxInit$  # 18
+       .word SprDrawPset80pxInit$  # 20
+       .word SprDrawLnStartBegin   # 22 88
+       .word SprDrawPset96pxInit$  # 24
+       .word SprDrawLnStartBegin   # 26 104
+       .word SprDrawLnStartBegin   # 28 112
+       .word SprDrawLnStartBegin   # 30 120
+       .word SprDrawPset128pxInit$ # 32
+    #------------------------------------------------------------------------}}}
+
+    SprDrawPset8pxInit$: #---------------------------------------------------{{{
+        MOV  $80-2,R1
+        MOV  $SOBToEndOfPsetDrawChain+1, @$SprDrawPset_SOB$ #  2 / 2 = 1
+        BR   SprDrawPset8pxVer$
+    SprDrawPset16pxInit$:
+        MOV  $80-4,R1
+        MOV  $SOBToEndOfPsetDrawChain+2, @$SprDrawPset_SOB$ #  4 / 2 = 2
+        BR   SprDrawPset16pxVer$
+    SprDrawPset24pxInit$:
+        MOV  $80-6,R1
+        MOV  $SOBToEndOfPsetDrawChain+3, @$SprDrawPset_SOB$ #  6 / 2 = 3
+        BR   SprDrawPset24pxVer$
+    SprDrawPset32pxInit$:
+        MOV  $80-8,R1
+        MOV  $SOBToEndOfPsetDrawChain+4, @$SprDrawPset_SOB$ #  8 / 2 = 4
+        BR   SprDrawPset32pxVer$
+    SprDrawPset40pxInit$:
+        MOV  $80-10,R1
+        MOV  $SOBToEndOfPsetDrawChain+5, @$SprDrawPset_SOB$ # 10 / 2 = 5
+        MOV  $SprDrawPset40pxVer$,R3
+    SprDrawPset48pxInit$:
+        MOV  $80-12,R1
+        MOV  $SOBToEndOfPsetDrawChain+6, @$SprDrawPset_SOB$ # 12 / 2 = 6
+        MOV  $SprDrawPset48pxVer$,R3
+    SprDrawPset64pxInit$:
+        MOV  $80-16,R1
+        MOV  $SOBToEndOfPsetDrawChain+8, @$SprDrawPset_SOB$ # 16 / 2 = 7
+        MOV  $SprDrawPset64pxVer$,R3
+    SprDrawPset72pxInit$:
+        MOV  $80-18,R1
+        MOV  $SOBToEndOfPsetDrawChain+9, @$SprDrawPset_SOB$ # 18 / 2 = 9
+        MOV  $SprDrawPset32pxVer$,R3
+    SprDrawPset80pxInit$:
+        MOV  $80-20,R1
+        MOV  $SOBToEndOfPsetDrawChain+10,@$SprDrawPset_SOB$ # 20 / 2 = 10
+        MOV  $SprDrawPset80pxVer$,R3
+    SprDrawPset96pxInit$:
+        MOV  $80-24,R1
+        MOV  $SOBToEndOfPsetDrawChain+12,@$SprDrawPset_SOB$ # 24 / 2 = 12
+        MOV  $SprDrawPset96pxVer$,R3
+    SprDrawPset128pxInit$:
+        MOV  $80-32,R1
+        MOV  $SOBToEndOfPsetDrawChain+16,@$SprDrawPset_SOB$ # 32 / 2 = 16
+        MOV  $SprDrawPset128pxVer$,R3
+#----------------------------------------------------------------------------}}}
+    SprDrawPset_Double$:
+        BIT  $1,R2
+        BNZ  SprDrawPset24pxVer$
+        ADD  $6,R5
+        BR   SprDrawPset_LineSkip$
+
+    SprDrawPset128pxVer$: #--------------------------------------------------{{{
+        MOV  (R4)+,(R5)+
+        MOV  (R4)+,(R5)+
+        MOV  (R4)+,(R5)+
+        MOV  (R4)+,(R5)+
+    SprDrawPset96pxVer$:
+        MOV  (R4)+,(R5)+
+        MOV  (R4)+,(R5)+
+    SprDrawPset80pxVer$:
+        MOV  (R4)+,(R5)+
+    SprDrawPset72pxVer:
+        MOV  (R4)+,(R5)+
+    SprDrawPset64pxVer$:
+        MOV  (R4)+,(R5)+
+        MOV  (R4)+,(R5)+
+    SprDrawPset48pxVer$:
+        MOV  (R4)+,(R5)+
+    SprDrawPset40pxVer$:
+        MOV  (R4)+,(R5)+
+    SprDrawPset32pxVer$:
+        MOV  (R4)+,(R5)+
+    SprDrawPset24pxVer$:
+        MOV  (R4)+,(R5)+
+    SprDrawPset16pxVer$:
+        MOV  (R4)+,(R5)+
+    SprDrawPset8pxVer$:
+        MOV  (R4)+,(R5)+
+    #------------------------------------------------------------------------}}}
+
+       .equiv SOBToEndOfPsetDrawChain, 0077202
+    SprDrawPset_LineSkip$:
+        ADD  R1,R5
+    SprDrawPset_SOB$:
+        SOB  R2,SprDrawPset24pxVer$
+
+        RETURN
+#----------------------------------------------------------------------------}}}
+

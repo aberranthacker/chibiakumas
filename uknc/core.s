@@ -20,6 +20,7 @@
        .global KeyboardScanner_P2
        .global LevelStart
        .global MultiplayConfig
+       .global NotImplemented
        .global null
        .global ObjectArray_Redraw
        .global Player_Array
@@ -287,57 +288,56 @@ TranspColors: .byte 0x00 # 0b00000000
                                         #     defb &21,&09,&0C,&0F,&27,&3F,&3C,&39,&61,&49,&4c,&4f,&67,&7f,&7c,&79
 
 Event_VectorArray:
-       .word Event_OneObj                      # 0x00 0x00  0   0 evtSingleSprite
-       .word NotImplemented                    # 0x01 0x02  2  16 # defw Event_MultiObj
-       .word NotImplemented                    # 0x02 0x04  4  32 # defw Event_ObjColumn
-       .word NotImplemented                    # 0x03 0x06  6  48 # defw Event_ObjStrip
-       .word NotImplemented                    # 0x04 0x08  8  64 # defw Event_StarBust
-       .word null                              # 0x05 0x0A 10  80
-       .word null                              # 0x06 0x0C 12  96
-       .word Event_CoreMultipleEventsAtOneTime # 0x07 0x0E 14 112
-       .word null                              # 0x08 0x10 16 128 Event_MoveSwitch, legacy
-       .word Event_SaveObjSettings             # 0x09 0x12 18 144
-       .word Event_LoadObjSettings             # 0x0A 0x14 20 160
-       .word NotImplemented                    # 0x0B 0x16 22 176 # defw Event_CoreSaveLoadSettings2
-       .word null                              # 0x0C 0x18 24 192
-       .word null                              # 0x0D 0x1A 26 208
-       .word null                              # 0x0E 0x1C 28 224
-       .word null                              # 0x0F 0x1E 30 240 Event_CoreReprogram, legacy
+       .word Event_OneObj                      # 0x00 0x00  evtSingleSprite
+       .word NotImplemented                    # 0x01 0x02  # defw Event_MultiObj
+       .word NotImplemented                    # 0x02 0x04  # defw Event_ObjColumn
+       .word NotImplemented                    # 0x03 0x06  # defw Event_ObjStrip
+       .word NotImplemented                    # 0x04 0x08  # defw Event_StarBust
+       .word null                              # 0x05 0x0A
+       .word null                              # 0x06 0x0C
+       .word Event_CoreMultipleEventsAtOneTime # 0x07 0x0E
+       .word null                              # 0x08 0x10  Event_MoveSwitch, legacy
+       .word Event_SaveObjSettings             # 0x09 0x12
+       .word Event_LoadObjSettings             # 0x0A 0x14
+       .word NotImplemented                    # 0x0B 0x16  # defw Event_CoreSaveLoadSettings2
+       .word null                              # 0x0C 0x18
+       .word null                              # 0x0D 0x1A
+       .word null                              # 0x0E 0x1C
+       .word null                              # 0x0F 0x1E  Event_CoreReprogram, legacy
 # Event_MoveVector:
-       .word NotImplemented                    # 0x10 0x20      defw Event_MoveLifeSwitch_0000
-       .word Event_SetProgram                  # 0x11 0x22  2 # defw Event_ProgramSwitch_0001
-       .word NotImplemented                    # 0x12 0x24      defw Event_LifeSwitch_0010
-       .word NotImplemented                    # 0x13 0x26      defw Event_MoveSwitch_0011
-       .word Event_SetProgMoveLife             # 0x14 0x28  8 # mvSetProgMoveLife
-       .word NotImplemented                    # 0x15 0x2A      defw Event_SpriteSwitch_0101
-       .word Event_AddToBackground             # 0x16 0x2C 12 mvAddToBackground
-       .word Event_AddToForeground             # 0x17 0x2E 14 mvAddToForeground
-       .word Event_ChangeStreamTime            # 0x18 0x30 16   defw Event_ChangeStreamTime_1000
-       .word NotImplemented                    # 0x19 0x32      defw Event_Call_1001
-       .word NotImplemented                    # 0x1A 0x34 20   defw Event_LoadLastAddedObjectToAddress_1010
-       .word NotImplemented                    # 0x1B 0x36      defw Event_ClearPowerups
-       .word NotImplemented                    # 0x1C 0x38      defw Event_ChangeStreamSpeed_1100
-       .word Event_SetSpriteSize               # 0x1D 0x3A 26 mvSetObjectSize
-       .word Event_SetAnimator                 # 0x1E 0x3C 28 mvSetAnimator
-       .word NotImplemented                    # 0x1F 0x3E      defw Event_CoreReprogram_AnimatorPointer
+       .word NotImplemented                    # 0x10 0x20    defw Event_MoveLifeSwitch_0000
+       .word Event_SetProgram                  # 0x11 0x22  # defw Event_ProgramSwitch_0001
+       .word NotImplemented                    # 0x12 0x24    defw Event_LifeSwitch_0010
+       .word NotImplemented                    # 0x13 0x26    defw Event_MoveSwitch_0011
+       .word Event_SetProgMoveLife             # 0x14 0x28  evtSetProgMoveLife
+       .word NotImplemented                    # 0x15 0x2A    defw Event_SpriteSwitch_0101
+       .word Event_AddToBackground             # 0x16 0x2C  evtAddToBackground
+       .word Event_AddToForeground             # 0x17 0x2E  evtAddToForeground
+       .word Event_ChangeStreamTime            # 0x18 0x30    defw Event_ChangeStreamTime_1000
+       .word Event_Call                        # 0x19 0x32  evtCallAddress
+       .word Event_LoadLastAddedObjectToAddress# 0x1A 0x34    defw Event_LoadLastAddedObjectToAddress_1010
+       .word NotImplemented                    # 0x1B 0x36    defw Event_ClearPowerups
+       .word NotImplemented                    # 0x1C 0x38    defw Event_ChangeStreamSpeed_1100
+       .word Event_SetSpriteSize               # 0x1D 0x3A  evtSetObjectSize
+       .word Event_SetAnimator                 # 0x1E 0x3C  evtSetAnimator
+       .word NotImplemented                    # 0x1F 0x3E    defw Event_CoreReprogram_AnimatorPointer
 # Event_ReprogramVector:
-       .word Event_CoreReprogram_Palette       # 0x20 0x40 0
-       .word null                              # 0x21 0x42    Obsolete - Reserver for Plus Palette
-       .word NotImplemented                    # 0x22 0x44    defw Event_CoreReprogram_ObjectHitHandler
-       .word NotImplemented                    # 0x23 0x46    defw Event_CoreReprogram_ShotToDeath
-       .word NotImplemented                    # 0x24 0x48    defw Event_CoreReprogram_CustomMove1
-       .word NotImplemented                    # 0x25 0x4A    defw Event_CoreReprogram_CustomMove2
-       .word NotImplemented                    # 0x26 0x4C    defw Event_CoreReprogram_PowerupSprites
-       .word NotImplemented                    # 0x27 0x4E    defw Event_CoreReprogram_CustomMove3
-       .word NotImplemented                    # 0x28 0x50    defw Event_CoreReprogram_CustomMove4
-       .word NotImplemented                    # 0x29 0x52    defw Event_CustomProgram1
-       .word NotImplemented                    # 0x2A 0x54    defw Event_CustomProgram2
-       .word NotImplemented                    # 0x2B 0x56    defw Event_CustomPlayerHitter
-       .word NotImplemented                    # 0x2C 0x58    defw Event_CustomSmartBomb
-       .word NotImplemented                    # 0x2D 0x5A    defw Event_ReprogramObjectBurstPosition
-       .word NotImplemented                    # 0x2E 0x5C    defw Event_ObjectFullCustomMoves
-       .word NotImplemented                    # 0x2F 0x5E    defw Event_SmartBombSpecial
-
+       .word Event_CoreReprogram_Palette       # 0x20 0x40
+       .word null                              # 0x21 0x42  Obsolete - Reserver for Plus Palette
+       .word NotImplemented                    # 0x22 0x44  defw Event_CoreReprogram_ObjectHitHandler
+       .word NotImplemented                    # 0x23 0x46  defw Event_CoreReprogram_ShotToDeath
+       .word NotImplemented                    # 0x24 0x48  defw Event_CoreReprogram_CustomMove1
+       .word NotImplemented                    # 0x25 0x4A  defw Event_CoreReprogram_CustomMove2
+       .word NotImplemented                    # 0x26 0x4C  defw Event_CoreReprogram_PowerupSprites
+       .word NotImplemented                    # 0x27 0x4E  defw Event_CoreReprogram_CustomMove3
+       .word NotImplemented                    # 0x28 0x50  defw Event_CoreReprogram_CustomMove4
+       .word NotImplemented                    # 0x29 0x52  defw Event_CustomProgram1
+       .word NotImplemented                    # 0x2A 0x54  defw Event_CustomProgram2
+       .word NotImplemented                    # 0x2B 0x56  defw Event_CustomPlayerHitter
+       .word NotImplemented                    # 0x2C 0x58  defw Event_CustomSmartBomb
+       .word NotImplemented                    # 0x2D 0x5A  defw Event_ReprogramObjectBurstPosition
+       .word NotImplemented                    # 0x2E 0x5C  defw Event_ObjectFullCustomMoves
+       .word NotImplemented                    # 0x2F 0x5E  defw Event_SmartBombSpecial
 
                                         # read "..\SrcCPC\Akuyou_CPC_InterruptHandler.asm"
 null:   RETURN
@@ -387,8 +387,9 @@ null:   RETURN
                                         ## endif
 NotImplemented:
        BR   .
-       .asciz "Not implemented"
-       .even
+      .rept 2
+       NOP
+      .endr
 end: FileEndCore:
 
 LevelStart:

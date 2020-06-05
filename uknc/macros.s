@@ -19,9 +19,17 @@
 
 .macro .puts str_addr
    .wait_ppu
-    MOV  \str_addr, @$PPUCommandArg
-    MOV  $PPU_Print,@$PPUCommand
+   .ppudo $PPU_Print,\str_addr
    .wait_ppu
+.endm
+
+.macro .inform_and_hang str
+   .wait_ppu
+   .ppudo $PPU_PrintAt, $.+14
+    BR   .
+   .byte 0,0
+   .asciz "\str"
+   .even
 .endm
 
 # generic macros
@@ -32,7 +40,11 @@
 .macro .call cond=none, dst:req # CALL cc,nn
   .if \cond == "EQ" # equal (z)
     BNE  .+6
+  .elseif \cond == "ZE" # zero
+    BNE  .+6
   .elseif \cond == "NE" # not equal (nz)
+    BEQ  .+6
+  .elseif \cond == "NZ" # not zero
     BEQ  .+6
   .else
     .error "Unknown condition for conditional call"

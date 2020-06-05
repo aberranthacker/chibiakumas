@@ -217,13 +217,12 @@ ShowMenu:
     .else
         MOV  $EventStreamArray_Menu_EP1, R5
     .endif
-.list
         CALL @$ResetEventStream
-        .nolist
         # TODO: show hiscore value
         CALL @$Timer_UpdateTimer # Aku/Level00-Menu.asm:1180
         CALL @$EventStream_Process
         WAIT
+
        .ppudo_ensure $PPU_PrintAt,$MenuText1
         CALL @$ObjectArray_Redraw
 

@@ -32,18 +32,6 @@
 .equiv CBP12D, CBP1DT  # CPU bitplanes 1 and 2 data register
                        # alias for word access
 
-# PPU: bitplanes registers
-.equiv PBPADR, 0177010 # PPU bitplanes address register
-.equiv PBP0DT, 0177012 # PPU bitplane 0 data register
-.equiv PBP1DT, 0177014 # PPU bitplane 1 data register
-.equiv PBP2DT, 0177015 # PPU bitplane 2 data register
-.equiv PBP12D, PBP1DT  # alias for word access
-.equiv DTSCOL, 0177016 # PPU dots color
-.equiv BP01BC, 0177020 # PPU bitplanes 0/1 background color
-.equiv BP12BC, 0177022 # PPU bitplanes 1/2 background color
-.equiv DTSOCT, 0177024 # PPU dots octet
-.equiv PBPMSK, 0177026 # PPU bitplanes mask register
-
 # CPU: to PPU communication channels
 # terminal emulation channel
 .equiv CCH0II, 060     # CPU channel 0 in   state interrupt
@@ -68,12 +56,28 @@
 .equiv CCH2OS, 0176674 # CPU channel 2 out  state register
 .equiv CCH2OD, 0176676 # CPU channel 2 out  data register
 
-# PPU: Programmable timer
-.equiv TMRST , 0177710 # State register
-.equiv TMREVN, 0310    # External event interrupt
-.equiv PGTMRI, 0304    # Programmable timer interrupt
-.equiv TMRBRG, 0177712 # Buffer register
-.equiv TMRCST, 0177714 # Current state register
+# SRAM module register
+.equiv WNDRGS, 0176000 # windows registers
+.equiv WNDRGA, 0176000 # window a register
+.equiv WNDRGB, 0176001 # window b register
+
+################################################################################
+#                               PPU registers                                  #
+################################################################################
+
+# PPU: bitplanes registers
+.equiv PBPADR, 0177010 # PPU bitplanes address register
+.equiv PBP0DT, 0177012 # PPU bitplane 0 data register
+.equiv PBP1DT, 0177014 # PPU bitplane 1 data register
+.equiv PBP2DT, 0177015 # PPU bitplane 2 data register
+.equiv PBP12D, PBP1DT  # alias for word access
+.equiv DTSCOL, 0177016 # PPU dots color
+.equiv BP01BC, 0177020 # PPU bitplanes 0/1 background color
+.equiv BP12BC, 0177022 # PPU bitplanes 1/2 background color
+.equiv DTSOCT, 0177024 # PPU dots octet
+.equiv PBPMSK, 0177026 # PPU bitplanes mask register
+
+.equiv PASWCR, 0177054 # PPU address space window control register
 
 # PPU: to CPU communication channels
 .equiv PCH0II, 0320    # PPU channel 0 in  data interrupt
@@ -83,27 +87,31 @@
 .equiv PCH2II, 0340    # PPU channel 2 in  data interrupt
 .equiv PCH2ID, 0177064 # PPU channel 2 in  data register
 .equiv PCHSIS, 0177066 # PPU channels 0, 1, 2 in - state register
-.equiv Ch2StateIn0Int, 0b00000001 # channel 0 interrupt allowed
-.equiv Ch2StateIn1Int, 0b00000010 # channel 1 interrupt allowed
-.equiv Ch2StateIn2Int, 0b00000100 # channel 2 interrupt allowed
-.equiv Ch2In0Ready,    0b00001000 # channel 0 ready
-.equiv Ch2In1Ready,    0b00010000 # channel 1 ready
-.equiv Ch2In2Ready,    0b00100000 # channel 2 ready
+.equiv Ch0StateInInt,  0b00000001 # channel 0 interrupt allowed
+.equiv Ch1StateInInt,  0b00000010 # channel 1 interrupt allowed
+.equiv Ch2StateInInt,  0b00000100 # channel 2 interrupt allowed
+.equiv Ch0InReady,     0b00001000 # channel 0 ready
+.equiv Ch1InReady,     0b00010000 # channel 1 ready
+.equiv Ch2InReady,     0b00100000 # channel 2 ready
 .equiv IntOnCPU_RESET, 0b01000000 # interrupt on RESET on CPU bus
-.equiv RSTINT, 0314    # RESET on CPU bus interrupt
-
 .equiv PCH0OI, 0324    # PPU channel 0 out  data interrupt
 .equiv PCH0OD, 0177070 # PPU channel 0 out  data register
 .equiv PCH1OI, 0334    # PPU channel 1 out  data interrupt
 .equiv PCH1OD, 0177072 # PPU channel 1 out  data register
 .equiv PCHSOS, 0177076 # PPU channels 0/1 out - state register
 
+.equiv RSTINT, 0314    # RESET on CPU bus interrupt
+
 # PPU: keyboard
 .equiv KBINT,  0300    # keyboard interrupt
 .equiv KBSTAT, 0177700 # keyboard state register
 .equiv KBDATA, 0177702 # keyboard data register
 
-# SRAM module register
-.equiv WNDRGS, 0176000 # windows registers
-.equiv WNDRGA, 0176000 # window a register
-.equiv WNDRGB, 0176001 # window b register
+# PPU: Programmable timer
+.equiv TMRST , 0177710 # State register
+.equiv TMREVN, 0310    # External event interrupt
+.equiv PGTMRI, 0304    # Programmable timer interrupt
+.equiv TMRBRG, 0177712 # Buffer register
+.equiv TMRCST, 0177714 # Current state register
+
+

@@ -11,16 +11,17 @@
 .equiv FB_gap, FB0 + 16000
 .equiv FB1, FB_gap + 384
 
-.equiv PPU_NOP,            2 #  1
-.equiv PPU_Finalize,       4 #  2
-.equiv PPU_SingleProcess,  6 #  3
-.equiv PPU_MultiProcess,   8 #  4
-.equiv PPU_SetPalette,    10 #  5
-.equiv PPU_Print,         12 #  6
-.equiv PPU_PrintAt,       14 #  7
-.equiv PPU_FlipFB,        16 #  8
-.equiv PPU_ShowFB0,       18 #  9
-.equiv PPU_ShowFB1,       20 # 10
+.equiv PPU_NOP,            1 << 1
+.equiv PPU_Finalize,       2 << 1
+.equiv PPU_SingleProcess,  3 << 1
+.equiv PPU_MultiProcess,   4 << 1
+.equiv PPU_SetPalette,     5 << 1
+.equiv PPU_Print,          6 << 1
+.equiv PPU_PrintAt,        7 << 1
+.equiv PPU_FlipFB,         8 << 1
+.equiv PPU_ShowFB0,        9 << 1
+.equiv PPU_ShowFB1,       10 << 1
+.equiv PPU_LoadText,      11 << 1
 
 .equiv BootstrapStart,  512
 .equiv Akuyou_GameVarsStart, FB1 + 16000
@@ -30,7 +31,7 @@
 .equiv PlayerStarArraySize, 128
 .equiv GameVarsArraysSize, StarArraySize * 4 + ObjectArraySize * 8 + PlayerStarArraySize * 4 + 15*8
 
-.equiv Akuyou_LevelStart, 0x92E6 # 37606 0111346 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x96BE # 38590 0113276 # auto-generated during a build
 .equiv LevelSprites, Akuyou_LevelStart + 4
 
 .equiv SPReset,       0157772 # Initial stack pointer
@@ -56,6 +57,12 @@
 .equiv Keymap_F3,    0x40
 .equiv Keymap_Pause, 0x80
 .equiv Keymap_AnyFire, 0b01110000
+
+.equiv chr1Up,   0x7B # 0173
+.equiv chr2Up,   0x7C # 0174
+.equiv chrSlab,  0x7D # 0175
+.equiv chrCross, 0x7E # 0176
+.equiv chrHeart, 0x7F # 0177
 
 
 # PlusSprite_ExtBank equ &C7

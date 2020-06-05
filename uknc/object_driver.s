@@ -77,7 +77,7 @@ ObjectArray_ConfigureForSize:                               # ObjectArray_Config
 ObjectArray_Redraw:                                         # ObjectArray_Redraw:
         TST  @$srcTimer_TicksOccured                        #     ld a,(Timer_TicksOccured)
                                                             #     or a
-        BEQ  game_paused$                                   #     ret z   ; see if game is paused (TicksOccurred = 0 )
+        BZE  game_paused$                                   #     ret z   ; see if game is paused (TicksOccurred = 0 )
                                                             #
         CALL ObjectArray_ConfigureForSize                   #     call ObjectArray_ConfigureForSize
                                                             #
@@ -88,7 +88,7 @@ ObjectArray_Redraw:                                         # ObjectArray_Redraw
     object_loop$:                                           # Objectloop2:
         MOV  (R5)+,R1 # Screen Y=LSB co-ordinate (one byte) #     ld c,(hl)   ; Y
         TSTB R1       # 0 means this object is unused       #     cp c
-        BNE  object_present$                                #     jr NZ,Objectloop_NotZero ;if object Y =0 the object is dead
+        BNZ  object_present$                                #     jr NZ,Objectloop_NotZero ;if object Y =0 the object is dead
 
 ObjectArray_Turbo:                                          # ObjectArray_Turbo:
         ADD  $6,R5                                          #     inc l
@@ -133,7 +133,7 @@ ObjectArray_Turbo:                                          # ObjectArray_Turbo:
         SWAB R4                                             #         dec h
         TSTB R4                                             #         ld a,(hl) ; animator
                                                             #         or a
-       .call NE, @$ObjectAnimator                           #         call nz,ObjectAnimator
+       .call NZ, @$ObjectAnimator                           #         call nz,ObjectAnimator
                                                             #
         SWAB R2                                             #         ld a,iyh
         MOV  R2,R0
@@ -141,16 +141,16 @@ ObjectArray_Turbo:                                          # ObjectArray_Turbo:
         MOV  R0,@$srcSprShow_SprNum                         #         ld (SprShow_SprNum),a
                                                             #         ld a,iyh
         BIT  $0xC0,R2                                       #         and %11000000
-        BEQ  Objectloop_SpriteBankSet$ # one frame sprite   #         jr z,Objectloop_SpriteBankSet
+        BZE  Objectloop_SpriteBankSet$ # one frame sprite   #         jr z,Objectloop_SpriteBankSet
         BIT  $0x40,R2                                       #         bit 6,a
-        BEQ  Objectloop_TwoFrameSprite$                     #         jr z,Objectloop_TwoFrameSprite
+        BZE  Objectloop_TwoFrameSprite$                     #         jr z,Objectloop_TwoFrameSprite
 
                                                             #         ;if we got here it's a FourFrameSprite
                                                             #         and %00000011
                                                             #         jr Objectloop_SpriteBankSet
 
 Objectloop_TwoFrameSprite$:                                 # Objectloop_TwoFrameSprite:
-        HALT                                                #         ld a,(Timer_CurrentTick)
+        CALL NotImplemented                                 #         ld a,(Timer_CurrentTick)
                                                             #         cpl
                                                             #         and %00000010
                                                             #
@@ -231,7 +231,7 @@ ObjectLoopBothPlayerSkip:                                   # ObjectLoopBothPlay
 #        xxxxx = hit points (if not B then ages over time)
         TSTB R3 # R3 Life=LSB, Program=MSB                  #     ld a,ixl
                                                             #     or a
-        BEQ  ObjectLoopP1StarSkip                           #     jr z,ObjectLoopP1StarSkip   ; immortal object (background)
+        BZE  ObjectLoopP1StarSkip                           #     jr z,ObjectLoopP1StarSkip   ; immortal object (background)
                                                             #     bit 7,a
                                                             #     jr nz,ObjectLoop_AgelessIXLCheck    ; If it can be shot, it doesn't auto age
                                                             #
@@ -341,24 +341,24 @@ ObjectLoop_SaveChanges$:                                    # ObjectLoop_SaveCha
                                                             #         inc h;dec h ;    Spritesize never changes
                                                             #
         # Animator and Spritesize never changes             #         ld a,iyl
-        MOV  R3,-(R5)                                       #         ld (hl),a ; Program Code
+        MOV  R3,-(R5) # LSB=Life, MSB=Program Code          #         ld (hl),a ; Program Code
                                                             #         inc h ;dec h
                                                             #         ld a,ixl
                                                             #         ld (hl),a ;Life
                                                             #         res 6,l ;dec h
                                                             #         ld a,iyh
-        MOV  R2,-(R5)                                       #         ld (hl),a ;spr
+        MOV  R2,-(R5) # LSB=Move, MSB=Sprite                #         ld (hl),a ;spr
                                                             #         dec h
                                                             #         ld a,ixh
                                                             #         ld (hl),a ;Move
                                                             #         dec h
-        MOVB R4,-(R5)                                       #         ld (hl),b ;X
+        MOVB R4,-(R5) # X                                   #         ld (hl),b ;X
                                                             #         dec h
-        MOVB R1,-(R5)                                       #         ld (hl),c ;Y
+        MOVB R1,-(R5) # Y                                   #         ld (hl),c ;Y
                                                             #
                                                             #         ld a,iyl
         BIT  R3,$0xFF00                                     #         or a
-       .call NE,@$ObjectProgram                             #         call nz, ObjectProgram
+       .call NZ,@$ObjectProgram                             #         call nz, ObjectProgram
                                                             #
 ObjectLoop_ShowSprite:                                      # ObjectLoop_ShowSprite:
                                                             #         ld b,Akuyou_LevelStart_Bank;&C0
@@ -407,7 +407,7 @@ ObjectLoop_ShowSprite:                                      # ObjectLoop_ShowSpr
                                                             #
                                                             #     exx
 ObjectAnimator:                                             # ObjectAnimator:
-        HALT
+        .inform_and_hang "ObjectAnimator is not implemented"
                                                             #     ;our animator is in A
                                                             #     ;format is
                                                             #     ;TTTTAAAA
@@ -594,7 +594,7 @@ ObjectAnimator:                                             # ObjectAnimator:
                                                             # ret
                                                             #
 ObjectProgram:                                              # ObjectProgram:
-        HALT                                                #     ret z       ; return if zero
+        .inform_and_hang "ObjectProgram is not implemented" #     ret z       ; return if zero
                                                             #     cp %00000001
                                                             #     jp z,ObjectProgram_BitShiftSprite   ; Used by background, sprite bank based on X co-ord
                                                             #     and %11111000           ;00000XXX = Powerup
