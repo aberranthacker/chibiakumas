@@ -1278,8 +1278,9 @@ ClearObjects:
     ret
 ShowText1Init:
         ld a,1
+
 UpdateShowText:
-        ld(ShowTextUpdate_Plus1-1),a
+        ld(ShowTextUpdate_Plus1 - 1),a
         ret
 ShowText2Init:
         ld a,2
@@ -1955,13 +1956,13 @@ ShowBossText_StartText:
     push hl
     push bc
         ld a,2
-        call Akuyou_SpriteBank_Font
+        call Akuyou_SpriteBank_Font ; SrcCPC/Akuyou_CPC_ShowSprite.asm:19
     pop bc
     pop hl
 
     ld l,&14 :OnscreenTextPos_Plus1
     ld a,1 :BossCharNum_Plus1
-    ld i,a  ; show up to 255 chars
+    ld i,a  ; show up to 255 chars ; I Limits the number of characters to be show,
 
 ShowBossText_MoreText:
     ei
@@ -1976,10 +1977,10 @@ ShowBossText_MoreText:
     inc bc
 
     push hl
-        call Akuyou_DrawText_LocateSprite
-
-        call Akuyou_DrawText_PrintString
+        call Akuyou_DrawText_LocateSprite ; SrcCPC/Akuyou_CPC_TextDriver.asm:104
+        call Akuyou_DrawText_PrintString ; SrcCPC/Akuyou_CPC_TextDriver.asm:28
     pop hl
+
     inc l
     ld a,i
     dec a

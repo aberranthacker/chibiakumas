@@ -421,7 +421,8 @@ SprDrawLnDoubleLine:
 SprDrawLineEnd2:
 
 ;--------------------Turbo Version! misuse the stack for faster writes ----------------
-SprDraw8pxInit:
+
+SprDraw8pxInit: ;------------------------------------------------------------{{{
     ld de,Sprdraw8PxVer
     jp SprDrawTurboPrep
 SprDraw16pxInit:
@@ -445,6 +446,7 @@ SprDraw72pxInit:
 SprDraw96pxInit:
     ld de,Sprdraw96PxVer
     jr SprDrawTurboPrep
+;----------------------------------------------------------------------------}}}
 
 SprDrawTurboPrep:
     ld (Sprdraw24PxJumpPos_Plus2-2),de
@@ -476,7 +478,7 @@ Sprdraw24PxVer_Double:  ;Line doubler - does two nextlines each time
         bit 0,C
         jp z,SprDrawTurbo_LineSkip
         jp Sprdraw24PxVer
-Sprdraw96PxVer:
+Sprdraw96PxVer: ;------------------------------------------------------------{{{
         pop de
         cp e
         jr z,SprDraw24pxW_SkipFb
@@ -647,6 +649,7 @@ Sprdraw8PxVer:
         jr z,SprDraw24pxW_Skip6
         ld (hl),d
         SprDraw24pxW_Skip6:
+;----------------------------------------------------------------------------}}}
 SprDrawTurbo_LineSkip:
     dec c
     jr z,SprDrawTurbo_Done
@@ -704,8 +707,8 @@ SprDrawChooseRenderLineDoublerPset:
     ex af,af';pop af
     ld de,SprdrawPset_Double
     jp SprDrawPsetPrep
-
-SprDrawChooseRenderPset:        ; Can do any size between 8-48 pixels
+; Can do any size between 8-48 pixels
+SprDrawChooseRenderPset: ;---------------------------------------------------{{{
     ld a,(SprShow_TempW)
     cp 6
     jp z,SprDrawPset24pxInit
@@ -729,8 +732,9 @@ SprDrawChooseRenderPset:        ; Can do any size between 8-48 pixels
     jr z,SprDrawPset72pxInit
     cp 10
     jr z,SprDrawPset40pxInit
+;----------------------------------------------------------------------------}}}
     jp SprDrawLnStartBeginB
-SprDrawPset8pxInit:
+SprDrawPset8pxInit: ;--------------------------------------------------------{{{
     ld de,SprDrawPset8PxVer
     jr SprDrawPsetPrep
 SprDrawPset16pxInit:
@@ -762,8 +766,8 @@ SprDrawPset128pxInit:
     jr SprDrawPsetPrep
 SprDrawPset24pxInit:
     ld de,SprDrawPset24PxVer
+;----------------------------------------------------------------------------}}}
 SprDrawPsetPrep:
-
     ld (SprDrawPset24PxJumpPos_Plus2-2),de
 
 SprDrawPsetPrep2:
@@ -786,7 +790,7 @@ SprdrawPset_Double:             ;Line doubler, moves down two lines instead of o
         bit 0,a
         jr z,SprDrawPset_LineSkip
         jp SprDrawPset24PxVer
-SprDrawPset128PxVer:
+SprDrawPset128PxVer: ;-------------------------------------------------------{{{
         ldi
         ldi
 
@@ -834,7 +838,7 @@ SprDrawPset16PxVer:
 SprDrawPset8PxVer:
         ldi
         ldi
-
+;----------------------------------------------------------------------------}}}
 SprDrawPset_LineSkip:
     dec iyl
     ret z
