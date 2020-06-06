@@ -10,22 +10,42 @@
                .equiv  PPU_ModuleSizeWords, (end - start) >> 1
                .global PPU_ModuleSizeWords
 
+               .equiv SLTAB, 0100000
+               .equiv OffscreenAreaAddr, 0140000
+
                .=PPU_UserRamStart
 
 start:
+                MOV  @$0100, @$SYS100
+                MOV  $VblankIntHandler,@$0100
+
+                MOV  @$0300, @$SYS300
+                MOV  $KeyboardIntHadler,@$0300
+
+                MOV  $0b001,@$PBPMSK  # disable writes to bitplane 0
+
 ClrTextArea: # --------------------------------------------------------------{{{
-                MOV  $88*40>>1, R0
+            .if OffscreenAreaAddr < 0120000
+                MOV  $0x011,@$PASWCR
+            .elseif OffscreenAreaAddr < 0140000
+                MOV  $0x021,@$PASWCR
+            .elseif OffscreenAreaAddr < 0160000
+                MOV  $0x041,@$PASWCR
+            .else
+                MOV  $0x081,@$PASWCR
+            .endif
+
+                MOV  $88*20>>1, R0
                 CLR  R1
-                MOV  $PBPADR,R5
-                MOV  $PBP0DT,R4
-                MOV  $0100000,(R5)
+                MOV  $OffscreenAreaAddr,R5
 
 1$:            .rept 2
-                MOV  R1,(R4)
-                INC  (R5)
+                MOV  R1,(R5)+
                .endr
                 SOB  R0,1$
 #----------------------------------------------------------------------------}}}
+
+                MOV  $0x051,@$PASWCR # 
 # initialize our scanlines parameters table (SLTAB): ------------------------{{{
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 312 (1..312) lines is SECAM half-frame
@@ -161,7 +181,7 @@ SLTABInit:      MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
                 ADD  $8,R1           #  calculate pointer to next record
                 MOV  R1,(R0)+        #--pointer to the record 20
 #------------------------------------- top region, header
-                MOV  $0100000,R2     # scanlines 20..307 are visible
+                MOV  $OffscreenAreaAddr,R2     # scanlines 20..307 are visible
                 MOV  $43,R3          #
 2$:             MOV  R2,(R0)+        #--address of screenline
                 ADD  $4,R1           #  calc address of next record of SLTAB
@@ -206,7 +226,7 @@ SLTABInit:      MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
 #------------------------------------- bottom region, footer
                 MOV  $0x2020,(R0)+   # colors  011  010  001  000 (YRGB)
                 MOV  $0x2020,(R0)+   # colors  111  110  101  100 (YRGB)
-                MOV  $0103340+40,R2  #
+                MOV  $OffscreenAreaAddr+03340+40,R2  #
                 MOV  R2,(R0)+        #
                 ADD  $40,R2          # calculate address of next screenline
                 ADD  $8,R1           # calculate pointer to next record
@@ -221,17 +241,12 @@ SLTABInit:      MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
                 SOB  R3,4$           #
                                      #
                 CLR  (R0)+           #--address of line 308
+                .list
+
                 MOV  R1,(R0)         #--pointer back to record 308
+                .nolist
 #----------------------------------------------------------------------------}}}
-Setup: #---------------------------------------------------------------------{{{
-                MOV  @$0100, @$SYS100
-                MOV  $VblankIntHandler,@$0100
-
-                MOV  @$0300, @$SYS300
-                MOV  $KeyboardIntHadler,@$0300
-
-                MOV  $0b001,@$PBPMSK  # disable writes to bitplane 0
-
+#----------------------------------------------------------------------------{{{
                 MOV  @$0272, @$SYS272 # store address of system SLTAB (186; 0xBA)
                 MOV  $SLTAB, @$0272   # use our SLTAB
 
@@ -295,6 +310,7 @@ ClrSingleProcessFlag: #------------------------------------------------------{{{
                 JMP  CommandExecuted
 #----------------------------------------------------------------------------}}}
 SetPalette: #----------------------------------------------------------------{{{
+                MOV  $0x051,@$PASWCR
                 MOV  $PPU_PPUCommandArg, @$PBPADR
                 MOV  @$PBP12D, @$PBPADR # get palette address
                 CLC
@@ -712,7 +728,6 @@ SYS300:  .word 0175412 # address of default keyboard interrupt handler
 
 FBSLTAB: .word 0          # adrress of main screen SLTAB
 FirstLineAddress: .word 0 #
-         .balign 4*2   # scan-lines parameters table, it has to be aligned at 4 words
-SLTAB:   # space for the SLTAB must be reserved when allocating PPU memory
-         .space 2*2    # .balign has no effect without this
+
+         .word 0xFFFF
 end:

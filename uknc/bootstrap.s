@@ -42,7 +42,7 @@ Bootstrap_Launch:
 
         JSR  R5,PPEXEC
        .word FB1 # PPU module location
-       .word PPU_ModuleSizeWords + 1280 # 2.5KB is a space required for SLTAB
+       .word PPU_ModuleSizeWords
 #-------------------------------------------------------------------------------
      .ifdef ShowLoadingScreen
        .ppudo_ensure $PPU_SetPalette, $LoadingScreenPalette
