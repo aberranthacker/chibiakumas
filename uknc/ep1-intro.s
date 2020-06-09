@@ -17,8 +17,7 @@ start:
        .incbin "resources/ep1-intro.spr"
 
 EventStreamArray:
-    .word 0 # time
-    .word evtMultipleCommands | 5
+    .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
     .word         prgBitShift
     .word         mveBackground | 0x01
@@ -28,8 +27,7 @@ EventStreamArray:
     .word     evtAddToBackground               # 4
     .word     evtSaveObjSettings | 0           # 5
 
-    .word 0 # time
-    .word evtMultipleCommands | 5
+    .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
     .word         prgBitShift
     .word         mveBackground | 0x10
@@ -39,35 +37,31 @@ EventStreamArray:
     .word     evtAddToBackground               # 4
     .word     evtSaveObjSettings | 1           # 5
 
-    .word 0 # time
-    .word evtMultipleCommands | 2
+    .word 0, evtMultipleCommands | 2
     .word     evtSetProgMoveLife               # 1
     .word         prgNone
     .word         mvStatic
     .word         lifeImmortal
     .word     evtSaveObjSettings | 2           # 2
 
-    .word 0 # time
-    .word evtMultipleCommands | 2
+    .word 0, evtMultipleCommands | 2
     .word     evtSetProgMoveLife               # 1
     .word         prgNone
     .word         mvRegular | spdFast | 0x20
     .word         lifeImmortal
     .word     evtSaveObjSettings | 3           # 2
 
-    .word 0 # time
-    .word evtMultipleCommands | 2
+    .word 0, evtMultipleCommands | 2
     .word     evtSetProgMoveLife               # 1
     .word         prgNone
     .word         mvRegular | spdNormal | 0x32
     .word         lifeImmortal
     .word     evtSaveObjSettings | 4           # 2
 
-    .word 0 # time
-    .word evtMultipleCommands | 5
+    .word 0, evtMultipleCommands | 5
     .word     evtAddToForeground               # 1
     .word     evtLoadObjSettings | 2           # 2
-    .word     evtSingleSprite, 3               # 3
+    .word     evtSingleSprite, 5               # 3
     .byte         24+80+6, 24+80-16 # Y, X
     .word     evtSaveLstObjToAdd               # 4
     .word         charnikohime
@@ -85,12 +79,43 @@ EventStreamArray:
     .word FadeStartPoint + 3 # time
     .word evtSetPalette, RealPalette
 
-   #.word 10 # time
-    .word 4 # time
-    .word evtCallAddress, ShowText1Init
+    .word 10, evtCallAddress, ShowText1Init
 
-    .word 64 # time
-    .word evtCallAddress, EndLevel
+    .word 49, evtCallAddress, ShowText0Init
+
+    .word 50, evtMultipleCommands | 4
+    .word     evtLoadObjSettings | 3              # 1
+    .word     evtSingleSprite, TwoFrameSprite + 0 # 2
+    .byte         24+40-10, 24+160-24
+    .word     evtSingleSprite, TwoFrameSprite + 1 # 3
+    .byte         24+40-10, 24+160-12
+    .word     evtSingleSprite, TwoFrameSprite + 2 # 4
+    .byte         24+40-10, 24+160
+
+    .word 51, evtMultipleCommands | 5
+    .word     evtSingleSprite, TwoFrameSprite + 6
+    .byte         24+40-10,      24+160-12-6
+    .word     evtSingleSprite, TwoFrameSprite + 6
+    .byte         24+40+24+8-10, 24+160-12-6
+    .word     evtSingleSprite, TwoFrameSprite + 6
+    .byte         24+40-10,      24+160-12
+    .word     evtSingleSprite, TwoFrameSprite + 6
+    .byte         24+40+24+8-10, 24+160-12
+    .word     evtSingleSprite, TwoFrameSprite + 6
+    .byte         24+40-10+8,    24+160-12
+    /*
+    ...
+    */
+    .word 68, evtCallAddress, ShowText2Init
+    /*
+    ...
+    */
+ 
+    .word 72, evtCallAddress, ShowText3Init
+
+    .word 85, evtCallAddress, ShowText4Init
+
+    .word 0x240, evtCallAddress, EndLevel
 
 charnikohime: .word 0
 
@@ -122,11 +147,11 @@ LevelLoop:
        #WAIT
         CALL @$EventStream_Process
         CALL @(PC)+; dstDoubleStreamProcess: .word null
-       #WAIT
 
         BITB @$KeyboardScanner_P1,$Keymap_AnyFire
         BNZ  EndLevel
 
+        WAIT
         CALL @$ObjectArray_Redraw
         CALL @(PC)+; dstShowBossTextCommand: .word ShowBossText
 
@@ -134,33 +159,65 @@ LevelLoop:
         CMP  R0,$22
         BHI  LevelLoop
 
-        ASL  R0 
-        JMP  @ShowTextJumpTable(R0)
-    ShowTextJumpTable: #-----------------------------------------------------{{{
-       .word ShowText0
-       .word ShowText1
-       .word ShowText2
-       .word ShowText3
-       .word ShowText4
-       .word ShowText5
-       .word ShowText6
-       .word ShowText7
-       .word ShowText8
-       .word ShowText9
-       .word ShowText10
-       .word ShowText11
-       .word ShowText12
-       .word ShowText13
-       .word ShowText14
-       .word ShowText15
-       .word ShowText16
-       .word ShowText17
-       .word ShowText18
-       .word ShowText19
-       .word ShowText20
-       .word ShowText21
-       .word ShowText22
-    #------------------------------------------------------------------------}}}
+        ASL  R0
+        MOV  SubtitlesTable(R0),R5
+        BR   ResetText
+    SubtitlesTable:
+       .word SubtitlesEmpty
+       .word Subtitles1
+       .word Subtitles2
+       .word Subtitles3
+       .word Subtitles4
+       .word Subtitles5
+       .word Subtitles6
+       .word Subtitles7
+       .word Subtitles8
+       .word Subtitles9
+       .word Subtitles10
+       .word Subtitles11
+       .word Subtitles12
+       .word Subtitles13
+       .word Subtitles14
+       .word Subtitles15
+       .word Subtitles16
+       .word Subtitles17
+       .word Subtitles18
+       .word Subtitles19
+       .word Subtitles20
+       .word Subtitles21
+       .word Subtitles22
+
+    ResetText:                                              # ResetText:
+       #MOV  R5,@$srcOnscreenTextPointer                    #         ld(OnscreenTextPointer_Plus2-2),hl
+                                                            #         ld (OnscreenTextPos_Plus1-1),a
+                                                            #         ld a,1
+                                                            #         ld (BossCharNum_Plus1-1),a
+                                                            #         ld a,0
+        MOV  $0xFF,@$srcShowTextUpdate                      #         ld(ShowTextUpdate_Plus1-1),a
+                                                            #         ld a,15
+                                                            #         ld (OnscreenTimer_Plus1-1),a
+       .wait_ppu
+        MOV  R5, @$PPUCommandArg;
+        MOV  $PPU_LoadText, @$PPUCommand
+        MOV  $1,@$srcCharsToPrint
+
+        CALL @$Clear4000                                    #         call Clear4000
+                                                            #
+                                                            #         ld ixh,0
+                                                            ##ifdef BuildCPC
+                                                            #         call Akuyou_RasterColors_Blackout
+                                                            ##endif
+                                                            ##if buildCPCv+buildENTv
+                                                            #         call null   :CompiledSprite_Plus2
+                                                            ##endif
+                                                            #
+                                                            # NoBackPic:
+                                                            ##if buildCPCv+buildENTv
+                                                            #         ld a,ixh
+                                                            #         cp 0
+                                                            #         call nz,RLE_Draw
+                                                            ##endif
+        JMP  @$LevelLoop                                    #         jp levelloop
 
 ShowText0Init: #-------------------------------------------------------------{{{
         MOV  $0,R0
@@ -238,104 +295,103 @@ NoSpeech:
         RETURN
 #----------------------------------------------------------------------------}}}
 
-    ShowText0:
-
-    ShowText1:
-        MOV  $Subtitles1,R5
-        MOV  $5,R0
-        BR   ResetText
-    ShowText2:
-    ShowText3:
-    ShowText4:
-    ShowText5:
-    ShowText6:
-    ShowText7:
-    ShowText8:
-    ShowText9:
-    ShowText10:
-    ShowText11:
-    ShowText12:
-    ShowText13:
-    ShowText14:
-    ShowText15:
-    ShowText16:
-    ShowText17:
-    ShowText18:
-    ShowText19:
-    ShowText20:
-    ShowText21:
-    ShowText22:
-
-    ResetText:                                              # ResetText:
-        MOV  R5,@$srcOnscreenTextPointer                    #         ld(OnscreenTextPointer_Plus2-2),hl
-                                                            #         ld (OnscreenTextPos_Plus1-1),a
-                                                            #         ld a,1
-                                                            #         ld (BossCharNum_Plus1-1),a
-                                                            #         ld a,0
-        MOV  $0xFF,@$srcShowTextUpdate                      #         ld(ShowTextUpdate_Plus1-1),a
-                                                            #         ld a,15
-                                                            #         ld (OnscreenTimer_Plus1-1),a
-      #.wait_ppu
-       #MOV  R5, @$PPUCommandArg; .word srcOnscreenTextPointer
-       #MOV  $PPU_LoadText, @$PPUCommand
-        CALL @$Clear4000                                    #         call Clear4000
-                                                            # 
-                                                            #         ld ixh,0
-                                                            ##ifdef BuildCPC
-                                                            #         call Akuyou_RasterColors_Blackout
-                                                            ##endif
-                                                            ##if buildCPCv+buildENTv
-                                                            #         call null   :CompiledSprite_Plus2
-                                                            ##endif
-                                                            # 
-                                                            # NoBackPic:
-                                                            ##if buildCPCv+buildENTv
-                                                            #         ld a,ixh
-                                                            #         cp 0
-                                                            #         call nz,RLE_Draw
-                                                            ##endif
-        JMP  @$LevelLoop                                    #         jp levelloop
-
 ShowBossText: # ../Aku/Level252-Intro.asm:1950
-       CMP  (PC)+,(PC)+; srcOnscreenTimer:
-      .word 15, 10
-       BLO  1237$
-       MOV  (PC)+,R1; srcOnscreenTextPointer: .word SubtitlesEmpty
-
-    AnotheLineStart$:
-       MOVB (R1)+,@$buffer
-       MOVB (R1)+,@$buffer+1
-       MOVB (R1)+,@$buffer+2
-      .ppudo_ensure $PPU_PrintAt,$buffer
-
-100$:  WAIT
-       MOVB (R1)+,R0
-       BZE  1237$
-       CMPB R0,$0xFF
-       BEQ  AnotheLineStart$
-
-       MOVB R0,@$buffer+2
-      .ppudo_ensure $PPU_Print,$buffer+2
-
-       BR   100$
-
-1237$: RETURN 
-
-buffer: .byte 0,0,0,0
+        INC  @$srcCharsToPrint
+        MOV  (PC)+, @(PC)+
+        srcCharsToPrint: .word 1; .word PPUCommandArg;
+        MOV  $PPU_ShowBossText, @$PPUCommand
+        RETURN
 
 SubtitlesEmpty:
-    .byte  4, 0; .ascii "     " ; .byte 0xFF
-    .byte  4, 1; .ascii "     " ; .byte 0x00
+    .byte  4, 10; .ascii "     " ; .byte 0xFF
+    .byte  4, 11; .ascii "     " ; .byte 0x00
     .even
 Subtitles1:
-                        #0         1         2         3         4
-                        #01234567890123456789012345678901234567890
-    .byte  8, 5; .ascii "Once Upon a time..."                ; .byte 0xFF
-    .byte  5, 6; .ascii "In a land far far away..."          ; .byte 0xFF
-    .byte  3, 7; .ascii "There was a girl who was kind"      ; .byte 0xFF
-    .byte  1, 8; .ascii "to everyone and brought happiness"  ; .byte 0xFF
-    .byte  4, 9; .ascii "everywhere She went \177 \177 \177" ; .byte 0x00
+                         #0         1         2         3         4
+                         #01234567890123456789012345678901234567890
+    .byte  8,  5; .ascii "Once Upon a time..."                     ; .byte 0xFF
+    .byte  5,  6; .ascii "In a land far far away..."               ; .byte 0xFF
+    .byte  3,  7; .ascii "There was a girl who was kind"           ; .byte 0xFF
+    .byte  1,  8; .ascii "to everyone and brought happiness"       ; .byte 0xFF
+    .byte  4,  9; .ascii "everywhere She went \177 \177 \177"      ; .byte 0x00
     .even
+Subtitles2:
+    .byte  7, 23; .ascii "She isn't in this game!!!"               ; .byte 0x00
+    .even
+Subtitles3:
+    .byte  7, 12; .ascii "Do you know what happens"                ; .byte 0xFF
+    .byte  7, 13; .ascii "       when you die???"                  ; .byte 0x00
+    .even
+Subtitles4:
+    .byte  8, 12; .ascii "They say \"if you're good"               ; .byte 0xFF
+    .byte  3, 13; .ascii "You go to a place of wonder where"       ; .byte 0xFF
+    .byte  5, 14; .ascii "all your dreams will come true\""        ; .byte 0x00
+    .even
+Subtitles5:
+    .byte  4, 12; .ascii "But 'If you're bad, you'll go to"        ; .byte 0xFF
+    .byte  4, 13; .ascii "the OTHER PLACE Where you'll be"         ; .byte 0xFF
+    .byte  1, 14; .ascii "punished for the bad things you did!!'"  ; .byte 0x00
+    .even
+Subtitles6:
+    .byte  3, 12; .ascii "But what no-one tells you is that"       ; .byte 0xFF
+    .byte  2, 13; .ascii "some people are SO bad, they don't "     ; .byte 0xFF
+    .byte 12, 14; .ascii "go there either.."                       ; .byte 0x00
+    .even
+Subtitles7:
+    .byte  2, 18; .ascii "Chibiko was a typical cheerful girl.."   ; .byte 0x00
+    .even
+Subtitles8:
+    .byte 10, 18; .ascii "She loved animals,!"                     ; .byte 0x00
+    .even
+Subtitles9:
+    .byte  2, 18; .ascii "And enjoyed spending time outdoors!!"    ; .byte 0x00
+    .even
+Subtitles10:
+    .byte  3, 18; .ascii "Sometimes she was 'a bit' naughty."      ; .byte 0x00
+    .even
+Subtitles11:
+    .byte  1, 18; .ascii " And she didn't really like to study."   ; .byte 0x00
+    .even
+Subtitles12:
+    .byte  1, 18; .ascii "But one time she was very, very bad."    ; .byte 0x00
+    .even
+Subtitles13:
+    .byte  6, 18; .ascii "And took a 'prank' too far."             ; .byte 0x00
+    .even
+Subtitles14:
+    .byte  2, 18; .ascii "When someone does the unforgivable..."   ; .byte 0x00
+    .even
+Subtitles15:
+    .byte  7, 18; .ascii "Judgement comes from above!."            ; .byte 0x00
+    .even
+Subtitles16:
+    .byte  2, 18; .ascii "and strikes them once and for all!."     ; .byte 0x00
+    .even
+Subtitles17:
+    .byte  2, 18; .ascii "Really bad people don't go to heaven."   ; .byte 0x00
+    .even
+Subtitles18:
+    .byte  1, 18; .ascii "and even hell has its limit to who"      ; .byte 0xFF
+    .byte 12, 19; .ascii "they'll take!!."                         ; .byte 0x00
+    .even
+Subtitles19:
+    .byte  2, 16; .ascii "You see, when people die,if they've "    ; .byte 0xFF
+    .byte  4, 17; .ascii "been 'Really Bad', they dont go"         ; .byte 0xFF
+    .byte 10, 18; .ascii "'up' or 'down''"                         ; .byte 0x00
+    .even
+Subtitles20:
+    .byte  2, 16; .ascii "They stay where they were as undead"     ; .byte 0xFF
+    .byte  6, 17; .ascii "monsters, hated by God, and"             ; .byte 0xFF
+    .byte  9, 18; .ascii "feared by all mankind!"                  ; .byte 0xFF
+    .byte  1, 19; .ascii "with an endless thirst for human blood!" ; .byte 0x00
+    .even
+Subtitles21:
+Subtitles22:
+    .byte  2, 16; .ascii "They live out eternity as Nosferatu,"    ; .byte 0xFF
+    .byte  1, 17; .ascii "Vampires, cursed to live by feeding on"  ; .byte 0xFF
+    .byte  2, 18; .ascii "their former friends and companions!!"   ; .byte 0x00
+    .even
+
 
 Clear4000: #-----------------------------------------------------------------{{{
         # do note use the power more than 4, because of the limit of the SOB
@@ -496,7 +552,7 @@ RealPalette: #---------------------------------------------------------------{{{
     .byte 1       #  set colors
     .word 0xAA00  #
     .word 0xFFDD  #
- 
+
     .byte 201     #--line number, 201 - end of the main screen params
     .even
 #----------------------------------------------------------------------------}}}

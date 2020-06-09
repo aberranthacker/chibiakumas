@@ -26,12 +26,16 @@ start:
 
 ClrTextArea: # --------------------------------------------------------------{{{
             .if OffscreenAreaAddr < 0120000
+                # replace ROM with RAM in the range 0100000..0117777
                 MOV  $0x011,@$PASWCR
             .elseif OffscreenAreaAddr < 0140000
+                # replace ROM with RAM in the range 0120000..0137777
                 MOV  $0x021,@$PASWCR
             .elseif OffscreenAreaAddr < 0160000
+                # replace ROM with RAM in the range 0140000..0157777
                 MOV  $0x041,@$PASWCR
             .else
+                # replace ROM with RAM in the range 0160000..0176777
                 MOV  $0x081,@$PASWCR
             .endif
 
@@ -44,8 +48,9 @@ ClrTextArea: # --------------------------------------------------------------{{{
                .endr
                 SOB  R0,1$
 #----------------------------------------------------------------------------}}}
-
-                MOV  $0x051,@$PASWCR # 
+                # replace ROM with RAM in the ranges 0100000..0117777 and
+                # 014000..0157777 (0x8000..0x9FFF and 0xC000..0xDFFF)
+                MOV  $0x011,@$PASWCR
 # initialize our scanlines parameters table (SLTAB): ------------------------{{{
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 312 (1..312) lines is SECAM half-frame
@@ -241,11 +246,10 @@ SLTABInit:      MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
                 SOB  R3,4$           #
                                      #
                 CLR  (R0)+           #--address of line 308
-                .list
-
                 MOV  R1,(R0)         #--pointer back to record 308
-                .nolist
 #----------------------------------------------------------------------------}}}
+                # disable the ROM peplacement
+                MOV  $0x001,@$PASWCR
 #----------------------------------------------------------------------------{{{
                 MOV  @$0272, @$SYS272 # store address of system SLTAB (186; 0xBA)
                 MOV  $SLTAB, @$0272   # use our SLTAB
@@ -261,15 +265,15 @@ PGM: #--------------------------------------------------------------------------
 ShortLoop:      MOV  $PPU_PPUCommand, @$PBPADR
                 MOV  @$PBP12D,R0
             .ifdef DebugMode
-                CMP  R0,$20
+                CMP  R0,$24
                 BHI  .
             .endif
                 JMP  @JMPTable(R0)
 JMPTable:      .word EventLoop            # do nothing
                .word CommandExecuted      # PPU_NOP
                .word Teardown             # PPU_Finalize
-               .word SetSingleProcessFlag # PPU_SingleProcess
-               .word ClrSingleProcessFlag # PPU_MultiProcess
+               .word GoSingleProcess      # PPU_SingleProcess
+               .word GoMultiProcess       # PPU_MultiProcess
                .word SetPalette           # PPU_SetPalette
                .word Print                # PPU_Print
                .word PrintAt              # PPU_PrintAt
@@ -277,6 +281,7 @@ JMPTable:      .word EventLoop            # do nothing
                .word ShowFB0              # PPU_ShowFB0
                .word ShowFB1              # PPU_ShowFB1
                .word LoadText             # PPU_LoadText
+               .word ShowBossText         # PPU_ShowBossText
 #-------------------------------------------------------------------------------
 CommandExecuted: #-----------------------------------------------------------{{{
                 MOV  $PPU_PPUCommand, @$PBPADR
@@ -301,16 +306,22 @@ Teardown: #------------------------------------------------------------------{{{
                 CLR  @$07100          # do not run the PGM anymore
                 JMP  @$0174170        # jump back to the process manager (63608; 0xF878)
 #----------------------------------------------------------------------------}}}
-SetSingleProcessFlag: #------------------------------------------------------{{{
+GoSingleProcess: #-----------------------------------------------------------{{{
+                # replace ROM with RAM in the ranges 0100000..0117777 and
+                # 014000..0157777 (0x8000..0x9FFF and 0xC000..0xDFFF)
+                MOV  $0x051,@$PASWCR
+
                 MOV  $1,@$SingleProcessFlag # skip firmware processes
                 JMP  CommandExecuted
 #----------------------------------------------------------------------------}}}
-ClrSingleProcessFlag: #------------------------------------------------------{{{
+GoMultiProcess: #------------------------------------------------------------{{{
+                # disable the ROM peplacement
+                MOV  $0x001,@$PASWCR
+
                 CLR  @$SingleProcessFlag
                 JMP  CommandExecuted
 #----------------------------------------------------------------------------}}}
 SetPalette: #----------------------------------------------------------------{{{
-                MOV  $0x051,@$PASWCR
                 MOV  $PPU_PPUCommandArg, @$PBPADR
                 MOV  @$PBP12D, @$PBPADR # get palette address
                 CLC
@@ -439,18 +450,18 @@ NextChar:       MOV  R1,(R5)      # load address of the next char into address r
                 INC  R1
                 INC  (PC)+; srcCurrentChar: .word 0
                 CMP  @$srcCurrentChar,R2 # end of screen line? (R2 == 40)
-                BNE  NextChar         # no, print another character
+                BNE  NextChar            # no, print another character
 NewLine:        CLR  @$srcCurrentChar
                 INC  (PC)+; srcCurrentLine: .word 0
                 CMP  @$srcCurrentLine,$TextLinesCount # next line out of screen?
                 BNE  Recalculate      # no, recalculate screen address
-                CLR  @$srcCurrentLine    # yes, print from the beginning
+                CLR  @$srcCurrentLine # yes, print from the beginning
 
 Recalculate:    MOV  @$srcCurrentLine,R1 #
-                MUL  $CharLineSize,R1 # calculate relative line address
+                MUL  $CharLineSize,R1    # calculate relative line address
                 ADD  @$srcCurrentChar,R1 # calculate relative char dst address
-                ADD  $FbStart,R1      # calculate screen address of the next char
-                MOV  R1,(R5)          # load screen address of the next char to address register
+                ADD  $FbStart,R1         # calculate screen address of the next char
+                MOV  R1,(R5)             # load screen address of the next char to address register
                 BR   NextChar
 
 NextString:     MOV  $StrBuffer,R3
@@ -527,6 +538,45 @@ LoadText: #------------------------------------------------------------------{{{
 
 1237$:          JMP  @$CommandExecuted
 #----------------------------------------------------------------------------}}}
+ShowBossText: #--------------------------------------------------------------{{{
+                MOV  $01<<1,@$DTSCOL # foreground color
+                MOV  $LineWidth,R2
+                MOV  $StrBuffer,R3
+                MOV  $PBP12D,R4
+                MOV  $PBPADR,R5
+
+                MOV  $PPU_PPUCommandArg, (R5) # setup address register
+                MOV  (R4),@$srcCharsToPrint
+
+SBT_NextString: MOVB (R3)+,R0
+                ADD  $FbStart,R0
+
+                MOVB (R3)+,R1
+                MUL  $CharLineSize,R1
+                ADD  R0,R1
+
+SBT_NextChar:   DEC  (PC)+; srcCharsToPrint: .word 0xFF
+                BZE  1237$
+
+                MOV  R1,(R5)      # load address of the next char into address register
+                MOVB (R3)+,R0     # load character code from string buffer
+                TSTB R0
+                BMI  SBT_NextString
+                BZE  1237$
+
+                ASH  $3,R0        # shift left by 3(multiply by 8)
+                ADD  $Font,R0     # calculate char bitmap address
+
+               .rept 8
+                MOVB (R0)+,(R4) #
+                ADD  R2,(R5)    # advance the address register to the next line
+               .endr
+
+                INC  R1
+                BR   SBT_NextChar
+
+1237$:          JMP  @$CommandExecuted
+#----------------------------------------------------------------------------}}}
 
 VblankIntHandler: #----------------------------------------------------------{{{
         # we do not need firmware interrupt handler except for this small
@@ -586,7 +636,7 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
 # |  76 | 3E | Б / B   |          | 175 | 7D | - / = |           |
 # |  77 | 3F | Ю / @   |          | 176 | 7E | О / } |           |
 # | 105 | 45 | HP      | Shift    | 177 | 7F | 9 / ) |           |
-# ----------------------------------------------------------------------------}}}
+#-----------------------------------------------------------------------------}}}
         MOV  R0,-(SP)
         MOV  @$PBPADR,-(SP)
 

@@ -22,6 +22,7 @@
 .equiv PPU_ShowFB0,        9 << 1
 .equiv PPU_ShowFB1,       10 << 1
 .equiv PPU_LoadText,      11 << 1
+.equiv PPU_ShowBossText,  12 << 1
 
 .equiv BootstrapStart,  512
 .equiv Akuyou_GameVarsStart, FB1 + 16000
@@ -31,10 +32,11 @@
 .equiv PlayerStarArraySize, 128
 .equiv GameVarsArraysSize, StarArraySize * 4 + ObjectArraySize * 8 + PlayerStarArraySize * 4 + 15*8
 
-.equiv Akuyou_LevelStart, 0x96BE # 38590 0113276 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x96B0 # 38576 0113260 # auto-generated during a build
 .equiv LevelSprites, Akuyou_LevelStart + 4
 
-.equiv SPReset,       0157772 # Initial stack pointer
+.equiv SPReset,       0157770 # Initial stack pointer
+.equiv storedSP,      0157772 # place where we store SP, in case if we need yet another register
 .equiv PPUCommand,    0157774 # command for PPU code
 .equiv PPUCommandArg, 0157776 # command for PPU argument
 # 0xE000 57344 0160000 end of ram

@@ -45,7 +45,9 @@ Bootstrap_Launch:
        .word PPU_ModuleSizeWords
 #-------------------------------------------------------------------------------
      .ifdef ShowLoadingScreen
+       .ppudo_ensure $PPU_SingleProcess
        .ppudo_ensure $PPU_SetPalette, $LoadingScreenPalette
+       .ppudo_ensure $PPU_MultiProcess
 
         MOV  $loading_screen.bin,R0
         CALL Bootstrap_LoadDiskFile

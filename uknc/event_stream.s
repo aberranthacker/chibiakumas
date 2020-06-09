@@ -574,54 +574,6 @@ RETURN                                                      #     ret
         ADD  $8,R3                                          #     inc hl      :Event_AddObject_MoveDirection_Plus1
         SOB  R4,Event_Objectloop$                           #     djnz,Event_Objectloop
 RETURN                                                      #     ret
-                                                            #
-# Event_CoreSaveLoadSettings2:
-# # 1001XXXX Save/Load object settings XXXX bank
-# # (0-15 = load . 16 = Save (to bank marked by next byte))
-#         MOV  (PC)+,@(PC)+
-#              srcEvent_SavedSettings:
-#        .word 0
-#        .word srcEvent_SavedSettingsFinal
-#
-#         BR    Event_CoreSaveLoadSettingsStart$
-#
-# Event_CoreSaveLoadSettings:
-# # 1001XXXX Save/Load object settings XXXX slot
-# # (0x0 - 0xE = load / 0xF = Save (to slot marked by next word))
-#         MOV  $Event_SavedSettings,@$srcEvent_SavedSettingsFinal
-#
-# Event_CoreSaveLoadSettingsStart$:
-#         MOV  R1,R0
-#         CMP  R1,$0x0F  # save?
-#         BNE  Event_CoreSaveLoadSettings_Part2$
-#         MOV  (R5)+,R0 # yes, get save slot number
-#
-# Event_CoreSaveLoadSettings_Part2$:
-#         ASH  $3,R0
-#         MOV  (PC)+,R3; srcEvent_SavedSettingsFinal: .word 0
-#         ADD  R0,R3
-#
-#         CMP  R1,$0x0F
-#         BEQ  Event_CoreSaveLoadSettings_Save$
-#         # Load settings
-#         MOVB (R3)+, @$srcEventObjectProgramToAdd
-#         MOVB (R3)+, @$srcEventObjectMoveToAdd
-#         MOVB (R3)+, @$srcEventObjectLifeToAdd
-#         MOVB (R3)+, @$srcEventObjectSpriteToAdd
-#         MOVB (R3)+, @$srcEventObjectSpriteSizeToAdd
-#         MOVB (R3)+, @$srcEventObjectAnimatorToAdd
-#         MOVB (R3)+, @$srcObjectAddToForeBack
-# RETURN
-#
-# Event_CoreSaveLoadSettings_Save$:
-#         MOVB @$srcEventObjectProgramToAdd,   (R3)+
-#         MOVB @$srcEventObjectMoveToAdd,      (R3)+
-#         MOVB @$srcEventObjectLifeToAdd,      (R3)+
-#         MOVB @$srcEventObjectSpriteToAdd,    (R3)+
-#         MOVB @$srcEventObjectSpriteSizeToAdd,(R3)+
-#         MOVB @$srcEventObjectAnimatorToAdd,  (R3)+
-#         MOVB @$srcObjectAddToForeBack,       (R3)
-# RETURN
 
 Event_SaveObjSettings:
         ASH  $3,R1
