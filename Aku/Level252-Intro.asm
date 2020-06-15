@@ -206,11 +206,6 @@ defb 51,evtSingleSprite,TwoFrameSprite+6 ,24+160-12 ,24+40+24+8-10
 
 defb 51,evtSingleSprite,TwoFrameSprite+6 ,24+160-12 ,24+40-10+8
 
-;defb 51,evtSingleSprite,TwoFrameSprite+5 ,24+160-12    ,24+40-10+20
-;defb 21,evtSingleSprite,TwoFrameSprite+6 ,24+160-12-6  ,24+40+24+24
-;defb 52,evtCallAddress         ;Call a memory location
-;defw   halttest
-
     defb 52,%01110000+4         ; 4 Commands
 
     defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
@@ -928,9 +923,9 @@ ResetEventStream:
 
 ret
 
-DiskMap_EndOutro_Screens    equ &0DC1   ;13 T13-SC1.D03
-DiskMap_EndOutro_Screens_Size   equ 24  ; &2000
-DiskMap_EndOutro_Disk       equ 3
+DiskMap_EndOutro_Screens      equ &0DC1   ;13 T13-SC1.D03
+DiskMap_EndOutro_Screens_Size equ 24  ; &2000
+DiskMap_EndOutro_Disk         equ 3
 
 OutroScreen1 equ &8000
 OutroScreen2 equ &8003
@@ -956,9 +951,9 @@ ScreenPosReset:
 ret
 
 
-DiskMap_MusicIntro          equ &1BC1+&2800 ;T67-SC1.D03
-DiskMap_MusicIntro_Size             equ 2
-DiskMap_MusicIntro_Disk             equ 2
+DiskMap_MusicIntro       equ &1BC1+&2800 ;T67-SC1.D03
+DiskMap_MusicIntro_Size  equ 2
+DiskMap_MusicIntro_Disk  equ 2
 
 if BuildCPCv+BuildENTv
 ScreenFirmwareReset:
@@ -1136,7 +1131,7 @@ endif
 
     djnz PauseLoopB
 
-    ld a,0 :ShowTextUpdate_Plus1
+    ld a,0 :ShowTextUpdate_Plus1 ; {{{
     or a
     jp z,LevelLoop
     cp 1
@@ -1185,6 +1180,8 @@ endif
     jp z,ShowText22
     cp 255
     jp z,ShowText0
+; }}}
+
     jp LevelLoop
 
 

@@ -1,17 +1,28 @@
 Chibi Akumas - Rle Decoder
 
-The RLE deoder uses a custom format,because it originated on the CPC  it works in chunks of 4 bits (2 pixels) - this was to allow for 'checkerboard' patterns to compress well. The RLE encoder is built into the Sprite editor and Sprite Compiler - it is open source and written in C#
+    The RLE deoder uses a custom format,because it originated on the CPC  it
+works in chunks of 4 bits (2 pixels) - this was to allow for 'checkerboard'
+patterns to compress well.
+    The RLE encoder is built into the Sprite editor and Sprite Compiler - it is
+open source and written in C#
 
-the RLE render works in logical lines - so are processed as they appear on screen, not in memory, and to improve compression efficency on the CPC a nibble is the color info for 2 neighbouring pixels on the cpc (so the bits have to be shifted before writing to screen format)
+    the RLE render works in logical lines - so are processed as they appear on
+screen, not in memory, and to improve compression efficency on the CPC a nibble
+is the color info for 2 neighbouring pixels on the CPC (so the bits have to be
+shifted before writing to screen format)
 
-the MSX version has two plain BMP bytes at the start - this is because the VDP init command needs one byte, and the encoder works in pairs. The MSX files on disk have a small header, the first byte denotes if a palette is included (1 for yes) there are two 16 bit words for Width and Height, next is the palette (if applicable) and finally the RLE data:
+    the MSX version has two plain BMP bytes at the start - this is because the
+VDP init command needs one byte, and the encoder works in pairs.
+The MSX files on disk have a small header, the first byte denotes if a palette
+is included (1 for yes) there are two 16 bit words for Width and Height, next
+is the palette (if applicable) and finally the RLE data:
 
 Each block has a single byte 'Header' to denote blocks of data, the header is in the following format
 
 Rle Block: 	%rrrrcccc (&cc)
 %rrrrcccc	rrrr is the 4 bit pattern to be repeated. if cccc is zero, then this is a 'Bitmap block'
 	cccc is the number of repeats - if this is 15 then another whole byte (&cc) is added to the value - if this byte is 255 then this 'adding procedure is reated until it is not'
-	The pattern is written to the screen, 
+	The pattern is written to the screen,
 
 Bitmap Block:	%cccc0000 (&cc) &bb &bb &bb
 %cccc0000	cccc is the number of bytes that will follow if cccc is zero, then this is a 'OneByte block'

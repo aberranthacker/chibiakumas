@@ -199,21 +199,11 @@ PLY_Track1_InstrumentResetPT
     ld (PLY_Track1_Instrument + 1),hl
 
 
-
-
-
 PLY_Track1_NoNoteGiven
 
     ld a,1
 PLY_Track1_NewInstrument_SetWait
     ld (PLY_Track1_WaitCounter + 1),a
-
-
-
-
-
-
-
 
 
 ;Read the Track 2.
