@@ -2,10 +2,15 @@
 
 This is a port of the [Chibi Akumas](http://www.chibiakumas.com/) ([github](https://github.com/akuyou/chibiakumas)) game to Soviet PDP-11
 compatible microcomputer [UKNC](https://en.wikipedia.org/wiki/UKNC).
-
-The conversion process is in it's very(very) initial state.
-
 [-](https://guides.github.com/features/mastering-markdown/)
+
+## Status
+* Done
+** Main menu
+** Connect AY chip to the UKNC
+* Work in progress
+** Intro
+** Port Arkos Tracker
 
 ## How to build the project
 Since default assembler for PDP-11 [MACRO-11](https://en.wikipedia.org/wiki/MACRO-11)
@@ -22,7 +27,7 @@ In short, you'll have to grab latest version of [binutils](http://ftpmirror.gnu.
    tar xvf /path/to/binutils-version-stuff.tar.bz2
 ```
 configure it to support PDP-11
-```   
+```
    cd binutils-version-stuff
    mkdir build-pdp11-aout
    cd build-pdp11-aout
@@ -31,5 +36,5 @@ configure it to support PDP-11
    make install
 ```
 and thats it.
-Now you are all set to run the `make` command from within `./uknc/` directory to build the project. 
-      
+Now you are all set to run the `make` command from within `./uknc/` directory to build the project.
+

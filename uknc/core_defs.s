@@ -1,5 +1,15 @@
+# Note that the PRESENCE of those variables is tested, NOT their values. -------
 .equiv DebugMode, 1
 #.equiv ShowLoadingScreen, 1
+#-------------------------------------------------------------------------------
+.equiv MainMenu, 0x8000
+.equiv Episode1_Intro, 0x0000
+
+.equiv StartOnLevel, MainMenu
+
+.if StartOnLevel == MainMenu
+  .equiv ShowLoadingScreen, 1
+.endif
 
 .equiv PPU_UserRamStart, 0x27B6 # 023666 10166
 .equiv PPU_UserRamSize,  0x5844 # 054104 22596
@@ -11,18 +21,20 @@
 .equiv FB_gap, FB0 + 16000
 .equiv FB1, FB_gap + 384
 
-.equiv PPU_NOP,            1 << 1
-.equiv PPU_Finalize,       2 << 1
-.equiv PPU_SingleProcess,  3 << 1
-.equiv PPU_MultiProcess,   4 << 1
-.equiv PPU_SetPalette,     5 << 1
-.equiv PPU_Print,          6 << 1
-.equiv PPU_PrintAt,        7 << 1
-.equiv PPU_FlipFB,         8 << 1
-.equiv PPU_ShowFB0,        9 << 1
-.equiv PPU_ShowFB1,       10 << 1
-.equiv PPU_LoadText,      11 << 1
-.equiv PPU_ShowBossText,  12 << 1
+.equiv PPU_NOP,            1 * 2
+.equiv PPU_Finalize,       2 * 2
+.equiv PPU_SingleProcess,  3 * 2
+.equiv PPU_MultiProcess,   4 * 2
+.equiv PPU_SetPalette,     5 * 2
+.equiv PPU_Print,          6 * 2
+.equiv PPU_PrintAt,        7 * 2
+.equiv PPU_FlipFB,         8 * 2
+.equiv PPU_ShowFB0,        9 * 2
+.equiv PPU_ShowFB1,       10 * 2
+.equiv PPU_LoadText,      11 * 2
+.equiv PPU_ShowBossText,  12 * 2
+.equiv PPU_LoadMusic,     13 * 2
+.equiv PPU_MusicRestart,  14 * 2
 
 .equiv BootstrapStart,  512
 .equiv Akuyou_GameVarsStart, FB1 + 16000
@@ -32,7 +44,7 @@
 .equiv PlayerStarArraySize, 128
 .equiv GameVarsArraysSize, StarArraySize * 4 + ObjectArraySize * 8 + PlayerStarArraySize * 4 + 15*8
 
-.equiv Akuyou_LevelStart, 0x96B0 # 38576 0113260 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x966C # 38508 0113154 # auto-generated during a build
 .equiv LevelSprites, Akuyou_LevelStart + 4
 
 .equiv SPReset,       0157770 # Initial stack pointer
@@ -66,37 +78,6 @@
 .equiv chrCross, 0x7E # 0176
 .equiv chrHeart, 0x7F # 0177
 
-
-# PlusSprite_ExtBank equ &C7
-# Akuyou_PlayerSpritePos equ &3800
-# Akuyou_PlusSpritesPos  equ &3800
-#
-# Akuyou_Music_Bank  equ &C0
-# Akuyou_MusicPos    equ &50   ;Akuyou only allows &400 bytes for music
-# Akuyou_MusicPosAlt equ &7B00 ;When music switches during boss battle, store the alternate here
-# Akuyou_SfxPos      equ &3000 ;Akuyou only allows &100 bytes for SFX
-#
-# Akuyou_LevelStart      equ &4000 ;+3-Bank 0
-# Akuyou_LevelStart_Bank equ &C0
-#
-# LevelData128kpos      equ &4000  ;+3-Bank 1
-# LevelData128kpos_Bank equ &C7
-#
-# LevelData128kpos_C      equ &4000 ;+3-Bank 1
-# LevelData128kpos_C_Bank equ &C4
-#
-# LevelData128kpos_D         equ &6000 ;+3-Bank 1
-# LevelData128kpos_D_OneByte equ &60
-# LevelData128kpos_D_Bank    equ &C4
-#
-# CSprite_SetDisk  equ 2*3
-# CSprite_Continue equ 1*3
-# CSprite_Loading  equ 0*3
-#
-# Font_Membank        equ &C6
-# Font_RegularSizePos equ &7000
-# Font_SmallSizePos   equ &7800
-#
 #-------------------------------------------------------------------------------
 # Platform Specific Core commands
 #-------------------------------------------------------------------------------

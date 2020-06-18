@@ -9,16 +9,16 @@
 # Byte 0 is the height of the sprite data in lines
 # Byte 1 is the Width of the sprite in bytes
 # Byte 2 is the Y offset...
-#        a 16 pixel sprite may have 4 blank lines at the top...
-#        in this case the sprite would have a height of 12 and an offset of 4...
+#        a 16 pixel sprite may have 4 blank lines at the top
+#        in this case the sprite would have a height of 12 and an offset of 4
 #        this is to save memory
-# Byte 3 is the Settings...
+# Byte 3 is the Settings
 #        the top bit (7) defines if the sprite is transparent (slow) or PSET
-#        (fast)...
+#        (fast)
 #        bit 5 defines if the sprite changes or accepts the background color on
-#        the speccy...
+#        the speccy
 #        other bits also select the transparent color (bytemask) on cpc
-# Bytes 4,5 define the offset to the bitmap data of the sprite in the file...
+# Bytes 4,5 define the offset to the bitmap data of the sprite in the file
 #        in this case the sprite starts at &0100... this is defined in the
 #        spriteeditor by 'SpriteDataOffset' in the Spritelist tab
 #
@@ -50,7 +50,8 @@ def transform(sprite_words)
       nibble3 = REVERSE_TABLE_4BIT[(word & 0x0F00) >> 8]
       nibble4 = REVERSE_TABLE_4BIT[(word & 0xF000) >> 12]
 
-      words << (nibble4 << 12 | nibble2 << 8 | nibble3 << 4 | nibble1)
+      # words << (nibble4 << 12 | nibble2 << 8 | nibble3 << 4 | nibble1)
+      words << (nibble3 << 12 | nibble1 << 8 | nibble4 << 4 | nibble2)
     end
   end
 end
@@ -91,10 +92,11 @@ end
 new_file = '' if options.font
 
 header.each do |md|
-  print "i: #{md[:idx].to_s.rjust(3, '0')} "
-  print "h: #{md[:height].to_s.rjust(3, '0')} "
-  print "w: #{md[:width].to_s.rjust(2, '0')} "
-  print "y_offset: #{md[:y_offset].to_s.rjust(2, '0')} "
+  print "i: #{md[:idx].to_s.rjust(3, ' ')} "
+  print "h: #{md[:height].to_s.rjust(3, ' ')} "
+  print "w: #{md[:width].to_s.rjust(2, ' ')} "
+  print "y_offset: #{md[:y_offset].to_s.rjust(2, ' ')} "
+  print "settings: #{md[:settings].to_s.rjust(3, ' ')} "
   puts  "offset: #{md[:offset]}"
 
   sprite = file[md[:offset], md[:height] * md[:width]].unpack('v*')

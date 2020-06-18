@@ -68,7 +68,7 @@ RETURN                                                      #     ret
                                                             #     jr NC,DoMoves_Kill  ;over the page
                                                             #     ret
 DoMoves_Spec$:                                              # DoMoves_Spec:   ;Special moves - various kinds
-       .inform_and_hang "DoMoves_Spec is not implemented"   #     ld a,(Timer_TicksOccured)
+       .inform_and_hang "no DoMoves_Spec"                   #     ld a,(Timer_TicksOccured)
                                                             #     and %11111111           :SpecialMoveSlowdown_Plus1
                                                             #     ret z
                                                             #     ld a,d

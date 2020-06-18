@@ -27,11 +27,12 @@ cpc_bmp = cpc_bmp[   0, 1000] +
           cpc_bmp[7168, 1000]
 
 cpc_bmp.each.with_index do |cpc_word, i|
-  q1 = REVERSE_TABLE_4BIT[(cpc_word & 0b1111)]
-  q2 = REVERSE_TABLE_4BIT[(cpc_word & 0b1111_0000) >> 4]
-  q3 = REVERSE_TABLE_4BIT[(cpc_word & 0b1111_0000_0000) >> 8]
-  q4 = REVERSE_TABLE_4BIT[(cpc_word & 0b1111_0000_0000_0000) >> 12]
-  uknc_word = q1 | q2 << 8 | q3 << 4 | q4 << 12
+  nibble1 = REVERSE_TABLE_4BIT[(cpc_word & 0x000F)]
+  nibble2 = REVERSE_TABLE_4BIT[(cpc_word & 0x00F0) >> 4]
+  nibble3 = REVERSE_TABLE_4BIT[(cpc_word & 0x0F00) >> 8]
+  nibble4 = REVERSE_TABLE_4BIT[(cpc_word & 0xF000) >> 12]
+
+  uknc_word = (nibble3 << 12 | nibble1 << 8 | nibble4 << 4 | nibble2)
 
   line_idx = i / 40 # 40 words per line
   word_idx_within_a_line = i % 40

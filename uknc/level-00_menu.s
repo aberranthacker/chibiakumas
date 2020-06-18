@@ -20,18 +20,9 @@ TITLETEX: .incbin "resources/titletex.spr"
 CustomRam: .space 64 # Pos-Tick-Pos-Tick # enough memory for 16 enemies!
 
 EventStreamArray_Ep1: #------------------------------------------------------{{{
-    # Load Palette
-    .word 0 # -> srcEvent_NextEventTime
-    # event MSB->R0, argument LSB->R1
-    .word evtMultipleCommands | 1 # Event_CoreMultipleEventsAtOneTime; 1 -> srcEvent_MultipleEventCount
-    .word     evtSetPalette # Event_CoreReprogram; Event_CoreReprogram_Palette
-    .word         TitleScreenPalette # palette data address
+    .word 0, evtSetPalette, TitleScreenPalette
 
-    .word 4 # -> srcEvent_NextEventTime
-    # Jump to a different level point
-    .word evtChangeStreamTime # Event_MoveSwitch; Event_ChangeStreamTime
-    .word     PauseLoop # pointer
-    .word     60        # new time
+    .word 4, evtChangeStreamTime, 60, PauseLoop
 #----------------------------------------------------------------------------}}}
 
 EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
@@ -151,10 +142,8 @@ EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
     .byte 24+200-64, 12*1 + 24+160-24 # Y, X
 #----------------------------------------------------------------------------}}}
 PauseLoop:
-    .word 4 # -> srcEvent_NextEventTime
-    .word evtChangeStreamTime # Jump to a different level point
-    .word PauseLoop # pointer
-    .word 60        # new time
+    # Jump to a different level point
+    .word 4, evtChangeStreamTime, 60, PauseLoop
 
 LevelInit:
         MTPS $PR0 # enable interrupts
@@ -521,120 +510,87 @@ WaitKey: #-------------------------------------------------------------------{{{
 # 9 br.     # A br.     # B br.     # C br.     # D br.     # E br.     # F white
 # 1 blue    # 2 green   # 3 cyan    # 4 red     # 5 magenta # 6 yellow  # 7 gray
 TitleScreenPalette: #--------------------------------------------------------{{{
-    .byte 0       #--line number, last line of the top screen area
-    .byte 0       #  0 - set cursor/scale/palette
+    .byte 0, 0    #--line number, 0 - set cursor/scale/palette
     .word 0b10000 #  graphical cursor
     .word 0b10101 #  320 dots per line, pallete 5
-    .byte 1       #--line number, first line of the main screen area
-    .byte 1       #  set colors
-    .word 0xCC00  #
-    .word 0xFF99  #
-    .byte 49      #--line number (201 if there is no more parameters)
-    .byte 1       #  set colors
-    .word 0x1100  #
-    .word 0xFF55  #
-    .byte 63      #--line number
-    .byte 1       #  set colors
-    .word 0xDD00  #
-    .word 0xFF55  #
-    .byte 95      #--line number
-    .byte 1       #  set colors
-    .word 0xBB00  #
-    .word 0xFF22  #
-    .byte 185     #--line number
-    .byte 1       #  set colors
-    .word 0x0000  #
-    .word 0xFF22  #
-    .byte 192     #--line number
-    .byte 1       #  set colors
-    .word 0xBB00  #
-    .word 0xFF22  #
-    .byte 196     #--line number
-    .byte 1       #  set colors
-    .word 0xCC00  #
-    .word 0xFF22  #
+
+    .byte 1,   1  #--line number, set colors
+    .byte 0x00, 0x99, 0xCC, 0xFF
+    .byte 49,  1  #--line number, set colors
+    .byte 0x00, 0x55, 0x11, 0xFF
+    .byte 63,  1  #--line number, set colors
+    .byte 0x00, 0x55, 0xDD, 0xFF
+    .byte 95,  1  #--line number, set colors
+    .byte 0x00, 0x22, 0xBB, 0xFF
+    .byte 185, 1  #--line number, set colors
+    .byte 0x00, 0x22, 0x00, 0xFF
+    .byte 192, 1  #--line number, set colors
+    .byte 0x00, 0x22, 0xBB, 0xFF
+    .byte 196, 1  #--line number, set colors
+    .byte 0x00, 0x22, 0xCC, 0xFF
+
     .byte 201     #--line number, 201 - end of the main screen params
     .even
 #----------------------------------------------------------------------------}}}
 MenuPalette: #---------------------------------------------------------------{{{
-    .byte 0       #--line number, last line of the top screen area
-    .byte 0       #  0 - set cursor/scale/palette *always 0 for the first record*
+    .byte 0, 0    #--line number, 0 - set cursor/scale/palette
     .word 0b10000 #  graphical cursor
     .word 0b10111 #  320 dots per line, pallete 7
-    .byte 1       #--line number, first line of the main screen area
-    .byte 1       #  set colors
-    .word 0xEE00  #  colors 011 010 001 000 (YRGB)
-    .word 0xFFDD  #  colors 111 110 101 100 (YRGB)
-    .byte 40      #--line number
-    .byte 1       #  set colors
-    .word 0xBB00  #
-    .word 0xFFCC  #
-    .byte 60      #--line number
-    .byte 1       #  set colors
-    .word 0xBB00  #
-    .word 0xFF44  #
-    .byte 67      #--line number
-    .byte 1       #  set colors
-    .word 0xCC00  #
-    .word 0xFF55  #
-    .byte 88      #--line number
-    .byte 1       #  set colors
-    .word 0xBB00  #
-    .word 0xFF55  #
-    .byte 113     #--line number
-    .byte 1       #  set colors
-    .word 0x3300  #
-    .word 0xFF55  #
-    .byte 117     #--line number
-    .byte 1       #  set colors
-    .word 0x3300  #
-    .word 0xFF77  #
-    .byte 120     #--line number
-    .byte 0       #  0 - set cursor/scale/palette
+
+    .byte 1, 1    # line number, set colors
+    .byte 0x00, 0xDD, 0xEE, 0xFF
+    .byte 40, 1
+    .byte 0x00, 0xCC, 0xBB, 0xFF
+    .byte 60, 1
+    .byte 0x00, 0x44, 0xBB, 0xFF
+    .byte 67, 1
+    .byte 0x00, 0x55, 0xCC, 0xFF
+    .byte 88, 1
+    .byte 0x00, 0x55, 0xBB, 0xFF
+    .byte 113, 1
+    .byte 0x00, 0x55, 0x33, 0xFF
+    .byte 117, 1
+    .byte 0x00, 0x77, 0x33, 0xFF
+
+    .byte 120, 0  # line number, 0 - set cursor/scale/palette
     .word 0b10000 #  graphical cursor
-    .word 0b10011 #  320 dots per line, pallete 7
-    .byte 121     #--line number
-    .byte 1       #  set colors
-    .word 0xDD00  #
-    .word 0xFF77  #
-    .byte 136     #--line number
-    .byte 0       #  0 - set cursor/scale/palette
+    .word 0b10011 #  320 dots per line, pallete 3
+
+    .byte 121, 1
+    .byte 0x00, 0x77, 0xDD, 0xFF
+
+    .byte 136, 0  #--line number, 0 - set cursor/scale/palette
     .word 0b10000 #  graphical cursor
     .word 0b10111 #  320 dots per line, pallete 7
-    .byte 137     #--line number
-    .byte 1       #  set colors
-    .word 0xCC00  #
-    .word 0xAA77  #
-    .byte 190     #--line number
-    .byte 0       #  0 - set cursor/scale/palette
+
+    .byte 137, 1
+    .byte 0x00, 0x77, 0xCC, 0xAA
+
+    .byte 190, 0  #--line number, 0 - set cursor/scale/palette
     .word 0b10000 #  graphical cursor
     .word 025     #  320 dots per line, pallete 5
-    .byte 191     #--line number
-    .byte 1       #  set colors
-    .word 0xEE00  #
-    .word 0xFF66  #
+
+    .byte 191, 1
+    .byte 0x00, 0x66, 0xEE, 0xFF
+
     .byte 201     #--line number, 201 - end of the main screen params
     .even
 #----------------------------------------------------------------------------}}}
 FireKeyBrightPalette: #------------------------------------------------------{{{
-    .byte 185, 1  # starting line 185, setup palette
-    .word 0xEE00
-    .word 0xFF22
-    .byte 192, -1 # until line 192
+    .byte 185, 1  # line number, setup palette
+    .byte 0x00, 0x22, 0xEE, 0xFF
+    .byte 192, -1 # until the line 192
 FireKeyNormalPalette:
     .byte 185, 1
-    .word 0xCC00
-    .word 0xFF22
+    .byte 0x00, 0x22, 0xCC, 0xFF
     .byte 192, -1
 FireKeyDarkPalette:
     .byte 185, 1
-    .word 0x4400
-    .word 0xFF22
+    .byte 0x00, 0x22, 0x44, 0xFF
     .byte 192, -1
 FireKeyBlackPalette:
     .byte 185, 1
-    .word 0x0000
-    .word 0xFF22
+    .byte 0x00, 0x22, 0x00, 0xFF
     .byte 192, -1
 #----------------------------------------------------------------------------}}}
 

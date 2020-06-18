@@ -88,6 +88,7 @@ build/core.o : $(common) \
 
 build/ppu.o : $(common) \
               ppu.s \
+              ../../akg_player/akg_player.s \
               resources/font.raw \
               resources/cga8x8b.raw
 	$(AS) ppu.s -al -o build/ppu.o
@@ -107,22 +108,24 @@ build/ep1-intro.o : $(common) \
 #                     build_tools/spr_cpc_to_uknc.rb
 #	build_tools/spr_cpc_to_uknc.rb ../Aku/Sprites/T07-SC1.SPR --font -o resources/font.raw
 
-resources/font.raw : ../ResCPC/font.bin \
-                     build_tools/spr_cpc_to_uknc.rb
+resources/font.raw : build_tools/spr_cpc_to_uknc.rb \
+	                 ../ResCPC/font.bin
 	build_tools/spr_cpc_to_uknc.rb ../ResCPC/font.bin --font -o resources/font.raw
 
 resources/cga8x8b.raw : resources/cga8x8b.bmp.raw \
                         build_tools/prepare_font.rb
 	ruby build_tools/prepare_font.rb resources/cga8x8b.bmp.raw
 
-resources/titletex.spr : ../Aku/Sprites/TITLETEX.SPR
+resources/titletex.spr :  build_tools/spr_cpc_to_uknc.rb \
+	                  ../Aku/Sprites/TITLETEX.SPR
 	build_tools/spr_cpc_to_uknc.rb ../Aku/Sprites/TITLETEX.SPR -o resources/titletex.spr
 
 resources/menu_cursor.spr : build_tools/bmp_to_uknc_raw.rb \
                             resources/menu_cursor-Sheet.bmp
 	build_tools/bmp_to_uknc_raw.rb
 
-resources/ep1-intro.spr : ../ResCPC/LEVEL252A.SPR
+resources/ep1-intro.spr : build_tools/spr_cpc_to_uknc.rb \
+	                      ../ResCPC/LEVEL252A.SPR
 	build_tools/spr_cpc_to_uknc.rb ../ResCPC/LEVEL252A.SPR -o resources/ep1-intro.spr
 
 clean :

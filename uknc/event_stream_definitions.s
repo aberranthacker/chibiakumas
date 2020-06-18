@@ -46,8 +46,8 @@
 #                            ; change any registers (other than A)
 .equiv evtCallAddress, (0x19 * 2) << 8 # 50
 # evtSaveLstObjToAdd equ 138 ; Save the memory position of last added object in
-#                            ; the object array to memory location w1... used for
-#                            ; boss sprites
+#                            ; the object array to memory location w1
+#                            ; used for boss sprites
 .equiv evtSaveLstObjToAdd, (0x1A * 2) << 8 # 52
                                                             # evtResetPowerup    equ 139 ; Take away the player powerups... how mean!
                                                             # evtSetLevelSpeed   equ 140 ; Change the speed of the object array to b1...
@@ -100,60 +100,60 @@
 #                       ; 0+1        Add one sprite to pos b1 Far right (sprite predefined)
 #                       ; 0+(2-13)   add one 24 pixel object far right X=160+24 Y=v*16 -8 (sprite predefined)
 .equiv evtSingleSprite, 0
-                                                            #
-                                                            # evtBurstSprite equ 14 ; Add an object to the burst position
-                                                            # evtTileSprite  equ 48 ; add  V objects... all on column b1 starting at row b2..
-                                                            #                       ; Spaced b3 apart vertically
-                                                            #
-                                                            # ;Time,type,Sprite,XY (16 px precision)
-                                                            #
-                                                            # ; Types:
-                                                            # ;type XXXX----
-                                                            # ;     00000000 A X Y = (0)  add one object A=sprnum, X , Y
-                                                            # ;     00000001 Y        Add one sprite to pos Y Far right (Same sprite as last time
-                                                            # ;     0000yyyy A    2-13 add one 24 pixel object far right X=160+24 Y*16 -8 (Same sprite as last time
-                                                            #             ;14 Add one to ObjectBurst
-                                                            # ;     0001xxxx A B = (16) add  xxxx objects
-                                                            # ;     0010xxxx X B = (32) add  xxxx objects all on column X
-                                                            # ;     0011xxxx X Y S = (48) add  xxxx objects all on column X, Ypos Spaced S apart vertically
-                                                            # ;     0100xxxx X Y   = (64) add stars to X,Y (pattern xxxx)
-                                                            # ;     0101       Unused
-                                                            # ;     0110       Unused
-                                                            # ;     0111xxxx  = (112) Read Multiple events at the same time point
-                                                            #
-                                                            # ;     10000000 M L = (128) Change object movement to M, Life to L
-                                                            # ;     10000001 P = (129) Change object Program
-                                                            # ;     10000010 L = (130) Change object Life
-                                                            # ;     10000011 M = (131) Change object Move
-                                                            # ;     10000100 P M L = (132) Change object Program Move and Life
-                                                            # ;     10000101 S = (133) Change object Sprite (only works with 0000XXXX )
-                                                            # ;     10000110 (134) Add Objects to Front of list first (Background)
-                                                            # ;     10000111 (135) Add Objects to Back of list first (Foreground) - Background objects may not be shown in turbo mode!
-                                                            # ;     10001000 L H T (136) = Load HL as next event pointer, change time to T
-                                                            # ;     10001001 L H   (137) = Call HL
-                                                            # ;     10001010 L H   (138) = Load last added object address to address HL
+#
+# evtBurstSprite equ 14 ; Add an object to the burst position
+# evtTileSprite  equ 48 ; add  V objects... all on column b1 starting at row b2..
+#                       ; Spaced b3 apart vertically
+#
+# ;Time,type,Sprite,XY (16 px precision)
+#
+# ; Types:
+# ;type XXXX----
+# ;     00000000 A X Y = (0)  add one object A=sprnum, X , Y
+# ;     00000001 Y        Add one sprite to pos Y Far right (Same sprite as last time
+# ;     0000yyyy A    2-13 add one 24 pixel object far right X=160+24 Y*16 -8 (Same sprite as last time
+#             ;14 Add one to ObjectBurst
+# ;     0001xxxx A B = (16) add  xxxx objects
+# ;     0010xxxx X B = (32) add  xxxx objects all on column X
+# ;     0011xxxx X Y S = (48) add  xxxx objects all on column X, Ypos Spaced S apart vertically
+# ;     0100xxxx X Y   = (64) add stars to X,Y (pattern xxxx)
+# ;     0101       Unused
+# ;     0110       Unused
+# ;     0111xxxx  = (112) Read Multiple events at the same time point
+#
+# ;     10000000 M L = (128) Change object movement to M, Life to L
+# ;     10000001 P = (129) Change object Program
+# ;     10000010 L = (130) Change object Life
+# ;     10000011 M = (131) Change object Move
+# ;     10000100 P M L = (132) Change object Program Move and Life
+# ;     10000101 S = (133) Change object Sprite (only works with 0000XXXX )
+# ;     10000110 (134) Add Objects to Front of list first (Background)
+# ;     10000111 (135) Add Objects to Back of list first (Foreground) - Background objects may not be shown in turbo mode!
+# ;     10001000 L H T (136) = Load HL as next event pointer, change time to T
+# ;     10001001 L H   (137) = Call HL
+# ;     10001010 L H   (138) = Load last added object address to address HL
 
 # 10011111 B = Save to bank B
 # 1001XXXX Load object settings (Prog, Move, Life, Spritesize, Animator,
 # BG/FG layer) from XXXX bank (0-14 - see above 15 is save command)
 .equiv evtSaveObjSettings, (0x09 * 2) << 8 # 18
 .equiv evtLoadObjSettings, (0x0A * 2) << 8 # 20
-                                                            # ;       Use this function to create template enemy moves and background object types
-                                                            # ;     1010       Unused
-                                                            # ;     1011       Unused
-                                                            # ;     1100XXXX   Unused
-                                                            # ;     1101XXXX   Unused
-                                                            # ;     1110XXXX   Unused
-                                                            # ;     1111XXXX   Reprogram memory chunk
-                                                            #
-                                                            # ;     1111XXXX   Reprogram memory chunk
-                                                            # ;     11110000 O B  X X X  = (240) Reprogram palette (B no of Bytes, O = offset; X X X byte data)
-                                                            # ;     11110001 O B  X X X  = (240) Reprogram Background (B no of Bytes (up to 41), O = offset; X X X byte data)
-                                                            # ;     11110010 LH   = when an object is shot jump to HL (Akuyou_Object_DecreaseLifeShot is true hitcounter)
-                                                            # ;     11110011 1P2  = Scroll rate 1 before P then 2 (1 must be faster than 2)
-                                                            # ;     11110100 LH   = Reprogram Custom Move1
-                                                            # ;     11110101 LH   = Reprogram Custom Move2
-                                                            #
+# Use this function to create template enemy moves and background object types
+# 1010       Unused
+# 1011       Unused
+# 1100XXXX   Unused
+# 1101XXXX   Unused
+# 1110XXXX   Unused
+# 1111XXXX   Reprogram memory chunk
+#
+# 1111XXXX   Reprogram memory chunk
+# 11110000 O B  X X X  = (240) Reprogram palette (B no of Bytes, O = offset; X X X byte data)
+# 11110001 O B  X X X  = (240) Reprogram Background (B no of Bytes (up to 41), O = offset; X X X byte data)
+# 11110010 LH   = when an object is shot jump to HL (Akuyou_Object_DecreaseLifeShot is true hitcounter)
+# 11110011 1P2  = Scroll rate 1 before P then 2 (1 must be faster than 2)
+# 11110100 LH   = Reprogram Custom Move1
+# 11110101 LH   = Reprogram Custom Move2
+#
                                                             # ; Life BPxxxxx      B=hurt by bullets , P hurts player, xxxxxx = Life ... Life decreases either over time or due to hits %00000000 means an immortal object which will only dissapear if it goes ofscreen
                                                             #
                                                             # ;Domoves
@@ -312,8 +312,8 @@
                                                             # lifDeadly       equ %01000000 ; Deadly and cant be shot
 # lifImmortal     equ 0
 .equiv lifeImmortal, 0
-                                                            # TwoFrameSprite  equ 128    ; sequence is 1,2 1,2 etc
-                                                            # FourFrameSprite equ 128+64 ; sequence is 1,3,2,4 ,1,3,2,4 etc
+.equiv sprTwoFrame, 128                                     # TwoFrameSprite  equ 128    ; sequence is 1,2 1,2 etc
+.equiv sprFourFrame, 128+64                                 # FourFrameSprite equ 128+64 ; sequence is 1,3,2,4 ,1,3,2,4 etc
                                                             #
                                                             # ;Animators 4 bytes... Animator,X,Y,Z
 # anmEmpty          equ 00 ; do nothing

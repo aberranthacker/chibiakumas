@@ -102,6 +102,16 @@
 
 .equiv RSTINT, 0314    # RESET on CPU bus interrupt
 
+# PPU: programmable parallel interface
+.equiv PAR_A,  0177100 # parallel port A data register
+.equiv PAR_B,  0177101 # parallel port B data register
+.equiv PAR_C,  0177102 # parallel port C data register
+.equiv PARCTL, 0177103 # parallel port control byte
+
+# PPU: floppy disk controller
+.equiv FDCST, 0177130 # floppy disk controller state register
+.equiv FDCDT, 0177132 # floppy disk controller data register
+
 # PPU: keyboard
 .equiv KBINT,  0300    # keyboard interrupt
 .equiv KBSTAT, 0177700 # keyboard state register
@@ -114,4 +124,5 @@
 .equiv TMRBRG, 0177712 # Buffer register
 .equiv TMRCST, 0177714 # Current state register
 
+.equiv CTRLRG, 0177716 # system control register
 

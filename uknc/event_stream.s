@@ -162,7 +162,7 @@ Event_LoadNextEvt:                                          # Event_LoadNextEvt:
 
 
 Event_StarBust:                                             # Event_StarBust:
-        .inform_and_hang "Event_StarBust is not implemented"
+        .inform_and_hang "no Event_StarBust"
                                                             #     ld d,(hl)   ;X
                                                             #     inc hl
                                                             #     ld c,(hl)   ;Y
@@ -351,13 +351,13 @@ Event_Call:                                                 # Event_Call_1001:
 
                                                             # ; alter stream time
 Event_ChangeStreamTime:                                     # Event_ChangeStreamTime_1000:
-        MOV  (R5)+,R1                                       #     ld c,(hl)
+                                                            #     ld c,(hl)
                                                             #     inc hl
                                                             #     ld b,(hl)
                                                             #     inc hl
-        MOV  (R5),R0                                        #     ld a,(hl)
+        MOV  (R5)+,R0                                       #     ld a,(hl)
                                                             #
-        MOV  R1,R5                                          #     ld h,b
+        MOV  (R5),R5                                        #     ld h,b
                                                             #     ld l,c
                                                             #
         CALL SetLevelTime                                   #     call SetLevelTime
@@ -576,7 +576,9 @@ RETURN                                                      #     ret
 RETURN                                                      #     ret
 
 Event_SaveObjSettings:
-        ASH  $3,R1
+        ASL  R1
+        ASL  R1
+        ASL  R1
         ADD  $Event_SavedSettings,R1
 
         MOVB @$srcEventObjectProgramToAdd,   (R1)+
@@ -589,7 +591,9 @@ Event_SaveObjSettings:
 RETURN
 
 Event_LoadObjSettings:
-        ASH  $3,R1
+        ASL  R1
+        ASL  R1
+        ASL  R1
         ADD  $Event_SavedSettings,R1
 
         MOVB (R1)+, @$srcEventObjectProgramToAdd

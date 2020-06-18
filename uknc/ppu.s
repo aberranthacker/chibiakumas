@@ -265,7 +265,7 @@ PGM: #--------------------------------------------------------------------------
 ShortLoop:      MOV  $PPU_PPUCommand, @$PBPADR
                 MOV  @$PBP12D,R0
             .ifdef DebugMode
-                CMP  R0,$24
+                CMP  R0,$28
                 BHI  .
             .endif
                 JMP  @JMPTable(R0)
@@ -282,6 +282,8 @@ JMPTable:      .word EventLoop            # do nothing
                .word ShowFB1              # PPU_ShowFB1
                .word LoadText             # PPU_LoadText
                .word ShowBossText         # PPU_ShowBossText
+               .word LoadMusic            # PPU_LoadMusic
+               .word MusicRestart         # PPU_MusicRestart
 #-------------------------------------------------------------------------------
 CommandExecuted: #-----------------------------------------------------------{{{
                 MOV  $PPU_PPUCommand, @$PBPADR
@@ -322,6 +324,8 @@ GoMultiProcess: #------------------------------------------------------------{{{
                 JMP  CommandExecuted
 #----------------------------------------------------------------------------}}}
 SetPalette: #----------------------------------------------------------------{{{
+                MOV  $0x011,@$PASWCR
+
                 MOV  $PPU_PPUCommandArg, @$PBPADR
                 MOV  @$PBP12D, @$PBPADR # get palette address
                 CLC
@@ -396,7 +400,7 @@ Print: #---------------------------------------------------------------------{{{
                .equiv Font, FontBitmap - (32 * 8)
                .equiv BPDataReg, DTSOCT
 
-                MOV  $01<<1,@$DTSCOL # foreground color
+                MOV  $10<<1,@$DTSCOL # foreground color
                 MOV  $LineWidth,R2
                 MOV  $StrBuffer,R3
                 MOV  $PBP12D,R4
@@ -577,6 +581,30 @@ SBT_NextChar:   DEC  (PC)+; srcCharsToPrint: .word 0xFF
 
 1237$:          JMP  @$CommandExecuted
 #----------------------------------------------------------------------------}}}
+LoadMusic: #------------------------------------------------------------------{{{
+                MOV  $MusicBuffer,R3
+                MOV  $PBP12D,R4
+                MOV  $PBPADR,R5
+
+                MOV  $PPU_PPUCommandArg, (R5)
+                MOV  (R4),R0  # get address of a string from CPU RAM
+                CLC
+                ROR  R0
+                MOV  R0,(R5)
+
+                MOV  $512>>1,R0
+               .rept 1<<1
+                MOV  (R4),(R3)+
+                INC  R5
+               .endr
+
+                JMP  @$CommandExecuted
+#----------------------------------------------------------------------------}}}
+MusicRestart: #--------------------------------------------------------------{{{
+        #CALL PLY_AKG_Init
+
+         JMP  @$CommandExecuted
+#----------------------------------------------------------------------------}}}
 
 VblankIntHandler: #----------------------------------------------------------{{{
         # we do not need firmware interrupt handler except for this small
@@ -586,6 +614,20 @@ VblankIntHandler: #----------------------------------------------------------{{{
         DEC  @$07130 # decrease spindle rotation counter
         BNZ  1237$   # continue rotation unless the counter reaches zero
         CALL @07132  # stop floppy drive spindle
+
+       #MOV  R0,-(SP)
+       #MOV  R1,-(SP)
+       #MOV  R2,-(SP)
+       #MOV  R3,-(SP)
+       #MOV  R4,-(SP)
+       #MOV  R5,-(SP)
+       #CALL @$PLY_Play
+       #MOV  (SP)+,R0
+       #MOV  (SP)+,R1
+       #MOV  (SP)+,R2
+       #MOV  (SP)+,R3
+       #MOV  (SP)+,R4
+       #MOV  (SP)+,R5
 1237$:
         RTI
 #----------------------------------------------------------------------------}}}
@@ -767,7 +809,8 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         RTI
 #----------------------------------------------------------------------------}}}
 
-StrBuffer:  .space 320
+       #.include "../../akg_player/akg_player.s"
+
 FontBitmap: .space 8 # whitespace symbol
             .incbin "resources/font.raw"
 # FontBitmap: .incbin "resources/cga8x8b.raw"
@@ -779,5 +822,7 @@ SYS300:  .word 0175412 # address of default keyboard interrupt handler
 FBSLTAB: .word 0          # adrress of main screen SLTAB
 FirstLineAddress: .word 0 #
 
+StrBuffer:  .space 320
+MusicBuffer:
          .word 0xFFFF
 end:

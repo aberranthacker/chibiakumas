@@ -71,8 +71,7 @@ Bootstrap_Launch:
         # TODO: Initialize the Sound Effects.
 #----------------------------------------------------------------------------}}}
 
-       #MOV  $0x8000,R5
-        MOV  $0x0000,R5
+        MOV  $StartOnLevel,R5
 
 Bootstrap_FromR5:
        .ppudo_ensure $PPU_MultiProcess
@@ -627,38 +626,25 @@ BlackPalette: #------------------------------------------------------{{{
     .even
 #----------------------------------------------------------------------------}}}
 LoadingScreenPalette: #------------------------------------------------------{{{
-    .byte 0       #--line number, last line of the top screen area, *required!*
-    .byte 0       #  0 - set cursor/scale/palette, *ignored for the first record*
+    .byte 0, 0    #--line number, 0 - set cursor/scale/palette
     .word 0b10000 #  graphical cursor
     .word 0b10101 #  320 dots per line, pallete 5
-    .byte 1       #--line number, first line of the main screen area, *required!*
-    .byte 1       #  set colors
-    .word 0xCC00  #  colors 011 010 001 000 (YRGB) | br.red   | black   |
-    .word 0xFF99  #  colors 111 110 101 100 (YRGB) | br.white | br.blue |
-    .byte 49      #--line number (201 if there is no more parameters)
-    .byte 1       #  set colors
-    .word 0x1100  #  | blue     | black   |
-    .word 0xFF55  #  | br.white | magenta |
-    .byte 63      #--line number
-    .byte 1       #  set colors
-    .word 0xDD00  #  | br.green | black   |
-    .word 0xFF55  #  | br.white | magenta |
-    .byte 95      #--line number
-    .byte 1       #  set colors
-    .word 0xBB00  #  | br.cyan  | black   |
-    .word 0xFF22  #  | br.white | green   |
-    .byte 185     #--line number
-    .byte 1       #  set colors
-    .word 0x0000  #
-    .word 0xFF22  #
-    .byte 192     #--line number
-    .byte 1       #  set colors
-    .word 0xBB00  #
-    .word 0xFF22  #
-    .byte 196     #--line number
-    .byte 1       #  set colors
-    .word 0xCC00  #  | br.red   | black   |
-    .word 0xFF22  #  | br.white | green   |
+
+    .byte 1,   1  #--line number, set colors
+    .byte 0x00, 0x99, 0xCC, 0xFF
+    .byte 49,  1  #--line number, set colors
+    .byte 0x00, 0x55, 0x11, 0xFF
+    .byte 63,  1  #--line number, set colors
+    .byte 0x00, 0x55, 0xDD, 0xFF
+    .byte 95,  1  #--line number, set colors
+    .byte 0x00, 0x22, 0xBB, 0xFF
+    .byte 185, 1  #--line number, set colors
+    .byte 0x00, 0x22, 0x00, 0xFF
+    .byte 192, 1  #--line number, set colors
+    .byte 0x00, 0x22, 0xBB, 0xFF
+    .byte 196, 1  #--line number, set colors
+    .byte 0x00, 0x22, 0xCC, 0xFF
+
     .byte 201     #--line number, 201 - end of the main screen params
     .even
 #----------------------------------------------------------------------------}}}

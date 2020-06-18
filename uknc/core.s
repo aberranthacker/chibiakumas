@@ -313,9 +313,9 @@ Event_VectorArray:
        .word NotImplemented                    # 0x15 0x2A    defw Event_SpriteSwitch_0101
        .word Event_AddToBackground             # 0x16 0x2C  evtAddToBackground
        .word Event_AddToForeground             # 0x17 0x2E  evtAddToForeground
-       .word Event_ChangeStreamTime            # 0x18 0x30    defw Event_ChangeStreamTime_1000
+       .word Event_ChangeStreamTime            # 0x18 0x30  evtChangeStreamTime
        .word Event_Call                        # 0x19 0x32  evtCallAddress
-       .word Event_LoadLastAddedObjectToAddress# 0x1A 0x34    defw Event_LoadLastAddedObjectToAddress_1010
+       .word Event_LoadLastAddedObjectToAddress# 0x1A 0x34  evtSaveLstObjToAdd
        .word NotImplemented                    # 0x1B 0x36    defw Event_ClearPowerups
        .word NotImplemented                    # 0x1C 0x38    defw Event_ChangeStreamSpeed_1100
        .word Event_SetSpriteSize               # 0x1D 0x3A  evtSetObjectSize

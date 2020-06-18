@@ -143,6 +143,7 @@ ObjectArray_Turbo:                                          # ObjectArray_Turbo:
         BIT  $0xC0,R2                                       #         and %11000000
         BZE  Objectloop_SpriteBankSet$ # one frame sprite   #         jr z,Objectloop_SpriteBankSet
         BIT  $0x40,R2                                       #         bit 6,a
+                                                            #         ld a,(Timer_CurrentTick)
         BZE  Objectloop_TwoFrameSprite$                     #         jr z,Objectloop_TwoFrameSprite
 
                                                             #         ;if we got here it's a FourFrameSprite
@@ -150,7 +151,6 @@ ObjectArray_Turbo:                                          # ObjectArray_Turbo:
                                                             #         jr Objectloop_SpriteBankSet
 
 Objectloop_TwoFrameSprite$:                                 # Objectloop_TwoFrameSprite:
-        CALL NotImplemented                                 #         ld a,(Timer_CurrentTick)
                                                             #         cpl
                                                             #         and %00000010
                                                             #
@@ -407,7 +407,7 @@ ObjectLoop_ShowSprite:                                      # ObjectLoop_ShowSpr
                                                             #
                                                             #     exx
 ObjectAnimator:                                             # ObjectAnimator:
-        .inform_and_hang "ObjectAnimator is not implemented"
+        .inform_and_hang "no ObjectAnimator"
                                                             #     ;our animator is in A
                                                             #     ;format is
                                                             #     ;TTTTAAAA
@@ -594,7 +594,7 @@ ObjectAnimator:                                             # ObjectAnimator:
                                                             # ret
                                                             #
 ObjectProgram:                                              # ObjectProgram:
-        .inform_and_hang "ObjectProgram is not implemented" #     ret z       ; return if zero
+        .inform_and_hang "no ObjectProgram"                 #     ret z       ; return if zero
                                                             #     cp %00000001
                                                             #     jp z,ObjectProgram_BitShiftSprite   ; Used by background, sprite bank based on X co-ord
                                                             #     and %11111000           ;00000XXX = Powerup

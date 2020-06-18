@@ -55,7 +55,11 @@
 .macro .jmp cond=none, dst:req # JP cc,nn
   .if \cond == "EQ" # equal (z)
     BNE  .+6
+  .elseif \cond == "ZE" # zero
+    BNE  .+6
   .elseif \cond == "NE" # not equal (nz)
+    BEQ  .+6
+  .elseif \cond == "NZ" # not zero
     BEQ  .+6
   .else
     .error "Unknown condition for conditional jump"
