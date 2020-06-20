@@ -6,11 +6,11 @@ compatible microcomputer [UKNC](https://en.wikipedia.org/wiki/UKNC).
 
 ## Status
 * Done
-** Main menu
-** Connect AY chip to the UKNC
+  * Main menu
+  * Connect AY chip to the UKNC
 * Work in progress
-** Intro
-** Port Arkos Tracker
+  * Intro
+  * Port of the Arkos Tracker
 
 ## How to build the project
 Since default assembler for PDP-11 [MACRO-11](https://en.wikipedia.org/wiki/MACRO-11)
