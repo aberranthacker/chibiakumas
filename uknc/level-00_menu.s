@@ -510,8 +510,8 @@ WaitKey: #-------------------------------------------------------------------{{{
 # 9 br.     # A br.     # B br.     # C br.     # D br.     # E br.     # F white
 # 1 blue    # 2 green   # 3 cyan    # 4 red     # 5 magenta # 6 yellow  # 7 gray
 TitleScreenPalette: #--------------------------------------------------------{{{
-    .byte 0, 0    #--line number, 0 - set cursor/scale/palette
-    .word 0b10000 #  graphical cursor
+    .byte 0,   0  #--line number, 0 - set cursor/scale/palette
+    .word 0x10    #  graphical cursor, cursor color is black
     .word 0b10101 #  320 dots per line, pallete 5
 
     .byte 1,   1  #--line number, set colors

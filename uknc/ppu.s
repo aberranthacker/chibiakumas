@@ -10,8 +10,8 @@
                .equiv  PPU_ModuleSizeWords, (end - start) >> 1
                .global PPU_ModuleSizeWords
 
-               .equiv SLTAB, 0100000
-               .equiv OffscreenAreaAddr, 0140000
+               .equiv SLTAB, 0x8000 # 0100000
+               .equiv OffscreenAreaAddr, 0140000 # 0xC000
 
                .=PPU_UserRamStart
 
@@ -19,23 +19,21 @@ start:
                 MOV  @$0100, @$SYS100
                 MOV  $VblankIntHandler,@$0100
 
-                MOV  @$0300, @$SYS300
-                MOV  $KeyboardIntHadler,@$0300
+                MOV  @$KBINT, @$SYS300
+                MOV  $KeyboardIntHadler,@$KBINT
 
                 MOV  $0b001,@$PBPMSK  # disable writes to bitplane 0
 
+                MOV  @$PASWCR,-(SP)
 ClrTextArea: # --------------------------------------------------------------{{{
-            .if OffscreenAreaAddr < 0120000
-                # replace ROM with RAM in the range 0100000..0117777
+                # enable write-only direct access to the RAM above 0100000
+            .if OffscreenAreaAddr < 0120000     # 0100000..0117777
                 MOV  $0x011,@$PASWCR
-            .elseif OffscreenAreaAddr < 0140000
-                # replace ROM with RAM in the range 0120000..0137777
+            .elseif OffscreenAreaAddr < 0140000 # 0120000..0137777
                 MOV  $0x021,@$PASWCR
-            .elseif OffscreenAreaAddr < 0160000
-                # replace ROM with RAM in the range 0140000..0157777
+            .elseif OffscreenAreaAddr < 0160000 # 0140000..0157777
                 MOV  $0x041,@$PASWCR
-            .else
-                # replace ROM with RAM in the range 0160000..0176777
+            .else                               # 0160000..0176777
                 MOV  $0x081,@$PASWCR
             .endif
 
@@ -48,9 +46,8 @@ ClrTextArea: # --------------------------------------------------------------{{{
                .endr
                 SOB  R0,1$
 #----------------------------------------------------------------------------}}}
-                # replace ROM with RAM in the ranges 0100000..0117777 and
-                # 014000..0157777 (0x8000..0x9FFF and 0xC000..0xDFFF)
-                MOV  $0x011,@$PASWCR
+                # replace ROM with RAM in the range 0100000..0117777
+                MOV  $0x010,@$PASWCR
 # initialize our scanlines parameters table (SLTAB): ------------------------{{{
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 312 (1..312) lines is SECAM half-frame
@@ -248,8 +245,7 @@ SLTABInit:      MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
                 CLR  (R0)+           #--address of line 308
                 MOV  R1,(R0)         #--pointer back to record 308
 #----------------------------------------------------------------------------}}}
-                # disable the ROM peplacement
-                MOV  $0x001,@$PASWCR
+                MOV  (SP)+,@$PASWCR
 #----------------------------------------------------------------------------{{{
                 MOV  @$0272, @$SYS272 # store address of system SLTAB (186; 0xBA)
                 MOV  $SLTAB, @$0272   # use our SLTAB
@@ -309,22 +305,16 @@ Teardown: #------------------------------------------------------------------{{{
                 JMP  @$0174170        # jump back to the process manager (63608; 0xF878)
 #----------------------------------------------------------------------------}}}
 GoSingleProcess: #-----------------------------------------------------------{{{
-                # replace ROM with RAM in the ranges 0100000..0117777 and
-                # 014000..0157777 (0x8000..0x9FFF and 0xC000..0xDFFF)
-                MOV  $0x051,@$PASWCR
-
                 MOV  $1,@$SingleProcessFlag # skip firmware processes
                 JMP  CommandExecuted
 #----------------------------------------------------------------------------}}}
 GoMultiProcess: #------------------------------------------------------------{{{
-                # disable the ROM peplacement
-                MOV  $0x001,@$PASWCR
-
                 CLR  @$SingleProcessFlag
                 JMP  CommandExecuted
 #----------------------------------------------------------------------------}}}
 SetPalette: #----------------------------------------------------------------{{{
-                MOV  $0x011,@$PASWCR
+                MOV  @$PASWCR,-(SP)
+                MOV  $0x010,@$PASWCR
 
                 MOV  $PPU_PPUCommandArg, @$PBPADR
                 MOV  @$PBP12D, @$PBPADR # get palette address
@@ -345,18 +335,18 @@ SetPalette: #----------------------------------------------------------------{{{
                 ASH  $3,R5        # calculate offset by multiplying by 8 (by shifting R5 left by 3 bits)
                 ADD  @$FBSLTAB,R5 # and add address of SLTAB section we modify
 
-                MOVB @$PBP2DT,R2  # get display/color parameters flag
+                MOVB @$PBP2DT,R2     # get display/color parameters flag
+                BMI  palette_is_set$ # negative value - terminator
                 INC  @$PBPADR
-                MOV  @$PBP12D,R0  # get first data word
+                MOV  @$PBP12D,R0     # get first data word
                 INC  @$PBPADR
-                MOV  @$PBP12D,R1  # get second data word
+                MOV  @$PBP12D,R1     # get second data word
                 INC  @$PBPADR
                 CLR  R4
                 BISB @$PBP1DT,R4  # get next line idx
     set_params$:
                 TSTB R2
-                BMI  palette_is_set$ # negative value - terminator
-                BNE  set_colors$     # 1 - set colors
+                BNZ  set_colors$     # 1 - set colors
                 BIC  $0b100,(R5)+    # 0 - set data
                 BR   set_data$
     set_colors$:
@@ -364,7 +354,8 @@ SetPalette: #----------------------------------------------------------------{{{
     set_data$:
                 MOV  R0,(R5)+
                 MOV  R1,(R5)+
-                ADD  $2,R5        # skip third word (screen line address)
+                INC  R5
+                INC  R5           # skip third word (screen line address)
 
                 INC  R3           # increase current line idx
                 CMP  R3,R4        # compare current line idx with next line idx
@@ -372,7 +363,10 @@ SetPalette: #----------------------------------------------------------------{{{
 
                 CMP  R4,$201
                 BNE  next_record$
+
     palette_is_set$:
+                MOV  (SP)+,@$PASWCR
+
                 JMP  CommandExecuted
 #----------------------------------------------------------------------------}}}
 PrintAt: #-------------------------------------------------------------------{{{
@@ -492,6 +486,9 @@ FlipFB: #--------------------------------------------------------------------{{{
                 BR   ShowFB0
 #----------------------------------------------------------------------------}}}
 ShowFB0: #-------------------------------------------------------------------{{{
+                MOV  @$PASWCR,-(SP)
+                MOV  $0x010,@$PASWCR
+
                 MOV  $0x2000,R0
                 MOV  $8,R1
                 MOV  $200>>1,R2
@@ -503,9 +500,14 @@ ShowFB0: #-------------------------------------------------------------------{{{
                .endr
                 SOB  R2,100$
 
+                MOV  (SP)+, @$PASWCR
+
                 JMP  CommandExecuted
 #----------------------------------------------------------------------------}}}
 ShowFB1: #-------------------------------------------------------------------{{{
+                MOV  @$PASWCR,-(SP)
+                MOV  $0x010,@$PASWCR
+
                 MOV  $0x2000,R0
                 MOV  $8,R1
                 MOV  $200>>1,R2
@@ -516,6 +518,8 @@ ShowFB1: #-------------------------------------------------------------------{{{
                 ADD  R1,R5
                .endr
                 SOB  R2,100$
+
+                MOV  (SP)+, @$PASWCR
 
                 JMP  CommandExecuted
 #----------------------------------------------------------------------------}}}

@@ -61,6 +61,10 @@
     BEQ  .+6
   .elseif \cond == "NZ" # not zero
     BEQ  .+6
+  .elseif \cond == "CC" # carry clear
+    BCS  .+6
+  .elseif \cond == "CS" # carry set
+    BCC  .+6
   .else
     .error "Unknown condition for conditional jump"
   .endif

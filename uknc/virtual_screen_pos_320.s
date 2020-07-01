@@ -17,7 +17,7 @@ from the list
 
   input  R1=VitrualX; R2=VirtualY
 
-  output R2=ScreenByteX; R1=ScreenY (Y=255 if ofscreen)
+  output R2=ScreenByteX; R1=ScreenY (Y=255 if offscreen)
          R4 X bytes to skip;  R5 X bytes to remove
          R2 Y lines to skip;  R3 Y lines to remove
 --------------------------------------------------------------------------------
@@ -56,14 +56,14 @@ VirtualPosToScreenByte:                                     # VirtualPosToScreen
     VirtualPos_1$:                                          # VirtualPos_1:
                                                             #     ;ld a,B ;Check X
         CMP  R2,(PC)+; cmpSpriteSizeConfig184less12: .word 184-12 #     cp 184-12 :SpriteSizeConfig184less12_Plus1
-        BLO  VirtualPos_2$ # X < 172                        #     jp C,VirtualPos_1
-        # X >= 172
+        BLOS VirtualPos_2$ # X <= 172                       #     jp C,VirtualPos_1
+        # X > 172
         MOV  R2,R0                                          #     ld a,B
         SUB  (PC)+,R0; srcSpriteSizeConfig184less12: .word 184-12 #     sub 184-12 :SpriteSizeConfig184less12B_Plus1
                                                             #
         RORB R0                                             #     RRA
                                                             #
-        ADD  R0,R5                                          #     add L   ;   X pos is ok, but plot A less bytes
+        ADD  R0,R5 # X pos is ok, but plot R0 less -words-  #     add L   ;   X pos is ok, but plot A less bytes
                                                             #     ld L,A
                                                             #     ;ld a,B ;Check X
     VirtualPos_2$:                                          # VirtualPos_2:
@@ -72,6 +72,7 @@ VirtualPosToScreenByte:                                     # VirtualPosToScreen
         RORB R2                                             #     RRA ; halve the result, as we have 80 bytes, but 160 x co-ords
         MOVB R2,@$srcSprShow_TempX                          #     ld B,a
     #---------------------------------------------------------------------------
+        # R1 Y
         CLR  R2 # Y lines to skip
         CLR  R3 # Y lines to remove
                                                             #     ld a,C  ;Check Y

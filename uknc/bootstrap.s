@@ -45,9 +45,7 @@ Bootstrap_Launch:
        .word PPU_ModuleSizeWords
 #-------------------------------------------------------------------------------
      .ifdef ShowLoadingScreen
-       .ppudo_ensure $PPU_SingleProcess
-       .ppudo_ensure $PPU_SetPalette, $LoadingScreenPalette
-       .ppudo_ensure $PPU_MultiProcess
+       .ppudo_ensure $PPU_SetPalette, $TitleScreenPalette
 
         MOV  $loading_screen.bin,R0
         CALL Bootstrap_LoadDiskFile
@@ -625,7 +623,7 @@ BlackPalette: #------------------------------------------------------{{{
     .byte 201     #--line number, 201 - end of the main screen params
     .even
 #----------------------------------------------------------------------------}}}
-LoadingScreenPalette: #------------------------------------------------------{{{
+TitleScreenPalette: #--------------------------------------------------------{{{
     .byte 0, 0    #--line number, 0 - set cursor/scale/palette
     .word 0b10000 #  graphical cursor
     .word 0b10101 #  320 dots per line, pallete 5

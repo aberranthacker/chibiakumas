@@ -1,13 +1,11 @@
-                                                            #
-                                                            # ;*******************************************************************************
-                                                            # ;*                                Music & SFX                                  *
-                                                            # ;*******************************************************************************
-                                                            #
-                                                            # ;
-                                                            # ; Note - the version of ArkosTracker has had many of its functions removed,
-                                                            # ; if this SFX function can't do what you want, neither can this arkostracker!
-                                                            # ;
-                                                            #
+/*
+ *******************************************************************************
+ *                                Music & SFX                                  *
+ *******************************************************************************
+   
+    Note - the version of ArkosTracker has had many of its functions removed,
+    if this SFX function can't do what you want, neither can this arkostracker!
+*/
                                                             # SFX_PlaySfx:
         MOV  $0x0000,R0; Sfx_Sound_Plus2:                   #     ld a,&00 :Sfx_Sound_Plus1
        .equiv  srcSfx_Sound, Sfx_Sound_Plus2 - 2
