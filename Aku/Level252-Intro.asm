@@ -1277,7 +1277,7 @@ ShowText1Init:
         ld a,1
 
 UpdateShowText:
-        ld(ShowTextUpdate_Plus1 - 1),a
+        ld (ShowTextUpdate_Plus1 - 1),a
         ret
 ShowText2Init:
         ld a,2

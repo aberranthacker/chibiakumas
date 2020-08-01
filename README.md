@@ -8,12 +8,12 @@ compatible microcomputer [Elektronika MS 0511](https://en.wikipedia.org/wiki/UKN
   * ~~Main menu~~
   * ~~Connect the AY chip to UKNC~~
   * Intro
-  * Port of the Arkos Tracker 2
+  * Port the Arkos Player Generic
   * Connect the AY to UKNC right way
 
 ## How to build the project
 Since default assembler for PDP-11 [MACRO-11](https://en.wikipedia.org/wiki/MACRO-11)
-has very annoying limitation - only first six characters of a symbol is recognized,
+has very annoying limitation - only first six characters of a symbol are recognized,
 my assembler of choice is [GNU Assembler](https://sourceware.org/binutils/docs/as/index.html).
 
 Here is a couple of articles on the subject
