@@ -1,17 +1,15 @@
 # Chibi Akumas
 
 This is a port of the [Chibi Akumas](http://www.chibiakumas.com/) ([github](https://github.com/akuyou/chibiakumas)) game to Soviet PDP-11
-compatible microcomputer [UKNC](https://en.wikipedia.org/wiki/UKNC).
+compatible microcomputer [Elektronika MS 0511](https://en.wikipedia.org/wiki/UKNC).
 [-](https://guides.github.com/features/mastering-markdown/)
 
-## Status
-* Done
-  * Main menu
-  * Connect AY chip to the UKNC
-* Work in progress
+## TODO
+  * ~~Main menu~~
+  * ~~Connect the AY chip to UKNC~~
   * Intro
   * Port of the Arkos Tracker 2
-  * Connect AY to UKNC right way
+  * Connect the AY to UKNC right way
 
 ## How to build the project
 Since default assembler for PDP-11 [MACRO-11](https://en.wikipedia.org/wiki/MACRO-11)

@@ -33,17 +33,11 @@
                        # alias for word access
 
 # CPU: to PPU communication channels
-# terminal emulation channel
-.equiv CCH0II, 060     # CPU channel 0 in   state interrupt
-.equiv CCH0IS, 0177560 # CPU channel 0 in   state register
-.equiv CCH0ID, 0177562 # CPU channel 0 in   data register
-.equiv CCH0OI, 064     # CPU channel 0 out  state interrupt
-.equiv CCH0OS, 0177564 # CPU channel 0 out  state register
-.equiv CCH0OD, 0177566 # CPU channel 0 out  data register
-.equiv TTYIS, CCH0IS   # TTY in state
-.equiv TTYID, CCH0ID   # TTY in data
-.equiv TTYOS, CCH0OS   # TTY out state
-.equiv TTYOD, CCH0OD   # TTY out data
+# serial port
+.equiv S2IST, 0176570
+.equiv S2IDT, 0176572
+.equiv S2OST, 0176574
+.equiv S2ODT, 0176576
 # parallel port access channel
 .equiv CCH1II, 0460    # CPU channel 1 in   state interrupt
 .equiv CCH1IS, 0176660 # CPU channel 1 in   state register
@@ -55,6 +49,18 @@
 .equiv CCH2OI, 0474    # CPU channel 2 out  state interrupt
 .equiv CCH2OS, 0176674 # CPU channel 2 out  state register
 .equiv CCH2OD, 0176676 # CPU channel 2 out  data register
+# terminal emulation channel
+.equiv CCH0II, 060     # CPU channel 0 in   state interrupt
+.equiv CCH0IS, 0177560 # CPU channel 0 in   state register
+.equiv CCH0ID, 0177562 # CPU channel 0 in   data register
+.equiv CCH0OI, 064     # CPU channel 0 out  state interrupt
+.equiv CCH0OS, 0177564 # CPU channel 0 out  state register
+.equiv CCH0OD, 0177566 # CPU channel 0 out  data register
+.equiv TTYIST, CCH0IS   # TTY in state
+.equiv TTYIDT, CCH0ID   # TTY in data
+.equiv TTYOST, CCH0OS   # TTY out state
+.equiv TTYODT, CCH0OD   # TTY out data
+
 
 # SRAM module register
 .equiv WNDRGS, 0176000 # windows registers

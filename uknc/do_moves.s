@@ -15,7 +15,7 @@ DoMoves: .global DoMoves
         SWAB R1    # R1 = Y
 
         BIT  $0x80,R2                                       #     bit 7,d         ; See if we are using a SPECIAL move pattern
-        BNZ  DoMoves_Spec$                                  #     jr nz,DoMoves_Spec
+        BNZ  DoMoves_Spec                                   #     jr nz,DoMoves_Spec
                                                             # ;DoMovesStars
         # Y move ---------------------------------------------------------------
         MOV  R2,R0                                          #     ld a,D
@@ -25,30 +25,30 @@ DoMoves: .global DoMoves
                                                             #
         SUB  $8,R0                                          #     sub 8
         BIT  $0x40,R2 # fast move?                          #     bit 6,d
-        BZE  DoMoves_NoMultY$                               #     jp z,DoMoves_NoMult2
+        BZE  DoMoves_NoMultY                                #     jp z,DoMoves_NoMult2
         ASL  R0                                             #          rlca
-    DoMoves_NoMultY$:                                       #     DoMoves_NoMult2:
+    DoMoves_NoMultY:                                        #     DoMoves_NoMult2:
         ADD  R1,R0                                          #     add C
                                                             #
         CMP  R0,$199+24                                     #     cp 199+24       ;we are at the bottom of the screen
-        BHIS DoMoves_Kill$                                  #     jr NC,DoMoves_Kill  ;over the page
+        BHIS DoMoves_Kill                                   #     jr NC,DoMoves_Kill  ;over the page
         MOV  R0,R1                                          #     ld c,a
         # X move ---------------------------------------------------------------
         MOV  R2,R0                                          #     ld a,D
         BIC  $0177770,R0                                    #     and %00000111
         SUB  $4,R0                                          #     sub 4
         BIT  $0x40,R2 # fast move?                          #     bit 6,d
-        BZE  DoMoves_NoMultX$                               #     jp z,DoMoves_NoMult
+        BZE  DoMoves_NoMultX                                #     jp z,DoMoves_NoMult
         ASL  R0                                             #          rlca
-    DoMoves_NoMultX$:                                       #     DoMoves_NoMult:
+    DoMoves_NoMultX:                                        #     DoMoves_NoMult:
         ADD  R4,R0                                          #     add b
                                                             #
         CMP  R0,$160+24                                     #     cp 160+24          ;we are at the bottom of the screen
-        BHIS DoMoves_Kill$                                  #     jr NC,DoMoves_Kill ;over the page
+        BHIS DoMoves_Kill                                   #     jr NC,DoMoves_Kill ;over the page
         MOV  R0,R4                                          #     ld b,a
                                                             #
 RETURN                                                      #     ret
-    DoMoves_Kill$:                                          # DoMoves_Kill:          ; Object has gone offscreen
+    DoMoves_Kill:                                           # DoMoves_Kill:          ; Object has gone offscreen
         CLR  R1                                             #     ld C,0
 RETURN                                                      #     ret
                                                             # DoMoves_Background: ; Background sprites move much more slowly, and only in 1 direction
@@ -67,7 +67,7 @@ RETURN                                                      #     ret
                                                             #     cp 160+24+24        ;we are offscreen
                                                             #     jr NC,DoMoves_Kill  ;over the page
                                                             #     ret
-DoMoves_Spec$:                                              # DoMoves_Spec:   ;Special moves - various kinds
+DoMoves_Spec:                                               # DoMoves_Spec:   ;Special moves - various kinds
        .inform_and_hang "no DoMoves_Spec"                   #     ld a,(Timer_TicksOccured)
                                                             #     and %11111111           :SpecialMoveSlowdown_Plus1
                                                             #     ret z

@@ -1,4 +1,4 @@
-               .nolist
+               .list
 
                .TITLE Chibi Akumas Bootsector
 
@@ -28,7 +28,7 @@ load_bootstrap:
 10$:    MOVB (R0)+,@$CCH2OD # Send a byte to the channel 2
 
 20$:    TSTB @$CCH2OS       #
-        BPL  20$            # Wait until channel is ready
+        BPL  20$            # Wait until the channel is ready
 
         SOB  R1,10$         # Next byte
 
@@ -63,10 +63,10 @@ PrintStr:
 10$:    MOVB (R0)+,R1
         BZE  1237$
 
-20$:    BIT  $0x80, @$TTYOS
+20$:    BIT  $0x80, @$TTYOST
         BZE  20$
 
-        MOV  R1, @$TTYOD
+        MOV  R1, @$TTYODT
         BR   10$
 
 1237$:  RETURN
@@ -98,3 +98,4 @@ TitleStr:    #---------------------------------------------------------------{{{
        .byte  0
 #----------------------------------------------------------------------------}}}
        .=0x200
+               .nolist

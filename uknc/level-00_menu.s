@@ -568,7 +568,7 @@ MenuPalette: #---------------------------------------------------------------{{{
 
     .byte 190, 0  #--line number, 0 - set cursor/scale/palette
     .word 0b10000 #  graphical cursor
-    .word 025     #  320 dots per line, pallete 5
+    .word 0b10101 #  320 dots per line, pallete 5
 
     .byte 191, 1
     .byte 0x00, 0x66, 0xEE, 0xFF

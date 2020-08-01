@@ -34,6 +34,7 @@
        .global SmartBombsReset
        .global StarArrayPointer
        .global Timer_UpdateTimer
+       .global unlzsa1
 #----------------------------------------------------------------------------}}}
 
        .include "./hwdefs.s"
@@ -385,6 +386,8 @@ null:   RETURN
                                         ## ;   read "../SrcALL/Multiplatform_MonitorMemdump.asm"
                                         ## ;   read "../SrcALL/Multiplatform_MonitorSimple.asm"
                                         ## endif
+       .include "decoders/lzsa1.s"
+
 NotImplemented:
        BR   .
       .rept 2

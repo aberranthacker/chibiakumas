@@ -2,7 +2,7 @@
  *******************************************************************************
  *                                Music & SFX                                  *
  *******************************************************************************
-   
+
     Note - the version of ArkosTracker has had many of its functions removed,
     if this SFX function can't do what you want, neither can this arkostracker!
 */

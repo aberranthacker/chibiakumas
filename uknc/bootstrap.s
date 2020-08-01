@@ -143,6 +143,10 @@ Bootstrap_Level_Intro:
         MOV  $ep1_intro.bin,R0
         CALL Bootstrap_LoadDiskFile
 
+        # TODO: load music Aku/BootStrap.asm:1185
+        MOV  $ep1_intro_slides.bin,R0
+        CALL Bootstrap_LoadDiskFile
+
        .ppudo_ensure $PPU_SingleProcess
         MOV  $SPReset,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
@@ -426,6 +430,10 @@ ep1_intro.bin:
        .word Akuyou_LevelStart
        .word Ep1IntroSizeWords
        .word Ep1IntroBlockNum
+ep1_intro_slides.bin:
+       .word FB1
+       .word Ep1IntroSlidesSizeWords
+       .word Ep1IntroSlidesBlockNum
 #----------------------------------------------------------------------------}}}
 
        .include "./ppucmd.s"

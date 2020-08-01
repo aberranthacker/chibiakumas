@@ -1,9 +1,9 @@
 
 GetMemPos:
-    # Input  R1 = XY (x=bytes - so 80 across)
+    # input  R1 = XY (x=bytes - so 80 across)
     # output R5 = screen mem pos
     MOV  R4,R5
-    ASL  R5 # 4x ASL 20% faster than ASH  $4,R5
+    ASL  R5 # 4x ASL 29% faster than ASH $4,R5
     ASL  R5
     ASL  R5
     ASL  R5

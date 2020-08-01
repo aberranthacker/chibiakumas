@@ -16,7 +16,20 @@ start:
         JMP  @$LevelInit
        .incbin "resources/ep1-intro.spr"
 
+slide01: .incbin "build/ep1-intro/ep1-intro-slide01.raw.lzsa1"
+slide02: .incbin "build/ep1-intro/ep1-intro-slide02.raw.lzsa1"
+slide03: .incbin "build/ep1-intro/ep1-intro-slide03.raw.lzsa1"
+slide04: .incbin "build/ep1-intro/ep1-intro-slide04.raw.lzsa1"
+slide05: .incbin "build/ep1-intro/ep1-intro-slide05.raw.lzsa1"
+slide06: .incbin "build/ep1-intro/ep1-intro-slide06.raw.lzsa1"
+slide07: .incbin "build/ep1-intro/ep1-intro-slide07.raw.lzsa1"
+slide08: .incbin "build/ep1-intro/ep1-intro-slide08.raw.lzsa1"
+
 EventStreamArray:
+    #----------
+   #.word 0, evtChangeStreamTime, 256+15+155, StartPoint
+    #----------
+
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
     .word         prgBitShift
@@ -132,28 +145,27 @@ EventStreamArray:
 StartIntroProper:
     .word 68, evtCallAddress, ShowText0Init
     .word 68, evtCallAddress, ClearObjects
-    .word 70, evtSetPalette, Palette70
 
-    .word 72, evtCallAddress, ShowText3Init
-    .word 85, evtCallAddress, ShowText4Init
-
-    .word 110,evtCallAddress, ShowText5Init
-    .word 140,evtCallAddress, ShowText6Init
-    .word 170,evtCallAddress, ShowText7Init
-    .word 200,evtCallAddress, ShowText8Init
-    .word 230,evtCallAddress, ShowText9Init
-    .word 256+5,evtCallAddress, ShowText10Init
-    .word 256+35,evtCallAddress, ShowText11Init
-    .word 256+65,evtCallAddress, ShowText12Init
-    .word 256+95,evtCallAddress, ShowText13Init
-    .word 256+125,evtCallAddress, ShowText14Init
-    .word 256+155,evtCallAddress, ShowText15Init
-    .word 256+185,evtCallAddress, ShowText16Init
-    .word 256+215,evtCallAddress, ShowText17Init
-    .word 256+245,evtCallAddress, ShowText18Init
-    .word 512+20,evtCallAddress, ShowText19Init
-    .word 512+50,evtCallAddress, ShowText20Init
-    .word 512+90,evtCallAddress, ShowText21Init
+    .word 75,         evtCallAddress, ShowText3Init  # when you die
+    .word 85+15,      evtCallAddress, ShowText4Init
+    .word 110+15,     evtCallAddress, ShowText5Init
+    .word 140+15,     evtCallAddress, ShowText6Init
+    .word 170+15,     evtCallAddress, ShowText7Init  # chibiko
+    .word 200+15,     evtCallAddress, ShowText8Init  # fishing
+    .word 230+15,     evtCallAddress, ShowText9Init  # camping
+    .word 256+  5+15, evtCallAddress, ShowText10Init # prank
+    .word 256+ 35+15, evtCallAddress, ShowText11Init # school1
+    .word 256+ 65+15, evtCallAddress, ShowText12Init # bulbs
+    .word 256+ 95+15, evtCallAddress, ShowText13Init # plane
+    .word 256+125+15, evtCallAddress, ShowText14Init # school2
+StartPoint:
+    .word 256+155+15, evtCallAddress, ShowText15Init # lightning1
+    .word 256+185+15, evtCallAddress, ShowText16Init # lightning2
+    .word 256+215+15, evtCallAddress, ShowText17Init
+    .word 256+245+15, evtCallAddress, ShowText18Init
+    .word 512+ 20+15, evtCallAddress, ShowText19Init
+    .word 512+ 50+15, evtCallAddress, ShowText20Init
+    .word 512+ 90+15, evtCallAddress, ShowText21Init
 
     .word 768+64, evtCallAddress, EndLevel
 
@@ -165,6 +177,15 @@ EndLevel:
         JMP  @$ExecuteBootstrap
 
 LevelInit:
+        MOV  $Ep1IntroSlidesSizeWords,R0
+        ASR  R0
+        MOV  $FB1,R1
+        MOV  $FB0+6000,R2
+100$:
+        MOV  (R1)+,(R2)+
+        MOV  (R1)+,(R2)+
+        SOB  R0,100$
+
        .ppudo_ensure $PPU_SetPalette, $BlackPalette
         # TODO: Load artifact of Level252-Intro_Screens1.asm
         # TODO: call Akuyou_Music_Restart when implemented
@@ -203,7 +224,38 @@ LevelLoop:
 
         ASL  R0
         MOV  SubtitlesTable(R0),R5
-        BR   ResetText
+        MOV  $0xFF,@$srcShowTextUpdate
+
+       .wait_ppu
+        MOV  R5, @$PPUCommandArg;
+        MOV  $PPU_LoadText, @$PPUCommand
+        MOV  $1,@$srcCharsToPrint
+
+        CALL @$Clear4000
+
+        MOV  PalettesTable(R0), @$PPUCommandArg
+        MOV  $PPU_SetPalette, @$PPUCommand
+
+        MOV  (PC)+,R1; PicAddr: .word 0
+        BZE  1237$
+        MOV  $FB0,R2
+        JSR  PC,@$unlzsa1
+
+        MOV  $FB0,R1
+        MOV  $FB1+(12*2),R2
+        MOV  $96,R3
+96$:    MOV  $4,R4
+4$:    .rept 4
+        MOV  (R1)+,(R2)+
+       .endr
+        SOB  R4,4$
+        ADD  $24*2,R2
+        SOB  R3,96$
+
+1237$:
+        JMP  @$LevelLoop
+
+
     SubtitlesTable:
        .word SubtitlesEmpty
        .word Subtitles1
@@ -228,106 +280,121 @@ LevelLoop:
        .word Subtitles20
        .word Subtitles21
        .word Subtitles22
-
-    ResetText:                                              # ResetText:
-       #MOV  R5,@$srcOnscreenTextPointer                    #         ld(OnscreenTextPointer_Plus2-2),hl
-                                                            #         ld (OnscreenTextPos_Plus1-1),a
-                                                            #         ld a,1
-                                                            #         ld (BossCharNum_Plus1-1),a
-                                                            #         ld a,0
-        MOV  $0xFF,@$srcShowTextUpdate                      #         ld(ShowTextUpdate_Plus1-1),a
-                                                            #         ld a,15
-                                                            #         ld (OnscreenTimer_Plus1-1),a
-       .wait_ppu
-        MOV  R5, @$PPUCommandArg;
-        MOV  $PPU_LoadText, @$PPUCommand
-        MOV  $1,@$srcCharsToPrint
-
-        CALL @$Clear4000                                    #         call Clear4000
-                                                            #
-                                                            #         ld ixh,0
-                                                            ##ifdef BuildCPC
-                                                            #         call Akuyou_RasterColors_Blackout
-                                                            ##endif
-                                                            ##if buildCPCv+buildENTv
-                                                            #         call null   :CompiledSprite_Plus2
-                                                            ##endif
-                                                            #
-                                                            # NoBackPic:
-                                                            ##if buildCPCv+buildENTv
-                                                            #         ld a,ixh
-                                                            #         cp 0
-                                                            #         call nz,RLE_Draw
-                                                            ##endif
-        JMP  @$LevelLoop                                    #         jp levelloop
+    PalettesTable:
+       .word BlackPalette           #  0
+       .word RealPalette            #  1
+       .word ChibikoAttacksPalette2 #  2
+       .word WhenYouDiePalette      #  3
+       .word IfYoureGoodPalette     #  4
+       .word IfYoureBadPalette      #  5
+       .word OtherOptionPalette     #  6
+       .word PhotoChibiko1Palette   #  7
+       .word FishingPalette         #  8
+       .word CampingPalette         #  9
+       .word PrankPalette           # 10
+       .word School1Palette         # 11
+       .word BulbsPalette           # 12
+       .word PlanePalette           # 13
+       .word School2Palette         # 14
+       .word Lightning1Palette      # 15
+       .word Lightning2Palette      # 16
+       .word School2Palette         # 17
+       .word School2Palette         # 18 
+       .word School2Palette         # 19 
+       .word School2Palette         # 20 
+       .word School2Palette         # 21 
+       .word School2Palette         # 22 
 
 ShowText0Init: #-------------------------------------------------------------{{{
+        CLR  @$PicAddr
         MOV  $0,R0
         BR   UpdateShowText
 ShowText1Init:
+        CLR  @$PicAddr
         MOV  $1,R0
         BR   UpdateShowText
 ShowText2Init:
+        CLR  @$PicAddr
         MOV  $2,R0
         BR   UpdateShowText
 ShowText3Init:
+        CLR  @$PicAddr
         MOV  $3,R0
         BR   UpdateShowText
 ShowText4Init:
+        CLR  @$PicAddr
         MOV  $4,R0
         BR   UpdateShowText
 ShowText5Init:
+        CLR  @$PicAddr
         MOV  $5,R0
         BR   UpdateShowText
 ShowText6Init:
+        CLR  @$PicAddr
         MOV  $6,R0
         BR   UpdateShowText
 ShowText7Init:
+        MOV  $slide01,@$PicAddr # chibiko
         MOV  $7,R0
         BR   UpdateShowText
 ShowText8Init:
+        MOV  $slide02,@$PicAddr # fishing
         MOV  $8,R0
         BR   UpdateShowText
 ShowText9Init:
+        MOV  $slide03,@$PicAddr # camping
         MOV  $9,R0
         BR   UpdateShowText
 ShowText10Init:
+        MOV  $slide04,@$PicAddr # prank
         MOV  $10,R0
         BR   UpdateShowText
 ShowText11Init:
+        MOV  $slide05,@$PicAddr # school1
         MOV  $11,R0
         BR   UpdateShowText
 ShowText12Init:
+        MOV  $slide06,@$PicAddr # bulbs
         MOV  $12,R0
         BR   UpdateShowText
 ShowText13Init:
+        MOV  $slide07,@$PicAddr # plane
         MOV  $13,R0
         BR   UpdateShowText
 ShowText14Init:
+        MOV  $slide08,@$PicAddr # school2
         MOV  $14,R0
         BR   UpdateShowText
 ShowText15Init:
+        MOV  $slide09,@$PicAddr # lightning1
         MOV  $15,R0
         BR   UpdateShowText
 ShowText16Init:
+        MOV  $slide10,@$PicAddr # lightning2
         MOV  $16,R0
         BR   UpdateShowText
 ShowText17Init:
+        MOV  $slide11,@$PicAddr # heaven
         MOV  $17,R0
         BR   UpdateShowText
 ShowText18Init:
+        MOV  $slide12,@$PicAddr # hell
         MOV  $18,R0
         BR   UpdateShowText
 ShowText19Init:
+        MOV  $slide13,@$PicAddr # photo1
         MOV  $19,R0
         BR   UpdateShowText
 ShowText20Init:
+        MOV  $slide14,@$PicAddr # photo2
         MOV  $20,R0
         BR   UpdateShowText
 ShowText21Init:
+        MOV  $slide15,@$PicAddr # haunting
         MOV  $21,R0
         BR   UpdateShowText
 ShowText22Init:
+        CLR  @$PicAddr
         MOV  $22,R0
 
 UpdateShowText:
@@ -342,6 +409,7 @@ ShowBossText: # ../Aku/Level252-Intro.asm:1950
         MOV  (PC)+, @(PC)+
         srcCharsToPrint: .word 1; .word PPUCommandArg;
         MOV  $PPU_ShowBossText, @$PPUCommand
+        WAIT
 RETURN
 
 # Subtitles #----------------------------------------------------------------{{{
@@ -381,13 +449,13 @@ Subtitles6: #----------------------------------------------------------------{{{
     .byte 12, 14; .ascii "go there either.."                       ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles7: #----------------------------------------------------------------{{{
-    .byte  2, 18; .ascii "Chibiko was a typical cheerful girl.."   ; .byte 0x00
+    .byte  2, 18; .ascii "Chibiko was a typical cheerful girl."    ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles8: #----------------------------------------------------------------{{{
-    .byte 10, 18; .ascii "She loved animals,!"                     ; .byte 0x00
+    .byte 10, 18; .ascii "She loved animals,"                      ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles9: #----------------------------------------------------------------{{{
-    .byte  2, 18; .ascii "And enjoyed spending time outdoors!!"    ; .byte 0x00
+    .byte  2, 18; .ascii "And enjoyed spending time outdoors!"     ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles10: #---------------------------------------------------------------{{{
     .byte  3, 18; .ascii "Sometimes she was 'a bit' naughty."      ; .byte 0x00
@@ -396,7 +464,7 @@ Subtitles11: #---------------------------------------------------------------{{{
     .byte  1, 18; .ascii " And she didn't really like to study."   ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles12: #---------------------------------------------------------------{{{
-    .byte  1, 18; .ascii "But one time she was very, very bad."    ; .byte 0x00
+    .byte  1, 18; .ascii "But one time she was very, very bad"     ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles13: #---------------------------------------------------------------{{{
     .byte  6, 18; .ascii "And took a 'prank' too far."             ; .byte 0x00
@@ -405,17 +473,17 @@ Subtitles14: #---------------------------------------------------------------{{{
     .byte  2, 18; .ascii "When someone does the unforgivable..."   ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles15: #---------------------------------------------------------------{{{
-    .byte  7, 18; .ascii "Judgement comes from above!."            ; .byte 0x00
+    .byte  7, 18; .ascii "Judgement comes from above!"             ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles16: #---------------------------------------------------------------{{{
-    .byte  2, 18; .ascii "and strikes them once and for all!."     ; .byte 0x00
+    .byte  2, 18; .ascii "and strikes them once and for all!"      ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles17: #---------------------------------------------------------------{{{
     .byte  2, 18; .ascii "Really bad people don't go to heaven."   ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles18: #---------------------------------------------------------------{{{
     .byte  1, 18; .ascii "and even hell has its limit to who"      ; .byte 0xFF
-    .byte 12, 19; .ascii "they'll take!!."                         ; .byte 0x00
+    .byte 12, 19; .ascii "they'll take!!"                          ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles19: #---------------------------------------------------------------{{{
     .byte  2, 16; .ascii "You see, when people die,if they've "    ; .byte 0xFF
@@ -438,7 +506,7 @@ Subtitles22:
 
 Decapitate:
         MOV  @$charnikohime,R0
-        MOVB $sprTwoFrame|4,3(R0) # change sprite
+        MOVB $sprTwoFrame | 4, 3(R0) # change sprite
 RETURN
 
 Decapitateend:
@@ -532,21 +600,252 @@ ChibikoAttacksPalette2: #----------------------------------------------------{{{
     .byte 201
     .even
 #----------------------------------------------------------------------------}}}
-Palette70: #-----------------------------------------------------------------{{{
+WhenYouDiePalette: #---------------------------------------------------------{{{
     .byte 0, 0    # line number, 0 - set cursor/scale/palette
     .word 0x10    #  graphical cursor, YRGB color
-    .word 0b10011 #  320 dots per line, pallete 4
+    .word 0b10001 #  320 dots per line, pallete 3
 
     .byte 1, 1
-    .byte 0x00, 0xDD, 0x77, 0xFF # 54=000, 5D=80F, 40=888, 4B=FFF
+    .byte 0x00, 0x55, 0x77, 0xFF # 000 42A 77B DDE
+
+    .byte 201
+    .even
+#----------------------------------------------------------------------------}}}
+IfYoureGoodPalette: #---------------------------------------------------------------{{{
+    .byte 0, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10    #  graphical cursor, YRGB color
+    .word 0b10010 #  320 dots per line, pallete 1
+
+    .byte 1, 1
+    .byte 0x00, 0x33, 0xBB, 0xFF # 000 17E 0DF AFF
+
+    .byte 201
+    .even
+#----------------------------------------------------------------------------}}}
+IfYoureBadPalette: #----------------------------------------------------------------{{{
+    .byte 0, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10    #  graphical cursor, YRGB color
+    .word 0b10100 #  320 dots per line, pallete 1
+
+    .byte 1, 1
+    .byte 0x00, 0x44, 0xCC, 0xFF # 000 900 F00 F88
+
+    .byte 201
+    .even
+#----------------------------------------------------------------------------}}}
+OtherOptionPalette: #--------------------------------------------------------{{{
+    .byte 0, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10    #  graphical cursor, YRGB color
+    .word 0b10011 #  320 dots per line, pallete 1
+
+    .byte 1, 1
+    .byte 0x00, 0x55, 0xDD, 0xFF # 000 505 80F B5F
+
+    .byte 201
+    .even
+#----------------------------------------------------------------------------}}}
+PhotoChibiko1Palette: #-------------------------------------------------------------{{{
+    .byte 0, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10    #  graphical cursor, YRGB color
+    .word 0b10001 #  320 dots per line, pallete 1
+
+    .byte 1, 1
+    .byte 0x00, 0xDD, 0xBB, 0xFF # 000 808 88F FDF
+
+    .byte 99, 0   # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, cursor color YRGB
+    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
+
+    .byte 100, 1
+    .byte 0x00, 0xEE, 0xBB, 0xFF
+
+    .byte 201
+    .even
+#----------------------------------------------------------------------------}}}
+FishingPalette: #------------------------------------------------------------{{{
+    .byte 0, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
+
+    .byte 1, 1
+    .byte 0x00, 0x11, 0xBB, 0xFF # 000 00F 0FF FFF
+    .byte 52, 1
+    .byte 0x00, 0x55, 0xBB, 0xFF # 000 808 0FF FFF
+    .byte 78, 1
+    .byte 0x00, 0x22, 0xBB, 0xFF # 000 808 0FF FFF
+
+    .byte 99, 0   # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, cursor color YRGB
+    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
+
+    .byte 100, 1
+    .byte 0x00, 0xEE, 0xBB, 0xFF
+
+    .byte 201
+    .even
+#----------------------------------------------------------------------------}}}
+CampingPalette: #-------------------------------------------------------------{{{
+    .byte 0, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b100  #  320 dots per line, pallete RGB components
+
+    .byte 1, 1
+    .byte 0x00, 0xCC, 0xEE, 0xFF # 000 F00 F90 FFB
+
+    .byte 99, 0   # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, cursor color YRGB
+    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
+
+    .byte 100, 1
+    .byte 0x00, 0xEE, 0xBB, 0xFF
+
+    .byte 201
+    .even
+#----------------------------------------------------------------------------}}}
+PrankPalette: #--------------------------------------------------------------{{{
+    .byte 0, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b010  #  320 dots per line, pallete RGB components
+
+    .byte 1, 1
+    .byte 0x00, 0x55, 0xBB, 0xFF
+    .byte 38, 1
+    .byte 0x00, 0xAA, 0xBB, 0xFF
+
+    .byte 70, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
+
+    .byte 73, 1
+    .byte 0x00, 0x22, 0x33, 0xFF
+
+    .byte 100, 1
+    .byte 0x00, 0xEE, 0xBB, 0xFF
+
+    .byte 201
+    .even
+#----------------------------------------------------------------------------}}}
+School1Palette: #------------------------------------------------------------{{{
+    .byte 0, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b001  #  320 dots per line, pallete RGB components
+
+    .byte 1, 1
+    .byte 0x00, 0x99, 0xDD, 0xFF
+
+    .byte 99, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
+
+    .byte 100, 1
+    .byte 0x00, 0xEE, 0xBB, 0xFF
+
+    .byte 201
+    .even
+#----------------------------------------------------------------------------}}}
+BulbsPalette: #------------------------------------------------------------{{{
+    .byte 0, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b010  #  320 dots per line, pallete RGB components
+
+    .byte 1, 1
+    .byte 0x00, 0x77, 0x22, 0xFF
+    .byte 30, 1
+    .byte 0x00, 0x55, 0xBB, 0xFF
+    .byte 70, 1
+    .byte 0x00, 0x22, 0x22, 0xFF
+
+    .byte 99, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
+
+    .byte 100, 1
+    .byte 0x00, 0xEE, 0xBB, 0xFF
+
+    .byte 201
+    .even
+#----------------------------------------------------------------------------}}}
+PlanePalette: #---  ---------------------------------------------------------{{{
+    .byte 0, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
+
+    .byte 1, 1
+    .byte 0x00, 0xCC, 0xAA, 0xFF
+
+    .byte 100, 1
+    .byte 0x00, 0xEE, 0xBB, 0xFF
+
+    .byte 201
+    .even
+#----------------------------------------------------------------------------}}}
+School2Palette: #------------------------------------------------------------{{{
+    .byte 0, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b100  #  320 dots per line, pallete RGB components
+
+    .byte 1, 1
+    .byte 0x00, 0xCC, 0xEE, 0xFF
+
+    .byte 99, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
+
+    .byte 100, 1
+    .byte 0x00, 0xEE, 0xBB, 0xFF
+
+    .byte 201
+    .even
+#----------------------------------------------------------------------------}}}
+Lightning1Palette: #---------------------------------------------------------{{{
+    .byte 0, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b010  #  320 dots per line, pallete RGB components
+
+    .byte 1, 1
+    .byte 0x00, 0x77, 0x22, 0xFF
+    .byte 30, 1
+    .byte 0x00, 0x55, 0x33, 0xFF
+    .byte 85, 1
+    .byte 0x00, 0x22, 0x22, 0xFF
+
+    .byte 99, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
+
+    .byte 100, 1
+    .byte 0x00, 0xEE, 0xBB, 0xFF
+
+    .byte 201
+    .even
+#----------------------------------------------------------------------------}}}
+Lightning2Palette: #---------------------------------------------------------{{{
+    .byte 0, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
+
+    .byte 1, 1
+    .byte 0x00, 0x77, 0xEE, 0xFF
+    .byte 85, 1
+    .byte 0x00, 0x22, 0x22, 0xFF
+
+    .byte 99, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
+
+    .byte 100, 1
+    .byte 0x00, 0xEE, 0xBB, 0xFF
 
     .byte 201
     .even
 #----------------------------------------------------------------------------}}}
 # 9 br.     # A br.     # B br.     # C br.     # D br.     # E br.     # F white
 # 1 blue    # 2 green   # 3 cyan    # 4 red     # 5 magenta # 6 yellow  # 7 gray
+#
+# 54=000, 5D=80F, 40=888, 4B=FFF
+# 54=000, 53=0FF, 5B=8FF, 4B=FFF
 
 # for some reason GAS(or LD) replaces the last byte with 0
 # so we add dummy word to avoid data/code corruption
-        .word 0xFFFF
+       .word 0xFFFF
 end:

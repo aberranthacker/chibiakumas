@@ -547,7 +547,7 @@ LoadText: #------------------------------------------------------------------{{{
 1237$:          JMP  @$CommandExecuted
 #----------------------------------------------------------------------------}}}
 ShowBossText: #--------------------------------------------------------------{{{
-                MOV  $01<<1,@$DTSCOL # foreground color
+                MOV  $10<<1,@$DTSCOL # foreground color
                 MOV  $LineWidth,R2
                 MOV  $StrBuffer,R3
                 MOV  $PBP12D,R4
@@ -555,6 +555,8 @@ ShowBossText: #--------------------------------------------------------------{{{
 
                 MOV  $PPU_PPUCommandArg, (R5) # setup address register
                 MOV  (R4),@$srcCharsToPrint
+
+                MOV  $DTSOCT,R4
 
 SBT_NextString: MOVB (R3)+,R0
                 ADD  $FbStart,R0

@@ -13,7 +13,8 @@ files = [
   'build/loading_screen.bin',
   'build/core.bin',
   'build/level-00.bin',
-  'build/ep1-intro.bin'
+  'build/ep1-intro.bin',
+  'build/ep1-intro-slides.bin'
 ]
 
 dsk = []
