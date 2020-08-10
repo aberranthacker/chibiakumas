@@ -38,71 +38,71 @@
 #   3. This notice may not be removed or altered from any source distribution.
 
 unlzsa1:
-		MOV  $0xFF00,R4
-		CLR  R3
+                MOV  $0xFF00,R4
+                CLR  R3
 unlzsa1_ReadToken:
-		MOVB (R1)+,R0
-		MOV  R0,R5
-		BIC  $0xFF8F,R0
-		BEQ  unlzsa1_NoLiterals
-		ASR  R0
-		ASR  R0
-		ASR  R0
-		ASR  R0
-		CMP  R0,$7
-		BNE  unlzsa1_m1
-		JSR  PC,unlzsa1_ReadLong
+                MOVB (R1)+,R0
+                MOV  R0,R5
+                BIC  $0xFF8F,R0
+                BEQ  unlzsa1_NoLiterals
+                ASR  R0
+                ASR  R0
+                ASR  R0
+                ASR  R0
+                CMP  R0,$7
+                BNE  unlzsa1_m1
+                JSR  PC,unlzsa1_ReadLong
 unlzsa1_m1:
-		BISB R0,R3
+                BISB R0,R3
 unlzsa1_bc1:
-		MOVB (R1)+,(R2)+
-		SOB  R3,unlzsa1_bc1
+                MOVB (R1)+,(R2)+
+                SOB  R3,unlzsa1_bc1
 unlzsa1_NoLiterals:
-		MOVB R5,R0
-		MOV  R4,R5
-		BISB (R1)+,R5
-		TST  R0
-		BPL  unlzsa1_ShortOffset
+                MOVB R5,R0
+                MOV  R4,R5
+                BISB (R1)+,R5
+                TST  R0
+                BPL  unlzsa1_ShortOffset
 #LongOffset:
-		BIC  R4,R5
-		SWAB R5
-		BISB (R1)+,R5
-		SWAB R5
+                BIC  R4,R5
+                SWAB R5
+                BISB (R1)+,R5
+                SWAB R5
 unlzsa1_ShortOffset:
-		BIC  $0xFFF0,R0
-		ADD  $3,R0
-		CMP  R0,$18
-		BNE  unlzsa1_m2
-		JSR  PC,unlzsa1_ReadLong
+                BIC  $0xFFF0,R0
+                ADD  $3,R0
+                CMP  R0,$18
+                BNE  unlzsa1_m2
+                JSR  PC,unlzsa1_ReadLong
 unlzsa1_m2:
-		BISB R0,R3
-		ADD  R2,R5
+                BISB R0,R3
+                ADD  R2,R5
 unlzsa1_bc2:
-		MOVB (R5)+,(R2)+
-		SOB  R3,unlzsa1_bc2
-		BR   unlzsa1_ReadToken
+                MOVB (R5)+,(R2)+
+                SOB  R3,unlzsa1_bc2
+                BR   unlzsa1_ReadToken
 unlzsa1_ReadLong:
-		MOVB (R1)+,R3
-		BIS  R4,R3
-		ADD  R3,R0
-		BCC  unlzsa1_m3
+                MOVB (R1)+,R3
+                BIS  R4,R3
+                ADD  R3,R0
+                BCC  unlzsa1_m3
 
-		MOV  R0,R3
-		CLR  R0
-		BISB (R1)+,R0
-		SWAB R3
-		BIC  $0xFF,R3
-		BNZ  1237$
+                MOV  R0,R3
+                CLR  R0
+                BISB (R1)+,R0
+                SWAB R3
+                BIC  $0xFF,R3
+                BNZ  1237$
 
-		MOVB (R1)+,R3
-		BIC  R4,R3
-		SWAB R3
-		BISB R0,R3
-		BNZ  1237$
+                MOVB (R1)+,R3
+                BIC  R4,R3
+                SWAB R3
+                BISB R0,R3
+                BNZ  1237$
 
-		MOV  (SP)+,R4
+                MOV  (SP)+,R4
 unlzsa1_m3:
-		CLR  R3
+                CLR  R3
 1237$:
-		RTS  PC
+                RTS  PC
 
