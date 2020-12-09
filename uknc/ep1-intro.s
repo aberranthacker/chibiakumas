@@ -15,6 +15,8 @@
 start:
         JMP  @$LevelInit
        .incbin "resources/ep1-intro.spr"
+IntroMusic:
+       .incbin "build/ep1_intro_music.bin"
 
 slide01: .incbin "build/ep1-intro/ep1-intro-slide01.raw.lzsa1"
 slide02: .incbin "build/ep1-intro/ep1-intro-slide02.raw.lzsa1"
@@ -189,11 +191,11 @@ LevelInit:
        .ppudo_ensure $PPU_SetPalette, $BlackPalette
         # TODO: Load artifact of Level252-Intro_Screens1.asm
         # TODO: call Akuyou_Music_Restart when implemented
+       .ppudo_ensure $PPU_LoadMusic,$IntroMusic
+       .ppudo_ensure $PPU_MusicRestart
         MOV  $EventStreamArray,R5
        #MOV  $Event_SavedSettings,R3
         CALL @$Event_StreamInit
-      #.ppudo_ensure $PPU_LoadMusic, $MusicStart
-      #.ppudo_ensure $PPU_MusicRestart
         CALL @$ScreenBuffer_Reset
 
         MTPS $PR0 # enable interrupts

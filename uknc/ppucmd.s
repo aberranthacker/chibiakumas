@@ -1,10 +1,11 @@
 
 PPEXEC:         #------------------------------------------------------------{{{
-        MOV  2(R5),@$PS.A2      # Arg 2 - memory size, words
+       #MOV  2(R5),@$PS.A2      # Arg 2 - memory size, words
+        MOV  $PPU_UserRamSizeWords,@$PS.A2      # Arg 2 - memory size, words
         MOVB $01,  @$PS.Request # 01 - allocate memory
         CALL PPUOut             # => Send request to PPU
         BNE  MAError            # If error, --> Memory allocation error
-        # CALL Info               #
+       #CALL Info               #
         CMP  @$PS.A1, $PPU_UserRamStart # check if allocated area begins where we wanted
         BNE  MAError
                                 # PS.A1 contains address of allocated area
@@ -13,7 +14,7 @@ PPEXEC:         #------------------------------------------------------------{{{
         MOVB $020, @$PS.Request # 020 - CPU to PPU memory copy
         CALL PPUOut             # => Send request to PPU
         BNE  MCpError           # If error, --> Memory copy error
-        # CALL Info             #
+       #CALL Info               #
                                 #
         MOVB $030,@$PS.Request  # 030 - Execute programm
         CALL PPUOut             # => Send request to PPU

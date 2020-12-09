@@ -4,7 +4,8 @@
 .equiv MainMenu, 0x8000
 .equiv Episode1_Intro, 0x0000
 
-.equiv StartOnLevel, Episode1_Intro
+.equiv StartOnLevel, MainMenu
+#.equiv StartOnLevel, Episode1_Intro
 
 .if StartOnLevel == MainMenu
   .equiv ShowLoadingScreen, 1
@@ -15,6 +16,7 @@
 .equiv PPU_UserRamSizeWords, PPU_UserRamSize >> 1 # 0x2C22 026042 11298
 .equiv PPU_PPUCommand,    PPUCommand >> 1
 .equiv PPU_PPUCommandArg, PPUCommandArg >> 1
+.equiv PPU_MusicBuffer, 0x3934 # 14644 034464 # auto-generated during a build
 
 .equiv FB0, 384 # 0600 0x0180
 .equiv FB_gap, FB0 + 16000
@@ -34,6 +36,7 @@
 .equiv PPU_ShowBossText,  12 * 2
 .equiv PPU_LoadMusic,     13 * 2
 .equiv PPU_MusicRestart,  14 * 2
+.equiv PPU_MusicStop,     15 * 2
 
 .equiv BootstrapStart,  512
 .equiv Akuyou_GameVarsStart, FB1 + 16000
@@ -43,7 +46,7 @@
 .equiv PlayerStarArraySize, 128
 .equiv GameVarsArraysSize, StarArraySize * 4 + ObjectArraySize * 8 + PlayerStarArraySize * 4 + 15*8
 
-.equiv Akuyou_LevelStart, 0x96E8 # 38632 0113350 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x96F4 # 38644 0113364 # auto-generated during a build
 .equiv LevelSprites, Akuyou_LevelStart + 4
 
 .equiv SPReset,       0157770 # Initial stack pointer

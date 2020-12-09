@@ -16,6 +16,7 @@ start:
         JMP  @$LevelInit
 
 TITLETEX: .incbin "resources/titletex.spr"
+TitleMusic: .incbin "build/ep1_title_music.bin"
 
 CustomRam: .space 64 # Pos-Tick-Pos-Tick # enough memory for 16 enemies!
 
@@ -155,7 +156,8 @@ LevelInit:
        #MOV  $EventStreamArray_Ep1,R5 # Event Stream
        #MOV  $Event_SavedSettings,R3  # Saved Settings
        #CALL @$ResetEventStream
-
+       .ppudo_ensure $PPU_LoadMusic,$TitleMusic
+       .ppudo_ensure $PPU_MusicRestart
        .ppudo_ensure $PPU_PrintAt,$PressFireKeyStr # Aku/Level00-Menu.asm:1101
         # Aku/Level00-Menu.asm:1103
        #CALL @$Timer_UpdateTimer

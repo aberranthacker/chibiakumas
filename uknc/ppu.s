@@ -1,7 +1,9 @@
                .nolist
 
-               .TITLE Chibi Akumas PPU module
-               .GLOBAL start # make the entry point available to a linker
+               .title Chibi Akumas PPU module
+               .global start # make the entry point available to a linker
+
+               .global MusicBuffer
 
                .include "./macros.s"
                .include "./hwdefs.s"
@@ -261,7 +263,7 @@ PGM: #--------------------------------------------------------------------------
 ShortLoop:      MOV  $PPU_PPUCommand, @$PBPADR
                 MOV  @$PBP12D,R0
             .ifdef DebugMode
-                CMP  R0,$28
+                CMP  R0,$30
                 BHI  .
             .endif
                 JMP  @JMPTable(R0)
@@ -280,6 +282,7 @@ JMPTable:      .word EventLoop            # do nothing
                .word ShowBossText         # PPU_ShowBossText
                .word LoadMusic            # PPU_LoadMusic
                .word MusicRestart         # PPU_MusicRestart
+               .word MusicStop            # PPU_MusicStop
 #-------------------------------------------------------------------------------
 CommandExecuted: #-----------------------------------------------------------{{{
                 MOV  $PPU_PPUCommand, @$PBPADR
@@ -587,7 +590,7 @@ SBT_NextChar:   DEC  (PC)+; srcCharsToPrint: .word 0xFF
 
 1237$:          JMP  @$CommandExecuted
 #----------------------------------------------------------------------------}}}
-LoadMusic: #------------------------------------------------------------------{{{
+LoadMusic: #-----------------------------------------------------------------{{{
                 MOV  $MusicBuffer,R3
                 MOV  $PBP12D,R4
                 MOV  $PBPADR,R5
@@ -598,21 +601,57 @@ LoadMusic: #------------------------------------------------------------------{{
                 ROR  R0
                 MOV  R0,(R5)
 
-                MOV  $512>>1,R0
-               .rept 1<<1
+                MOV  $1536>>2,R0
+        10$:
                 MOV  (R4),(R3)+
-                INC  R5
-               .endr
+                INC  (R5)
+                MOV  (R4),(R3)+
+                INC  (R5)
+                
+                SOB  R0, 10$
 
                 JMP  @$CommandExecuted
 #----------------------------------------------------------------------------}}}
 MusicRestart: #--------------------------------------------------------------{{{
-        #CALL PLY_AKG_Init
+        # don't call PLY_AKG_Play on VblankInt
+        MOV  $0000401,@$MusicPlayerCall # BR .+4
+        CALL PLY_AKG_Stop
 
-         JMP  @$CommandExecuted
+        CLR  R0 # Subsong0
+        MOV  $MusicBuffer, R5
+        CALL PLY_AKG_Init
+        # call PLY_Play on VblankInt
+        MOV  $0004737,@$MusicPlayerCall # CALL @(PC)+
+
+        JMP  @$CommandExecuted
+#----------------------------------------------------------------------------}}}
+MusicStop: #-----------------------------------------------------------------{{{
+        # don't call PLY_Play on VblankInt
+        MOV  $0000401,@$MusicPlayerCall # BR .+4
+        CALL PLY_AKG_Stop
+
+        JMP  @$CommandExecuted
 #----------------------------------------------------------------------------}}}
 
 VblankIntHandler: #----------------------------------------------------------{{{
+        MOV  R5,-(SP)
+        MOV  R4,-(SP)
+        MOV  R3,-(SP)
+        MOV  R2,-(SP)
+        MOV  R1,-(SP)
+        MOV  R0,-(SP)
+
+MusicPlayerCall:
+        BR   .+4 # or CALL @(PC)+ when music is playing
+       .word PLY_AKG_Play
+
+        MOV  (SP)+,R0
+        MOV  (SP)+,R1
+        MOV  (SP)+,R2
+        MOV  (SP)+,R3
+        MOV  (SP)+,R4
+        MOV  (SP)+,R5
+
         # we do not need firmware interrupt handler except for this small
         # procedure
         TST  @$07130 # is floppy drive spindle rotating?
@@ -620,20 +659,6 @@ VblankIntHandler: #----------------------------------------------------------{{{
         DEC  @$07130 # decrease spindle rotation counter
         BNZ  1237$   # continue rotation unless the counter reaches zero
         CALL @07132  # stop floppy drive spindle
-
-       #MOV  R0,-(SP)
-       #MOV  R1,-(SP)
-       #MOV  R2,-(SP)
-       #MOV  R3,-(SP)
-       #MOV  R4,-(SP)
-       #MOV  R5,-(SP)
-       #CALL @$PLY_Play
-       #MOV  (SP)+,R0
-       #MOV  (SP)+,R1
-       #MOV  (SP)+,R2
-       #MOV  (SP)+,R3
-       #MOV  (SP)+,R4
-       #MOV  (SP)+,R5
 1237$:
         RTI
 #----------------------------------------------------------------------------}}}
@@ -815,7 +840,10 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         RTI
 #----------------------------------------------------------------------------}}}
 
-       #.include "../../akg_player/akg_player.s"
+       .include "./music/ep1_title_music_playerconfig.s"
+       .include "./music/ep1_intro_music_playerconfig.s"
+       #SkipPSGSend = 1
+       .include "../../akg_player/akg_player.s"
 
 FontBitmap: .space 8 # whitespace symbol
             .incbin "resources/font.raw"

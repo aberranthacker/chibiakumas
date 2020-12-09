@@ -2,6 +2,7 @@
 ExecuteBootstrap:
        #PUSH R5
 
+       .ppudo_ensure $PPU_MusicStop
         CALL ScreenBuffer_Reset
 
         MOV  $BootstrapSizeDWords,R0

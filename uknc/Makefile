@@ -104,16 +104,28 @@ build/ppu.o : $(common) \
               resources/font.raw \
               resources/cga8x8b.raw
 	$(AS) ppu.s -al -o build/ppu.o
+	build_tools/music_buffer_update.rb
 
 build/level-00_menu.o : $(common) \
                         level-00_menu.s \
                         resources/titletex.spr \
-                        resources/menu_cursor.spr
+                        resources/menu_cursor.spr \
+                        build/ep1_title_music.bin
 	$(AS) -al level-00_menu.s -o build/level-00_menu.o
+
+build/ep1_title_music.bin: build/ep1_title_music.o
+	$(LD) build/ep1_title_music.o -o build/ep1_title_music.out -s
+	ruby build_tools/aout2sav.rb build/ep1_title_music.out -b -s -o build/ep1_title_music.bin
+
+build/ep1_title_music.o : $(common) \
+	                  build/ppu.o \
+	                  build/ep1_title_music.formatted.s
+	$(AS) build/ep1_title_music.formatted.s -o build/ep1_title_music.o
 
 build/ep1-intro.o : $(common) \
                     ep1-intro.s \
                     resources/ep1-intro.spr \
+                    build/ep1_intro_music.bin \
                     build/ep1-intro/ep1-intro-slide01.raw.lzsa1 \
                     build/ep1-intro/ep1-intro-slide02.raw.lzsa1 \
                     build/ep1-intro/ep1-intro-slide03.raw.lzsa1 \
@@ -123,6 +135,15 @@ build/ep1-intro.o : $(common) \
                     build/ep1-intro/ep1-intro-slide07.raw.lzsa1 \
                     build/ep1-intro/ep1-intro-slide08.raw.lzsa1
 	$(AS) -al ep1-intro.s -o build/ep1-intro.o
+
+build/ep1_intro_music.bin: build/ep1_intro_music.o
+	$(LD) build/ep1_intro_music.o -o build/ep1_intro_music.out -s
+	ruby build_tools/aout2sav.rb build/ep1_intro_music.out -b -s -o build/ep1_intro_music.bin
+
+build/ep1_intro_music.o : $(common) \
+	                  build/ppu.o \
+	                  build/ep1_intro_music.formatted.s
+	$(AS) build/ep1_intro_music.formatted.s -o build/ep1_intro_music.o
 
 build/ep1-intro-slides.o : ep1-intro-slides.s \
                            build/ep1-intro/ep1-intro-slide09.raw.lzsa1 \
@@ -153,6 +174,14 @@ resources/titletex.spr : build_tools/spr_cpc_to_uknc.rb \
 resources/menu_cursor.spr : build_tools/bmp_to_uknc_raw.rb \
                             resources/menu_cursor-Sheet.bmp
 	build_tools/bmp_to_uknc_raw.rb
+
+build/ep1_title_music.formatted.s : build_tools/format_song.rb \
+      	                            music/ep1_title_music.s
+	build_tools/format_song.rb music/ep1_title_music.s build/ep1_title_music.formatted.s
+
+build/ep1_intro_music.formatted.s : build_tools/format_song.rb \
+	                      music/ep1_intro_music.s
+	build_tools/format_song.rb music/ep1_intro_music.s build/ep1_intro_music.formatted.s
 
 resources/ep1-intro.spr : build_tools/spr_cpc_to_uknc.rb \
 	                  ../ResCPC/LEVEL252A.SPR
@@ -190,5 +219,5 @@ build/ep1-intro/ep1-intro-slide15.raw.lzsa1: resources/ep1-intro-slides-2.raw
 	ruby build_tools/build_intro_slides.rb
 
 clean :
-	rm -f build/*
+	rm -rf build/*
 

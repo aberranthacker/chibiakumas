@@ -8,8 +8,10 @@ compatible microcomputer [Elektronika MS 0511](https://en.wikipedia.org/wiki/UKN
   * ~~Main menu~~
   * ~~Connect the AY chip to UKNC~~
   * Intro
-  * [Port](https://github.com/aberranthacker/akg_player) the [AKG (generic) player](http://www.julien-nevo.com/arkostracker/index.php/the-akg-generic-player/)
-  * ~~Connect the AY to UKNC [right way](https://github.com/aberranthacker/aberrant_sound_module)~~
+  * ~~[Port](https://github.com/aberranthacker/akg_player) the [AKG (generic)
+  player](http://www.julien-nevo.com/arkostracker/index.php/the-akg-generic-player/)~~
+  * ~~Connect the AY to UKNC
+  [right way](https://github.com/aberranthacker/aberrant_sound_module)~~
 
 ## How to build the project
 Since default assembler for PDP-11 [MACRO-11](https://en.wikipedia.org/wiki/MACRO-11)
