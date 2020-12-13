@@ -160,14 +160,14 @@ StartIntroProper:
     .word 256+ 65+15, evtCallAddress, ShowText12Init # bulbs
     .word 256+ 95+15, evtCallAddress, ShowText13Init # plane
     .word 256+125+15, evtCallAddress, ShowText14Init # school2
-StartPoint:
+#StartPoint:
     .word 256+155+15, evtCallAddress, ShowText15Init # lightning1
     .word 256+185+15, evtCallAddress, ShowText16Init # lightning2
-    .word 256+215+15, evtCallAddress, ShowText17Init
-    .word 256+245+15, evtCallAddress, ShowText18Init
-    .word 512+ 20+15, evtCallAddress, ShowText19Init
-    .word 512+ 50+15, evtCallAddress, ShowText20Init
-    .word 512+ 90+15, evtCallAddress, ShowText21Init
+    .word 256+215+15, evtCallAddress, ShowText17Init # heaven
+    .word 256+245+15, evtCallAddress, ShowText18Init # hell
+    .word 512+ 20+15, evtCallAddress, ShowText19Init # chibiko
+    .word 512+ 50+15, evtCallAddress, ShowText20Init # chibiko nosferatu
+    .word 512+ 90+15, evtCallAddress, ShowText21Init # haunting
 
     .word 768+64, evtCallAddress, EndLevel
 
@@ -300,12 +300,12 @@ LevelLoop:
        .word School2Palette         # 14
        .word Lightning1Palette      # 15
        .word Lightning2Palette      # 16
-       .word School2Palette         # 17
-       .word School2Palette         # 18 
-       .word School2Palette         # 19 
-       .word School2Palette         # 20 
-       .word School2Palette         # 21 
-       .word School2Palette         # 22 
+       .word HeavenPalette          # 17
+       .word HellPalette            # 18
+       .word PhotoChibiko2Palette   # 19
+       .word PhotoChibiko3Palette   # 20
+       .word HauntingPalette        # 21
+       .word BlackPalette           # 22
 
 ShowText0Init: #-------------------------------------------------------------{{{
         CLR  @$PicAddr
@@ -433,7 +433,7 @@ Subtitles2: #----------------------------------------------------------------{{{
     .even #------------------------------------------------------------------}}}
 Subtitles3: #----------------------------------------------------------------{{{
     .byte  7, 12; .ascii "Do you know what happens"                ; .byte 0xFF
-    .byte  7, 13; .ascii "       when you die??"                   ; .byte 0x00
+    .byte  7, 13; .ascii "       when you die?"                    ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles4: #----------------------------------------------------------------{{{
     .byte  8, 12; .ascii "They say 'if you're good"                ; .byte 0xFF
@@ -443,7 +443,7 @@ Subtitles4: #----------------------------------------------------------------{{{
 Subtitles5: #----------------------------------------------------------------{{{
     .byte  4, 12; .ascii "But 'If you're bad, you'll go to"        ; .byte 0xFF
     .byte  4, 13; .ascii "the OTHER PLACE Where you'll be"         ; .byte 0xFF
-    .byte  1, 14; .ascii "punished for the bad things you did!!'"  ; .byte 0x00
+    .byte  1, 14; .ascii "punished for the bad things you did!'"   ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles6: #----------------------------------------------------------------{{{
     .byte  3, 12; .ascii "But what no-one tells you is that"       ; .byte 0xFF
@@ -502,7 +502,7 @@ Subtitles21: #---------------------------------------------------------------{{{
 Subtitles22:
     .byte  2, 16; .ascii "They live out eternity as Nosferatu,"    ; .byte 0xFF
     .byte  1, 17; .ascii "Vampires, cursed to live by feeding on"  ; .byte 0xFF
-    .byte  2, 18; .ascii "their former friends and companions!!"   ; .byte 0x00
+    .byte  2, 18; .ascii "their former friends and companions!"    ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 #----------------------------------------------------------------------------}}}
 
@@ -545,6 +545,7 @@ Clear4000: #-----------------------------------------------------------------{{{
 
         RETURN
 #-----------------------------------------------------------------------------}}}
+
 BlackPalette: #---------------------------------------------------------------{{{
     .byte 1, 1    # line number,  set colors
     .byte 0x00, 0x00, 0x00, 0x00
@@ -577,27 +578,27 @@ RealPalette: #---------------------------------------------------------------{{{
     .word 0b10100 #  320 dots per line, pallete 4
 
     .byte 1, 1    # line number, set colors
-    .byte 0x00, 0xEE, 0xDD, 0xFF # 54=000, 4D=F0F, 4F=F8F, 4B=FFF
+    .byte 0x00, 0xEE, 0xDD, 0xFF
 
     .byte 0121,1  #--line number, set colors
-    .byte 0x00, 0xDD, 0xAA, 0xFF # 54=000, 47=F88, 52=0F0, 4B=FFF
+    .byte 0x00, 0xDD, 0xAA, 0xFF
 
     .byte 201     #--line number, 201 - end of the main screen params
     .even
 #----------------------------------------------------------------------------}}}
 ChibikoAttacksPalette: #-----------------------------------------------------{{{
     .byte 1, 1
-    .byte 0x00, 0x55, 0x99, 0xFF # 0x0000, 0x0808, 0x088F, 0x0FFF RGB
+    .byte 0x00, 0x55, 0x99, 0xFF
 
     .byte 88,-1   #line number, leave palette unchanged starting the line
     .even
 #----------------------------------------------------------------------------}}}
 ChibikoAttacksPalette2: #----------------------------------------------------{{{
     .byte 88, 1
-    .byte 0x00, 0xCC, 0xAA, 0x77 # 000, C03, 2D7, 888 RGB
+    .byte 0x00, 0xCC, 0xAA, 0x77
 
     .byte 180, 1
-    .byte 0x00, 0x44, 0xCC, 0x77 # 000, 090, 0F0, 8F8 GRB
+    .byte 0x00, 0x44, 0xCC, 0x77
 
     .byte 201
     .even
@@ -608,29 +609,29 @@ WhenYouDiePalette: #---------------------------------------------------------{{{
     .word 0b10001 #  320 dots per line, pallete 3
 
     .byte 1, 1
-    .byte 0x00, 0x55, 0x77, 0xFF # 000 42A 77B DDE
+    .byte 0x00, 0x55, 0x77, 0xFF
 
     .byte 201
     .even
 #----------------------------------------------------------------------------}}}
-IfYoureGoodPalette: #---------------------------------------------------------------{{{
+IfYoureGoodPalette: #--------------------------------------------------------{{{
     .byte 0, 0    # line number, 0 - set cursor/scale/palette
     .word 0x10    #  graphical cursor, YRGB color
     .word 0b10010 #  320 dots per line, pallete 1
 
     .byte 1, 1
-    .byte 0x00, 0x33, 0xBB, 0xFF # 000 17E 0DF AFF
+    .byte 0x00, 0x33, 0xBB, 0xFF
 
     .byte 201
     .even
 #----------------------------------------------------------------------------}}}
-IfYoureBadPalette: #----------------------------------------------------------------{{{
+IfYoureBadPalette: #---------------------------------------------------------{{{
     .byte 0, 0    # line number, 0 - set cursor/scale/palette
     .word 0x10    #  graphical cursor, YRGB color
     .word 0b10100 #  320 dots per line, pallete 1
 
     .byte 1, 1
-    .byte 0x00, 0x44, 0xCC, 0xFF # 000 900 F00 F88
+    .byte 0x00, 0x44, 0xCC, 0xFF
 
     .byte 201
     .even
@@ -641,18 +642,18 @@ OtherOptionPalette: #--------------------------------------------------------{{{
     .word 0b10011 #  320 dots per line, pallete 1
 
     .byte 1, 1
-    .byte 0x00, 0x55, 0xDD, 0xFF # 000 505 80F B5F
+    .byte 0x00, 0x55, 0xDD, 0xFF
 
     .byte 201
     .even
 #----------------------------------------------------------------------------}}}
-PhotoChibiko1Palette: #-------------------------------------------------------------{{{
+PhotoChibiko1Palette: #------------------------------------------------------{{{
     .byte 0, 0    # line number, 0 - set cursor/scale/palette
     .word 0x10    #  graphical cursor, YRGB color
-    .word 0b10001 #  320 dots per line, pallete 1
+    .word 0x10 | 0b101  #  320 dots per line, pallete RGB components
 
     .byte 1, 1
-    .byte 0x00, 0xDD, 0xBB, 0xFF # 000 808 88F FDF
+    .byte 0x00, 0x55, 0xBB, 0xFF
 
     .byte 99, 0   # line number, 0 - set cursor/scale/palette
     .word 0x10 | 0b0000 #  graphical cursor, cursor color YRGB
@@ -670,11 +671,11 @@ FishingPalette: #------------------------------------------------------------{{{
     .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
 
     .byte 1, 1
-    .byte 0x00, 0x11, 0xBB, 0xFF # 000 00F 0FF FFF
+    .byte 0x00, 0x11, 0xBB, 0xFF
     .byte 52, 1
-    .byte 0x00, 0x55, 0xBB, 0xFF # 000 808 0FF FFF
+    .byte 0x00, 0x55, 0xBB, 0xFF
     .byte 78, 1
-    .byte 0x00, 0x22, 0xBB, 0xFF # 000 808 0FF FFF
+    .byte 0x00, 0x22, 0xBB, 0xFF
 
     .byte 99, 0   # line number, 0 - set cursor/scale/palette
     .word 0x10 | 0b0000 #  graphical cursor, cursor color YRGB
@@ -686,7 +687,7 @@ FishingPalette: #------------------------------------------------------------{{{
     .byte 201
     .even
 #----------------------------------------------------------------------------}}}
-CampingPalette: #-------------------------------------------------------------{{{
+CampingPalette: #------------------------------------------------------------{{{
     .byte 0, 0    # line number, 0 - set cursor/scale/palette
     .word 0x10 | 0b0000 #  graphical cursor, YRGB color
     .word 0x10 | 0b100  #  320 dots per line, pallete RGB components
@@ -707,7 +708,7 @@ CampingPalette: #-------------------------------------------------------------{{
 PrankPalette: #--------------------------------------------------------------{{{
     .byte 0, 0    # line number, 0 - set cursor/scale/palette
     .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b010  #  320 dots per line, pallete RGB components
+    .word 0x10 | 0b101  #  320 dots per line, pallete RGB components
 
     .byte 1, 1
     .byte 0x00, 0x55, 0xBB, 0xFF
@@ -745,10 +746,10 @@ School1Palette: #------------------------------------------------------------{{{
     .byte 201
     .even
 #----------------------------------------------------------------------------}}}
-BulbsPalette: #------------------------------------------------------------{{{
+BulbsPalette: #--------------------------------------------------------------{{{
     .byte 0, 0    # line number, 0 - set cursor/scale/palette
     .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b010  #  320 dots per line, pallete RGB components
+    .word 0x10 | 0b101  #  320 dots per line, pallete RGB components
 
     .byte 1, 1
     .byte 0x00, 0x77, 0x22, 0xFF
@@ -767,7 +768,7 @@ BulbsPalette: #------------------------------------------------------------{{{
     .byte 201
     .even
 #----------------------------------------------------------------------------}}}
-PlanePalette: #---  ---------------------------------------------------------{{{
+PlanePalette: #--------------------------------------------------------------{{{
     .byte 0, 0    # line number, 0 - set cursor/scale/palette
     .word 0x10 | 0b0000 #  graphical cursor, YRGB color
     .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
@@ -802,7 +803,7 @@ School2Palette: #------------------------------------------------------------{{{
 Lightning1Palette: #---------------------------------------------------------{{{
     .byte 0, 0    # line number, 0 - set cursor/scale/palette
     .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b010  #  320 dots per line, pallete RGB components
+    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
 
     .byte 1, 1
     .byte 0x00, 0x77, 0x22, 0xFF
@@ -837,6 +838,102 @@ Lightning2Palette: #---------------------------------------------------------{{{
 
     .byte 100, 1
     .byte 0x00, 0xEE, 0xBB, 0xFF
+
+    .byte 201
+    .even
+#----------------------------------------------------------------------------}}}
+HeavenPalette: #-------------------------------------------------------------{{{
+    .byte 0, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
+
+    .byte 1, 1
+    .byte 0x00, 0x55, 0xBB, 0xFF
+
+    .byte 99, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
+
+    .byte 100, 1
+    .byte 0x00, 0x55, 0xBB, 0xFF
+
+    .byte 201
+    .even
+#----------------------------------------------------------------------------}}}
+HellPalette: #---------------------------------------------------------------{{{
+    .byte 0, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b101  #  320 dots per line, pallete RGB components
+
+    .byte 1, 1
+    .byte 0x00, 0x55, 0xCC, 0xEE
+
+    .byte 99, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
+
+    .byte 100, 1
+    .byte 0x00, 0x55, 0xDD, 0xFF
+
+    .byte 201
+    .even
+#----------------------------------------------------------------------------}}}
+PhotoChibiko2Palette: #------------------------------------------------------{{{
+    .byte 0, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b101  #  320 dots per line, pallete RGB components
+
+    .byte 1, 1
+    .byte 0x00, 0x55, 0xBB, 0xFF
+
+    .byte 99, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
+
+    .byte 100, 1
+    .byte 0x00, 0x55, 0xDD, 0xFF
+
+    .byte 201
+    .even
+#----------------------------------------------------------------------------}}}
+PhotoChibiko3Palette: #------------------------------------------------------{{{
+    .byte 0, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
+
+    .byte 1, 1
+    .byte 0x00, 0x55, 0xBB, 0xFF
+    .byte 40, 1
+    .byte 0x00, 0x55, 0xCC, 0xFF
+    .byte 57, 1
+    .byte 0x00, 0x55, 0xBB, 0xFF
+
+    .byte 99, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
+
+    .byte 100, 1
+    .byte 0x00, 0x55, 0xDD, 0xFF
+
+    .byte 201
+    .even
+#----------------------------------------------------------------------------}}}
+HauntingPalette: #-----------------------------------------------------------{{{
+    .byte 0, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b101  #  320 dots per line, pallete RGB components
+
+    .byte 1, 1
+    .byte 0x00, 0x55, 0xBB, 0xFF
+    .byte 47, 1
+    .byte 0x00, 0xCC, 0xBB, 0xFF
+
+    .byte 99, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
+    .word 0x10 | 0b011  #  320 dots per line, pallete RGB components
+
+    .byte 100, 1
+    .byte 0x00, 0x55, 0xDD, 0xFF
 
     .byte 201
     .even
