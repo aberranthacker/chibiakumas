@@ -139,6 +139,7 @@ Bootstrap_Level_Intro:
         # call Akuyou_ShowCompiledSprite
         CALL LevelReset0000
 
+       .ppudo_ensure $PPU_SetPalette, $BlackPalette
         # TODO: load music Aku/BootStrap.asm:1185
         MOV  $ep1_intro.bin,R0
         CALL Bootstrap_LoadDiskFile

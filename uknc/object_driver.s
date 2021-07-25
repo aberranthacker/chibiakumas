@@ -322,16 +322,16 @@ ObjectLoopBothPlayerSkip:                                   # ObjectLoopBothPlay
                                                             #
 ObjectLoopP1StarSkip:                                       # ObjectLoopP1StarSkip:
         BR   ObjectLoop_NotShot$                            #         jr $+10 :ObjectLoop_IFShot_Plus1 ; 18 08 = JR 8
-        CALL @$Object_DecreaseLifeShot; ObjectShotOverride_Plus2: #   call Object_DecreaseLifeShot :ObjectShotOverride_Plus2 ;3 bytes
-       .equiv  dstObjectShotOverride, ObjectShotOverride_Plus2 - 2
+        CALL @$Object_DecreaseLifeShot                      #   call Object_DecreaseLifeShot :ObjectShotOverride_Plus2 ;3 bytes
+       .equiv  dstObjectShotOverride, . - 2
        .global dstObjectShotOverride
                                                             #         ld a,8                             ;2 bytes
         MOV  $0405,@$ObjectLoopP1StarSkip                   #         ld (ObjectLoop_IFShot_Plus1 -1 ),a ;3 bytes
                                                             #
 ObjectLoop_NotShot$:                                        # ObjectLoop_NotShot:
         SWAB R2                                             #         ld d,ixh
-        CALL @$DoMoves; ObjectDoMovesOverride_Plus2:        #         call DoMoves :ObjectDoMovesOverride_Plus2
-       .equiv  dstObjectDoMovesOverride, ObjectDoMovesOverride_Plus2 - 2
+        CALL @$DoMoves                                      #         call DoMoves :ObjectDoMovesOverride_Plus2
+       .equiv  dstObjectDoMovesOverride, . - 2
        .global dstObjectDoMovesOverride
 
                                                             #         ld ixh,d
@@ -703,28 +703,28 @@ ObjectProgram:                                              # ObjectProgram:
                                                             #     ret
                                                             #
 ObjectProgram_SnailFire:                                    # ObjectProgram_SnailFire:
-        MOV  $0b00010000,R0; FireFrequencyA_Plus2:          #     ld a,%00010000  :FireFrequencyA_Plus1
-       .equiv  srcFireFrequencyA, FireFrequencyA_Plus2 - 2
+        MOV  $0b00010000,R0                                 #     ld a,%00010000  :FireFrequencyA_Plus1
+       .equiv  srcFireFrequencyA, . - 2
        .global srcFireFrequencyA
         BR   ObjectProgram_Fire                             #     jr ObjectProgram_Fire
 ObjectProgram_SlowFire:                                     # ObjectProgram_SlowFire:
-        MOV  $0b00001000,R0; FireFrequencyB_Plus2:          #     ld a,%00001000  :FireFrequencyB_Plus1
-       .equiv  srcFireFrequencyB, FireFrequencyB_Plus2 - 2
+        MOV  $0b00001000,R0                                 #     ld a,%00001000  :FireFrequencyB_Plus1
+       .equiv  srcFireFrequencyB, . - 2
        .global srcFireFrequencyB
         BR   ObjectProgram_Fire                             #     jr ObjectProgram_Fire
 ObjectProgram_MidFire:                                      # ObjectProgram_MidFire:
-        MOV  $0b00001000,R0; FireFrequencyC_Plus2:          #     ld a,%00001000  :FireFrequencyC_Plus1
-       .equiv  srcFireFrequencyC, FireFrequencyC_Plus2 - 2
+        MOV  $0b00001000,R0                                 #     ld a,%00001000  :FireFrequencyC_Plus1
+       .equiv  srcFireFrequencyC, . - 2
        .global srcFireFrequencyC
         BR   ObjectProgram_Fire                             #     jr ObjectProgram_Fire
 ObjectProgram_Mid2Fire:                                     # ObjectProgram_Mid2Fire:
-        MOV  $0b00000100,R0; FireFrequencyD_Plus2:          #     ld a,%00000100; :FireFrequencyD_Plus1
-       .equiv  srcFireFrequencyD, FireFrequencyD_Plus2 - 2
+        MOV  $0b00000100,R0                                 #     ld a,%00000100; :FireFrequencyD_Plus1
+       .equiv  srcFireFrequencyD, . - 2
        .global srcFireFrequencyD
         BR   ObjectProgram_Fire                             #     jr ObjectProgram_Fire
 ObjectProgram_FastFire:                                     # ObjectProgram_FastFire:
-        MOV  $0b00000010,R0; FireFrequencyE_Plus2:          #     ld a,%00000010; :FireFrequencyE_Plus1
-       .equiv  srcFireFrequencyE, FireFrequencyE_Plus2 - 2
+        MOV  $0b00000010,R0                                 #     ld a,%00000010; :FireFrequencyE_Plus1
+       .equiv  srcFireFrequencyE, . - 2
        .global srcFireFrequencyE
                                                             #
 ObjectProgram_Fire:                                         # ObjectProgram_Fire:
