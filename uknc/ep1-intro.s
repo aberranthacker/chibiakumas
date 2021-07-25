@@ -18,14 +18,14 @@ start:
 IntroMusic:
        .incbin "build/ep1_intro_music.bin"
 
-slide01: .incbin "build/ep1-intro/ep1-intro-slide01.raw.lzsa1"
-slide02: .incbin "build/ep1-intro/ep1-intro-slide02.raw.lzsa1"
-slide03: .incbin "build/ep1-intro/ep1-intro-slide03.raw.lzsa1"
-slide04: .incbin "build/ep1-intro/ep1-intro-slide04.raw.lzsa1"
-slide05: .incbin "build/ep1-intro/ep1-intro-slide05.raw.lzsa1"
-slide06: .incbin "build/ep1-intro/ep1-intro-slide06.raw.lzsa1"
-slide07: .incbin "build/ep1-intro/ep1-intro-slide07.raw.lzsa1"
-slide08: .incbin "build/ep1-intro/ep1-intro-slide08.raw.lzsa1"
+slide01: .incbin "build/ep1-intro/ep1-intro-slide01.raw.lzsa1" # chibiki
+slide02: .incbin "build/ep1-intro/ep1-intro-slide02.raw.lzsa1" # fishing
+slide03: .incbin "build/ep1-intro/ep1-intro-slide03.raw.lzsa1" # camping
+slide04: .incbin "build/ep1-intro/ep1-intro-slide04.raw.lzsa1" # prank
+slide05: .incbin "build/ep1-intro/ep1-intro-slide05.raw.lzsa1" # school1
+slide06: .incbin "build/ep1-intro/ep1-intro-slide06.raw.lzsa1" # bulbs
+slide07: .incbin "build/ep1-intro/ep1-intro-slide07.raw.lzsa1" # plane
+slide08: .incbin "build/ep1-intro/ep1-intro-slide08.raw.lzsa1" # school2
 
 EventStreamArray:
     #----------
@@ -209,16 +209,19 @@ LevelLoop:
         CALL @(PC)+; dstFadeCommand: .word null
 
         CALL @$Timer_UpdateTimer
-        WAIT
         CALL @$EventStream_Process
         CALL @(PC)+; dstDoubleStreamProcess: .word null
 
         BITB @$KeyboardScanner_P1,$Keymap_AnyFire
         BNZ  EndLevel
 
-        WAIT
         CALL @$ObjectArray_Redraw
         CALL @(PC)+; dstShowBossTextCommand: .word ShowBossText
+        WAIT
+        WAIT
+        WAIT
+        WAIT
+        WAIT
 
         MOV  (PC)+, R0; srcShowTextUpdate: .word 0xFF
         CMP  R0,$22
@@ -411,7 +414,6 @@ ShowBossText: # ../Aku/Level252-Intro.asm:1950
         MOV  (PC)+, @(PC)+
         srcCharsToPrint: .word 1; .word PPUCommandArg;
         MOV  $PPU_ShowBossText, @$PPUCommand
-        WAIT
 RETURN
 
 # Subtitles #----------------------------------------------------------------{{{
@@ -606,10 +608,10 @@ ChibikoAttacksPalette2: #----------------------------------------------------{{{
 WhenYouDiePalette: #---------------------------------------------------------{{{
     .byte 0, 0    # line number, 0 - set cursor/scale/palette
     .word 0x10    #  graphical cursor, YRGB color
-    .word 0b10001 #  320 dots per line, pallete 3
+    .word 0b10000 #  320 dots per line, pallete 3
 
     .byte 1, 1
-    .byte 0x00, 0x55, 0x77, 0xFF
+    .byte 0x00, 0x55, 0xFF, 0xFF
 
     .byte 201
     .even

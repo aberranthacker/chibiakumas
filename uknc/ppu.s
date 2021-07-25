@@ -842,7 +842,7 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
 
        .include "./music/ep1_title_music_playerconfig.s"
        .include "./music/ep1_intro_music_playerconfig.s"
-       #SkipPSGSend = 1
+        SkipPSGSend = 1
        .include "../../akg_player/akg_player.s"
 
 FontBitmap: .space 8 # whitespace symbol

@@ -116,7 +116,7 @@
 
 # PPU: floppy disk controller
 .equiv FDCSTS, 0177130 # floppy disk controller state register
-.equiv FDCDT, 0177132  # floppy disk controller data register
+.equiv FDCDT,  0177132 # floppy disk controller data register
 
 # PPU: keyboard
 .equiv KBINT,  0300    # keyboard interrupt
@@ -126,7 +126,7 @@
 # PPU: Programmable timer
 .equiv TMRST , 0177710 # State register
 .equiv TMREVN, 0310    # External event interrupt
-.equiv PGTMRI, 0304    # Programmable timer interrupt
+.equiv TMRINT, 0304    # Programmable timer interrupt
 .equiv TMRBRG, 0177712 # Buffer register
 .equiv TMRCST, 0177714 # Current state register
 

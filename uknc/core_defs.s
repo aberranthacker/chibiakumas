@@ -16,7 +16,7 @@
 .equiv PPU_UserRamSizeWords, PPU_UserRamSize >> 1 # 0x2C22 026042 11298
 .equiv PPU_PPUCommand,    PPUCommand >> 1
 .equiv PPU_PPUCommandArg, PPUCommandArg >> 1
-.equiv PPU_MusicBuffer, 0x3934 # 14644 034464 # auto-generated during a build
+.equiv PPU_MusicBuffer, 0x3936 # 14646 034466 # auto-generated during a build
 
 .equiv FB0, 384 # 0600 0x0180
 .equiv FB_gap, FB0 + 16000

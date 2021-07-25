@@ -1,4 +1,7 @@
-require 'pry'
+# frozen_string_literal: true
+
+# The code is taken from https://github.com/nzeemin/ukncbtl-utils/blob/master/Sav2Cartridge/Sav2Cart.cpp
+# One can write C in any laguage)
 
 module Encoders
   class RLE
@@ -65,7 +68,13 @@ module Encoders
             coded_size = (seq_block_size < 256 / 8) ? 1 : 2
             coded_size += (previous_byte == 0 || previous_byte == 255) ? 0 : 1
 
-            sprintf("RLE  at\t%06o\tSEQ  %06o  %06o\t%02x\n", seq_block_offset + 512, seq_block_size, coded_size, previous_byte) if debug
+            sprintf("RLE  at\t%06o\tSEQ  %06o  %06o\t%02x\n",
+                    seq_block_offset + 512,
+                    seq_block_size,
+                    coded_size,
+                    previous_byte
+                   ) if debug
+
             coded_size_total += coded_size
             flag_byte = ((previous_byte == 0) ? 0 : ((previous_byte == 255) ? 0x60 : 0x20))
             if (seq_block_size < 256 / 8)
