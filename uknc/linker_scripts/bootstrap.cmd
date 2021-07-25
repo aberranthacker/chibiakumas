@@ -11,12 +11,13 @@ FileSizeCoreWords     = ((FileEndCore - FileBeginCore) / 2);
 FileSizeSettingsWords = ((SavedSettings - SavedSettings_Last) / 2);
 
 BootstrapBlockNum = 1;
-PPUModuleBlockNum      = (BootstrapSizeWords  + 255) / 256 + BootstrapBlockNum;
-LoadingScreenBlockNum  = (PPU_ModuleSizeWords + 255) / 256 + PPUModuleBlockNum;
-CoreBlockNum           = (8000                + 255) / 256 + LoadingScreenBlockNum;
-Level00BlockNum        = (FileSizeCoreWords   + 255) / 256 + CoreBlockNum;
-Ep1IntroBlockNum       = (Level00SizeWords    + 255) / 256 + Level00BlockNum;
-Ep1IntroSlidesBlockNum = (Ep1IntroSizeWords   + 255) / 256 + Ep1IntroBlockNum;
+PPUModuleBlockNum      = (BootstrapSizeWords      + 255) / 256 + BootstrapBlockNum;
+LoadingScreenBlockNum  = (PPU_ModuleSizeWords     + 255) / 256 + PPUModuleBlockNum;
+CoreBlockNum           = (8000                    + 255) / 256 + LoadingScreenBlockNum;
+Ep1IntroBlockNum       = (FileSizeCoreWords       + 255) / 256 + CoreBlockNum;
+Ep1IntroSlidesBlockNum = (Ep1IntroSizeWords       + 255) / 256 + Ep1IntroBlockNum;
+Level00BlockNum        = (Ep1IntroSlidesSizeWords + 255) / 256 + Ep1IntroSlidesBlockNum;
+Level01BlockNum        = (Level00SizeWords        + 255) / 256 + Level00BlockNum;
 
 SECTIONS
 {

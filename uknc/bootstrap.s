@@ -98,16 +98,16 @@ Bootstrap_SystemEvent:
 
 Bootstrap_Level:
     .ifdef DebugMode
-        CMP  R5,$0
+        CMP  R5,$1
         BHI  .
     .endif
         ASL  R5
         JMP  @LevelsJmpTable(R5)
     LevelsJmpTable:
        .word Bootstrap_Level_Intro
+       .word Bootstrap_Level_1
 
 Bootstrap_StartGame:
-
 
 Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
         CALL StartANewGame
@@ -149,6 +149,18 @@ Bootstrap_Level_Intro:
         CALL Bootstrap_LoadDiskFile
 
        .ppudo_ensure $PPU_SingleProcess
+        MOV  $SPReset,SP # we are not returning, so reset the stack
+        JMP  @$Akuyou_LevelStart
+#----------------------------------------------------------------------------
+Bootstrap_Level_1: # ../Aku/BootStrap.asm:838  main menu --------------------
+        CALL StartANewGame
+        CALL LevelReset0000
+
+        MOV  $level_01.bin,R0
+        CALL Bootstrap_LoadDiskFile
+
+       .ppudo_ensure $PPU_SingleProcess
+
         MOV  $SPReset,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
@@ -423,10 +435,6 @@ core.bin:
        .word FileBeginCore
        .word FileSizeCoreWords
        .word CoreBlockNum
-level_00.bin:
-       .word Akuyou_LevelStart
-       .word Level00SizeWords
-       .word Level00BlockNum
 ep1_intro.bin:
        .word Akuyou_LevelStart
        .word Ep1IntroSizeWords
@@ -435,6 +443,14 @@ ep1_intro_slides.bin:
        .word FB1
        .word Ep1IntroSlidesSizeWords
        .word Ep1IntroSlidesBlockNum
+level_00.bin:
+       .word Akuyou_LevelStart
+       .word Level00SizeWords
+       .word Level00BlockNum
+level_01.bin:
+       .word Akuyou_LevelStart
+       .word Level01SizeWords
+       .word Level01BlockNum
 #----------------------------------------------------------------------------}}}
 
        .include "./ppucmd.s"
