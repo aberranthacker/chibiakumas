@@ -226,6 +226,7 @@ SLTABInit:      MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
                 ADD  $8,R1           #  calc address of next record of SLTAB
                 MOV  R1,(R0)+        #--pointer to the next record of SLTAB
                 ADD  $40,R2          #  calculate address of next screenline
+
                 SOB  R3,3$           #
 #------------------------------------- bottom region, footer
                 MOV  $0x2020,(R0)+   # colors  011  010  001  000 (YRGB)
@@ -242,6 +243,7 @@ SLTABInit:      MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
                 ADD  $4,R1           #  calc address of next record of SLTAB
                 MOV  R1,(R0)+        #--pointer to the next record of SLTAB
                 ADD  $40,R2          # calculate address of next screenline
+
                 SOB  R3,4$           #
                                      #
                 CLR  (R0)+           #--address of line 308
@@ -607,7 +609,7 @@ LoadMusic: #-----------------------------------------------------------------{{{
                 INC  (R5)
                 MOV  (R4),(R3)+
                 INC  (R5)
-                
+
                 SOB  R0, 10$
 
                 JMP  @$CommandExecuted
@@ -634,12 +636,16 @@ MusicStop: #-----------------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 
 VblankIntHandler: #----------------------------------------------------------{{{
+        MTPS $PR7
+        PUSH @$PBPADR
         MOV  R5,-(SP)
         MOV  R4,-(SP)
         MOV  R3,-(SP)
         MOV  R2,-(SP)
         MOV  R1,-(SP)
         MOV  R0,-(SP)
+
+        CALL PrintDebugInfo
 
 MusicPlayerCall:
         BR   .+4 # or CALL @(PC)+ when music is playing
@@ -651,6 +657,7 @@ MusicPlayerCall:
         MOV  (SP)+,R3
         MOV  (SP)+,R4
         MOV  (SP)+,R5
+        POP  @$PBPADR
 
         # we do not need firmware interrupt handler except for this small
         # procedure
@@ -659,9 +666,70 @@ MusicPlayerCall:
         DEC  @$07130 # decrease spindle rotation counter
         BNZ  1237$   # continue rotation unless the counter reaches zero
         CALL @07132  # stop floppy drive spindle
-1237$:
+
+1237$:  MTPS $PR0
         RTI
 #----------------------------------------------------------------------------}}}
+
+PrintDebugInfo: #------------------------------------------------------------{{{
+        PUSH @$PASWCR
+        # enable write-only direct access to the RAM above 0100000
+    .if OffscreenAreaAddr < 0120000     # 0100000..0117777
+        MOV  $0x011,@$PASWCR
+    .elseif OffscreenAreaAddr < 0140000 # 0120000..0137777
+        MOV  $0x021,@$PASWCR
+    .elseif OffscreenAreaAddr < 0160000 # 0140000..0157777
+        MOV  $0x041,@$PASWCR
+    .else                               # 0160000..0176777
+        MOV  $0x081,@$PASWCR
+    .endif
+
+        MOV  $PBPADR,R5
+
+        MOV  $5,R0   # set R0 to number of decimal digits
+        MOV  $LevelTimeStr,R1
+        ADD  R0,R1   # set pointer to end of the string
+        MOV  $PPU_Event_LevelTime,(R5)
+        MOV  @$PBP12D,R3
+
+10$:    CLR  R2      # R2 - most, R3 - least significant word
+        DIV  $10,R2  # quotient -> R2 , remainder -> R3
+        ADD  $'0,R3  # add ASCII code for "0" to the remainder
+        MOVB R3,-(R1)
+        MOV  R2,R3
+        SOB  R0,10$
+
+        MOV  $5,R0
+        MOV  $Font,R1
+        MOV  $40,R2
+        MOV  $LevelTimeStrEnd,R3
+20$:
+        MOV  $OffscreenAreaAddr-1,R5
+        ADD  R0,R5
+
+        MOVB -(R3),R4
+        ASL  R4
+        ASL  R4
+        ASL  R4
+        ADD  R1,R4 # R4 contains font char address
+
+       .rept 8
+        MOVB (R4)+,(R5)
+        ADD  R2,R5
+       .endr
+
+        SOB  R0,20$
+
+        POP  @$PASWCR
+
+        RETURN
+LevelTimeStr:   .ascii "65535"
+LevelTimeStrEnd:
+       .even
+
+
+#----------------------------------------------------------------------------}}}
+
 KeyboardIntHadler: #---------------------------------------------------------{{{
 # key codes #----------------------------------------------------------------{{{
 # | oct | hex|  key    | note     | oct | hex|  key  |  note     |
