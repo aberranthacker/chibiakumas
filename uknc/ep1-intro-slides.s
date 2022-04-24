@@ -1,4 +1,3 @@
-
                .nolist
 
                .global start # make the entry point available to a linker

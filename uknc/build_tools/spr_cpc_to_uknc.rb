@@ -50,7 +50,6 @@ def transform(sprite_words)
       nibble3 = REVERSE_TABLE_4BIT[(word & 0x0F00) >> 8]
       nibble4 = REVERSE_TABLE_4BIT[(word & 0xF000) >> 12]
 
-      # words << (nibble4 << 12 | nibble2 << 8 | nibble3 << 4 | nibble1)
       words << (nibble3 << 12 | nibble1 << 8 | nibble4 << 4 | nibble2)
     end
   end

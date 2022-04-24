@@ -3,9 +3,11 @@
 #-------------------------------------------------------------------------------
 .equiv MainMenu, 0x8000
 .equiv Episode1_Intro, 0x0000
+.equiv Level1, 0x0001
 
-.equiv StartOnLevel, MainMenu
+#.equiv StartOnLevel, MainMenu
 #.equiv StartOnLevel, Episode1_Intro
+.equiv StartOnLevel, Episode1_Intro
 
 .if StartOnLevel == MainMenu
   .equiv ShowLoadingScreen, 1
@@ -46,7 +48,7 @@
 .equiv PlayerStarArraySize, 128
 .equiv GameVarsArraysSize, StarArraySize * 4 + ObjectArraySize * 8 + PlayerStarArraySize * 4 + 15*8
 
-.equiv Akuyou_LevelStart, 0x96F4 # 38644 0113364 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9746 # 38726 0113506 # auto-generated during a build
 .equiv LevelSprites, Akuyou_LevelStart + 4
 
 .equiv SPReset,       0157770 # Initial stack pointer
