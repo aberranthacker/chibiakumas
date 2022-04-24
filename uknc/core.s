@@ -59,35 +59,29 @@ Akuyou_GameVarsEnd:
 start:
 FileBeginCore:
 SavedSettings: # {{{
-                     .byte 255          # pos -22 spare
-                     .byte   0          # pos -21 spare
-                     .byte   0          # pos -20 spare
+                     .byte 255          # pos -20 spare
                      .byte   0          # pos -19 spare
-                     .byte 0b00000001   # pos -18 GameOptions (xxxxxxxS) Screen shake
-                     .byte   0          # pos -17 playmode 0 normal / 128 - 4D
-    ContinueMode:    .byte   0          # pos -16 Continue Sharing (0/1)
-    SmartBombsReset: .byte   3          # pos -15 SmartbombsReset
-    ContinuesReset:  .byte  60          # pos -14 Continues Reset
-    GameDifficulty:  .byte   0          # pos -13 Game difficulty
+                     .byte   0          # pos -18 spare
+                     .byte   0          # pos -17 spare
+                     .byte   0          # pos -16 spare
+                     .byte 0b00000001   # pos -15 GameOptions (xxxxxxxS) Screen shake
+                     .byte   0          # pos -14 playmode 0 normal / 128 - 4D
+    ContinueMode:    .byte   0          # pos -13 Continue Sharing (0/1)
+    SmartBombsReset: .byte   3          # pos -12 SmartbombsReset
+    ContinuesReset:  .byte  60          # pos -11 Continues Reset
+    GameDifficulty:  .byte   0          # pos -10 Game difficulty
                                         #         (enemy Fire Speed 0=normal, ;1=easy, 2=hard)
                                         #         +128 = heaven mode , +64 = star Speedup
-                     .byte 0b00000000   # pos -12 Achievements (WPx54321) (W=Won P=Played)
-    MultiplayConfig: .byte 0b00000000   # pos -11 Joy Config   (xxxxxxFM)
+                     .byte 0b00000000   # pos -9 Achievements (WPx54321) (W=Won P=Played)
+    MultiplayConfig: .byte 0b00000000   # pos -8 Joy Config   (xxxxxxFM)
                                         # M=Multiplay
                                         # F=Swap Fire 1/2
-    TurboMode:       .byte 0b00000000   # pos -10 ------XX = Turbo mode [NoInsults/NoBackground/NoRaster/NoMusic]
-    LivePlayers:     .byte 1            # pos -9 Number of players currently active in the game [2/1/0]
-    TimerTicks:      .byte 0            # pos -8 used for benchmarking
-    BlockHeavyPageFlippedColors: .byte 64   # pos -7 0/255=on  64=off
-    BlockPageFlippedColors:      .byte 255  # pos -6 0/255=on  64=off
-    # ;CPC 0  =464 , 128=128 ; 129 = 128 plus ; 192 = 128 plus with 512k; 193 = 128 plus with 512k pos -1
-    # ;MSX 1=V9990  4=turbo R
-    # ;ZX  0=TAP 1=TRD 2=DSK   128= 128k ;192 = +3 or black +2
-    CPCVer: .byte 00                    # pos  -5
-
+    TurboMode:       .byte 0b00000000   # pos -7 ------XX = Turbo mode [NoInsults/NoBackground/NoRaster/NoMusic]
+    LivePlayers:     .byte 1            # pos -6 Number of players currently active in the game [2/1/0]
+    TimerTicks:      .byte 0            # pos -5 used for benchmarking
        .even
-    ScreenBuffer_ActiveScreen:   .word FB1 # pos -3
-    ScreenBuffer_VisibleScreen:  .word FB1 # pos -1
+    ScreenBuffer_ActiveScreen:   .word FB1 # pos -4
+    ScreenBuffer_VisibleScreen:  .word FB1 # pos -2
 
     Player_Array:
         P1_P00: .byte 100        #  0 - Y 0x64
@@ -306,9 +300,9 @@ Event_VectorArray:
        .word null                              # 0x0E 0x1C
        .word null                              # 0x0F 0x1E  Event_CoreReprogram, legacy
 # Event_MoveVector:
-       .word NotImplemented                    # 0x10 0x20    defw Event_MoveLifeSwitch_0000
+       .word Event_SetMoveLife                 # 0x10 0x20  evtSetMoveLife
        .word Event_SetProgram                  # 0x11 0x22  # defw Event_ProgramSwitch_0001
-       .word NotImplemented                    # 0x12 0x24    defw Event_LifeSwitch_0010
+       .word Event_SetLife                     # 0x12 0x24  evtSetLife
        .word NotImplemented                    # 0x13 0x26    defw Event_MoveSwitch_0011
        .word Event_SetProgMoveLife             # 0x14 0x28  evtSetProgMoveLife
        .word NotImplemented                    # 0x15 0x2A    defw Event_SpriteSwitch_0101
@@ -389,10 +383,8 @@ null:   RETURN
        .include "decoders/lzsa1.s"
 
 NotImplemented:
-       BR   .
-      .rept 2
-       NOP
-      .endr
+       .inform_and_hang "core: not implemented!"
+
 end: FileEndCore:
 
 LevelStart:

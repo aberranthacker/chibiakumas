@@ -113,15 +113,13 @@ RETURN
 Event_Stream_ForceNow:                                      # Event_Stream_ForceNow:
         INC  (PC)+; srcEvent_LevelTime: .word 0x00          #     ld a,&0 :Event_LevelTime_Plus1
                                                             #     inc a
-        #MOV  @$srcEvent_LevelTime,R0                       #     ld (Event_LevelTime),a
+       #MOV  @$srcEvent_LevelTime,R0                        #     ld (Event_LevelTime),a
                                                             #     ld b,a
 
 Event_MoreEvents:                                           # Event_MoreEvents:
         # compare NextEventTime with LevelTime              #     ld a,1 :Event_NextEventTime_Plus1 ;The time the event should occur
-        CMP  (PC)+, @(PC)+
-             srcEvent_NextEventTime:
-       .word 0x01
-       .word srcEvent_LevelTime
+        CMP  $0x01, @$srcEvent_LevelTime
+       .equiv srcEvent_NextEventTime, .-4
 
         BEQ  Event_GetEventsNow
 RETURN                                                      #     ret nz  ; event does not happen yet
@@ -129,7 +127,8 @@ RETURN                                                      #     ret nz  ; even
 Event_GetEventsNow: # ../SrcALL/Akuyou_Multiplatform_EventStream.asm:121
         MOV  $Event_LoadNextEvt,-(SP) # We do a dirty trick to save space, all these actions end in a RET
 
-        MOV  (PC)+,R5; srcEvent_NextEventPointer: .word 0x0000 # mem pointer of next byte
+        MOV  $0x0000,R5
+       .equiv srcEvent_NextEventPointer, .-2 # mem pointer of next byte
 
         CLR  R1
         BISB (R5)+,R1

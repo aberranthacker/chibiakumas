@@ -526,7 +526,7 @@ ClearObjects:
 RETURN
 
 Clear4000: #-----------------------------------------------------------------{{{
-        # do note use the power more than 4, because of the limit of the SOB
+        # do note use the power more than 4, because of the SOB range
        .equiv Clear4000_PowerOfTwo, 4
         MOV  R0,-(SP)
         MOV  R1,-(SP)
