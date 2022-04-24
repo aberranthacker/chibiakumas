@@ -768,7 +768,7 @@ RETURN                                                      # ret
                                                             #         ld (hl),%10001011
                                                             #
                                                             #         inc h
-                                                            #         ld (hl),128+16  :PointsSpriteB_Plus1; Sprite
+        MOVB $128+16, (R5); .equiv srcPointsSpriteB, .-2    #         ld (hl),128+16  :PointsSpriteB_Plus1; Sprite
                                                             #
                                                             #         set 6,l
                                                             #         ld (hl),64+63   ; Life ; must "hurt" player for hit to be detected
@@ -808,15 +808,6 @@ RETURN                                                      # ret
                                                             # Player_Hit:
                                                             #         ld (PlayerHitMempointer_Plus2-2),hl
                                                             #
-                                                            #         ; check player isn't dead!
-                                                            #         ;push iy
-                                                            # ;           push hl
-                                                            # ;           pop iy
-                                                            # ;           ld a,(iy+9)
-                                                            # ;           or a
-                                                            # ;       pop iy
-                                                            # ;       ret z
-                                                            #
                                                             #         ld a,iyl
                                                             #         cp 16+2
        .CALL EQ,null; CustomPlayerHitter_Plus2:             #         call z,null :customPlayerHitter_Plus2
@@ -832,14 +823,18 @@ RETURN                                                      # ret
                                                             #         ld d,b
                                                             #
                                                             #         ld a,iyh
-                                                            #         cp 128+38   :DroneSprite_Plus1
-                                                            #         jr z,Player_Hit_PowerupDrone
-                                                            #         cp 128+39   :ShootSpeedSprite_Plus1
-                                                            #         jr z,Player_Hit_PowerupShootSpeed
-                                                            #         cp 128+40   :ShootPowerSprite_Plus1
-                                                            #         jr z,Player_Hit_PowerupShootPower
-                                                            #         cp 128+16   :PointsSprite_Plus1
-                                                            #         jr z,Player_Hit_Points
+       CMP  R0, $128+38                                     #         cp 128+38   :DroneSprite_Plus1
+      .equiv cmpDroneSprite, .-2
+       # jr z,Player_Hit_PowerupDrone                       #         jr z,Player_Hit_PowerupDrone
+       CMP  R0, $128+39                                     #         cp 128+39   :ShootSpeedSprite_Plus1
+      .equiv cmpShootSpeedSprite, .-2
+       # jr z,Player_Hit_PowerupShootSpeed                  #         jr z,Player_Hit_PowerupShootSpeed
+       CMP  R0, $128+40                                     #         cp 128+40   :ShootPowerSprite_Plus1
+      .equiv cmpShootPowerSprite, .-2
+       # jr z,Player_Hit_PowerupShootPower                  #         jr z,Player_Hit_PowerupShootPower
+       CMP  R0, $128+16                                     #         cp 128+16   :PointsSprite_Plus1
+      .equiv cmpPointsSprite, .-2
+       # jr z,Player_Hit_Points                             #         jr z,Player_Hit_Points
                                                             #     ret
                                                             #
                                                             # Player_Hit_Points:

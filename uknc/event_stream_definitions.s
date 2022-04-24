@@ -15,22 +15,23 @@
 #.equiv evtMove, 0x10 << 8 # 128 >> 4 * 2 = 16
 
 # evtSetMoveLife     equ 128+0 ; Set Move to b1, Set Life to b2
-#.equiv mvLife,             0x00 * 2 #  0
+.equiv evtSetMoveLife, (0x10 * 2) << 8 #  0
 
 # evtSetProg         equ 128+1 ; Set Prog to b1
 #.equiv mvProgramSwitch,    0x01 * 2 #  2
 
 # evtSetLife         equ 128+2 ; set Life to b1
+.equiv evtSetLife, (0x12 * 2) << 8 #  0
 #.equiv mvSetLife,          0x02 * 2 #  4
 
 # evtSetMove         equ 128+3 ; set Move to b1
 #.equiv mvSetMove,           0x03 * 2 #  6
 
 # evtSetProgMoveLife equ 128+4 ; Set prog to b1, Set move to b2, set life to b3
-.equiv evtSetProgMoveLife, (0x14 * 2) << 8 # 40
+.equiv evtSetProgMoveLife, (0x14 * 2) << 8 # 40 # Event_SetProgMoveLife
 
 # evtSetSprite       equ 128+5 ; set sprite to b1
-#.equiv mvSetSprite,        0x05 * 2 # 10
+.equiv evtSetSprite, (0x15 *2) << 8  # 42
 
 # evtAddToBackground equ 128+6 ; Add oject to background (back of object array)
 .equiv evtAddToBackground, (0x16 * 2) << 8 # 44
@@ -86,8 +87,9 @@
                                                             # evtReprogramCustomProg2 equ %11111010 ; Define Custom Programmer handler1 to call
                                                             #                                       ; w2 each program tick (custom fire patterns)
                                                             #
-                                                            # evtReprogram_PowerupSprites equ %11110110 ; Define the sprite numbers of the
-                                                            #                                           ; power up objects and coin to b1,b2,b3,b4
+# evtReprogram_PowerupSprites equ %11110110 ; Define the sprite numbers of the
+#                                           ; power up objects and coin to b1,b2,b3,b4
+.equiv evtReprogram_PowerupSprites, (0x26 * 2) << 8 # 76
                                                             #
                                                             # evtReprogramObjectBurstPosition   equ %11111101 ; Set Burst Animation position to
                                                             #                                                 ; (b1,b2)... used for nuke blasts in Ep2
@@ -201,11 +203,11 @@
                                                             #
                                                             #
                                                             # ;All under 31 Do not get killed by smartbomb except 0
-                                                            # prgFireSnail equ %10000000
-                                                            # prgFireSlow  equ %01100000
+.equiv prgFireSnail, 0b10000000                             # prgFireSnail equ %10000000
+.equiv prgFireSlow, 0b01100000                              # prgFireSlow  equ %01100000
                                                             # prgFireMid   equ %01000000
                                                             # prgFireMid2  equ %11000000
-                                                            # prgFireFast  equ %00100000
+.equiv prgFireFast, 0b00100000                              # prgFireFast  equ %00100000
                                                             # prgFireHyper equ %10100000
                                                             #
                                                             # ; Fire Patterns
@@ -213,8 +215,8 @@
                                                             # ;defw   Stars_AddObject         ;0 = just one - Special use only
                                                             #
                                                             # ; Quarter bursts
-                                                            # fireTopLeft     equ 1
-                                                            # fireBottomLeft  equ 2
+.equiv fireTopLeft, 1                                       # fireTopLeft     equ 1
+.equiv fireBottomLeft, 2                                    # fireBottomLeft  equ 2
                                                             # fireTopRight    equ 3
                                                             # fireBottomRight equ 4
                                                             # ; half bursts
@@ -225,20 +227,20 @@
                                                             # ; triangle bursts
                                                             # fireTopWide    equ  9
                                                             # fireBottomWide equ 10
-                                                            # fireLeftWide   equ 11
+.equiv fireLeftWide, 11                                     # fireLeftWide   equ 11
                                                             # fireRightWide  equ 12
                                                             # ; Omni burst
-                                                            # fireBurst      equ 13
+.equiv fireBurst, 13                                        # fireBurst      equ 13
                                                             # fireSmallBurst equ 14
                                                             # fireOuterBurst equ 15  ;Necromancer attack
                                                             # ; single dot
-                                                            # fireSingleWest      equ 16
+.equiv fireSingleWest, 16                                   # fireSingleWest      equ 16
                                                             # fireSingleNorthWest equ 17
                                                             # fireSingleNorth     equ 18
                                                             # fireSingleNorthEast equ 19
                                                             # fireSingleEast      equ 20
                                                             # fireSingleSouthEast equ 21
-                                                            # fireSingleSouth     equ 22
+.equiv fireSingleSouth, 22                                  # fireSingleSouth     equ 22
                                                             # fireSingleSouthWest equ 23
                                                             #
                                                             # fireSingleFastWest      equ 16+8 ;24
@@ -267,14 +269,12 @@
 .equiv spdFast, 0x40
 
                                                             # mveMisc       equ 0 ;used for visual clarity!
-# mveStatic     equ &24
-.equiv mvStatic, 0x24
-.equiv mveBackground, 0xC0                                  # mveBackground equ %11000000
+.equiv mvStatic, 0x24                                       # mveStatic     equ &24
+.equiv mveBackground, 0b11000000                            # mveBackground equ %11000000
                                                             # mveSeaker_P1  equ %10000100
                                                             # mveSeaker_P2  equ %10010000
                                                             # mveSeaker     equ %10001000 ;seek! I can't spel!
-                                                            # mveWave       equ %10100000
-                                                            # ;mveWaveSmall   equ %10010000 depricated
+.equiv mveWave, 0b10100000                                  # mveWave       equ %10100000
                                                             # mveCustom1    equ %11110000
                                                             # mveCustom2    equ %11100000
                                                             # mveCustom3    equ %11010000
@@ -307,7 +307,8 @@
                                                             #
                                                             # lifCustom       equ 255       ; We use 63 as a marker for custom code's INIT -
                                                             #                               ; a real life will be set by the custom code
-                                                            # lifEnemy        equ %11000000 ; HurtByBullets,Hurts Player
+# lifEnemy        equ %11000000 ; HurtByBullets,Hurts Player
+.equiv lifeEnemy, 0b11000000 # Hurt by bullets, hurts player
                                                             # lifTimed        equ %00000000 ; Doesnt hurt, dies automatically
                                                             # lifDeadly       equ %01000000 ; Deadly and cant be shot
 # lifImmortal     equ 0

@@ -811,7 +811,8 @@ Object_DecreaseLifeShot: .global Object_DecreaseLifeShot    #  Object_DecreaseLi
                                                             #     call SFX_QueueSFX_Generic
                                                             #
                                                             #     ;create a coin
-                                                            #     ld iyh,128+16 :PointsSpriteC_Plus1  ; Sprite
+        MOV  $128+16,R0                                     #     ld iyh,128+16 :PointsSpriteC_Plus1  ; Sprite
+       .equiv srcPointsSpriteC, .-2
                                                             #     ld ixh,%10000111; Seaker Fast 1000001XX XX=Speed
                                                             #     ld a,(ObjectShotShooter_Plus1-1)    ;1=Player 1, 129 = player 2
                                                             #     dec a
