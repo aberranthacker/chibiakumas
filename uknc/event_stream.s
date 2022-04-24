@@ -221,20 +221,20 @@ RETURN                                                      #
                                                             #     ld hl,Event_ReprogramVector
         #JMP  VectorJump_PushHlFirst # uknc/stararray_add.s:149 #     jp VectorJump_PushHlFirst
 
-                                                            # ;Powerup objects are defined by their sprite, which changes each level
-                                                            # ; OK so I didn't think this through very well!
-                                                            # Event_CoreReprogram_PowerupSprites:
+# Powerup objects are defined by their sprite, which changes each level
+# OK so I didn't think this through very well!
+Event_CoreReprogram_PowerupSprites:                         # Event_CoreReprogram_PowerupSprites:
                                                             #     rst 6
-                                                            #     ld (DroneSprite_Plus1-1),a
+        MOVB (R5)+,@$cmpDroneSprite                         #     ld (DroneSprite_Plus1-1),a
                                                             #     rst 6
-                                                            #     ld (ShootSpeedSprite_Plus1-1),a
-                                                            #     rst 6
-                                                            #     ld (ShootPowerSprite_Plus1-1),a
-                                                            #     rst 6
-                                                            #     ld (PointsSprite_Plus1-1),a
-                                                            #     ld (PointsSpriteB_Plus1-1),a
-                                                            #     ld (PointsSpriteC_Plus1-1),a
-                                                            #     ret
+        MOVB (R5)+,@$cmpShootSpeedSprite                    #     ld (ShootSpeedSprite_Plus1-1),a
+        MOV  (R5)+,R0                                       #     rst 6
+        MOVB R0,@$cmpShootPowerSprite                       #     ld (ShootPowerSprite_Plus1-1),a
+        SWAB R0                                             #     rst 6
+        MOVB R0,@$cmpPointsSprite                           #     ld (PointsSprite_Plus1-1),a
+        MOVB R0,@$srcPointsSpriteB                          #     ld (PointsSpriteB_Plus1-1),a
+        MOVB R0,@$srcPointsSpriteC                          #     ld (PointsSpriteC_Plus1-1),a
+RETURN                                                      #     ret
                                                             #
                                                             # Event_ReprogramObjectBurstPosition:
                                                             #     ld de,BurstPosition_Plus2-2
