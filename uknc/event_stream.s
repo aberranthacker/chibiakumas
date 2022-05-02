@@ -88,44 +88,38 @@ Event_StreamInit:                                           # Event_StreamInit:
         # process the first batch of events
         BR   Event_GetEventsNow # uknc/event_stream.s:130
 
-Event_MoreEventsDec: #multiple events at the same timepoint # Event_MoreEventsDec: ; multiple events at the same timepoint
-                                                            #     dec a
-                                                            #     ld (Event_MultipleEventCount_Plus1-1),a
-                                                            #     ld (Event_NextEventPointer),hl
-                                                            #     jr Event_GetEventsNow
-                                                            #
-                                                            # ;     Process the event stream - the eventstream is basically the level map,
-                                                            # ; rather than a bitmap which would waste memory, it is a bytestream based around
-                                                            # ; a Time,Event structure.
-                                                            # ;    Multiple events can be at the same time, and the length of each event
-                                                            # ; varies depending upon the event, for this reason, it is only intended that the
-                                                            # ; stream is read forwards not backwards.
+#     Process the event stream - the eventstream is basically the level map,
+# rather than a bitmap which would waste memory, it is a bytestream based around
+# a Time/Event structure.
+#    Multiple events can be at the same time, and the length of each event
+# varies depending upon the event, for this reason, it is only intended that the
+# stream is read forwards not backwards.
 
-EventStream_Process:                                        # Event_Stream:
-        BIT  (PC)+,@(PC)+                                   #     ld a,(Timer_TicksOccured)
-             srcEvent_LevelSpeed:                           #     and %00000100:Event_LevelSpeed_Plus1    ; how often ticks occur
-       .word 0x04
-       .word srcTimer_TicksOccured
+EventStream_Process:
+        BIT  $0x04,@$srcTimer_TicksOccured
+       .equiv srcEvent_LevelSpeed, .-4 # how often ticks occur
 
-        BNZ  Event_Stream_ForceNow                          #     ret z       ; no ticks occured
-RETURN
+        BNZ  Event_Stream_ForceNow
 
-Event_Stream_ForceNow:                                      # Event_Stream_ForceNow:
-        INC  (PC)+; srcEvent_LevelTime: .word 0x00          #     ld a,&0 :Event_LevelTime_Plus1
-                                                            #     inc a
-       #MOV  @$srcEvent_LevelTime,R0                        #     ld (Event_LevelTime),a
-                                                            #     ld b,a
+        RETURN # no ticks occured
 
-Event_MoreEvents:                                           # Event_MoreEvents:
-        # compare NextEventTime with LevelTime              #     ld a,1 :Event_NextEventTime_Plus1 ;The time the event should occur
+Event_Stream_ForceNow:
+        INC  $0xFFFF
+       .equiv srcEvent_LevelTime, .-2
+       .global srcEvent_LevelTime
+        CMP  @$srcEvent_LevelTime,$275
+        BNE  Event_MoreEvents
+Event_MoreEvents:
+        # compare NextEventTime with LevelTime
         CMP  $0x01, @$srcEvent_LevelTime
-       .equiv srcEvent_NextEventTime, .-4
+       .equiv srcEvent_NextEventTime, .-4 # The time the event should occur
 
         BEQ  Event_GetEventsNow
-RETURN                                                      #     ret nz  ; event does not happen yet
+        RETURN # event does not happen yet
 
 Event_GetEventsNow: # ../SrcALL/Akuyou_Multiplatform_EventStream.asm:121
-        MOV  $Event_LoadNextEvt,-(SP) # We do a dirty trick to save space, all these actions end in a RET
+        # We do a dirty trick to save space, all these actions end in a RET
+        MOV  $Event_LoadNextEvt,-(SP)
 
         MOV  $0x0000,R5
        .equiv srcEvent_NextEventPointer, .-2 # mem pointer of next byte
@@ -142,23 +136,19 @@ Event_GetEventsNow: # ../SrcALL/Akuyou_Multiplatform_EventStream.asm:121
         JMP  @Event_VectorArray(R0)
 
 # Read in the next object
-Event_LoadNextEvt:                                          # Event_LoadNextEvt:
-        TST  (PC)+; srcEvent_MultipleEventCount: .word 0x00 #     ld a,0 :Event_MultipleEventCount_Plus1
-                                                            #     or a
-        BZE  events_processed$                              #     jp nz,Event_MoreEventsDec ; there are multiple events at this point
-        # multiple events at the same timepoint             # Event_MoreEventsDec: ; multiple events at the same timepoint
-                                                            #     dec a
-        DEC  @$srcEvent_MultipleEventCount                  #     ld (Event_MultipleEventCount_Plus1-1),a
-        MOV  R5,@$srcEvent_NextEventPointer                 #     ld (Event_NextEventPointer),hl
-        JMP  @$Event_GetEventsNow                           #     jr Event_GetEventsNow
-    events_processed$:
-        MOV  (R5)+,@$srcEvent_NextEventTime                 #     rst 6
-                                                            #     ld (Event_NextEventTime),a
-        MOV  R5,@$srcEvent_NextEventPointer                 #     ld (Event_NextEventPointer),hl
-        #MOV  @$srcEvent_LevelTime,R0                       #     ld a,(Event_LevelTime)
-                                                            #     ld b,a
-        JMP  @$Event_MoreEvents                             #     jp Event_MoreEvents
+Event_LoadNextEvt:
+        TST  (PC)+; srcEvent_MultipleEventCount: .word 0x00
+        BZE  events_processed$
 
+        # multiple events at the same timepoint
+        DEC  @$srcEvent_MultipleEventCount
+        MOV  R5,@$srcEvent_NextEventPointer
+        JMP  @$Event_GetEventsNow
+events_processed$:
+        MOV  (R5)+,@$srcEvent_NextEventTime
+        MOV  R5,@$srcEvent_NextEventPointer
+
+        JMP  @$Event_MoreEvents
 
 Event_StarBust:                                             # Event_StarBust:
         .inform_and_hang "no Event_StarBust"
@@ -516,7 +506,7 @@ Event_AddObject: # called by object_driver as well          # Event_AddObject:
     Event_Objectloop$:                                      # Event_Objectloop:
                                                             #     ld a,(hl)   ; Y check
         TSTB (R3)                                           #     or a
-        BNE  Event_ObjectLoopNext$                          #     jp NZ,Event_ObjectLoopNext
+        BNZ  Event_ObjectLoopNext$                          #     jp NZ,Event_ObjectLoopNext
 
                                                             #     ;found a free slot!
         MOV  R3,@$srcObjects_LastAdded                      #     ld (Objects_LastAdded_Plus2 - 2),hl

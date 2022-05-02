@@ -1,5 +1,5 @@
 # Size-optimized LZSA1 PDP-11 decoder version by Ivan Gorodetsky
-# https://gitlab.com/ivagor/lzsa8080/-/blob/master/PDP11/LZSA1/lzsa1.asm
+# https://github.com/ivagorRetrocomp/DeLZSA
 #
 # usage:
 #  mov #src_adr,r1
@@ -81,6 +81,7 @@ unlzsa1_bc2:
                 MOVB (R5)+,(R2)+
                 SOB  R3,unlzsa1_bc2
                 BR   unlzsa1_ReadToken
+
 unlzsa1_ReadLong:
                 MOVB (R1)+,R3
                 BIS  R4,R3

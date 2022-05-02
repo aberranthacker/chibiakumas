@@ -46,15 +46,15 @@
 #******************************************************************************#
                 .=Akuyou_GameVarsStart # Need about 2136 bytes
 
-        ObjectArrayPointer:     .space ObjectArraySize * 8
-        StarArrayPointer:       .space StarArraySize * 4
-        PlayerStarArrayPointer: .space PlayerStarArraySize * 4
-        Event_SavedSettings:    .space 15 * 8
+    # WARNING: update GameVarsArraySize calculation in `core_defs.s`
+    # in case you changed values below
+    ObjectArrayPointer:     .space ObjectArraySize * 8
+    StarArrayPointer:       .space StarArraySize * 4
+    PlayerStarArrayPointer: .space PlayerStarArraySize * 4
+    Event_SavedSettings:    .space 15 * 8
 
-        KeyboardScanner_P1: .word 0
-        KeyboardScanner_P2: .word 0
-
-Akuyou_GameVarsEnd:
+    KeyboardScanner_P1: .word 0
+    KeyboardScanner_P2: .word 0
 
 start:
 FileBeginCore:
@@ -354,7 +354,7 @@ null:   RETURN
                                         # ;;;;;;;;;;;;;;;;;;;;Input Driver;;;;;;;;;;;;;;;;;;;;;;;;
                                         # read "../SrcCPC/Akuyou_CPC_KeyboardDriver.asm"
                                         # ;;;;;;;;;;;;;;;;;;;;Disk Driver;;;;;;;;;;;;;;;;;;;;;;;;
-       .include "disk_driver.s"         # read "../SrcCPC/Akuyou_CPC_DiskDriver.asm"
+      #.include "disk_driver.s"         # read "../SrcCPC/Akuyou_CPC_DiskDriver.asm"
        .include "execute_bootstrap.s"   # read "../SrcCPC/Akuyou_CPC_ExecuteBootstrap.asm"
                                         # read "../SrcCPC/Akuyou_CPC_TextDriver.asm"
                                         #
