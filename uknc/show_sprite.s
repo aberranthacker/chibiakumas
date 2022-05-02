@@ -48,11 +48,11 @@ ShowSprite_ReadInfo: # ------------------------------------------------------{{{
                                                             # ShowSprite_ReadInfo:
         MOV  (PC)+,R0; srcSprShow_SprNum: .word 0           #     ld a,&0 :SprShow_SprNum_Plus1
                                                             #     ld c,a
-                                                            #
                                                             #     ld b,0
-                                                            #         or a ; only done to clear carry flag
-        BIC  $0xC0,R0 # what for???
-        ASL  R0       # is it equal???                      #     rl b
+                                                            
+       #BIC  $0xC0,R0 # what for???
+        ASL  R0       # is it equal???                      #     or a ; only done to clear carry flag
+                                                            #     rl b
                                                             #     rl c
                                                             #
         MOV  (PC)+,R5; srcSprShow_BankAddr: .word LevelSprites #  ld hl,&4000 :SprShow_BankAddr_Plus2

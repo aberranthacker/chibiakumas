@@ -645,7 +645,7 @@ VblankIntHandler: #----------------------------------------------------------{{{
         MOV  R1,-(SP)
         MOV  R0,-(SP)
 
-        CALL PrintDebugInfo
+        CALL @$PrintDebugInfo
 
 MusicPlayerCall:
         BR   .+4 # or CALL @(PC)+ when music is playing

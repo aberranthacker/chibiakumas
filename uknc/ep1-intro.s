@@ -27,10 +27,9 @@ slide06: .incbin "build/ep1-intro/ep1-intro-slide06.raw.lzsa1" # bulbs
 slide07: .incbin "build/ep1-intro/ep1-intro-slide07.raw.lzsa1" # plane
 slide08: .incbin "build/ep1-intro/ep1-intro-slide08.raw.lzsa1" # school2
 
+         .even
+
 EventStreamArray:
-    #----------
-   #.word 0, evtChangeStreamTime, 256+15+155, StartPoint
-    #----------
 
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
@@ -73,6 +72,10 @@ EventStreamArray:
     .word         lifeImmortal
     .word     evtSaveObjSettings | 4           # 2
 
+    #----------
+   #.word 0, evtChangeStreamTime, 245, StartPoint
+    #----------
+
     .word 0, evtMultipleCommands | 5
     .word     evtAddToForeground               # 1
     .word     evtLoadObjSettings | 2           # 2
@@ -97,6 +100,7 @@ EventStreamArray:
     .word 10, evtCallAddress, ShowText1Init
 
     .word 49, evtCallAddress, ShowText0Init
+
 
     .word 50, evtSetPalette, ChibikoAttacksPalette
 
@@ -154,13 +158,14 @@ StartIntroProper:
     .word 140+15,     evtCallAddress, ShowText6Init
     .word 170+15,     evtCallAddress, ShowText7Init  # chibiko
     .word 200+15,     evtCallAddress, ShowText8Init  # fishing
+StartPoint:
     .word 230+15,     evtCallAddress, ShowText9Init  # camping
+
     .word 256+  5+15, evtCallAddress, ShowText10Init # prank
     .word 256+ 35+15, evtCallAddress, ShowText11Init # school1
     .word 256+ 65+15, evtCallAddress, ShowText12Init # bulbs
     .word 256+ 95+15, evtCallAddress, ShowText13Init # plane
     .word 256+125+15, evtCallAddress, ShowText14Init # school2
-#StartPoint:
     .word 256+155+15, evtCallAddress, ShowText15Init # lightning1
     .word 256+185+15, evtCallAddress, ShowText16Init # lightning2
     .word 256+215+15, evtCallAddress, ShowText17Init # heaven
@@ -200,23 +205,24 @@ LevelInit:
 
         MTPS $PR0 # enable interrupts
 LevelLoop:
-        CALL @(PC)+; dstClearScreenPoint: .word null
-
-    .ifdef Debug_ShowLevelTime
-        CALL @$ShowLevelTime
-    .endif
-
-        CALL @(PC)+; dstFadeCommand: .word null
+       .equiv dstClearScreenPoint, .+2
+        CALL @$null
+       .equiv dstFadeCommand, .+2
+        CALL @$null
 
         CALL @$Timer_UpdateTimer
         CALL @$EventStream_Process
-        CALL @(PC)+; dstDoubleStreamProcess: .word null
+
+       .equiv dstDoubleStreamProcess, .+2
+        CALL @$null
 
         BITB @$KeyboardScanner_P1,$Keymap_AnyFire
         BNZ  EndLevel
 
         CALL @$ObjectArray_Redraw
-        CALL @(PC)+; dstShowBossTextCommand: .word ShowBossText
+
+       .equiv dstShowBossTextCommand, .+2
+        CALL @$ShowBossText
         WAIT
         WAIT
         WAIT
@@ -241,10 +247,11 @@ LevelLoop:
         MOV  PalettesTable(R0), @$PPUCommandArg
         MOV  $PPU_SetPalette, @$PPUCommand
 
-        MOV  (PC)+,R1; PicAddr: .word 0
+        MOV  $0x0000,R1
+       .equiv PicAddr, .-2
         BZE  1237$
         MOV  $FB0,R2
-        JSR  PC,@$unlzsa1
+        CALL @$unlzsa1
 
         MOV  $FB0,R1
         MOV  $FB1+(12*2),R2
@@ -411,8 +418,8 @@ NoSpeech:
 
 ShowBossText: # ../Aku/Level252-Intro.asm:1950
         INC  @$srcCharsToPrint
-        MOV  (PC)+, @(PC)+
-        srcCharsToPrint: .word 1; .word PPUCommandArg;
+       .equiv srcCharsToPrint, .+2
+        MOV  $1, @$PPUCommandArg
         MOV  $PPU_ShowBossText, @$PPUCommand
 RETURN
 
@@ -424,18 +431,18 @@ SubtitlesEmpty: #------------------------------------------------------------{{{
 Subtitles1: #----------------------------------------------------------------{{{
                          #0         1         2         3         4
                          #01234567890123456789012345678901234567890
-    .byte  8,  5; .ascii "Once Upon a time..."                     ; .byte 0xFF
-    .byte  5,  6; .ascii "In a land far far away..."               ; .byte 0xFF
-    .byte  3,  7; .ascii "There was a girl who was kind"           ; .byte 0xFF
-    .byte  1,  8; .ascii "to everyone and brought happiness"       ; .byte 0xFF
-    .byte  4,  9; .ascii "everywhere She went \177 \177 \177"      ; .byte 0x00
+    .byte 11,  5; .ascii "Once Upon a time..."                     ; .byte 0xFF
+    .byte  7,  6; .ascii "In a land far far away..."               ; .byte 0xFF
+    .byte  5,  7; .ascii "There was a girl who was kind"           ; .byte 0xFF
+    .byte  3,  8; .ascii "to everyone and brought happiness"       ; .byte 0xFF
+    .byte  6,  9; .ascii "everywhere She went \177 \177 \177"      ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles2: #----------------------------------------------------------------{{{
     .byte  7, 23; .ascii "She isn't in this game!!!"               ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles3: #----------------------------------------------------------------{{{
-    .byte  7, 12; .ascii "Do you know what happens"                ; .byte 0xFF
-    .byte  7, 13; .ascii "       when you die?"                    ; .byte 0x00
+    .byte  8, 12; .ascii "Do you know what happens"                ; .byte 0xFF
+    .byte 13, 13; .ascii "when you  die?"                          ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles4: #----------------------------------------------------------------{{{
     .byte  8, 12; .ascii "They say 'if you're good"                ; .byte 0xFF
@@ -443,35 +450,35 @@ Subtitles4: #----------------------------------------------------------------{{{
     .byte  5, 14; .ascii "all your dreams will come true'"         ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles5: #----------------------------------------------------------------{{{
-    .byte  4, 12; .ascii "But 'If you're bad, you'll go to"        ; .byte 0xFF
+    .byte  4, 12; .ascii "But \"If you're bad, you'll go to"       ; .byte 0xFF
     .byte  4, 13; .ascii "the OTHER PLACE Where you'll be"         ; .byte 0xFF
-    .byte  1, 14; .ascii "punished for the bad things you did!'"   ; .byte 0x00
+    .byte  1, 14; .ascii "punished for the bad things you did!\""  ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles6: #----------------------------------------------------------------{{{
     .byte  3, 12; .ascii "But what no-one tells you is that"       ; .byte 0xFF
     .byte  2, 13; .ascii "some people are SO bad, they don't "     ; .byte 0xFF
-    .byte 12, 14; .ascii "go there either.."                       ; .byte 0x00
+    .byte 12, 14; .ascii "go there either..."                      ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles7: #----------------------------------------------------------------{{{
     .byte  2, 18; .ascii "Chibiko was a typical cheerful girl."    ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles8: #----------------------------------------------------------------{{{
-    .byte 10, 18; .ascii "She loved animals,"                      ; .byte 0x00
+    .byte 13, 18; .ascii "She loved animals,"                      ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles9: #----------------------------------------------------------------{{{
-    .byte  2, 18; .ascii "And enjoyed spending time outdoors!"     ; .byte 0x00
+    .byte  2, 18; .ascii "and enjoyed spending time outdoors!"     ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles10: #---------------------------------------------------------------{{{
     .byte  3, 18; .ascii "Sometimes she was 'a bit' naughty."      ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles11: #---------------------------------------------------------------{{{
-    .byte  1, 18; .ascii " And she didn't really like to study."   ; .byte 0x00
+    .byte  2, 18; .ascii "And she didn't really like to study."    ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles12: #---------------------------------------------------------------{{{
-    .byte  1, 18; .ascii "But one time she was very, very bad"     ; .byte 0x00
+    .byte  2, 18; .ascii "But one time she was very, very bad"     ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles13: #---------------------------------------------------------------{{{
-    .byte  6, 18; .ascii "And took a 'prank' too far."             ; .byte 0x00
+    .byte  7, 18; .ascii "And took a 'prank' too far."             ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles14: #---------------------------------------------------------------{{{
     .byte  2, 18; .ascii "When someone does the unforgivable..."   ; .byte 0x00
@@ -480,25 +487,25 @@ Subtitles15: #---------------------------------------------------------------{{{
     .byte  7, 18; .ascii "Judgement comes from above!"             ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles16: #---------------------------------------------------------------{{{
-    .byte  2, 18; .ascii "and strikes them once and for all!"      ; .byte 0x00
+    .byte  3, 18; .ascii "and strikes them once and for all!"      ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles17: #---------------------------------------------------------------{{{
     .byte  2, 18; .ascii "Really bad people don't go to heaven."   ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles18: #---------------------------------------------------------------{{{
-    .byte  1, 18; .ascii "and even hell has its limit to who"      ; .byte 0xFF
-    .byte 12, 19; .ascii "they'll take!!"                          ; .byte 0x00
+    .byte  3, 18; .ascii "and even hell has its limit to who"      ; .byte 0xFF
+    .byte 13, 19; .ascii "they'll take!!!"                         ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles19: #---------------------------------------------------------------{{{
     .byte  2, 16; .ascii "You see, when people die,if they've "    ; .byte 0xFF
     .byte  4, 17; .ascii "been 'Really Bad', they dont go"         ; .byte 0xFF
-    .byte 10, 18; .ascii "'up' or 'down'"                          ; .byte 0x00
+    .byte 13, 18; .ascii "'up' or 'down'"                          ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles20: #---------------------------------------------------------------{{{
     .byte  2, 16; .ascii "They stay where they were as undead"     ; .byte 0xFF
     .byte  6, 17; .ascii "monsters, hated by God, and"             ; .byte 0xFF
     .byte  9, 18; .ascii "feared by all mankind!"                  ; .byte 0xFF
-    .byte  1, 19; .ascii "with an endless thirst for human blood!" ; .byte 0x00
+    .byte  1, 19; .ascii "With an endless thirst for human blood!" ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles21: #---------------------------------------------------------------{{{
 Subtitles22:

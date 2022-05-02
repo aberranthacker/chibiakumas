@@ -299,11 +299,10 @@ DoShowCredits: #-------------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 
 ResetEventStream: #----------------------------------------------------------{{{
-        MOV  $GameVarsArraysSize>>2,R0
+        MOV  $GameVarsArraySizeWords,R0
         MOV  $Akuyou_GameVarsStart,R1
 
 100$:   CLR  (R1)+
-        CLR  (R1)+
         SOB  R0,100$
 
         MOV  $Event_SavedSettings,R3  # Saved Settings

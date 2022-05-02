@@ -96,7 +96,6 @@ build/bootstrap.o : $(common) \
 build/core.o : $(common) \
                core.s \
                compiled_sprite_viewer.s \
-               disk_driver.s \
                do_moves.s \
                event_stream.s \
                execute_bootstrap.s \

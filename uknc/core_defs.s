@@ -5,9 +5,8 @@
 .equiv Episode1_Intro, 0x0000
 .equiv Level1, 0x0001
 
-#.equiv StartOnLevel, MainMenu
+.equiv StartOnLevel, MainMenu
 #.equiv StartOnLevel, Episode1_Intro
-.equiv StartOnLevel, Episode1_Intro
 
 .if StartOnLevel == MainMenu
   .equiv ShowLoadingScreen, 1
@@ -18,27 +17,27 @@
 .equiv PPU_UserRamSizeWords, PPU_UserRamSize >> 1 # 0x2C22 026042 11298
 .equiv PPU_PPUCommand,    PPUCommand >> 1
 .equiv PPU_PPUCommandArg, PPUCommandArg >> 1
-.equiv PPU_MusicBuffer, 0x3936 # 14646 034466 # auto-generated during a build
+.equiv PPU_MusicBuffer, 0x39D6 # 14806 034726 # auto-generated during a build
 
 .equiv FB0, 384 # 0600 0x0180
 .equiv FB_gap, FB0 + 16000
 .equiv FB1, FB_gap + 384
 
-.equiv PPU_NOP,            1 * 2
-.equiv PPU_Finalize,       2 * 2
-.equiv PPU_SingleProcess,  3 * 2
-.equiv PPU_MultiProcess,   4 * 2
-.equiv PPU_SetPalette,     5 * 2
-.equiv PPU_Print,          6 * 2
-.equiv PPU_PrintAt,        7 * 2
-.equiv PPU_FlipFB,         8 * 2
-.equiv PPU_ShowFB0,        9 * 2
-.equiv PPU_ShowFB1,       10 * 2
-.equiv PPU_LoadText,      11 * 2
-.equiv PPU_ShowBossText,  12 * 2
-.equiv PPU_LoadMusic,     13 * 2
-.equiv PPU_MusicRestart,  14 * 2
-.equiv PPU_MusicStop,     15 * 2
+.equiv PPU_NOP,            2
+.equiv PPU_Finalize,       4
+.equiv PPU_SingleProcess,  6
+.equiv PPU_MultiProcess,   8
+.equiv PPU_SetPalette,    10
+.equiv PPU_Print,         12
+.equiv PPU_PrintAt,       14
+.equiv PPU_FlipFB,        16
+.equiv PPU_ShowFB0,       18
+.equiv PPU_ShowFB1,       20
+.equiv PPU_LoadText,      22
+.equiv PPU_ShowBossText,  24
+.equiv PPU_LoadMusic,     26
+.equiv PPU_MusicRestart,  28
+.equiv PPU_MusicStop,     30
 
 .equiv BootstrapStart,  512
 .equiv Akuyou_GameVarsStart, FB1 + 16000
@@ -46,9 +45,11 @@
 .equiv StarArraySize, 256
 .equiv ObjectArraySize, 60
 .equiv PlayerStarArraySize, 128
-.equiv GameVarsArraysSize, StarArraySize * 4 + ObjectArraySize * 8 + PlayerStarArraySize * 4 + 15*8
+# WARNING: Update `core.s` if you changed array element size (multiplicator)
+.equiv GameVarsArraySize, ObjectArraySize * 8 + StarArraySize * 4 + PlayerStarArraySize * 4 + 15 * 8
+.equiv GameVarsArraySizeWords, GameVarsArraySize >> 1
 
-.equiv Akuyou_LevelStart, 0x9746 # 38726 0113506 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x974E # 38734 0113516 # auto-generated during a build
 .equiv LevelSprites, Akuyou_LevelStart + 4
 
 .equiv SPReset,       0157770 # Initial stack pointer

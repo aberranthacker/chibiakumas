@@ -79,7 +79,7 @@ ObjectArray_Redraw:                                         # ObjectArray_Redraw
                                                             #     or a
         BZE  game_paused$                                   #     ret z   ; see if game is paused (TicksOccurred = 0 )
                                                             #
-        CALL ObjectArray_ConfigureForSize                   #     call ObjectArray_ConfigureForSize
+        CALL @$ObjectArray_ConfigureForSize                 #     call ObjectArray_ConfigureForSize
                                                             #
         MOV  $ObjectArraySize,R4                            #     ld B,ObjectArraySize ;00ObjectArray_Size_Plus1
         MOV  $ObjectArrayPointer,R5                         #     ld hl,ObjectArrayPointer;(ObjectArrayAddress)
@@ -800,7 +800,7 @@ Object_DecreaseLifeShot: .global Object_DecreaseLifeShot    #  Object_DecreaseLi
                                                             # Object_DecreaseShotToDeathB:
                                                             #     ;object has been shot to death
         # check if address mode is right                                                    #
-        CALL null                                           #     call null :CustomShotToDeathCall_Plus2
+        CALL @$null                                         #     call null :CustomShotToDeathCall_Plus2
        .equiv  dstCustomShotToDeathCall, .-2
        .global dstCustomShotToDeathCall
                                                             #

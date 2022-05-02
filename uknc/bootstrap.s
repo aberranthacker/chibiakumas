@@ -115,21 +115,8 @@ Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
 
         MOV  $level_00.bin,R0
         CALL Bootstrap_LoadDiskFile
-                                        # ld hl,DiskMap_MainMenu      ;T08-SC1.D01
-                                        # ld c,DiskMap_MainMenu_Disk
-                                        #
-                                        # call Bootstrap_LoadEP2Music_Z # ../Aku/BootStrap.asm:656
-                                        #
-                                        # ld hl,DiskMap_MainMenu      ;T08-SC1.D01
-                                        # ld c,DiskMap_MainMenu_Disk
-                                        #
-                                        # ;need to use Specail MSX version - no extra tilemaps
-                                        # jp Bootstrap_LoadEP2Level_1PartOnly # ../Aku/BootStrap.asm:724
-       .ppudo_ensure $PPU_SingleProcess
 
-# .ppudo_ensure $PPU_SetPalette, $LoadingScreenPalette
-# .ppudo_ensure $PPU_PrintAt, $TestStr
-# br .
+       .ppudo_ensure $PPU_SingleProcess
 
         MOV  $SPReset,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
@@ -144,7 +131,6 @@ Bootstrap_Level_Intro:
         MOV  $ep1_intro.bin,R0
         CALL Bootstrap_LoadDiskFile
 
-        # TODO: load music Aku/BootStrap.asm:1185
         MOV  $ep1_intro_slides.bin,R0
         CALL Bootstrap_LoadDiskFile
 
@@ -320,7 +306,7 @@ RETURN
 #----------------------------------------------------------------------------}}}
 
 LevelReset0000: # ../Aku/BootStrap.asm:2306 ---------------------------------{{{
-            # wipe our memory, to clear out any junk from old levels
+        # wipe our memory, to clear out any junk from old levels
         MOV  $GameVarsArraySizeWords,R1
         MOV  $Akuyou_GameVarsStart,R3
   100$: CLR  (R3)+
@@ -406,7 +392,12 @@ Bootstrap_LoadDiskFile: # ---------------------------------------------------{{{
         BMI  3$
         BEQ  1237$
         SEC  # set carry flag to indicate that there was an error
-        MOV  @$PS.Status,R0
+        MOVB @$PS.Status,R0
+       .ppudo $PPU_Print, $LoadingErrorMsg
+        BR   .
+LoadingErrorMsg: .asciz "Loading error"
+       .even
+
 1237$:  RETURN
 
 ParamsAddr: .byte 0, 0, 0, 0xFF # init sequence (just in case)
