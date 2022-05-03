@@ -135,7 +135,9 @@ Bootstrap_Level_Intro:
         CALL Bootstrap_LoadDiskFile
 
        .ppudo_ensure $PPU_SingleProcess
+       .list
         MOV  $SPReset,SP # we are not returning, so reset the stack
+        .nolist
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
 Bootstrap_Level_1: # ../Aku/BootStrap.asm:838  main menu --------------------
@@ -431,7 +433,7 @@ ep1_intro.bin:
        .word Ep1IntroSizeWords
        .word Ep1IntroBlockNum
 ep1_intro_slides.bin:
-       .word FB1
+       .word Ep1IntroSlidesStart
        .word Ep1IntroSlidesSizeWords
        .word Ep1IntroSlidesBlockNum
 level_00.bin:

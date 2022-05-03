@@ -21,7 +21,7 @@ IntroMusic:
 slide01: .incbin "build/ep1-intro/ep1-intro-slide01.raw.lzsa1" # chibiki
 slide02: .incbin "build/ep1-intro/ep1-intro-slide02.raw.lzsa1" # fishing
 slide03: .incbin "build/ep1-intro/ep1-intro-slide03.raw.lzsa1" # camping
-slide04: .incbin "build/ep1-intro/ep1-intro-slide04.raw.lzsa1" # prank
+slide04: .incbin "build/ep1-intro/ep1-intro-slide04.raw.lzsa1" # prank with poison
 slide05: .incbin "build/ep1-intro/ep1-intro-slide05.raw.lzsa1" # school1
 slide06: .incbin "build/ep1-intro/ep1-intro-slide06.raw.lzsa1" # bulbs
 slide07: .incbin "build/ep1-intro/ep1-intro-slide07.raw.lzsa1" # plane
@@ -100,7 +100,6 @@ EventStreamArray:
     .word 10, evtCallAddress, ShowText1Init
 
     .word 49, evtCallAddress, ShowText0Init
-
 
     .word 50, evtSetPalette, ChibikoAttacksPalette
 
@@ -184,16 +183,7 @@ EndLevel:
         JMP  @$ExecuteBootstrap
 
 LevelInit:
-        MOV  $Ep1IntroSlidesSizeWords,R0
-        ASR  R0
-        MOV  $FB1,R1
-        MOV  $FB0+6000,R2
-100$:
-        MOV  (R1)+,(R2)+
-        MOV  (R1)+,(R2)+
-        SOB  R0,100$
-
-       .ppudo_ensure $PPU_SetPalette, $BlackPalette
+        CALL @$ScreenBuffer_Reset
         # TODO: Load artifact of Level252-Intro_Screens1.asm
         # TODO: call Akuyou_Music_Restart when implemented
        .ppudo_ensure $PPU_LoadMusic,$IntroMusic
@@ -201,55 +191,68 @@ LevelInit:
         MOV  $EventStreamArray,R5
        #MOV  $Event_SavedSettings,R3
         CALL @$Event_StreamInit
-        CALL @$ScreenBuffer_Reset
 
         MTPS $PR0 # enable interrupts
 LevelLoop:
-       .equiv dstClearScreenPoint, .+2
         CALL @$null
-       .equiv dstFadeCommand, .+2
+       .equiv dstClearScreenPoint, .-2
         CALL @$null
+       .equiv dstFadeCommand, .-2
 
         CALL @$Timer_UpdateTimer
         CALL @$EventStream_Process
 
-       .equiv dstDoubleStreamProcess, .+2
         CALL @$null
+       .equiv dstDoubleStreamProcess, .-2
 
         BITB @$KeyboardScanner_P1,$Keymap_AnyFire
         BNZ  EndLevel
 
         CALL @$ObjectArray_Redraw
 
-       .equiv dstShowBossTextCommand, .+2
-        CALL @$ShowBossText
+        CALL @$null
+       .equiv dstShowBossTextCommand, .-2
+        WAIT
         WAIT
         WAIT
         WAIT
         WAIT
         WAIT
 
-        MOV  (PC)+, R0; srcShowTextUpdate: .word 0xFF
+        MOV  $0, R0
+       .equiv srcShowTextUpdate, .-2
         CMP  R0,$22
         BHI  LevelLoop
 
-        ASL  R0
-        MOV  SubtitlesTable(R0),R5
+        # Show next slide
+#        CMP  R0, $1
+#        BEQ  1$
+#        CMP  R0, $2
+#        BNE  2$
+#1$:     MOV  $null, @$dstClearScreenBeforeShowTextSub
+#        BR   3$
+#2$:     MOV  $Clear4000, @$dstClearScreenBeforeShowTextSub
+#3$:
         MOV  $0xFF,@$srcShowTextUpdate
+        ASL  R0
 
        .wait_ppu
-        MOV  R5, @$PPUCommandArg;
+        MOV  SubtitlesTable(R0), @$PPUCommandArg
         MOV  $PPU_LoadText, @$PPUCommand
-        MOV  $1,@$srcCharsToPrint
+
+        MOV  $1, @$srcCharsToPrint
+        MOV  $ShowBossText, @$dstShowBossTextCommand
 
         CALL @$Clear4000
+       #.equiv dstClearScreenBeforeShowTextSub, .-2
 
+       .wait_ppu
         MOV  PalettesTable(R0), @$PPUCommandArg
         MOV  $PPU_SetPalette, @$PPUCommand
 
         MOV  $0x0000,R1
        .equiv PicAddr, .-2
-        BZE  1237$
+        BZE  1237$      # address is zero, no slide to display
         MOV  $FB0,R2
         CALL @$unlzsa1
 
@@ -319,7 +322,7 @@ LevelLoop:
 
 ShowText0Init: #-------------------------------------------------------------{{{
         CLR  @$PicAddr
-        MOV  $0,R0
+        CLR  R0
         BR   UpdateShowText
 ShowText1Init:
         CLR  @$PicAddr
@@ -410,9 +413,9 @@ ShowText22Init:
         MOV  $22,R0
 
 UpdateShowText:
+        MOV  $null, @$dstShowBossTextCommand
         MOV  R0, @$srcShowTextUpdate
 
-NoSpeech:
         RETURN
 #----------------------------------------------------------------------------}}}
 
@@ -425,8 +428,7 @@ RETURN
 
 # Subtitles #----------------------------------------------------------------{{{
 SubtitlesEmpty: #------------------------------------------------------------{{{
-    .byte  4, 10; .ascii "     " ; .byte 0xFF
-    .byte  4, 11; .ascii "     " ; .byte 0x00
+    .byte  0,  0; .ascii ""; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles1: #----------------------------------------------------------------{{{
                          #0         1         2         3         4
@@ -463,7 +465,7 @@ Subtitles7: #----------------------------------------------------------------{{{
     .byte  2, 18; .ascii "Chibiko was a typical cheerful girl."    ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles8: #----------------------------------------------------------------{{{
-    .byte 13, 18; .ascii "She loved animals,"                      ; .byte 0x00
+    .byte 11, 18; .ascii "She loved animals,"                      ; .byte 0x00
     .even #------------------------------------------------------------------}}}
 Subtitles9: #----------------------------------------------------------------{{{
     .byte  2, 18; .ascii "and enjoyed spending time outdoors!"     ; .byte 0x00
@@ -533,8 +535,8 @@ ClearObjects:
 RETURN
 
 Clear4000: #-----------------------------------------------------------------{{{
-        # do note use the power more than 4, because of the SOB range
-       .equiv Clear4000_PowerOfTwo, 4
+        # do note use the power more than 5, because of the SOB range
+       .equiv Clear4000_PowerOfTwo, 5
         MOV  R0,-(SP)
         MOV  R1,-(SP)
         MOV  R2,-(SP)

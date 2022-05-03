@@ -5,8 +5,8 @@
 .equiv Episode1_Intro, 0x0000
 .equiv Level1, 0x0001
 
-.equiv StartOnLevel, MainMenu
-#.equiv StartOnLevel, Episode1_Intro
+#.equiv StartOnLevel, MainMenu
+.equiv StartOnLevel, Episode1_Intro
 
 .if StartOnLevel == MainMenu
   .equiv ShowLoadingScreen, 1
@@ -18,10 +18,6 @@
 .equiv PPU_PPUCommand,    PPUCommand >> 1
 .equiv PPU_PPUCommandArg, PPUCommandArg >> 1
 .equiv PPU_MusicBuffer, 0x39D6 # 14806 034726 # auto-generated during a build
-
-.equiv FB0, 384 # 0600 0x0180
-.equiv FB_gap, FB0 + 16000
-.equiv FB1, FB_gap + 384
 
 .equiv PPU_NOP,            2
 .equiv PPU_Finalize,       4
@@ -39,15 +35,15 @@
 .equiv PPU_MusicRestart,  28
 .equiv PPU_MusicStop,     30
 
-.equiv BootstrapStart,  512
-.equiv Akuyou_GameVarsStart, FB1 + 16000
+# memory map ------------------------------------------------------------------
+.equiv FB0, 384 # 0600 0x0180
+.equiv FB_gap, FB0 + 16000
+.equiv FB1, FB_gap + 384
 
-.equiv StarArraySize, 256
-.equiv ObjectArraySize, 60
-.equiv PlayerStarArraySize, 128
-# WARNING: Update `core.s` if you changed array element size (multiplicator)
-.equiv GameVarsArraySize, ObjectArraySize * 8 + StarArraySize * 4 + PlayerStarArraySize * 4 + 15 * 8
-.equiv GameVarsArraySizeWords, GameVarsArraySize >> 1
+.equiv BootstrapStart,  FB0
+.equiv Ep1IntroSlidesStart, FB0 + 4096
+
+.equiv Akuyou_GameVarsStart, FB1 + 16000
 
 .equiv Akuyou_LevelStart, 0x974E # 38734 0113516 # auto-generated during a build
 .equiv LevelSprites, Akuyou_LevelStart + 4
@@ -56,7 +52,15 @@
 .equiv storedSP,      0157772 # place where we store SP, in case if we need yet another register
 .equiv PPUCommand,    0157774 # command for PPU code
 .equiv PPUCommandArg, 0157776 # command for PPU argument
-# 0xE000 57344 0160000 end of ram
+# 0xE000 57344 0160000 end of ram ---------------------------------------------
+
+.equiv StarArraySize, 256
+.equiv ObjectArraySize, 60
+.equiv PlayerStarArraySize, 128
+# WARNING: Update `core.s` if you changed array element size (multiplicator)
+.equiv GameVarsArraySize, ObjectArraySize * 8 + StarArraySize * 4 + PlayerStarArraySize * 4 + 15 * 8
+.equiv GameVarsArraySizeWords, GameVarsArraySize >> 1
+
 
 .equiv TextScreen_MaxX, 39
 .equiv TextScreen_MinX, 0

@@ -539,6 +539,9 @@ LoadText: #------------------------------------------------------------------{{{
                 ROR  R0       # divide it by 2 to calculate bitplane address
                 MOV  R0,(R5)  # load address of a string into address register
 
+                MOV  (R4),(R3)+ # load and store coordinates of the first line of the text
+                INC  (R5)
+
         10$:    MOV  (R4),R0  # load 2 bytes from CPU RAM
                 MOV  R0,(R3)+ # store them into the buffer
                 TSTB R0       #
@@ -559,11 +562,13 @@ ShowBossText: #--------------------------------------------------------------{{{
                 MOV  $PBPADR,R5
 
                 MOV  $PPU_PPUCommandArg, (R5) # setup address register
+
                 MOV  (R4),@$srcCharsToPrint
 
                 MOV  $DTSOCT,R4
 
-SBT_NextString: MOVB (R3)+,R0
+SBT_NextTextLine:
+                MOVB (R3)+,R0
                 ADD  $FbStart,R0
 
                 MOVB (R3)+,R1
@@ -576,8 +581,8 @@ SBT_NextChar:   DEC  (PC)+; srcCharsToPrint: .word 0xFF
                 MOV  R1,(R5)      # load address of the next char into address register
                 MOVB (R3)+,R0     # load character code from string buffer
                 TSTB R0
-                BMI  SBT_NextString
-                BZE  1237$
+                BMI  SBT_NextTextLine
+                BZE  1237$        # return if we are reached end of the text
 
                 ASH  $3,R0        # shift left by 3(multiply by 8)
                 ADD  $Font,R0     # calculate char bitmap address
