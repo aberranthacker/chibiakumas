@@ -14,7 +14,7 @@
                .equiv  Ep1IntroSlidesSizeWords, (end - start) >> 1
                .global Ep1IntroSlidesSizeWords
 
-               .=FB0 + 6000
+               .=Ep1IntroSlidesStart
 
 start:
   slide09: .incbin "build/ep1-intro/ep1-intro-slide09.raw.lzsa1"
