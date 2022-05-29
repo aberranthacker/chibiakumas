@@ -39,6 +39,7 @@ EventStreamArray:
     .word     evtSetObjectSize | 0             # 2
     .word     evtSetAnimator | anmNone         # 3
     .word     evtAddToBackground               # 4
+    # not used object settings
     .word     evtSaveObjSettings | 0           # 5
 
     .word 0, evtMultipleCommands | 5
@@ -49,7 +50,8 @@ EventStreamArray:
     .word     evtSetObjectSize | 0             # 2
     .word     evtSetAnimator | anmNone         # 3
     .word     evtAddToBackground               # 4
-    .word     evtSaveObjSettings | 2           # 5
+    # not used object settings
+    .word     evtSaveObjSettings | 1           # 5
 
     .word 0, evtMultipleCommands | 2
     .word     evtSetProgMoveLife               # 1
@@ -73,7 +75,7 @@ EventStreamArray:
     .word     evtSaveObjSettings | 4           # 2
 
     #----------
-   #.word 0, evtChangeStreamTime, 245, StartPoint
+   #.word 0, evtChangeStreamTime, 49, StartPoint
     #----------
 
     .word 0, evtMultipleCommands | 5
@@ -101,6 +103,7 @@ EventStreamArray:
 
     .word 49, evtCallAddress, ShowText0Init
 
+StartPoint:
     .word 50, evtSetPalette, ChibikoAttacksPalette
 
     .word 50, evtMultipleCommands | 4
@@ -157,7 +160,6 @@ StartIntroProper:
     .word 140+15,     evtCallAddress, ShowText6Init
     .word 170+15,     evtCallAddress, ShowText7Init  # chibiko
     .word 200+15,     evtCallAddress, ShowText8Init  # fishing
-StartPoint:
     .word 230+15,     evtCallAddress, ShowText9Init  # camping
 
     .word 256+  5+15, evtCallAddress, ShowText10Init # prank
