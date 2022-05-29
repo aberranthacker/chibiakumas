@@ -315,8 +315,8 @@ RETURN                                                      #     ret
                                                             #
 # Used to remember boss objects and apply custom animation etc by hacking the object array.
 Event_LoadLastAddedObjectToAddress:
-        MOV  (PC)+,@(R5)+
-        srcObjects_LastAdded: .word 0
+        MOV  $0,@(R5)+
+       .equiv srcObjects_LastAdded, .-2
 RETURN
                                                             #
 # call a function - be very careful what you do, as registers must be pretty

@@ -37,109 +37,66 @@ EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
         # ;  []=====[]=== (foreground) %11000001   Bank 0
 
     .word 0 # time
-    .word evtSetPalette  # Event_CoreReprogram_Palette
-    .word     MenuPalette # palette data address
+    .word evtSetPalette, MenuPalette # Event_CoreReprogram_Palette
 
-        # ; Background L
-        # defb 0
-        # defb 128+4     ; SrcALL/Akuyou_Multiplatform_EventStream.asm:182
-        #                ; CALL Event_ProgramMoveLifeSwitch_0100
-        # defb 1         ; Program - Bitshift Sprite
-        # defb %11000001 ; Move - dir Left Slow
-        # defb 0         ; Life - immortal
+        # Background L
     .word 0 # time
-    .word evtSetProgMoveLife # CALL Event_ProgramMoveLifeSwitch
-    .word prgBitShift # program - bitshift sprite
-    .word 0b11000001  # move    - dir left, slow
+    .word evtSetProgMoveLife    # CALL Event_ProgramMoveLifeSwitch
+    .word prgBitShift           # program - bitshift sprite
+    .word mveBackground | 0x01  # move    - dir left, slow
     .word lifeImmortal
-        # defb 0,%10010000+15,0      ; Save Object settings to Bank 0
     .word 0 # time
-    .word evtSaveObjSettings | 0 # Save Object settings to the Slot 0
+    .word evtSaveObjSettings | 0 # Save Object settings to the Slot 0, unused
 
-        # defb 0
-        # defb 128+4      ; SrcALL/Akuyou_Multiplatform_EventStream.asm:182
-        #                 ; CALL Event_ProgramMoveLifeSwitch_0100
-        # defb 1          ; Program - Bitshift Sprite
-        # defb %11000010  ; Move    - dir Left Slow
-        # defb 0          ; Life    - immortal
     .word 0 # time
     .word evtSetProgMoveLife # CALL Event_ProgramMoveLifeSwitch
     .word prgBitShift          # program - bitshift sprite
-    .word 0b11000010 # move    - dir left, slow
+    .word mveBackground | 0x10 # move    - dir left, slow
     .word lifeImmortal
-        # defb 0,%10010000+15,1      ; Save Object settings to Bank 1
     .word 0 # time
-    .word evtSaveObjSettings | 1 # Save Object settings to the Slot 1
+    .word evtSaveObjSettings | 1 # Save Object settings to the Slot 1, unused
 
-        # defb 0,128+4,0,&24,0       ; Static object
     .word 0 # time
     .word evtSetProgMoveLife # CALL Event_ProgramMoveLifeSwitch
     .word prgNone
     .word mvStatic
     .word lifeImmortal
-        # defb 0,%10010000+15,2      ; Save Object settings to Bank 2
     .word 0 # time
     .word evtSaveObjSettings | 2 # Save Object settings to the Slot 2
 
-        # ;Title
-        # defb 0,%01110000+7          ; 7 commands at the same timepoint
+        # Title
     .word 0 # time
     .word evtMultipleCommands | 7 # Event_CoreMultipleEventsAtOneTime; 7 -> srcEvent_MultipleEventCount
-        # defb %10010000+0+2          ; Load Settings from bank 2
-    .word evtLoadObjSettings | 2 # Load Object settings from the Slot 2
-        # defb 0, 12, 12*0+ 24+44, 24+16 ; Single Object sprite 11 (animated)
-    .word evtSingleSprite
-    .word 12 # sprite
-    .byte 24+16, 12*0 + 24+44 # Y, X
-        # defb 0, 13, 12*1+ 24+44, 24+16 ; Single Object sprite 11 (animated)
-    .word evtSingleSprite
-    .word 13 # sprite
-    .byte 24+16, 12*1 + 24+44 # Y, X
-        # defb 0, 14, 12*2+ 24+44, 24+16 ; Single Object sprite 11 (animated)
-    .word evtSingleSprite
-    .word 14 # sprite
-    .byte 24+16, 12*2 + 24+44 # Y, X
-        # defb 0, 15, 12*3+ 24+44, 24+16 ; Single Object sprite 11 (animated)
-    .word evtSingleSprite
-    .word 15 # sprite
-    .byte 24+16, 12*3 + 24+44 # Y, X
-        # defb 0, 16, 12*4+ 24+44, 24+16 ; Single Object sprite 11 (animated)
-    .word evtSingleSprite
-    .word 16 # sprite
-    .byte 24+16, 12*4 + 24+44 # Y, X
-        # defb 0, 17, 12*5+ 24+44, 24+16 ; Single Object sprite 11 (animated)
-    .word evtSingleSprite
-    .word 17 # sprite
-    .byte 24+16, 12*5 + 24+44 # Y, X
+    .word evtLoadObjSettings | 2  # Load Object settings from the Slot 2
+    .word evtSingleSprite, 12     # sprite
+    .byte 24+16, 12*0 + 24+44     # Y, X
+    .word evtSingleSprite, 13     # sprite
+    .byte 24+16, 12*1 + 24+44     # Y, X
+    .word evtSingleSprite, 14     # sprite
+    .byte 24+16, 12*2 + 24+44     # Y, X
+    .word evtSingleSprite, 15     # sprite
+    .byte 24+16, 12*3 + 24+44     # Y, X
+    .word evtSingleSprite, 16     # sprite
+    .byte 24+16, 12*4 + 24+44     # Y, X
+    .word evtSingleSprite, 17     # sprite
+    .byte 24+16, 12*5 + 24+44     # Y, X
 
-        # ;Chibiko
-        # defb 0,%01110000+3      ; 3 commands at the same timepoint
+        # Chibiko
     .word 0 # time
     .word evtMultipleCommands | 3 # Event_CoreMultipleEventsAtOneTime; 7 -> srcEvent_MultipleEventCount
-        # defb %10010000+0+2      ; Load Settings from bank 2
-    .word evtLoadObjSettings | 2 # Load Object settings from the Slot 2
-        # defb 0,0,12*0+ 24,24+64 ; Single Object sprite 11 (animated)
-    .word evtSingleSprite
-    .word 0                # sprite
-    .byte 24+64, 12*0 + 24 # Y, X
-        # defb 0,1,12*1+ 24,24+64 ; Single Object sprite 11 (animated)
-    .word evtSingleSprite
-    .word 1                # sprite
-    .byte 24+64, 12*1 + 24 # Y, X
+    .word evtLoadObjSettings | 2  # Load Object settings from the Slot 2
+    .word evtSingleSprite, 0      # sprite
+    .byte 24+64, 12*0 + 24        # Y, X
+    .word evtSingleSprite, 1      # sprite
+    .byte 24+64, 12*1 + 24        # Y, X
 
-        # ;Bochan!
-        # defb 0,%01110000+3                 ; 3 commands at the same timepoint
+        # Bochan!
     .word 0 # time
-    .word evtMultipleCommands | 3 # Event_CoreMultipleEventsAtOneTime; 7 -> srcEvent_MultipleEventCount
-        # defb %10010000+0+2                 ; Load Settings from bank 2
-    .word evtLoadObjSettings | 2 # Load Object settings from the Slot 2
-        # defb 0,2,12*0+ 24+160-24,24+200-64 ; Single Object sprite 11 (animated)
-    .word evtSingleSprite
-    .word 2               # sprite
+    .word evtMultipleCommands | 3     # Event_CoreMultipleEventsAtOneTime; 7 -> srcEvent_MultipleEventCount
+    .word evtLoadObjSettings | 2      # Load Object settings from the Slot 2
+    .word evtSingleSprite, 2          # sprite
     .byte 24+200-64, 12*0 + 24+160-24 # Y, X
-        # defb 0,3,12*1+ 24+160-24,24+200-64 ; Single Object sprite 11 (animated)
-    .word evtSingleSprite
-    .word 3               # sprite
+    .word evtSingleSprite, 3          # sprite
     .byte 24+200-64, 12*1 + 24+160-24 # Y, X
 #----------------------------------------------------------------------------}}}
 PauseLoop:
@@ -153,16 +110,9 @@ LevelInit:
         MOV  $Event_SavedSettings,R3  # Saved Settings
         CALL @$Event_StreamInit
 
-       #MOV  $EventStreamArray_Ep1,R5 # Event Stream
-       #MOV  $Event_SavedSettings,R3  # Saved Settings
-       #CALL @$ResetEventStream
        .ppudo_ensure $PPU_LoadMusic,$TitleMusic
        .ppudo_ensure $PPU_MusicRestart
        .ppudo_ensure $PPU_PrintAt,$PressFireKeyStr # Aku/Level00-Menu.asm:1101
-        # Aku/Level00-Menu.asm:1103
-       #CALL @$Timer_UpdateTimer
-       #CALL @$EventStream_Process
-       #CALL @$ObjectArray_Redraw
 
         CLR  @$KeyboardScanner_P1 # call Keys_WaitForRelease
 
