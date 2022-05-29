@@ -39,8 +39,7 @@ EventStreamArray:
     .word     evtSetObjectSize | 0             # 2
     .word     evtSetAnimator | anmNone         # 3
     .word     evtAddToBackground               # 4
-    # not used object settings
-    .word     evtSaveObjSettings | 0           # 5
+    .word     evtSaveObjSettings | 0           # 5  unused object settings
 
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
@@ -50,8 +49,7 @@ EventStreamArray:
     .word     evtSetObjectSize | 0             # 2
     .word     evtSetAnimator | anmNone         # 3
     .word     evtAddToBackground               # 4
-    # not used object settings
-    .word     evtSaveObjSettings | 1           # 5
+    .word     evtSaveObjSettings | 1           # 5 unused object settings
 
     .word 0, evtMultipleCommands | 2
     .word     evtSetProgMoveLife               # 1
@@ -74,17 +72,12 @@ EventStreamArray:
     .word         lifeImmortal
     .word     evtSaveObjSettings | 4           # 2
 
-    #----------
-   #.word 0, evtChangeStreamTime, 49, StartPoint
-    #----------
-
     .word 0, evtMultipleCommands | 5
     .word     evtAddToForeground               # 1
     .word     evtLoadObjSettings | 2           # 2
     .word     evtSingleSprite, 3               # 3
-    .byte         24+80+6, 24+80-16 # Y, X
-    .word     evtSaveLstObjToAdd               # 4
-    .word         charnikohime
+    .byte         24+80+6, 24+80-16 # Y, X 110, 88
+    .word     evtSaveLstObjToAdd, charnikohime # 4
     .word     evtAddToBackground               # 5
 
     # Start of fade in block
@@ -99,13 +92,17 @@ EventStreamArray:
     .word FadeStartPoint + 3 # time
     .word evtSetPalette, RealPalette
 
+    #----------
+    .word 3, evtChangeStreamTime, 49, StartPoint
+    #----------
+
     .word 10, evtCallAddress, ShowText1Init
 
     .word 49, evtCallAddress, ShowText0Init
 
 StartPoint:
     .word 50, evtSetPalette, ChibikoAttacksPalette
-
+    # flying Chibiko
     .word 50, evtMultipleCommands | 4
     .word     evtLoadObjSettings | 3           # 1
     .word     evtSingleSprite, sprTwoFrame | 0 # 2
@@ -114,7 +111,7 @@ StartPoint:
     .byte         24+40-10, 24+160-12
     .word     evtSingleSprite, sprTwoFrame | 2 # 4
     .byte         24+40-10, 24+160
-
+    # cleanup Chibiko sprite
     .word 51, evtMultipleCommands | 5
     .word     evtSingleSprite, sprTwoFrame | 6
     .byte         24+40-10,      24+160-12-6
@@ -128,7 +125,7 @@ StartPoint:
     .byte         24+40-10+8,    24+160-12
 
     .word 52, evtSetPalette, ChibikoAttacksPalette2
-
+    # flying head
     .word 52, evtMultipleCommands | 7
     .word     evtLoadObjSettings | 4               # 1
     .word     evtAddToBackground                   # 2
@@ -526,7 +523,7 @@ RETURN
 
 Decapitateend:
         MOV  @$charnikohimehead,R0
-        MOVB $0x24,2(R0) # change move to static
+        MOVB $0x24, 2(R0) # change move to static
 RETURN
 
 ClearObjects:

@@ -1,6 +1,6 @@
 AS=~/opt/binutils-pdp11/pdp11-dec-aout/bin/as
 LD=~/opt/binutils-pdp11/pdp11-dec-aout/bin/ld
-# 2.31.1
+# 2.38
 
 .SUFFIXES:
 .SUFFIXES: .s .o
