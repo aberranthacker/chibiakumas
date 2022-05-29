@@ -107,8 +107,7 @@ Event_Stream_ForceNow:
         INC  $0xFFFF
        .equiv srcEvent_LevelTime, .-2
        .global srcEvent_LevelTime
-        CMP  @$srcEvent_LevelTime,$275
-        BNE  Event_MoreEvents
+
 Event_MoreEvents:
         # compare NextEventTime with LevelTime
         CMP  $0x01, @$srcEvent_LevelTime

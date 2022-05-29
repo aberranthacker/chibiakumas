@@ -1,12 +1,14 @@
+#-------------------------------------------------------------------------------
 # Note that the PRESENCE of those variables is tested, NOT their values. -------
 .equiv DebugMode, 1
+.equiv SkipPSGSend, 1
 #-------------------------------------------------------------------------------
 .equiv MainMenu, 0x8000
 .equiv Episode1_Intro, 0x0000
 .equiv Level1, 0x0001
 
-#.equiv StartOnLevel, MainMenu
-.equiv StartOnLevel, Episode1_Intro
+.equiv StartOnLevel, MainMenu
+#.equiv StartOnLevel, Episode1_Intro
 
 .if StartOnLevel == MainMenu
   .equiv ShowLoadingScreen, 1
@@ -45,7 +47,7 @@
 
 .equiv Akuyou_GameVarsStart, FB1 + 16000
 
-.equiv Akuyou_LevelStart, 0x974E # 38734 0113516 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9746 # 38726 0113506 # auto-generated during a build
 .equiv LevelSprites, Akuyou_LevelStart + 4
 
 .equiv SPReset,       0157770 # Initial stack pointer
