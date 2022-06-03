@@ -32,13 +32,14 @@ ObjectArray_ConfigureForSizeB:                              # ObjectArray_Config
         BIS  $0b00000011,R0                                 #     or %00000011
         MOV  R0,@$srcSpriteSizeShiftHalfH                   #     ld (SpriteSizeShiftHalfH_Plus1 - 1),a
 
-ObjectArray_ConfigureForSize:                               # ObjectArray_ConfigureForSize:
+ObjectArray_ConfigureForSize: # Define player 1 and 2 hitboxes # ObjectArray_ConfigureForSize:
         # We update player location in advance for fast collision detection
         # Define player 1's hitbox
         CLR  R0
         BISB @$P1_P00,R0                                    #     ld a,(P1_P00)   ;PlayerY
         MOV  R0,@$srcPlayerY2                               #     ld (PlayerY2_Plus1 - 1),a
-        SUB  (PC)+,R0; srcSpriteSizeShiftFull: .word 24     #     sub 24  :SpriteSizeShiftFull_Plus1
+       .equiv srcSpriteSizeShiftFull, .+2
+        SUB  $24,R0                                         #     sub 24  :SpriteSizeShiftFull_Plus1
         BHIS 1$                                             #     call C,ZeroA
         CLR  R0                                             #     ld (PlayerY1_Plus1 - 1),a
 1$:     MOV  R0,@$srcPlayerY1                               #
@@ -78,7 +79,7 @@ ObjectArray_Redraw:                                         # ObjectArray_Redraw
         TST  @$srcTimer_TicksOccured                        #     ld a,(Timer_TicksOccured)
                                                             #     or a
         BZE  game_paused$                                   #     ret z   ; see if game is paused (TicksOccurred = 0 )
-                                                            #
+        # Define player 1 and 2 hitboxes                    #
         CALL @$ObjectArray_ConfigureForSize                 #     call ObjectArray_ConfigureForSize
                                                             #
         MOV  $ObjectArraySize,R4                            #     ld B,ObjectArraySize ;00ObjectArray_Size_Plus1
@@ -90,7 +91,7 @@ ObjectArray_Redraw:                                         # ObjectArray_Redraw
         TSTB R1       # 0 means this object is unused       #     cp c
         BNZ  object_present$                                #     jr NZ,Objectloop_NotZero ;if object Y =0 the object is dead
 
-ObjectArray_Turbo:                                          # ObjectArray_Turbo:
+ObjectArray_NextObject:                                     # ObjectArray_Turbo:
         ADD  $6,R5                                          #     inc l
         SOB  R4,object_loop$                                #     djnz Objectloop2
     game_paused$:                                           #
@@ -377,7 +378,7 @@ ObjectLoop_ShowSprite:                                      # ObjectLoop_ShowSpr
         POP  R5                                             #     pop hl
         POP  R4                                             #     pop bc
        #CLR  R0                                             #     xor a ; Zero
-        JMP  @$ObjectArray_Turbo                            #     jp ObjectArray_Turbo
+        JMP  @$ObjectArray_NextObject                       #     jp ObjectArray_Turbo
                                                             #
                                                             # Animator_VectorArray:
                                                             # defw ObjectAnimator_Update         ; 1

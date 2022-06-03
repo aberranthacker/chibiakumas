@@ -1,19 +1,24 @@
 /*
   See EventStreamDirections for details of how DoMoves works
 */
-DoMoves: .global DoMoves
+       .global DoMoves
+DoMoves:
         # SDYYYXXX
         # S - 'special move'
         # D - Doubler (speed up move)
         # YYY - Y movement bits
         # XXX - X movement bits
         # B =X, C =Y, D =Move
+        #
         # R4=X, R1=Y, R2 - LSB=Move, MSB=Sprite
+        .list
         CLR  R4
+        .nolist
         BISB R1,R4 # R4 = X
         CLRB R1
         SWAB R1    # R1 = Y
 
+        # Check  if we are using a SPECIAL move pattern
         BIT  $0x80,R2                                       #     bit 7,d         ; See if we are using a SPECIAL move pattern
         BNZ  DoMoves_Spec                                   #     jr nz,DoMoves_Spec
                                                             # ;DoMovesStars
