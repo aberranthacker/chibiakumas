@@ -71,7 +71,7 @@ EventStreamArray:
     .word         mvRegular | spdNormal | 0x32
     .word         lifeImmortal
     .word     evtSaveObjSettings | 4           # 2
-
+    # charnikohime
     .word 0, evtMultipleCommands | 5
     .word     evtAddToForeground               # 1
     .word     evtLoadObjSettings | 2           # 2
@@ -106,23 +106,23 @@ StartPoint:
     .word 50, evtMultipleCommands | 4
     .word     evtLoadObjSettings | 3           # 1
     .word     evtSingleSprite, sprTwoFrame | 0 # 2
-    .byte         24+40-10, 24+160-24
+    .byte         24+40-10, 24+160-24 # Y, X : 54, 160
     .word     evtSingleSprite, sprTwoFrame | 1 # 3
-    .byte         24+40-10, 24+160-12
+    .byte         24+40-10, 24+160-12 # Y, X : 54, 172
     .word     evtSingleSprite, sprTwoFrame | 2 # 4
     .byte         24+40-10, 24+160
     # cleanup Chibiko sprite
     .word 51, evtMultipleCommands | 5
     .word     evtSingleSprite, sprTwoFrame | 6
-    .byte         24+40-10,      24+160-12-6
+    .byte         24+40-10,      24+160-12-6 # Y, X : 54, 166
     .word     evtSingleSprite, sprTwoFrame | 6
-    .byte         24+40+24+8-10, 24+160-12-6
+    .byte         24+40+24+8-10, 24+160-12-6 # Y, X : 86, 166
     .word     evtSingleSprite, sprTwoFrame | 6
-    .byte         24+40-10,      24+160-12
+    .byte         24+40-10,      24+160-12   # Y, X : 54, 172
     .word     evtSingleSprite, sprTwoFrame | 6
-    .byte         24+40+24+8-10, 24+160-12
+    .byte         24+40+24+8-10, 24+160-12   # Y, X : 86, 172
     .word     evtSingleSprite, sprTwoFrame | 6
-    .byte         24+40-10+8,    24+160-12
+    .byte         24+40-10+8,    24+160-12   # Y, X : 46, 172
 
     .word 52, evtSetPalette, ChibikoAttacksPalette2
     # flying head
@@ -183,12 +183,9 @@ EndLevel:
 
 LevelInit:
         CALL @$ScreenBuffer_Reset
-        # TODO: Load artifact of Level252-Intro_Screens1.asm
-        # TODO: call Akuyou_Music_Restart when implemented
        .ppudo_ensure $PPU_LoadMusic,$IntroMusic
        .ppudo_ensure $PPU_MusicRestart
         MOV  $EventStreamArray,R5
-       #MOV  $Event_SavedSettings,R3
         CALL @$Event_StreamInit
 
         MTPS $PR0 # enable interrupts
@@ -216,22 +213,12 @@ LevelLoop:
         WAIT
         WAIT
         WAIT
-        WAIT
 
         MOV  $0, R0
        .equiv srcShowTextUpdate, .-2
         CMP  R0,$22
         BHI  LevelLoop
 
-        # Show next slide
-#        CMP  R0, $1
-#        BEQ  1$
-#        CMP  R0, $2
-#        BNE  2$
-#1$:     MOV  $null, @$dstClearScreenBeforeShowTextSub
-#        BR   3$
-#2$:     MOV  $Clear4000, @$dstClearScreenBeforeShowTextSub
-#3$:
         MOV  $0xFF,@$srcShowTextUpdate
         ASL  R0
 
@@ -243,15 +230,17 @@ LevelLoop:
         MOV  $ShowBossText, @$dstShowBossTextCommand
 
         CALL @$Clear4000
-       #.equiv dstClearScreenBeforeShowTextSub, .-2
 
+        TST  R0
+        BZE  skip_palette_change$
        .wait_ppu
         MOV  PalettesTable(R0), @$PPUCommandArg
         MOV  $PPU_SetPalette, @$PPUCommand
 
+    skip_palette_change$:
         MOV  $0x0000,R1
        .equiv PicAddr, .-2
-        BZE  1237$      # address is zero, no slide to display
+        BZE  1237$ # address is zero, no slide to display
         MOV  $FB0,R2
         CALL @$unlzsa1
 

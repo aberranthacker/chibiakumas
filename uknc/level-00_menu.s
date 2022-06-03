@@ -40,13 +40,11 @@ EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
     .word evtSetPalette, MenuPalette # Event_CoreReprogram_Palette
 
         # Background L
-    .word 0 # time
-    .word evtSetProgMoveLife    # CALL Event_ProgramMoveLifeSwitch
-    .word prgBitShift           # program - bitshift sprite
-    .word mveBackground | 0x01  # move    - dir left, slow
-    .word lifeImmortal
-    .word 0 # time
-    .word evtSaveObjSettings | 0 # Save Object settings to the Slot 0, unused
+    .word 0, evtSetProgMoveLife    # CALL Event_ProgramMoveLifeSwitch
+    .word      prgNone           # program - bitshift sprite
+    .word      mvRegular | spdNormal | 0x25  # move - dir left, slow
+    .word      lifeImmortal
+    .word 0, evtSaveObjSettings | 0 # Save Object settings to the Slot 0, unused
 
     .word 0 # time
     .word evtSetProgMoveLife # CALL Event_ProgramMoveLifeSwitch
@@ -84,20 +82,20 @@ EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
         # Chibiko
     .word 0 # time
     .word evtMultipleCommands | 3 # Event_CoreMultipleEventsAtOneTime; 7 -> srcEvent_MultipleEventCount
-    .word evtLoadObjSettings | 2  # Load Object settings from the Slot 2
+    .word evtLoadObjSettings | 0  # Load Object settings from the Slot 2
     .word evtSingleSprite, 0      # sprite
-    .byte 24+64, 12*0 + 24        # Y, X
+    .byte 24+64, 12*0 + 24        # Y, X : 88, 24
     .word evtSingleSprite, 1      # sprite
-    .byte 24+64, 12*1 + 24        # Y, X
+    .byte 24+64, 12*1 + 24        # Y, X : 88, 36
 
         # Bochan!
     .word 0 # time
     .word evtMultipleCommands | 3     # Event_CoreMultipleEventsAtOneTime; 7 -> srcEvent_MultipleEventCount
-    .word evtLoadObjSettings | 2      # Load Object settings from the Slot 2
+    .word evtLoadObjSettings | 0      # Load Object settings from the Slot 2
     .word evtSingleSprite, 2          # sprite
-    .byte 24+200-64, 12*0 + 24+160-24 # Y, X
+    .byte 24+200-64, 12*0 + 24+160-24 # Y, X 160, 160
     .word evtSingleSprite, 3          # sprite
-    .byte 24+200-64, 12*1 + 24+160-24 # Y, X
+    .byte 24+200-64, 12*1 + 24+160-24 # Y, X 160, 172
 #----------------------------------------------------------------------------}}}
 PauseLoop:
     # Jump to a different level point
@@ -180,8 +178,10 @@ ShowMenu:
 ShowMenu_Loop: #-------------------------------------------------------------{{{
         CALL @$ShowKeysBitmap
         CALL @$Timer_UpdateTimer
-
+.list
         CALL @$EventStream_Process
+        CALL @$ObjectArray_Redraw
+.nolist
 
         WAIT
 
