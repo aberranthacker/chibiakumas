@@ -6,7 +6,7 @@
 # of 256*4, and has an upper limit of 64 items!
 # YYYYYXXXXMMMMSSS LLLLPPPRRRAAAA
 #
-# Y = object y       (1)
+# Y = object Y       (1)
 # X = object X       (2)
 # M = object Move    (3)
 # S = Object Sprite  (4)
@@ -128,7 +128,8 @@ ObjectArray_NextObject:                                     # ObjectArray_Turbo:
                                                             #         dec h
         MOV  (R5),R4 # Sprite Size=LSB, Animator=MSB        #         ld a,(hl) ; Sprite Size
         MOV  R4,R0 # ObjectArray_reConfigureForSize expects value in R0
-        CMPB (PC)+,R4; srcObjectSpriteSizeCurrent: .word 0  #         cp 0    :ObjectSpriteSizeCurrent_Plus1
+       .equiv srcObjectSpriteSizeCurrent, .+2
+        CMPB $0x00,R4                                       #         cp 0    :ObjectSpriteSizeCurrent_Plus1
        .call NE, @$ObjectArray_reConfigureForSize           #         call nz,ObjectArray_reConfigureForSize      ;Code to change sprite size!
                                                             #     ;7
         SWAB R4                                             #         dec h

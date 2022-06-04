@@ -78,8 +78,8 @@ RETURN                                                      #     ret
                                                             # ; Restart the event stream for a new level
 # ../SrcALL/Akuyou_Multiplatform_EventStream.asm:86
 
-Event_StreamInit:                                           # Event_StreamInit:
        .global Event_StreamInit
+Event_StreamInit:                                           # Event_StreamInit:
         # Store the address of our 2nd setting buffer (1st is contained in core)
        #MOV  R3,@$srcEvent_SavedSettings # uknc/event_stream.s:621
         CLR  R0
@@ -96,22 +96,22 @@ Event_StreamInit:                                           # Event_StreamInit:
 # stream is read forwards not backwards.
 
 EventStream_Process:
+       .equiv srcEvent_LevelSpeed, .+2 # how often ticks occur
         BIT  $0x04,@$srcTimer_TicksOccured
-       .equiv srcEvent_LevelSpeed, .-4 # how often ticks occur
 
         BNZ  Event_Stream_ForceNow
 
         RETURN # no ticks occured
 
 Event_Stream_ForceNow:
-        INC  $0xFFFF
-       .equiv srcEvent_LevelTime, .-2
        .global srcEvent_LevelTime
+       .equiv srcEvent_LevelTime, .+2
+        INC  $0xFFFF
 
 Event_MoreEvents:
         # compare NextEventTime with LevelTime
+       .equiv srcEvent_NextEventTime, .+2 # The time the event should occur
         CMP  $0x01, @$srcEvent_LevelTime
-       .equiv srcEvent_NextEventTime, .-4 # The time the event should occur
 
         BEQ  Event_GetEventsNow
         RETURN # event does not happen yet
@@ -120,8 +120,8 @@ Event_GetEventsNow: # ../SrcALL/Akuyou_Multiplatform_EventStream.asm:121
         # We do a dirty trick to save space, all these actions end in a RET
         MOV  $Event_LoadNextEvt,-(SP)
 
+       .equiv srcEvent_NextEventPointer, .+2 # mem pointer of next byte
         MOV  $0x0000,R5
-       .equiv srcEvent_NextEventPointer, .-2 # mem pointer of next byte
 
         CLR  R1
         BISB (R5)+,R1
@@ -136,7 +136,8 @@ Event_GetEventsNow: # ../SrcALL/Akuyou_Multiplatform_EventStream.asm:121
 
 # Read in the next object
 Event_LoadNextEvt:
-        TST  (PC)+; srcEvent_MultipleEventCount: .word 0x00
+       .equiv srcEvent_MultipleEventCount, .+2
+        TST  $0x00
         BZE  events_processed$
 
         # multiple events at the same timepoint
@@ -160,14 +161,14 @@ Event_StarBust:                                             # Event_StarBust:
                                                             #         call Stars_AddObjectBatchDefault
                                                             #     pop iy
                                                             #     pop hl
-RETURN                                                      #     ret
+        RETURN                                              #     ret
                                                             #
 # By default each time can only have ONE event, but we can use this commend to declare
 # XX events will occur at this time to save memory!
 Event_CoreMultipleEventsAtOneTime:                          # Event_CoreMultipleEventsAtOneTime:
         # uknc/event_stream.s:485                           #     ld a,b
         MOV  R1,@$srcEvent_MultipleEventCount               #     ld (Event_MultipleEventCount_Plus1 - 1),a
-RETURN # JMP  Event_LoadNextEvt                             #     ret
+        RETURN # JMP Event_LoadNextEvt                      #     ret
                                                             #
 # Event_SpriteSwitch: # Set the next sprite                   # Event_SpriteSwitch_0101:          ;Set the next sprite
 #         MOV  (R5)+,@$srcEventObjectSpriteToAdd              #     ld de,EventObjectSpriteToAdd_Plus1-1
@@ -175,15 +176,15 @@ RETURN # JMP  Event_LoadNextEvt                             #     ret
                                                             #
 Event_SetProgram: # Set the next program                    # Event_ProgramSwitch_0001:
         MOV  (R5)+,@$srcEventObjectProgramToAdd             #     ld de,EventObjectProgramToAdd_Plus1 - 1
-RETURN                                                      #     jr Event_CoreReprogram_ByteCopy
+        RETURN                                              #     jr Event_CoreReprogram_ByteCopy
                                                             #
 Event_SetAnimator:                                          # Event_AnimatorSwitch_1110:
         MOV  R1,@$srcEventObjectAnimatorToAdd               #     ld de,EventObjectAnimatorToAdd_Plus1-1
-RETURN                                                      #     jr Event_CoreReprogram_ByteCopy
+        RETURN                                              #     jr Event_CoreReprogram_ByteCopy
                                                             #
 Event_SetSpriteSize:                                        # Event_SpriteSizeSwitch_1101:
         MOV  R1,@$srcEventObjectSpriteSizeToAdd             #     ld de,EventObjectSpriteSizeToAdd_Plus1-1
-RETURN                                                      #     jr Event_CoreReprogram_ByteCopy
+        RETURN                                              #     jr Event_CoreReprogram_ByteCopy
                                                             #
 # Event_MoveSwitch: # Set the next move                       # Event_MoveSwitch_0011:
 #         MOV  (R5)+,@$srcEventObjectMoveToAdd                #     ld de,EventObjectMoveToAdd_Plus1-1
@@ -197,7 +198,7 @@ Event_SetMoveLife:                                          # Event_MoveLifeSwit
                                                             #     ld (EventObjectMoveToAdd_Plus1 - 1),a
 Event_SetLife:                                              # Event_LifeSwitch_0010:
         MOV  (R5)+,@$srcEventObjectLifeToAdd                #     ld de,EventObjectLifeToAdd_Plus1 - 1
-RETURN                                                      #
+        RETURN                                              #
                                                             # Event_CoreReprogram_ByteCopy:
                                                             #     rst 6
                                                             #     ld (de),a   ; put it at DE
@@ -223,14 +224,15 @@ Event_CoreReprogram_PowerupSprites:                         # Event_CoreReprogra
         MOVB R0,@$cmpPointsSprite                           #     ld (PointsSprite_Plus1-1),a
         MOVB R0,@$srcPointsSpriteB                          #     ld (PointsSpriteB_Plus1-1),a
         MOVB R0,@$srcPointsSpriteC                          #     ld (PointsSpriteC_Plus1-1),a
-RETURN                                                      #     ret
+
+        RETURN                                              #     ret
                                                             #
                                                             # Event_ReprogramObjectBurstPosition:
                                                             #     ld de,BurstPosition_Plus2-2
                                                             #     jr SetCustMove
 Event_CoreReprogram_CustomMove1:                            # Event_CoreReprogram_CustomMove1:
         MOV  (R3)+,@$dstLevelSpecificMove                   #     ld de,LevelSpecificMove_Plus2-2
-RETURN # JMP @$Event_LoadNextEvt                            #     jr SetCustMove
+        RETURN # JMP @$Event_LoadNextEvt                    #     jr SetCustMove
                                                             # Event_CoreReprogram_CustomMove2:
                                                             #     ld de,LevelSpecificMoveB_Plus2-2
                                                             #     jr SetCustMove
@@ -271,7 +273,7 @@ SetCustMove:                                                # SetCustMove:
                                                             #     inc de
                                                             #     ld a,b
                                                             #     ld (de),a
-RETURN # JMP @$Event_LoadNextEvt                            #     ret;    jp Event_LoadNextEvt
+        RETURN # JMP @$Event_LoadNextEvt                    #     ret;    jp Event_LoadNextEvt
                                                             # Event_CoreReprogram_ShotToDeath:
                                                             #     ld de,CustomShotToDeathCall_Plus2-2
                                                             #     jr SetCustMove
@@ -288,7 +290,7 @@ RETURN # JMP @$Event_LoadNextEvt                            #     ret;    jp Eve
 Event_CoreReprogram_Palette:
         MOV  (R5)+,@$PPUCommandArg
        .ppudo_ensure $PPU_SetPalette
-RETURN # JMP @$Event_LoadNextEvt
+        RETURN # JMP @$Event_LoadNextEvt
                                                             # Event_CoreReprogram_DataCopy:
                                                             #     ;reads in Offset then Bytecount from (HL) and dumps to destination DE
                                                             #     xor a
@@ -308,16 +310,16 @@ RETURN # JMP @$Event_LoadNextEvt
                                                             #     inc hl
                                                             #
                                                             #     ldir
-RETURN                                                      #     ret
+        RETURN                                              #     ret
                                                             #
 # Event_MoveSwitch: # not used, legacy                      # Event_MoveSwitch:
 #         JMP  @Event_MoveVector(R1)                        #     jp VectorJump_PushHlFirst
                                                             #
 # Used to remember boss objects and apply custom animation etc by hacking the object array.
 Event_LoadLastAddedObjectToAddress:
-        MOV  $0,@(R5)+
-       .equiv srcObjects_LastAdded, .-2
-RETURN
+       .equiv srcObjects_LastAdded, .+2
+        MOV  $0x00,@(R5)+
+        RETURN
                                                             #
 # call a function - be very careful what you do, as registers must be pretty
 # much untouched otherwise a crash will occur on return. it's best to set a flag
@@ -356,12 +358,12 @@ Event_ChangeStreamTime:                                     # Event_ChangeStream
 # Add to the foreground (top of the object array)
 Event_AddToForeground:                                      # Event_AddFront_0110:
         MOV  $1,@$srcObjectAddToForeBack                    #     ld a,1
-RETURN                                                      #     jr Event_AddXX
+        RETURN                                              #     jr Event_AddXX
                                                             #
 # Add to the background (bottom of the object array)
 Event_AddToBackground:                                      # Event_AddBack_0111:
         CLR  @$srcObjectAddToForeBack                       #     xor a
-RETURN                                                      #
+        RETURN                                              #
                                                             # Event_AddXX:
                                                             #     ld (ObjectAddToForeBack_Plus1-1),a
                                                             #     ret
@@ -471,12 +473,11 @@ EventOneObject$:                                            # EventoneObject:
         # PUSH R3 all registers are versatile on PDP-11 :-) #     push hl
         CALL Event_AddObject                                #     call Event_AddObject
         # POP  R3                                           #     pop hl
-RETURN                                                      #     ret
+        RETURN                                              #     ret
 
 Event_AddObject: # called by object_driver as well          # Event_AddObject:
-                                                            #     ld hl,Event_AddObject_MoveDirection_Plus1 - 1
-        TST  (PC)+; srcObjectAddToForeBack: .word 0         #     ld a,0  :ObjectAddToForeBack_Plus1
-                                                            #     or a
+       .equiv srcObjectAddToForeBack, .+2                   #     ld a,0  :ObjectAddToForeBack_Plus1
+        TST  $0x00                                          #     or a
         BEQ  Event_AddObjectBack$                           #     jr z,Event_AddObjectBack
                                                             #
         #     0062703 == ADD (PC)+,R3                       #     ;add object to the front
@@ -516,13 +517,13 @@ Event_AddObject: # called by object_driver as well          # Event_AddObject:
                                                             #     inc h;
         MOV  R2,(R3)+ # Y=LSB, X=MSB                        #     ld (hl),d ;X
 
-                                                            #     inc h
-        MOVB (PC)+,(R3)+; srcEventObjectMoveToAdd: .word 0  #     ld (hl),&0 :EventObjectMoveToAdd_Plus1   ; Move
-                                                            #     inc h
-        MOVB (PC)+,(R3)+; srcEventObjectSpriteToAdd: .word 0#     ld (hl),&0 :EventObjectSpriteToAdd_Plus1 ; sprite
+       .equiv srcEventObjectMoveToAdd, .+2                  #     inc h
+        MOVB $0x00,(R3)+                                    #     ld (hl),&0 :EventObjectMoveToAdd_Plus1   ; Move
+       .equiv srcEventObjectSpriteToAdd, .+2                #     inc h
+        MOVB $0x00,(R3)+                                    #     ld (hl),&0 :EventObjectSpriteToAdd_Plus1 ; sprite
                                                             #     set 6,l
-                                                            #
-        MOV  (PC)+,R0; srcEventObjectLifeToAdd: .word 0     #     ld a,&0 :EventObjectLifeToAdd_Plus1 ; life
+       .equiv srcEventObjectLifeToAdd, .+2                  #
+        MOV  $0x00,R0                                       #     ld a,&0 :EventObjectLifeToAdd_Plus1 ; life
                                                             #     push af
         CMPB @$LivePlayers,$1                               #         ld a,(LivePlayers)
         BEQ  AddObjectOnePlayer$                            #         dec a
@@ -546,22 +547,27 @@ Event_AddObject: # called by object_driver as well          # Event_AddObject:
     AddObjectOnePlayer$:                                    # AddObjectOnePlayer:
                                                             #     pop af
                                                             # AddObjectTwoPlayer:
-        MOVB R0,(R3)+ # LifeToAdd                           #     ld (hl),a
-                                                            #     dec h
-        MOVB (PC)+,(R3)+; srcEventObjectProgramToAdd: .word 0x00 #     ld (hl),&0 :EventObjectProgramToAdd_Plus1    ; Program code
-       .global srcEventObjectProgramToAdd    # Program code
-                                                            #     dec h
-        MOVB (PC)+,(R3)+; srcEventObjectSpriteSizeToAdd: .word 0x00 #     ld (hl),&0 :EventObjectSpriteSizeToAdd_Plus1 ; Sprite size for collisions
-       .global srcEventObjectSpriteSizeToAdd # Sprite size for collisions
-                                                            #     dec h
-        MOVB (PC)+,(R3)+; srcEventObjectAnimatorToAdd: .word 0x00 #     ld (hl),&0 :EventObjectAnimatorToAdd_Plus1   ; Animator
-       .global srcEventObjectAnimatorToAdd   # Animator
-RETURN                                                      #     ret
+        MOVB R0,(R3)+    # LifeToAdd                        #     ld (hl),a
+
+       .global srcEventObjectProgramToAdd                   
+       .equiv srcEventObjectProgramToAdd, .+2               #     dec h
+        MOVB $0x00,(R3)+ # Program code                     #     ld (hl),&0 :EventObjectProgramToAdd_Plus1    ; Program code
+
+       .global srcEventObjectSpriteSizeToAdd 
+       .equiv srcEventObjectSpriteSizeToAdd, .+2
+        MOVB $0x00,(R3)+ # Sprite size for collisions       #     ld (hl),&0 :EventObjectSpriteSizeToAdd_Plus1 ; Sprite size for collisions
+
+       .global srcEventObjectAnimatorToAdd  
+       .equiv srcEventObjectAnimatorToAdd, .+2
+        MOVB $0x00,(R3)+ # Animator                         #     ld (hl),&0 :EventObjectAnimatorToAdd_Plus1   ; Animator
+
+        RETURN                                              #     ret
+
     Event_ObjectLoopNext$:                                  # Event_ObjectLoopNext:
         opcAddObject_MoveDirection$:
         ADD  $8,R3                                          #     inc hl      :Event_AddObject_MoveDirection_Plus1
         SOB  R4,Event_Objectloop$                           #     djnz,Event_Objectloop
-RETURN                                                      #     ret
+        RETURN                                              #     ret
 
 Event_SaveObjSettings:
         ASL  R1
@@ -576,7 +582,8 @@ Event_SaveObjSettings:
         MOVB @$srcEventObjectSpriteSizeToAdd,(R1)+
         MOVB @$srcEventObjectAnimatorToAdd,  (R1)+
         MOVB @$srcObjectAddToForeBack,       (R1)
-RETURN
+
+        RETURN
 
 Event_LoadObjSettings:
         ASL  R1
@@ -591,7 +598,8 @@ Event_LoadObjSettings:
         MOVB (R1)+, @$srcEventObjectSpriteSizeToAdd
         MOVB (R1)+, @$srcEventObjectAnimatorToAdd
         MOVB (R1),  @$srcObjectAddToForeBack
-RETURN
+
+        RETURN
 
 
 

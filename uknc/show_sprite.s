@@ -64,17 +64,16 @@ ShowSprite_ReadInfo: # ------------------------------------------------------{{{
 
         MOVB (R5)+,R1 # width in bytes
         # don't care about sign extension, 80 is a maximum value
-       #ASR  R1 # we are dealing with words here
         MOV  R1,@$srcSprShow_DrawWidth
         MOV  R1,@$srcSprShow_SpriteWidth
 
         MOVB (R5)+,@$srcSprShow_Yoffset
 
-        # Sprite attributes such as PSet, Doubleheight and trans color
+        # Sprite attributes such as PSet, Doubleheight and transp color
         MOVB (R5)+,R0 # sign extension is irrelevant
         MOV  R0,@$srcSprShow_SpriteAttributes
 
-        # R0 Xoff
+        # R0 sprite attributes
         # R1 width
         # R3 sprite store address
         # R5 sprite offset
@@ -174,7 +173,7 @@ ShowSprite: # ShowSprite is the main routine of our program!
         ADD  (R5),R3 # calculate sprite address
         MOV  R3,@$srcSprShow_TempAddr
 
-        # we are relying on Xoff still being in R0
+        # we are relying on sprite attributes still being in R0
         BIC  $0xFFF8,R0 # Bits 2,1,0 - transparency
         MOVB TranspColors(R0),@$srcTranspBitA
 
@@ -222,9 +221,7 @@ ShowSprite: # ShowSprite is the main routine of our program!
 
         # R1 Y
         # R2 X
-        .list
         CALL @$VirtualPosToScreenByte
-        .nolist
         # R2 Y lines to skip   | R4 X bytes to skip, left    #
         # R3 Y lines to remove | R5 X bytes to remove, right #
 

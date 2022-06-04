@@ -11,9 +11,7 @@ DoMoves:
         # B =X, C =Y, D =Move
         #
         # R4=X, R1=Y, R2 - LSB=Move, MSB=Sprite
-        .list
         CLR  R4
-        .nolist
         BISB R1,R4 # R4 = X
         CLRB R1
         SWAB R1    # R1 = Y
