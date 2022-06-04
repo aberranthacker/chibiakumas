@@ -18,8 +18,6 @@ start:
 TITLETEX: .incbin "resources/titletex.spr"
 TitleMusic: .incbin "build/ep1_title_music.bin"
 
-CustomRam: .space 64 # Pos-Tick-Pos-Tick # enough memory for 16 enemies!
-
 EventStreamArray_Ep1: #------------------------------------------------------{{{
     .word 0, evtSetPalette, TitleScreenPalette
 
@@ -27,75 +25,46 @@ EventStreamArray_Ep1: #------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 
 EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
-        # defb 0,evtCallAddress
-        # defw SetFaderEP1Menu
-
-        # ; We will use 4 Paralax layers
-        # ;  ---------()- (sky)        %11001000
-        # ;  ------------ (Far)        %11000100
-        # ;  -----X---X-- (mid)        %11000010   Bank 1
-        # ;  []=====[]=== (foreground) %11000001   Bank 0
-
     .word 0 # time
     .word evtSetPalette, MenuPalette # Event_CoreReprogram_Palette
 
-        # Background L
-    .word 0, evtSetProgMoveLife    # CALL Event_ProgramMoveLifeSwitch
-    .word      prgNone           # program - bitshift sprite
-    .word      mvRegular | spdNormal | 0x25  # move - dir left, slow
-    .word      lifeImmortal
-    .word 0, evtSaveObjSettings | 0 # Save Object settings to the Slot 0, unused
-
-    .word 0 # time
-    .word evtSetProgMoveLife # CALL Event_ProgramMoveLifeSwitch
-    .word prgBitShift          # program - bitshift sprite
-    .word mveBackground | 0x10 # move    - dir left, slow
-    .word lifeImmortal
-    .word 0 # time
-    .word evtSaveObjSettings | 1 # Save Object settings to the Slot 1, unused
-
-    .word 0 # time
-    .word evtSetProgMoveLife # CALL Event_ProgramMoveLifeSwitch
-    .word prgNone
-    .word mvStatic
-    .word lifeImmortal
-    .word 0 # time
-    .word evtSaveObjSettings | 2 # Save Object settings to the Slot 2
+    .word 0, evtSetProgMoveLife, prgNone, mvStatic, lifeImmortal
+    .word 0, evtSaveObjSettings | 0 # Save Object settings to the Slot 0
 
         # Title
     .word 0 # time
     .word evtMultipleCommands | 7 # Event_CoreMultipleEventsAtOneTime; 7 -> srcEvent_MultipleEventCount
-    .word evtLoadObjSettings | 2  # Load Object settings from the Slot 2
+    .word evtLoadObjSettings | 0  # Load Object settings from the Slot 2
     .word evtSingleSprite, 12     # sprite
-    .byte 24+16, 12*0 + 24+44     # Y, X
+    .byte 24+16, 12*0 + 24+44     # Y, X : 16,  88
     .word evtSingleSprite, 13     # sprite
-    .byte 24+16, 12*1 + 24+44     # Y, X
+    .byte 24+16, 12*1 + 24+44     # Y, X : 16, 112
     .word evtSingleSprite, 14     # sprite
-    .byte 24+16, 12*2 + 24+44     # Y, X
+    .byte 24+16, 12*2 + 24+44     # Y, X : 16, 136
     .word evtSingleSprite, 15     # sprite
-    .byte 24+16, 12*3 + 24+44     # Y, X
+    .byte 24+16, 12*3 + 24+44     # Y, X : 16, 160
     .word evtSingleSprite, 16     # sprite
-    .byte 24+16, 12*4 + 24+44     # Y, X
+    .byte 24+16, 12*4 + 24+44     # Y, X : 16, 184
     .word evtSingleSprite, 17     # sprite
-    .byte 24+16, 12*5 + 24+44     # Y, X
+    .byte 24+16, 12*5 + 24+44     # Y, X : 16, 208
 
         # Chibiko
     .word 0 # time
     .word evtMultipleCommands | 3 # Event_CoreMultipleEventsAtOneTime; 7 -> srcEvent_MultipleEventCount
     .word evtLoadObjSettings | 0  # Load Object settings from the Slot 2
     .word evtSingleSprite, 0      # sprite
-    .byte 24+64, 12*0 + 24        # Y, X : 88, 24
+    .byte 24+64, 12*0 + 24        # Y, X : 64,  0
     .word evtSingleSprite, 1      # sprite
-    .byte 24+64, 12*1 + 24        # Y, X : 88, 36
+    .byte 24+64, 12*1 + 24        # Y, X : 64, 24
 
         # Bochan!
     .word 0 # time
     .word evtMultipleCommands | 3     # Event_CoreMultipleEventsAtOneTime; 7 -> srcEvent_MultipleEventCount
     .word evtLoadObjSettings | 0      # Load Object settings from the Slot 2
     .word evtSingleSprite, 2          # sprite
-    .byte 24+200-64, 12*0 + 24+160-24 # Y, X 160, 160
+    .byte 24+200-64, 12*0 + 24+160-24 # Y, X 136, 272
     .word evtSingleSprite, 3          # sprite
-    .byte 24+200-64, 12*1 + 24+160-24 # Y, X 160, 172
+    .byte 24+200-64, 12*1 + 24+160-24 # Y, X 160, 296
 #----------------------------------------------------------------------------}}}
 PauseLoop:
     # Jump to a different level point
@@ -162,44 +131,32 @@ ShowMenu:
         CALL @$EventStream_Process
         WAIT
 
-       .ppudo_ensure $PPU_PrintAt,$MenuText1
+       .ppudo_ensure $PPU_PrintAt,$MenuText
         CALL @$ObjectArray_Redraw
 
         JSR  R5,@$OnscreenCursorDefine
-       .byte 0x0A,0x0C # startpos  X,Y ; hl = startpos
-       .byte 0x00,0x01 # movespeed X,Y ; bc = movespeed
-       .byte 0x02,0x26 # MinX,MaxX     ; ix = MinX,MaxX
+       .byte 0x0A,0x0C # startpos  X,Y
+       .byte 0x00,0x01 # movespeed X,Y
+       .byte 0x02,0x26 # MinX,MaxX
     .ifdef CompileEP2
-       .byte 0x0C,0x12 # MinY,MaxY     ; iy = MinY,MaxY
+       .byte 0x0C,0x12 # MinY,MaxY
     .else
-       .byte 0x0C,0x11 # MinY,MaxY     ; iy = MinY,MaxY
+       .byte 0x0C,0x11 # MinY,MaxY
     .endif
 
 ShowMenu_Loop: #-------------------------------------------------------------{{{
         CALL @$ShowKeysBitmap
         CALL @$Timer_UpdateTimer
-.list
         CALL @$EventStream_Process
-        CALL @$ObjectArray_Redraw
-.nolist
 
         WAIT
 
         BIT  $Keymap_AnyFire,@$KeyboardScanner_P1
         BNZ  MainMenuSelection
-                                                            #    push hl
-        CALL OnscreenCursor                                 #        call OnscreenCursor
-                                                            #    pop ix
-                                                            #    ld a,(ix+8)
-                                                            #    bit 2,a
-                                                            #    jp z,ConfigureControls
-                                                            #
-                                                            #ifdef Debug_ShowLevelTime
-                                                            #    call ShowLevelTime
-                                                            #endif
-                                                            #    call CallFade
-                                                            #
-        JMP  @$ShowMenu_Loop                                #    jp ShowMenu_Loop
+
+        CALL OnscreenCursor
+
+        JMP  @$ShowMenu_Loop
 #----------------------------------------------------------------------------}}}
 
 MainMenuSelection: #---------------------------------------------------------{{{
@@ -350,8 +307,6 @@ OnscreenCursor: #------------------------------------------------------------{{{
 RETURN
 #----------------------------------------------------------------------------}}}
 ClearChar: #-----------------------------------------------------------------{{{
-# c = 12 * 4 (48)
-# b =  9 * 2 (18)
         CALL @$GetMemPos
         MOV  $8,R0
 
@@ -378,16 +333,17 @@ Fader: #---------------------------------------------------------------------{{{
        .rept 1
         WAIT
        .endr
-        25$:
-             ADD  $80*9,R5
-             MOV  $4,R1
-             4$:
-                 .rept 10
-                  MOV  R0,-(R5)
-                 .endr
-             SOB  R1,4$
+    25$:
+        ADD  $80*9,R5
+        MOV  $4,R1
+    4$:
+       .rept 10
+        MOV  R0,-(R5)
+       .endr
+
+        SOB  R1,4$
         SOB  R2,25$
-    SOB  R3,8$
+        SOB  R3,8$
 
         MOV  (SP)+,R5
         MOV  (SP)+,R3
@@ -549,7 +505,7 @@ FireKeyBlackPalette:
 PressFireKeyStr: .byte 9,23
                  .asciz "Press Fire to Continue"
                  .even
-MenuText1:
+MenuText:
                         #0         1         2         3         4
                         #01234567890123456789012345678901234567890
     .byte 10,10; .ascii "Hit ESC to set controls"; .byte 0xFF
@@ -574,32 +530,6 @@ MenuText1:
 
 CursorSpr: .incbin "resources/menu_cursor.spr"
 
-DrawChibi: #------------------------------------------------------------------{{{
-       .equiv SprDst, FB1+(80*64)
-        MOV  $80-6,R1
-
-        MOV  $62,R0
-        MOV  $TITLETEX,R4
-        ADD  4(R4),R4
-        MOV  $SprDst,R5
-1$:    .rept 3
-        MOV  (R4)+,(R5)+
-       .endr
-        ADD  R1,R5
-        SOB  R0,1$
-
-        MOV  $62,R0
-        MOV  $TITLETEX,R4
-        ADD  10(R4),R4
-        MOV  $SprDst+6,R5
-2$:    .rept 3
-        MOV  (R4)+,(R5)+
-       .endr
-        ADD  R1,R5
-        SOB  R0,2$
-
-        BR   .
-#----------------------------------------------------------------------------}}}
 # for some reason, GAS replaces the last byte with 0
 # so we add the dummy word to avoid data/code corruption
         .word 0xFFFF
