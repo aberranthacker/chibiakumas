@@ -321,11 +321,11 @@ Event_VectorArray:
        .word null                              # 0x21 0x42  Obsolete - Reserver for Plus Palette
        .word NotImplemented                    # 0x22 0x44  defw Event_CoreReprogram_ObjectHitHandler
        .word NotImplemented                    # 0x23 0x46  defw Event_CoreReprogram_ShotToDeath
-       .word NotImplemented                    # 0x24 0x48  defw Event_CoreReprogram_CustomMove1
-       .word NotImplemented                    # 0x25 0x4A  defw Event_CoreReprogram_CustomMove2
+       .word Event_CoreReprogram_CustomMove1   # 0x24 0x48  mveCustom1
+       .word Event_CoreReprogram_CustomMove2   # 0x25 0x4A  mveCustom2
        .word NotImplemented                    # 0x26 0x4C  defw Event_CoreReprogram_PowerupSprites
-       .word NotImplemented                    # 0x27 0x4E  defw Event_CoreReprogram_CustomMove3
-       .word NotImplemented                    # 0x28 0x50  defw Event_CoreReprogram_CustomMove4
+       .word Event_CoreReprogram_CustomMove3   # 0x27 0x4E  mveCustom3
+       .word Event_CoreReprogram_CustomMove4   # 0x28 0x50  mveCustom4
        .word NotImplemented                    # 0x29 0x52  defw Event_CustomProgram1
        .word NotImplemented                    # 0x2A 0x54  defw Event_CustomProgram2
        .word NotImplemented                    # 0x2B 0x56  defw Event_CustomPlayerHitter

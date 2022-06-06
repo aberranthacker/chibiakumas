@@ -263,24 +263,12 @@
                                                             # specMoveChibiko equ 255
                                                             #
                                                             #
-.equiv mvRegular, 0
-.equiv mvSpecial, 0x80
-.equiv spdNormal, 0
-.equiv spdFast, 0x40
-
-                                 # mveMisc       equ 0 ;used for visual clarity!
-.equiv mvStatic, 0x24            # mveStatic     equ &24
-.equiv mveBackground, 0b11000000 # mveBackground equ %11000000
-                                 # mveSeaker_P1  equ %10000100
-                                 # mveSeaker_P2  equ %10010000
-                                 # mveSeaker     equ %10001000 ;seek! I can't spel!
-.equiv mveWave, 0b10100000       # mveWave       equ %10100000
-                                 # mveCustom1    equ %11110000
-                                 # mveCustom2    equ %11100000
-                                 # mveCustom3    equ %11010000
-                                 # mveCustom4    equ %10110000
-#
-#    Moves - Regular
+.equiv mvRegular, 0    # 0xxxxxxx
+.equiv mvSpecial, 0x80 # 1xxxxxxx
+.equiv spdNormal, 0    # 00xxxxxx
+.equiv spdFast, 0x40   # 01xxxxxx
+.equiv mvStatic, 0x24  # 00100100
+# Moves
 #         0   1   2   3   4   5   6   7
 #        -4  -3  -2  -1  0    1   2   3
 # -4  0  00  01  02  03  04  05  06  07
@@ -291,19 +279,17 @@
 #  1  5  28  29  2A  2B  2C  2D  2E  2F
 #  2  6  30  31  32  33  34  35  36  37
 #  3  7  38  39  3A  3B  3C  3D  3E  3F
-#
-# mveFast equ &40
-#    Moves - Fast
-#        0   1   2   3   4   5   6   7
-#        -4  -3  -2  -1  0   1   2   3
-# -4  0  40  41  42  43  44  45  46  47
-# -3  1  48  49  4A  4B  4C  4D  4E  4F
-# -2  2  50  51  52  53  54  55  56  57
-# -1  3  58  59  5A  5B  5C  5D  5E  5F
-#  0  4  60  61  62  63 [64] 65  66  67
-#  1  5  68  69  6A  6B  6C  6D  6E  6F
-#  2  6  70  71  72  73  74  75  76  77
-#  3  7  78  79  7A  7B  7C  7D  7E  7F
+
+                                 # mveMisc       equ 0 ;used for visual clarity!
+.equiv mveBackground, 0b11000000 # 1100xxxx, ----xxxx tick point
+.equiv mveSeaker_P1, 0b10000100  # 0b100001xx
+.equiv mveSeaker_P2, 0b10010000  # 0b100100xx
+.equiv mveSeaker,    0b10001000  # 0b100010xx seek! I can't spel!
+.equiv mveWave, 0b10100000       # 1010xxxx Wave pattern
+.equiv mveCustom1, 0b11110000    # 1111xxxx Level specific 1
+.equiv mveCustom2, 0b11100000    # 1110xxxx Level specific 2
+.equiv mveCustom3, 0b11010000    # 1101xxxx Level specific 3
+.equiv mveCustom4, 0b10110000    # 1011xxxx Level specific 4
                                                             #
                                                             # lifCustom       equ 255       ; We use 63 as a marker for custom code's INIT -
                                                             #                               ; a real life will be set by the custom code
@@ -313,6 +299,7 @@
                                                             # lifDeadly       equ %01000000 ; Deadly and cant be shot
 # lifImmortal     equ 0
 .equiv lifeImmortal, 0
+.equiv sprSingleFrame, 0
 .equiv sprTwoFrame, 128                                     # TwoFrameSprite  equ 128    ; sequence is 1,2 1,2 etc
 .equiv sprFourFrame, 128+64                                 # FourFrameSprite equ 128+64 ; sequence is 1,3,2,4 ,1,3,2,4 etc
                                                             #

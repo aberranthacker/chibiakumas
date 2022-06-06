@@ -17,93 +17,112 @@ DoMoves:
         SWAB R1    # R1 = Y
 
         # Check  if we are using a SPECIAL move pattern
-        BIT  $0x80,R2                                       #     bit 7,d         ; See if we are using a SPECIAL move pattern
-        BNZ  DoMoves_Spec                                   #     jr nz,DoMoves_Spec
-                                                            # ;DoMovesStars
+        BIT  $0x80,R2
+        BNZ  DoMoves_Spec
+
         # Y move ---------------------------------------------------------------
-        MOV  R2,R0                                          #     ld a,D
-        BIC  $0177707,R0                                    #     and %00111000
-        ASR  R0                                             #     rrca
-        ASR  R0                                             #     rrca
-                                                            #
-        SUB  $8,R0                                          #     sub 8
-        BIT  $0x40,R2 # fast move?                          #     bit 6,d
-        BZE  DoMoves_NoMultY                                #     jp z,DoMoves_NoMult2
-        ASL  R0                                             #          rlca
-    DoMoves_NoMultY:                                        #     DoMoves_NoMult2:
-        ADD  R1,R0                                          #     add C
-                                                            #
-        CMP  R0,$199+24                                     #     cp 199+24       ;we are at the bottom of the screen
-        BHIS DoMoves_Kill                                   #     jr NC,DoMoves_Kill  ;over the page
-        MOV  R0,R1                                          #     ld c,a
+        MOV  R2,R0
+        BIC  $0177707,R0
+        ASR  R0
+        ASR  R0
+        SUB  $8,R0
+        BIT  $0x40,R2 # fast move?
+        BZE  DoMoves_NoMultY
+
+        ASL  R0
+    DoMoves_NoMultY:
+        ADD  R1,R0
+        CMP  R0,$199+24    # we are at the bottom of the screen
+        BHIS DoMoves_Kill  # over the page
+
+        MOV  R0,R1
         # X move ---------------------------------------------------------------
-        MOV  R2,R0                                          #     ld a,D
-        BIC  $0177770,R0                                    #     and %00000111
-        SUB  $4,R0                                          #     sub 4
-        BIT  $0x40,R2 # fast move?                          #     bit 6,d
-        BZE  DoMoves_NoMultX                                #     jp z,DoMoves_NoMult
-        ASL  R0                                             #          rlca
-    DoMoves_NoMultX:                                        #     DoMoves_NoMult:
-        ADD  R4,R0                                          #     add b
-                                                            #
-        CMP  R0,$160+24                                     #     cp 160+24          ;we are at the bottom of the screen
-        BHIS DoMoves_Kill                                   #     jr NC,DoMoves_Kill ;over the page
-        MOV  R0,R4                                          #     ld b,a
-                                                            #
-RETURN                                                      #     ret
-    DoMoves_Kill:                                           # DoMoves_Kill:          ; Object has gone offscreen
-        CLR  R1                                             #     ld C,0
-RETURN                                                      #     ret
-                                                            # DoMoves_Background: ; Background sprites move much more slowly, and only in 1 direction
-                                                            #     ld a,d
-                                                            #     and %00001111
-                                                            #     rla
-                                                            #     ld e,a
-                                                            #     ;----XXXX
-                                                            #     ;XXXX tick point
-                                                            #     ld a,(Timer_TicksOccured)
-                                                            #     and e
-                                                            #     ret z
-                                                            #     ; time for a left move
-                                                            #     dec b       :DoMovesBGShift_Plus1   ;check xpos
-                                                            #     ld a,b
-                                                            #     cp 160+24+24        ;we are offscreen
-                                                            #     jr NC,DoMoves_Kill  ;over the page
-                                                            #     ret
-DoMoves_Spec:                                               # DoMoves_Spec:   ;Special moves - various kinds
-       .inform_and_hang "no DoMoves_Spec"                   #     ld a,(Timer_TicksOccured)
-                                                            #     and %11111111           :SpecialMoveSlowdown_Plus1
-                                                            #     ret z
-                                                            #     ld a,d
-                                                            #     and %11110000   ;
-                                                            #     cp %11000000    ;1100XXXX ; Background
-                                                            #     jr z,DoMoves_Background
-                                                            #
-                                                            #     cp %10100000    ;1010XXXX ; Wave
-                                                            #     jr z,DoMoves_Wave ;Wave pattern - pretty naff, but it seemed a good idea at the time
-                                                            #
-                                                            #     ; Level specifics are overriden by the code in the level
-                                                            #     cp %10110000    ;1011XXXX ; Level Specific 4
-                                                            #     jp z,null   :LevelSpecificMoveD_Plus2
-                                                            #     cp %11010000    ;1101XXXX ; Level Specific 3
-                                                            #     jp z,null   :LevelSpecificMoveC_Plus2
-                                                            #     cp %11100000    ;1110XXXX ; Level Specific 2
-                                                            #     jp z,null   :LevelSpecificMoveB_Plus2
-                                                            #     cp %11110000    ;1111XXXX ; Level Specific 1
-        BNE  .+6
-        JMP  @$null; LevelSpecificMove_Plus2:               #     jp z,null   :LevelSpecificMove_Plus2
-       .equiv  dstLevelSpecificMove, LevelSpecificMove_Plus2 - 2
-                                                            #
-                                                            #     ld a,d        ;1000XXXX
-                                                            #     and %11111100 ;101111XX
-                                                            #     cp  %10010000               ; P2 Used by 'Chu attack' - and also coins!
-                                                            #     jr z,DoMoves_Seekerp2           ; Used by 'Chu attack' - and also coins!
-                                                            #     cp  %10000100
-                                                            #     jr z,DoMoves_Seeker         ; Used by 'Chu attack' - and also coins!
-                                                            #     cp  %10001000
-                                                            #     jr z,DoMoves_SeekerAuto         ; Pick a live player to target!
-                                                            #     ret
-                                                            # DoMoves_Wave:
+        MOV  R2,R0
+        BIC  $0177770,R0
+        SUB  $4,R0
+        BIT  $0x40,R2 # fast move?
+        BZE  DoMoves_NoMultX
+
+        ASL  R0
+    DoMoves_NoMultX:
+        ADD  R4,R0
+        CMP  R0,$160+24   # we are at the bottom of the screen
+        BHIS DoMoves_Kill # over the page
+
+        MOV  R0,R4
+
+        RETURN
+
+    DoMoves_Kill: # Object has gone offscreen
+        CLR  R1
+        RETURN
+
+DoMoves_Background: # Background sprites move much more slowly, and only in 1 direction
+        MOV  R2,R0
+        BICB $0b11110000,R0 # ----XXXX tick point
+        ROLB R0
+        BITB R0,@$srcTimer_TicksOccured
+        BNZ  1$
+        RETURN
+
+    1$: # it's time for a left move
+       .equiv opcDoMovesBGShift, . # check Xpos
+        DEC  R4 # X
+        CMP  R4, $160+24+24 # we are offscreen
+        BHIS DoMoves_Kill # over the page
+        RETURN
+
+DoMoves_Spec: # Special moves - various kinds
+       .equiv srcSpecialMoveSlowdown, .+2
+        BITB $0xFF,@$srcTimer_TicksOccured
+        BNZ  1$
+        RETURN
+
+        # R2 - LSB=Move, MSB=Sprite
+        MOV  R2,R0
+    1$: BICB $0b00001111,R0
+        CMPB R0,$0b11000000 # 1100xxxx Background
+        BEQ  DoMoves_Background
+
+        CMPB R0,$0b10100000 # 1010xxxx Wave
+        BEQ  DoMoves_Wave # Wave pattern - pretty naff, but it seemed a good idea at the time
+
+        # Level specifics are overriden by the code in the level
+        CMPB R0,$0b10110000 # 1011xxxx Custom4
+        BNE  2$
+       .equiv jmpLevelSpecificMoveD, .+2
+        JMP  @$null
+
+    2$: CMPB R0,$0b11010000 # 1101xxxx Custom3
+        BNE  3$
+       .equiv jmpLevelSpecificMoveC, .+2
+        JMP  @$null
+
+    3$: CMPB R0,$0b11100000 # 1110xxxx Custom2
+        BNE  4$
+       .equiv jmpLevelSpecificMoveB, .+2
+        JMP  @$null
+
+    4$: CMPB R0,$0b11110000 # 1111xxxx Custom 1
+        BNE  5$
+       .equiv jmpLevelSpecificMoveA, .+2
+        JMP  @$null
+
+    5$: MOV  R2,R0          # 1000xxxx
+        BICB $0b00000011,R0 # 101111xx
+        CMPB R0,$0b10010000
+        BEQ  DoMoves_SeekerP2   # Used by 'Chu attack' - and also coins!
+
+        CMPB R0,$0b10000100
+        BEQ  DoMoves_SeekerP1   # Used by 'Chu attack' - and also coins!
+
+        CMPB R0,$0b10001000
+        BEQ  DoMoves_SeekerAuto # Pick a live player to target!
+
+        RETURN
+
+DoMoves_Wave:
+         .inform_and_hang "no DoMoves_Wave"
                                                             #     ;           3210
                                                             #     ; wave pattern  1010DSPP    D = Depth bit, S= Speed, PP Position
                                                             #
@@ -145,7 +164,8 @@ DoMoves_Spec:                                               # DoMoves_Spec:   ;S
                                                             #     jr C,DoMoves_Kill ; over the page
                                                             #     ret
                                                             #
-                                                            # DoMoves_SeekerAuto:
+DoMoves_SeekerAuto:
+         .inform_and_hang "no DoMoves_SeekerAuto"
                                                             #         push bc
                                                             #
                                                             #             ld c,%10010000  ;p2
@@ -179,11 +199,13 @@ DoMoves_Spec:                                               # DoMoves_Spec:   ;S
                                                             #
                                                             #         jp DoMoves_Spec
                                                             #
-                                                            # DoMoves_Seekerp2:       ;Home in on player 2
+DoMoves_SeekerP2: # Home in on player 2
+         .inform_and_hang "no DoMoves_SeekerP2"
                                                             #     push iy
                                                             #         ld iy,Player_Array2
                                                             #     jr DoMoves_SeekerContinue
-                                                            # DoMoves_Seeker:         ;Home in on player 1
+DoMoves_SeekerP1: # Home in on player 1
+         .inform_and_hang "no DoMoves_SeekerP1"
                                                             #
                                                             #     push iy
                                                             #         ld iy,Player_Array
