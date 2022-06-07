@@ -1,22 +1,46 @@
-To continue with the technical discussion of how Chibi Akumas works, I think it's important to now discuss screen co-ordinates
+  To continue with the technical discussion of how Chibi Akumas works, I think
+it's important to now discuss screen co-ordinates
 
-Chibi akumas was designed for the Amstrad cpc 'Mode 1', which has a 320x200 screen, with 4 bits per pixel... this means there are 80 bytes across, and 200 lines of bytes down.
+  Chibi akumas was designed for the Amstrad cpc 'Mode 1', which has a 320x200
+screen, with 4 bits per pixel... this means there are 80 bytes across, and 200
+lines of bytes down.
 
-Because the 'Bullet hell' style I wanted for the game would require a huge amount of onscreen action, I knew I had to always aim to be as fast as possible!... the Z80 is an 8 bit CPU, so is strong only at numbers from 0-255
+  Because the 'Bullet hell' style I wanted for the game would require a huge
+amount of onscreen action, I knew I had to always aim to be as fast as possible!
+The Z80 is an 8 bit CPU, so is strong only at numbers from 0-255
 
-Also, I needed some way of handling objects that were partially onscreen (Sprite clipping), so I needed the game to use XY co-ordinates that did not go above 255, and mapped well onto the CPC screen.
+  Also, I needed some way of handling objects that were partially onscreen
+(Sprite clipping), so I needed the game to use XY co-ordinates that did not go
+above 255, and mapped well onto the CPC screen.
 
-I decided that the 320x200 CPC screen would be treated as 160x200 giving 2 x co-ordinates per byte (while most sprites only move in single bytes, this allowed bullets to use the left or right half of one byte for smoother movement)
+  I decided that the 320x200 CPC screen would be treated as 160x200 giving
+2 x co-ordinates per byte (while most sprites only move in single bytes,
+this allowed bullets to use the left or right half of one byte for smoother movement)
 
-As I had already decided my sprites would typically be 24x24 pixels in size, I then added a 24 pixel border on all sides which would be the 'offscreen zone' for sprite clipping.
+  As I had already decided my sprites would typically be 24x24 pixels in size,
+I then added a 24 pixel border on all sides which would be the 'offscreen zone'
+for sprite clipping.
 
-This gave a virtual screen of 208x248, with a centeral visible window of 160x200... (24,24)-(184,224) is visible
+  This gave a virtual screen of 208x248, with a centeral visible window of 160x200
+(24,24)-(184,224) is visible
 
-Unfortunately, this did not account for the MSX & spectrum's smaller screen, I needed to alter the visible area - but keep the virtual one the same, so I removed 8 pixels from the sky... as more objects are ground based than sky - so fewer objects to reposition
-I also removed 16 pixels from either side of the visible screen. so on those systems V1.666 has a visible screen of (40,32)-(168,224) 
+  Unfortunately, this did not account for the MSX & spectrum's smaller screen,
+I needed to alter the visible area - but keep the virtual one the same, so I
+removed 8 pixels from the sky... as more objects are ground based than sky - so
+fewer objects to reposition
 
+  I also removed 16 pixels from either side of the visible screen. so on those
+ systems V1.666 has a visible screen of (40,32)-(168,224) 
 
-Text co-ordinates work differently, they are based on the CPC's firmare co-ordinate of  0-39 columns, and 0-24 rows
-As much of the games text is centered, I removed 4 colums from each side, and the bottom row, so on the MSX and spectrum visible text co-ordinates are now from 4-35 across  0-23 down
+  Text co-ordinates work differently, they are based on the CPC's firmare
+co-ordinate of  0-39 columns, and 0-24 rows
+  As much of the games text is centered, I removed 4 colums from each side,
+and the bottom row, so on the MSX and spectrum visible text co-ordinates are
+now from 4-35 across  0-23 down
 
-for future games that use a new game engine, I will probably resize the CPC screen to 256x192 so that all the systems use the same screen size (It also allows the CPC to use the faster INC L instead of INC HL in sprite commands)... it was something I considered during the development of the of the original game, but it seemed backwards as the game was a horizontal shooter, and I did not want the game to be accused of being a 'Speccy Port'
+  For future games that use a new game engine, I will probably resize the CPC
+screen to 256x192 so that all the systems use the same screen size (It also
+allows the CPC to use the faster INC L instead of INC HL in sprite commands)...
+It was something I considered during the development of the of the original
+game, but it seemed backwards as the game was a horizontal shooter, and I did
+not want the game to be accused of being a 'Speccy Port'
