@@ -78,10 +78,10 @@ build/ep1-intro-slides.bin : build/ep1-intro-slides.o
 	ruby build_tools/aout2sav.rb build/ep1-intro-slides.out -b -s -o build/ep1-intro-slides.bin
 
 build/level-01.bin : build/core.o \
-                     build/level-01.o
+                     build/level-01.o \
+                     build/ep1_level_music.bin
 	$(LD) build/level-01.o -R build/core.o -o build/level-01.out -s
 	ruby build_tools/aout2sav.rb build/level-01.out -b -s -o build/level-01.bin
-
 
 build/bootsector.o : $(common) \
                      bootsector.s
@@ -128,15 +128,6 @@ build/level-00_menu.o : $(common) \
                         build/ep1_title_music.bin
 	$(AS) -al level-00_menu.s -o build/level-00_menu.o
 
-build/ep1_title_music.bin: build/ep1_title_music.o
-	$(LD) build/ep1_title_music.o -o build/ep1_title_music.out -s
-	ruby build_tools/aout2sav.rb build/ep1_title_music.out -b -s -o build/ep1_title_music.bin
-
-build/ep1_title_music.o : $(common) \
-	                  build/ppu.o \
-	                  build/ep1_title_music.formatted.s
-	$(AS) build/ep1_title_music.formatted.s -o build/ep1_title_music.o
-
 resources/titletex.spr : build_tools/spr_cpc_to_uknc.rb \
 	                 ../Aku/Sprites/TITLETEX.SPR
 	build_tools/spr_cpc_to_uknc.rb ../Aku/Sprites/TITLETEX.SPR -o resources/titletex.spr
@@ -161,15 +152,6 @@ build/ep1-intro.o : $(common) \
                     build/ep1-intro/ep1-intro-slide08.raw.lzsa1
 	$(AS) -al ep1-intro.s -o build/ep1-intro.o
 
-build/ep1_intro_music.bin: build/ep1_intro_music.o
-	$(LD) build/ep1_intro_music.o -o build/ep1_intro_music.out -s
-	ruby build_tools/aout2sav.rb build/ep1_intro_music.out -b -s -o build/ep1_intro_music.bin
-
-build/ep1_intro_music.o : $(common) \
-	                  build/ppu.o \
-	                  build/ep1_intro_music.formatted.s
-	$(AS) build/ep1_intro_music.formatted.s -o build/ep1_intro_music.o
-
 build/ep1-intro-slides.o : ep1-intro-slides.s \
                            build/ep1-intro/ep1-intro-slide09.raw.lzsa1 \
                            build/ep1-intro/ep1-intro-slide10.raw.lzsa1 \
@@ -183,9 +165,9 @@ build/ep1-intro-slides.o : ep1-intro-slides.s \
 
 # level-01.o ----------------------------------------------------------------{{{
 build/level-01.o : $(common) \
-                    level-01.s \
-		    resources/level01.spr \
-		    resources/level01-tiles.spr
+                   level-01.s \
+		           resources/level01.spr \
+		           resources/level01-tiles.spr
 	$(AS) -al level-01.s -o build/level-01.o | build_tools/format_list.rb
 
 resources/level01.spr : build_tools/spr_cpc_to_uknc.rb \
@@ -198,23 +180,60 @@ resources/level01-tiles.spr : build_tools/spr_cpc_to_uknc.rb \
 # level-01.o ----------------------------------------------------------------}}}
 
 resources/font.raw : build_tools/spr_cpc_to_uknc.rb \
-	             ../ResCPC/font.bin
+	                 ../ResCPC/font.bin
 	build_tools/spr_cpc_to_uknc.rb ../ResCPC/font.bin --font -o resources/font.raw
 
 resources/cga8x8b.raw : resources/cga8x8b.bmp.raw \
                         build_tools/prepare_font.rb
 	ruby build_tools/prepare_font.rb resources/cga8x8b.bmp.raw
 
+# ep1_title_music.bin -------------------------------------------------------{{{
+build/ep1_title_music.bin: build/ep1_title_music.o
+	$(LD) build/ep1_title_music.o -o build/ep1_title_music.out -s
+	ruby build_tools/aout2sav.rb build/ep1_title_music.out -b -s -o build/ep1_title_music.bin
+
+build/ep1_title_music.o : $(common) \
+	                      build/ppu.o \
+	                      build/ep1_title_music.formatted.s
+	$(AS) build/ep1_title_music.formatted.s -o build/ep1_title_music.o
+
 build/ep1_title_music.formatted.s : build_tools/format_song.rb \
       	                            music/ep1_title_music.s
 	build_tools/format_song.rb music/ep1_title_music.s build/ep1_title_music.formatted.s
+# ep1_title_music.bin -------------------------------------------------------}}}
+
+# ep1_intro_music.bin -------------------------------------------------------{{{
+build/ep1_intro_music.bin: build/ep1_intro_music.o
+	$(LD) build/ep1_intro_music.o -o build/ep1_intro_music.out -s
+	ruby build_tools/aout2sav.rb build/ep1_intro_music.out -b -s -o build/ep1_intro_music.bin
+
+build/ep1_intro_music.o : $(common) \
+	                      build/ppu.o \
+	                      build/ep1_intro_music.formatted.s
+	$(AS) build/ep1_intro_music.formatted.s -o build/ep1_intro_music.o
 
 build/ep1_intro_music.formatted.s : build_tools/format_song.rb \
-	                      music/ep1_intro_music.s
+	                                music/ep1_intro_music.s
 	build_tools/format_song.rb music/ep1_intro_music.s build/ep1_intro_music.formatted.s
+# ep1_intro_music.bin -------------------------------------------------------}}}
+
+# ep1_level_music.bin -------------------------------------------------------{{{
+build/ep1_level_music.bin: build/ep1_level_music.o
+	$(LD) build/ep1_level_music.o -o build/ep1_level_music.out -s
+	ruby build_tools/aout2sav.rb build/ep1_level_music.out -b -s -o build/ep1_level_music.bin
+
+build/ep1_level_music.o : $(common) \
+	                      build/ppu.o \
+	                      build/ep1_level_music.formatted.s
+	$(AS) build/ep1_level_music.formatted.s -o build/ep1_level_music.o
+
+build/ep1_level_music.formatted.s : build_tools/format_song.rb \
+	                                music/ep1_level_music.s
+	build_tools/format_song.rb music/ep1_level_music.s  build/ep1_level_music.formatted.s
+# ep1_level_music.bin -------------------------------------------------------}}}
 
 resources/ep1-intro.spr : build_tools/spr_cpc_to_uknc.rb \
-	                  ../ResCPC/LEVEL252A.SPR
+	                      ../ResCPC/LEVEL252A.SPR
 	build_tools/spr_cpc_to_uknc.rb ../ResCPC/LEVEL252A.SPR -o resources/ep1-intro.spr
 
 build/ep1-intro/ep1-intro-slide01.raw.lzsa1: resources/ep1-intro-slides-1.raw
