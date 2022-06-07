@@ -13,13 +13,7 @@ Background_LastLine equ Background_LastLine_Plus1-1
 ;*******************************************************************************
 
 Background_GradientScroll:
-;   rst 6   ; Jp (IY)
-;
-;   ; 0-Left 1-Right 2-Up 3-Down
-;   push af
-;   call DoMovesBackground_SetScroll
-;   pop af
-
+    ; 0-Left 1-Right 2-Up 3-Down
     ld bc,Background_ShiftNow
     or a
     jr z,Event_BackgroundScrollDirection_2
@@ -28,15 +22,17 @@ Background_GradientScroll:
 
     ld bc,Background_LeftScroll ;0
     jr Event_BackgroundScrollDirection_2
-Background_Static
+Background_Static:
     ld bc,Background_NoShift
-Event_BackgroundScrollDirection_2
+Event_BackgroundScrollDirection_2:
     ld (Background_ShiftJumpA_Plus2-2),bc
-ret
+
+    ret
 
 Background_Gradient:
     ld a,c
     ld (ScrollPosRate1_Plus1-1),a
+
 ;Background_Clear
 ;di
 ;halt
@@ -124,53 +120,47 @@ Background_NotNextLine: ; No change yet!
 ; We use PushDE for fast screenwrite - Faster than CLS!
 repeatr1:
     ei
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-ifndef CPC320
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
+    push de
     di
-endif
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-ifdef CPC320
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    di
-    push de;push HL
-    push de;push HL
-    push de;push HL
-    push de;push HL
-endif
+    push de
+    push de
+    push de
+    push de
 
 ; NO 2          - do another line
     ld a,h
