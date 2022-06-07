@@ -1,4 +1,4 @@
-       .nolist
+       .list
 
        .title Chibi Akumas core module
        .global start # make entry point available to a linker
@@ -31,8 +31,11 @@
        .global SavedSettings_Last
        .global ScreenBuffer_ActiveScreen
        .global ScreenBuffer_Reset
+       .global ScreenBuffer_Init
+       .global ScreenBuffer_Flip
        .global SmartBombsReset
        .global StarArrayPointer
+       .global Timer_GetTimer
        .global Timer_UpdateTimer
        .global unlzsa1
 #----------------------------------------------------------------------------}}}
@@ -366,7 +369,7 @@ null:   RETURN
        .include "player_driver.s"       # read "../SrcALL/Akuyou_Multiplatform_PlayerDriver.asm"
        .include "timer.s"               # read "../SrcALL/Akuyou_Multiplatform_Timer.asm"
                                         #
-                                        # read "../SrcCPC/Akuyou_CPC_Gradient.asm"
+       .include "gradient.s"            # read "../SrcCPC/Akuyou_CPC_Gradient.asm"
                                         #
        .include "object_driver.s"       # read "../SrcALL/Akuyou_Multiplatform_ObjectDriver.asm"
        .include "event_stream.s"        # read "../SrcALL/Akuyou_Multiplatform_EventStream.asm"
@@ -389,3 +392,5 @@ end: FileEndCore:
 
 LevelStart:
         JMP  .
+
+       .nolist

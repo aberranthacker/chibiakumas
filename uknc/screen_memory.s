@@ -12,19 +12,55 @@ GetMemPos:
 
     MOV  R3,R0
     ASL  R0
-    BIS  (PC)+,R0; ScreenBuffer_ActiveScreenDirect: .word 0x4000
+   .equiv ScreenBuffer_ActiveScreenDirect, .+2
+    BIS  $0x4000,R0
 
     ADD  R0,R5
 RETURN
 
 ScreenBuffer_Reset:
-        MOV  $0x4000,@$ScreenBuffer_ActiveScreenDirect
-        MOVB $0x40,@$srcFB_MSB
-        MOV  $FB1,@$ScreenBuffer_ActiveScreen
-        MOV  $FB1,@$ScreenBuffer_VisibleScreen
+        MOV  $0x4000, @$ScreenBuffer_ActiveScreenDirect
+        MOVB $0x40, @$srcFB_MSB
+        MOV  $FB1, @$ScreenBuffer_ActiveScreen
+        MOV  $FB1, @$ScreenBuffer_VisibleScreen
        .ppudo_ensure $PPU_ShowFB1
         CALL CLS
 RETURN
+
+ScreenBuffer_Init:
+        MOV  $0x4000, @$ScreenBuffer_ActiveScreenDirect
+        MOVB $0x40, @$srcFB_MSB
+        MOV  $FB0, @$ScreenBuffer_ActiveScreen
+        CALL CLS
+        MOV  $FB1, @$ScreenBuffer_ActiveScreen
+        CALL CLS
+        MOV  $FB0, @$ScreenBuffer_VisibleScreen
+       .ppudo_ensure $PPU_ShowFB0
+RETURN
+
+ScreenBuffer_Flip:
+        TST  @$ScreenBuffer_ActiveScreenDirect
+        BZE  ScreenBuffer_SetFB1Active
+
+ScreenBuffer_SetFB0Active:
+        # FB1 active, switch to FB0
+       .ppudo $PPU_ShowFB1
+        CLR  @$ScreenBuffer_ActiveScreenDirect
+        CLRB @$srcFB_MSB
+        MOV  $FB0, @$ScreenBuffer_ActiveScreen
+        MOV  $FB1, @$ScreenBuffer_VisibleScreen
+        RETURN
+
+ScreenBuffer_SetFB1Active:
+        # FB0 active, switch to FB1
+       .ppudo $PPU_ShowFB0
+        MOV  $0x4000, @$ScreenBuffer_ActiveScreenDirect
+        MOVB $0x40, @$srcFB_MSB
+        MOV  $FB1, @$ScreenBuffer_ActiveScreen
+        MOV  $FB0, @$ScreenBuffer_VisibleScreen
+        RETURN
+
+
 
 scr_addr_table:
   .word 0x0180, 0x01D0, 0x0220, 0x0270, 0x02C0, 0x0310, 0x0360, 0x03B0 #  0

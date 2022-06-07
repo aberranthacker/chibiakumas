@@ -496,10 +496,10 @@ ShowFB0: #-------------------------------------------------------------------{{{
 
                 MOV  $0x2000,R0
                 MOV  $8,R1 # length of the screenlines table record
-                MOV  $200>>1,R2
+                MOV  $200>>2,R2
                 MOV  @$FirstLineAddress,R5
 
-        100$:  .rept 1<<1
+        100$:  .rept 1<<2
                 BIC  R0,(R5)
                 ADD  R1,R5
                .endr
@@ -510,15 +510,15 @@ ShowFB0: #-------------------------------------------------------------------{{{
                 JMP  CommandExecuted
 #----------------------------------------------------------------------------}}}
 ShowFB1: #-------------------------------------------------------------------{{{
-                MOV  @$PASWCR,-(SP)
+                MOV  @$PASWCR,-(SP) # PPU address space window control register
                 MOV  $0x010,@$PASWCR
 
                 MOV  $0x2000,R0
                 MOV  $8,R1
-                MOV  $200>>1,R2
+                MOV  $200>>2,R2
                 MOV  @$FirstLineAddress,R5
 
-        100$:  .rept 1<<1
+        100$:  .rept 1<<2
                 BIS  R0,(R5)
                 ADD  R1,R5
                .endr

@@ -49,7 +49,7 @@ VirtualPosToScreenByte:
         BLO  VirtualPos_2$ # X < 172
         # X >= 172
        .equiv srcSpriteSizeConfig184less12, .+2
-        MOV  $-144-24,R0
+        MOV  $-144-25,R0
         ADD  R2,R0
         ASR  R0
         ASR  R0
