@@ -99,6 +99,7 @@ build/core.o : $(common) \
                do_moves.s \
                event_stream.s \
                execute_bootstrap.s \
+               gradient.s \
                object_driver.s \
                player_driver.s \
                screen_memory.s \
@@ -108,7 +109,7 @@ build/core.o : $(common) \
                stararray_add.s \
                timer.s \
                virtual_screen_pos_320.s
-	$(AS) core.s -al -o build/core.o
+	$(AS) core.s -al -o build/core.o | build_tools/format_list.rb
 	build_tools/level_start_update.rb
 
 build/ppu.o : $(common) \
@@ -185,7 +186,7 @@ build/level-01.o : $(common) \
                     level-01.s \
 		    resources/level01.spr \
 		    resources/level01-tiles.spr
-	$(AS) -al level-01.s -o build/level-01.o
+	$(AS) -al level-01.s -o build/level-01.o | build_tools/format_list.rb
 
 resources/level01.spr : build_tools/spr_cpc_to_uknc.rb \
                         ../ResCPC/LEVEL1A.SPR
