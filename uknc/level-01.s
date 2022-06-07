@@ -1,4 +1,4 @@
-               .nolist
+               .list
 
                .include "./hwdefs.s"
                .include "./macros.s"
@@ -32,12 +32,14 @@ AnimatorData:
     .byte 01,128+01,0,0 # Sprite Anim
     .byte 01,128+02,0,0 # Sprite Anim
     .byte 00            # End of loop
+    .even
 
 ################################################################################
 #                             Data Allocations                                 #
 ################################################################################
 Event_SavedSettingsB:   # 2nd bank Saved settings array
     .byte 128, 0x00
+    .even
 
 EventStreamArray_Ep1: #----------------------------------------------------------{{{
         # ; We will use 4 Paralax layers
@@ -45,147 +47,146 @@ EventStreamArray_Ep1: #---------------------------------------------------------
         # ;  ------------ (Far)        %11000100
         # ;  -----X---X-- (mid)        %11000010   Bank 1
         # ;  []=====[]=== (foreground) %11000001   Bank 0
-    .word 0 # Time
-    .word evtReprogram_PowerupSprites # Event_CoreReprogram_PowerupSprites
-    .byte 128+38, 128+39, 128+40, 128+16 # Define powerup sprites
 
-    .word 0, evtMultipleCommands | 5
-    .word     evtSetProgMoveLife               # 1
-    .word         prgBitShift
-    .word         mveBackground | 0x01
-    .word         lifeImmortal
-    .word     evtSetObjectSize | 0             # 2
-    .word     evtSetAnimator | anmNone         # 3
-    .word     evtAddToBackground               # 4
-    .word     evtSaveObjSettings | 0           # 5
+    .word 0, evtSetPalette, RealPalette
+#   .word 0 # Time
+#   .word evtReprogram_PowerupSprites # Event_CoreReprogram_PowerupSprites
+#   .byte 128+38, 128+39, 128+40, 128+16 # Define powerup sprites
 
-    .word 0, evtMultipleCommands | 5
-    .word     evtSetProgMoveLife               # 1
-    .word         prgBitShift
-    .word         mveBackground | 0b00000010
-    .word         lifeImmortal
-    .word     evtSetObjectSize | 0             # 2
-    .word     evtSetAnimator | anmNone         # 3
-    .word     evtAddToBackground               # 4
-    .word     evtSaveObjSettings | 1           # 5
+#   .word 0, evtMultipleCommands | 5
+#   .word     evtSetProgMoveLife               # 1
+#   .word         prgBitShift
+#   .word         mveBackground | 0x01
+#   .word         lifeImmortal
+#   .word     evtSetObjectSize | 0             # 2
+#   .word     evtSetAnimator | anmNone         # 3
+#   .word     evtAddToBackground               # 4
+#   .word     evtSaveObjSettings | 0           # 5
 
-    # Rock Chick
-    .word 0, evtMultipleCommands | 5
-    .word     evtSetProgMoveLife               # 1
-    .word         prgFireSlow | fireLeftWide
-    .word         mvRegular | spdNormal | 0x22 # move - direction left, slow
-    .word         lifeEnemy | 1
-    .word     evtSetSprite | 1                 # 2
-    .word     evtSetAnimator | anmNone         # 3
-    .word     evtAddToForeground               # 4
-    .word     evtSaveObjSettings | 2           # 5
+#   .word 0, evtMultipleCommands | 5
+#   .word     evtSetProgMoveLife               # 1
+#   .word         prgBitShift
+#   .word         mveBackground | 0b00000010
+#   .word         lifeImmortal
+#   .word     evtSetObjectSize | 0             # 2
+#   .word     evtSetAnimator | anmNone         # 3
+#   .word     evtAddToBackground               # 4
+#   .word     evtSaveObjSettings | 1           # 5
 
-    # Skull bomber
-    .word 0, evtMultipleCommands | 5
-    .word     evtSetProgMoveLife               # 1
-    .word         prgFireFast | fireSingleSouth
-    .word         mvRegular | spdNormal | 0x23 # move - direction left, slow
-    .word         lifeEnemy | 4
-    .word     evtSetSprite | 37                # 2
-    .word     evtSetAnimator | anmNone         # 3
-    .word     evtAddToForeground               # 4
-    .word     evtSaveObjSettings | 3           # 5
+#   # Rock Chick
+#   .word 0, evtMultipleCommands | 5
+#   .word     evtSetProgMoveLife               # 1
+#   .word         prgFireSlow | fireLeftWide
+#   .word         mvRegular | spdNormal | 0x22 # move - direction left, slow
+#   .word         lifeEnemy | 1
+#   .word     evtSetSprite | 1                 # 2
+#   .word     evtSetAnimator | anmNone         # 3
+#   .word     evtAddToForeground               # 4
+#   .word     evtSaveObjSettings | 2           # 5
 
-    # Ant Attacker
-    .word 0, evtMultipleCommands | 5
-    .word     evtSetProgMoveLife               # 1
-    .word         prgFireSlow | fireTopLeft
-    .word         mvRegular | spdNormal | 0x23 # move - direction left, slow
-    .word         lifeEnemy | 4
-    .word     evtSetSprite | 0                 # 2
-    .word     evtSetAnimator | anmNone         # 3
-    .word     evtAddToForeground               # 4
-    .word     evtSaveObjSettings | 4           # 5
+#   # Skull bomber
+#   .word 0, evtMultipleCommands | 5
+#   .word     evtSetProgMoveLife               # 1
+#   .word         prgFireFast | fireSingleSouth
+#   .word         mvRegular | spdNormal | 0x23 # move - direction left, slow
+#   .word         lifeEnemy | 4
+#   .word     evtSetSprite | 37                # 2
+#   .word     evtSetAnimator | anmNone         # 3
+#   .word     evtAddToForeground               # 4
+#   .word     evtSaveObjSettings | 3           # 5
 
-    # Skeleton Crawler
-    .word 0, evtMultipleCommands | 5
-    .word     evtSetProgMoveLife               # 1
-    .word         prgFireSnail | fireLeftWide
-    .word         mvRegular | spdNormal | 0x22 # move - direction left, slow
-    .word         lifeEnemy | 3
-    .word     evtSetSprite | 36                # 2
-    .word     evtSetAnimator | anmNone         # 3
-    .word     evtAddToForeground               # 4
-    .word     evtSaveObjSettings | 5           # 5
+#   # Ant Attacker
+#   .word 0, evtMultipleCommands | 5
+#   .word     evtSetProgMoveLife               # 1
+#   .word         prgFireSlow | fireTopLeft
+#   .word         mvRegular | spdNormal | 0x23 # move - direction left, slow
+#   .word         lifeEnemy | 4
+#   .word     evtSetSprite | 0                 # 2
+#   .word     evtSetAnimator | anmNone         # 3
+#   .word     evtAddToForeground               # 4
+#   .word     evtSaveObjSettings | 4           # 5
 
-    # SpliceFace
-    .word 0, evtMultipleCommands | 5
-    .word     evtSetProgMoveLife               # 1
-    .word         prgFireSnail | fireBurst
-    .word         mvRegular | spdNormal | 0x25 # move - direction right, slow
-    .word         lifeEnemy | 4
-    .word     evtSetSprite | 34                # 2
-    .word     evtSetAnimator | anmNone         # 3
-    .word     evtAddToForeground               # 4
-    .word     evtSaveObjSettings | 6           # 5
+#   # Skeleton Crawler
+#   .word 0, evtMultipleCommands | 5
+#   .word     evtSetProgMoveLife               # 1
+#   .word         prgFireSnail | fireLeftWide
+#   .word         mvRegular | spdNormal | 0x22 # move - direction left, slow
+#   .word         lifeEnemy | 3
+#   .word     evtSetSprite | 36                # 2
+#   .word     evtSetAnimator | anmNone         # 3
+#   .word     evtAddToForeground               # 4
+#   .word     evtSaveObjSettings | 5           # 5
 
-    # BoniBurd
-    .word 0, evtMultipleCommands | 5
-    .word     evtSetProgMoveLife               # 1
-    .word         prgFireSnail | fireBottomLeft
-    .word         mvRegular | spdNormal | 0x22 # move - direction left, slow
-    .word         lifeEnemy | 3
-    .word     evtSetSprite | 2                 # 2
-    .word     evtSetAnimator | anmNone         # 3
-    .word     evtAddToForeground               # 4
-    .word     evtSaveObjSettings | 7           # 5
+#   # SpliceFace
+#   .word 0, evtMultipleCommands | 5
+#   .word     evtSetProgMoveLife               # 1
+#   .word         prgFireSnail | fireBurst
+#   .word         mvRegular | spdNormal | 0x25 # move - direction right, slow
+#   .word         lifeEnemy | 4
+#   .word     evtSetSprite | 34                # 2
+#   .word     evtSetAnimator | anmNone         # 3
+#   .word     evtAddToForeground               # 4
+#   .word     evtSaveObjSettings | 6           # 5
 
-    # Skull Gang
-    .word 0, evtMultipleCommands | 5
-    .word     evtSetProgMoveLife               # 1
-    .word         prgFireFast | fireSingleWest
-    .word         mveWave | 0b0001
-    .word         lifeEnemy | 3
-    .word     evtSetSprite | 35                # 2
-    .word     evtSetAnimator | anmNone         # 3
-    .word     evtAddToForeground               # 4
-    .word     evtSaveObjSettings | 8           # 5
+#   # BoniBurd
+#   .word 0, evtMultipleCommands | 5
+#   .word     evtSetProgMoveLife               # 1
+#   .word         prgFireSnail | fireBottomLeft
+#   .word         mvRegular | spdNormal | 0x22 # move - direction left, slow
+#   .word         lifeEnemy | 3
+#   .word     evtSetSprite | 2                 # 2
+#   .word     evtSetAnimator | anmNone         # 3
+#   .word     evtAddToForeground               # 4
+#   .word     evtSaveObjSettings | 7           # 5
 
-    # Eyeclopse
-    .word 0, evtMultipleCommands | 5
-    .word     evtSetProgMoveLife               # 1
-    .word         prgFireSlow | fireLeftWide
-    .word         mveWave | 0b1100
-    .word         lifeEnemy | 3
-    .word     evtSetSprite | 7                 # 2
-    .word     evtSetAnimator | anmNone         # 3
-    .word     evtAddToForeground               # 4
-    .word     evtSaveObjSettings | 9           # 5
+#   # Skull Gang
+#   .word 0, evtMultipleCommands | 5
+#   .word     evtSetProgMoveLife               # 1
+#   .word         prgFireFast | fireSingleWest
+#   .word         mveWave | 0b0001
+#   .word         lifeEnemy | 3
+#   .word     evtSetSprite | 35                # 2
+#   .word     evtSetAnimator | anmNone         # 3
+#   .word     evtAddToForeground               # 4
+#   .word     evtSaveObjSettings | 8           # 5
+
+#   # Eyeclopse
+#   .word 0, evtMultipleCommands | 5
+#   .word     evtSetProgMoveLife               # 1
+#   .word         prgFireSlow | fireLeftWide
+#   .word         mveWave | 0b1100
+#   .word         lifeEnemy | 3
+#   .word     evtSetSprite | 7                 # 2
+#   .word     evtSetAnimator | anmNone         # 3
+#   .word     evtAddToForeground               # 4
+#   .word     evtSaveObjSettings | 9           # 5
 
     # Add To Background
     .word 0, evtAddToBackground
-    .word 0, evtSetProgMoveLife
-    .word        prgBitShift
-    .word        mveBackground | 0b1000
-    .word        lifeImmortal
 
     .word 0, evtSetProgMoveLife
     .word        prgBitShift
     .word        mveBackground | 0b1000
     .word        lifeImmortal
 
-# defb 0,0,   3,24+ 160 -16 ,24+ 8 ; single sprite
-#
-# ;Castle
-#
+    .word 0, evtSingleSprite, sprSingleFrame | 0
+    .byte 24+ 8, 24+ 160 -16 # Y, X : 8, 288
 
-# defb 51,evtSingleSprite, TwoFrameSprite + 6, 24+160-12-6, 24+40-10
-#     .word     evtSingleSprite, sprTwoFrame | 6
-#     .byte         24+40-10,      24+160-12-6
-
-
+    # Castle
 # defb 0,evtSetMoveLife ,%11000010,0  ; Move    / dir Left Slow ... Life - immortal
-# defb 0,0,   4,24+ 120  ,24+ 50      ; single sprite
-#
-# defb 0,0,   14,24+ 100  ,24+ 40+80  ; single sprite
-#
-# defb 0,0,   13,24+ 90  ,24+ 40+100  ; single sprite
-# defb 0,0,   13,24+ 162  ,24+ 40+100 ; single sprite
+    .word 0, evtSetMoveLife, mveBackground | 0b0010, lifeImmortal
+
+    .word 0, evtSingleSprite, sprSingleFrame | 4
+    .byte 24+ 50,    24+ 120  # Y, X :  50, 240
+
+    .word 0, evtSingleSprite, sprSingleFrame | 14
+    .byte 24+ 40+90, 24+ 100  # Y, X : 130, 200
+
+    .word 0, evtSingleSprite, sprSingleFrame | 13
+    .byte 24+ 40+100, 24+ 90  # Y, X : 140, 180
+
+    .word 0, evtSingleSprite, sprSingleFrame | 13
+    .byte 24+ 40+100, 24+ 162 # Y, X : 140, 324
 #
 # ;Burning bloke
 # defb 0,evtMultipleCommands+3       ; 3 commands at the same timepoint
@@ -658,25 +659,26 @@ EndLevel:
         JMP  @$ExecuteBootstrap
 
 LevelInit:
-        JMP  @$EndLevel
-        call AkuYou_Player_GetPlayerVars
+       #JMP  @$EndLevel
+        CALL @$AkuYou_Player_GetPlayerVars
 
         MOV  $EventStreamArray_Ep1,R5 # Event Stream
-        MOV  $Event_SavedSettingsB,R3  # Saved Settings
+        MOV  $Event_SavedSettingsB,R3 # Saved Settings
         CALL @$Event_StreamInit
 
       #.ppudo_ensure $PPU_LoadMusic,$TitleMusic
       #.ppudo_ensure $PPU_MusicRestart
 
-       #CALL ScreenBuffer_Init
+        CALL ScreenBuffer_Init
        #ld (BackgroundFloodFillQuadSprite_Minus1+1),hl
        #ld (BackgroundSolidFillNextLine_Minus1+1),hl
+        MTPS $PR0
 LevelLoop:
-       #CALL Background_Draw
+        CALL @$Background_Draw
 
-        CALL EventStream_Process
+       #CALL @$EventStream_Process
 
-        CALL ObjectArray_Redraw
+       #CALL @$ObjectArray_Redraw
 
        #CALL Akuyou_Player_Handler
 
@@ -691,15 +693,219 @@ LevelLoop:
        .equiv FadeCommand, .+2
         CALL @$null
 
-       #CALL Akuyou_ScreenBuffer_Flip
+        CALL @$ScreenBuffer_Flip
 
        #ld (BackgroundSolidFillNextLine_Minus1+1),hl
        #ld (BackgroundFloodFillQuadSprite_Minus1+1),hl
 
         JMP  @$LevelLoop
 
+################################################################################
+#                          Generic Background Begin                            #
+################################################################################
+
+Background_Draw:
+#:bpt
+        MOV  $0,R0                           # ld a,0  ;0=left 1=right ;2=static
+
+        CALL @$Background_GradientScroll     # call Akuyou_Background_GradientScroll
+
+        CALL @$Timer_UpdateTimer             # call Akuyou_Timer_UpdateTimer
+
+                                             # push af ; need to keep the smartbomb color
+        # WARNING: supposed to return current timer in I
+        CALL @$Timer_GetTimer                # call Akuyou_Timer_GetTimer
+        MOV  R0,@$srcBitShifter_TicksOccured # ld (BitshifterTicksOccured_Plus1 - 1),a
+
+        MOV  @$ScreenBuffer_ActiveScreen, R5 # call Akuyou_ScreenBuffer_GetActiveScreen
+                                             # ld h,a
+                                             ##ifdef CPC320
+                                             #     ld l,&4F+1
+                                             ##else
+                                             #      ld l,&40
+                                             ##endif
+
+                                             # pop af
+
+                                             # or a
+                                             # jp nz,Background_SmartBomb
+
+       .equiv jmpBackgroundRender, .+2
+        JMP  @$Background_DrawB              # jp Background_DrawB :BackgroundRender_Plus2
+
+
+Background_DrawB:
+        MOV  $GradientTop,R3                 #    ld de,GradientTop
+        MOV  $GradientTopStart,R1            #    ld b,GradientTopStart
+        MOV  $0b11111100,R2                  #    ld c,%11111100 ; Shift on Timer Ticks
+                                             #
+        CALL @$Background_Gradient           #    call Akuyou_Background_Gradient
+                                             #
+                                             #    ;Bottom
+                                             #    ld a,0
+                                             #    ld de,LevelTiles
+                                             #    call GetSpriteMempos
+                                             #    push de
+                                             #        ld b,16 ;Lines
+                                             #        call BackgroundFloodFillQuadSprite ;need pointer to sprite in HL
+                                             #
+                                             #        ld de,&0000
+                                             #        ld b,32
+                                             #        call BackgroundSolidFill ;need pointer to sprite in HL
+                                             #    pop de
+                                             #    push de
+                                             #
+                                             #        ex hl,de        ;Move down 16 lines
+                                             #            ld bc,8*16
+                                             #            add hl,bc
+                                             #        ex hl,de
+                                             #        push de
+                                             #
+                                             #            ld b,16 ;Lines
+                                             #
+                                             #            call BackgroundFloodFillQuadSprite ;need pointer to sprite in HL
+                                             #
+                                             #            ld de,&0000
+                                             ##           ifdef CPC320
+                                             #                ld b,200-48-16-32-16-8-32
+                                             ##           else
+                                             #                ld b,192-48-16-32-16-8-32
+                                             ##           endif
+                                             #            call BackgroundSolidFill ;need pointer to sprite in HL
+                                             #
+
+        MOV  @$ScreenBuffer_ActiveScreen, R5
+        ADD  $13440,R5
+
+        MOV  $GradientBottom,R3              #            ld de,GradientBottom
+        MOV  $GradientBottomStart,R1         #            ld b,GradientBottomStart
+        MOV  $0b11111111,R2                  #            ld c,%11111111      ;Shift on Timer Ticks
+        CALL @$Background_Gradient           #            call Akuyou_Background_Gradient
+                                             #
+                                             #        pop de
+                                             #
+                                             #    ex hl,de        ;Move down 16 lines
+                                             #        ld bc,8*16
+                                             #        add hl,bc
+                                             #    ex hl,de
+                                             #
+                                             #    ld b,8 ;Lines
+                                             #
+                                             #    call BackgroundFloodFillQuadSprite ;need pointer to sprite in HL
+                                             #
+                                             #;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                                             #;               Spectrum & CPC Tile Bitshifts (MSX doesn't need them)
+                                             #;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                                             #    pop de ;needed to keep this for the bitshifts
+                                             #
+                                             #    ld hl,0007 ; shift to the right of the sprite
+                                             #    add hl,de
+                                             #    ld a,%11111100 ;Shift on Timer Ticks
+                                             #    ld b,&8     ; Bytes
+                                             #    ld c,16     ;lines
+                                             #
+                                             #    call BitShifter ;need pointer to sprite in HL
+                                             #
+                                             #    ;must be byte aligned
+                                             #    ld a,%11111110 ;Shift on Timer Ticks
+                                             #    ld b,&8     ; Bytes
+                                             #    ld c,16     ;lines
+                                             #
+                                             #    call BitShifter ;need pointer to sprite in HL
+                                             #
+                                             #    ;must be byte aligned - otherwise recalc!
+                                             #;   ld a,2
+                                             #;   ld de,LevelTiles
+                                             #;   call GetSpriteMempos
+                                             #;   ld hl,0007 ; shift to the right of the sprite
+                                             #;   add hl,de
+                                             #
+                                             #    inc h   ;Bitshifter wraps on byte align, so manually recalc, or force a move every 32 lines
+                                             #
+                                             #    ld a,%11111111 ;Shift on Timer Ticks
+                                             #    ld b,&8     ; Bytes
+                                             #    ld c,8      ;lines
+                                             #
+                                             #    call BitShifter ;need pointer to sprite in HL
+        RETURN                               #ret
+                                             #
+                                             #Background_SmartBomb:
+                                             #    ld e,d
+                                             #    jr Background_Fill
+                                             #Background_Black:
+                                             #    ld de,&0000
+                                             #Background_Fill:
+                                             ##   ifdef CPC320
+                                             #        ld b,200
+                                             ##   else
+                                             #        ld b,192
+                                             ##   endif
+                                             #
+                                             #    jp BackgroundSolidFill
+                                             #
+
+# CPC Background Data -------------------------------------------------------{{{
+   .equiv GradientTopStart, 48 # lines count
+GradientTop:
+#    defb &F0,&F0                 ;1 first line
+   .word 0xFF00, 0xFF00
+#    defb GradientTopStart-10,&D0 ;2 line num, New byte
+   .word GradientTopStart - 10, 0xDD00
+#    defb GradientTopStart-16,&70 ;3
+   .word GradientTopStart - 16, 0x7700
+#    defb GradientTopStart-20,&A0 ;4
+   .word GradientTopStart - 20, 0xAA00
+#    defb GradientTopStart-26,&50 ;5
+   .word GradientTopStart - 26, 0x5500
+#    defb GradientTopStart-30,&80 ;6
+   .word GradientTopStart - 30, 0x8800
+#    defb GradientTopStart-36,&20 ;7
+   .word GradientTopStart - 36, 0x2200
+#    defb GradientTopStart-40,&00 ;8
+   .word GradientTopStart - 40, 0x0000
+#    defb GradientTopStart-46,&00 ;9
+   .word GradientTopStart - 46, 0x0000
+#    defb 255
+   .word 0xFFFF
+
+   .equiv GradientBottomStart, 32 # lines count
+GradientBottom:
+#    defb &0,&0  ;1; first line
+   .word 0x0000, 0x0000
+#    defb 26,&20 ;10
+   .word 26, 0x2200
+#    defb 22,&80 ;11
+   .word 22, 0x8800
+#    defb 18,&50 ;12
+   .word 18, 0x5500
+#    defb 14,&A0 ;13
+   .word 14, 0xAA00
+#    defb 10,&70 ;14
+   .word 10, 0x7700
+#    defb 6,&D0  ;15
+   .word 6, 0xDD00
+#    defb 4,&F0  ;15
+   .word 4, 0xFF00
+#    defb 2,&F0  ;15
+   .word 2, 0xFF00
+#    defb 255
+   .word 0xFFFF
+
+       .include "bit_shifter.s"
+
+RealPalette: #---------------------------------------------------------------{{{
+    .byte 0, 0    # line number, 0 - set cursor/scale/palette
+    .word 0x10    #  graphical cursor, YRGB color
+    .word 0b10100 #  320 dots per line, pallete 4
+
+    .byte 1, 1    # line number, set colors
+    .byte 0x00, 0xEE, 0xDD, 0xFF
+
+    .byte 201     #--line number, 201 - end of the main screen params
+    .even
 #-------------------------------------------------------------------------------
 # for some reason GAS replaces the last byte with 0
 # so we add the dummy word to avoid data/code corruption
        .word 0xFFFF
 end:
+               .nolist
