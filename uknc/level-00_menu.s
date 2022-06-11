@@ -530,7 +530,5 @@ MenuText:
 
 CursorSpr: .incbin "resources/menu_cursor.spr"
 
-# for some reason, GAS replaces the last byte with 0
-# so we add the dummy word to avoid data/code corruption
-        .word 0xFFFF
+    .even
 end:

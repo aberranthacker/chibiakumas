@@ -44,16 +44,35 @@ magic_numbers = {
   0431 => 'auto-overlay (separate)'
 }
 
-puts "magic number:               #{a_magic.to_s(8)} (#{magic_numbers[a_magic]})" unless options.brief
-puts "size of text segment:       #{a_text}"   unless options.brief
-puts "size of initialized data:   #{a_data}"   unless options.brief
-puts "size of uninitialized data: #{a_bss}"    unless options.brief
-puts "size of symbol table:       #{a_syms}"   unless options.brief
-puts "entry point:                #{a_entry}"  unless options.brief
-puts "not used:                   #{a_unused}" unless options.brief
-puts "relocation info stripped:   #{a_flag}"   unless options.brief
-puts "size - entry:               #{a_text - a_entry}" unless options.brief
-puts "entry: #{a_entry} size: #{a_text - a_entry} ends: #{a_text}"
+unless options.brief
+ puts "magic number:               #{a_magic.to_s(8)} (#{magic_numbers[a_magic]})"
+ puts "size of text segment:       #{a_text}"
+ puts "size of initialized data:   #{a_data}"
+ puts "size of uninitialized data: #{a_bss}"
+ puts "size of symbol table:       #{a_syms}"
+ puts "entry point:                #{a_entry}"
+ puts "not used:                   #{a_unused}"
+ puts "relocation info stripped:   #{a_flag}"
+ puts "size - entry:               #{a_text - a_entry}"
+ puts "entry: #{a_entry} size: #{a_text - a_entry} ends: #{a_text}"
+end
+
+info = ''
+output_info = ''
+entry_updated = false
+info = File.read('build/binary_info.txt') if File.exists?('build/binary_info.txt')
+info.each_line do |line|
+  if line.include?(options.out_filename)
+    output_info << "#{options.out_filename},#{a_entry},#{a_text - a_entry},#{a_text}\n"
+    entry_updated = true
+  else
+    output_info << line
+  end
+end
+unless entry_updated
+  output_info << "#{options.out_filename},#{a_entry},#{a_text - a_entry},#{a_text}\n"
+end
+File.write('build/binary_info.txt', output_info)
 
 # the start of the text segment in the file is 20(8)
 text = if options.binary

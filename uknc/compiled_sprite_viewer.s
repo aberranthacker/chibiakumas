@@ -1,6 +1,6 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-                           Compiled Sprite Viewer 
+                           Compiled Sprite Viewer
 
     Compiled sprites are just machine code programs to render loading/continue
 etc screens we run them from here to allow the 64k override to be standardised
@@ -15,7 +15,7 @@ CLS:
         CLR  R0
         MOV  $8000>>4,R1
         MOV  @$ScreenBuffer_ActiveScreen,R2
-100$: 
+100$:
        .rept 1<<4
         MOV  R0,(R2)+
        .endr
@@ -48,7 +48,7 @@ RETURN
                                                             #     push hl
                                                             #     call Akuyou_RasterColors_DefaultSafe
                                                             #     pop hl
-                                                            # 
+                                                            #
                                                             #     ld a,&C6 ;Compiled sprites are in bank 6
                                                             #     ld h,&40
                                                             #     call BankSwitch_C0_CallHL

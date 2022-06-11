@@ -80,7 +80,7 @@ SetLevelTime: # This is used for jumping around the event stream # SetLevelTime:
 # ../SrcALL/Akuyou_Multiplatform_EventStream.asm:86
 
        .global Event_StreamInit
-Event_StreamInit:                                           # Event_StreamInit:
+Event_StreamInit:
         # Store the address of our 2nd setting buffer (1st is contained in core)
        #MOV  R3,@$srcEvent_SavedSettings # uknc/event_stream.s:621
         CLR  R0
@@ -587,8 +587,6 @@ Event_LoadObjSettings:
         MOVB (R1),  @$srcObjectAddToForeBack
 
         RETURN
-
-
 
                                                             # ; --------------------------------------------------
                                                             # ;                 Reset Powerup

@@ -1,4 +1,4 @@
-                .nolist
+                .list
 
                 .TITLE BootstrapChibi Akumas loader
 
@@ -40,7 +40,7 @@ Bootstrap_Launch:
         # PPU will clear the command code when it ready to execute a new one
        .ppudo $PPU_NOP
 
-        JSR  R5,PPEXEC
+        JSR  R5,@$PPEXEC
        .word FB1 # PPU module location
        .word PPU_ModuleSizeWords
 #-------------------------------------------------------------------------------
@@ -60,6 +60,7 @@ Bootstrap_Launch:
         SOB  R0, 1$
      .endif
 
+#:bpt
         # Load the game core - this is always in memory
         MOV  $core.bin,R0
         CALL Bootstrap_LoadDiskFile
@@ -135,15 +136,15 @@ Bootstrap_Level_Intro:
         CALL Bootstrap_LoadDiskFile
 
        .ppudo_ensure $PPU_SingleProcess
-       .list
         MOV  $SPReset,SP # we are not returning, so reset the stack
-        .nolist
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
 Bootstrap_Level_1: # ../Aku/BootStrap.asm:838  main menu --------------------
+#:bpt
         CALL StartANewGame
         CALL LevelReset0000
 
+       .ppudo_ensure $PPU_SetPalette, $TitleScreenPalette
         MOV  $level_01.bin,R0
         CALL Bootstrap_LoadDiskFile
 
@@ -363,6 +364,7 @@ RETURN
 #----------------------------------------------------------------------------}}}
 
 Bootstrap_LoadDiskFile: # ---------------------------------------------------{{{
+#:bpt
         MOV  (R0)+,@$PS.CPU_RAM_Address
         MOV  (R0)+,@$PS.WordsCount
         MOV  (R0),R0 # starting block number
@@ -392,7 +394,8 @@ Bootstrap_LoadDiskFile: # ---------------------------------------------------{{{
 
 3$:     TSTB @$PS.Status
         BMI  3$
-        BEQ  1237$
+        BZE  1237$
+        #:bpt
         SEC  # set carry flag to indicate that there was an error
         MOVB @$PS.Status,R0
        .ppudo $PPU_Print, $LoadingErrorMsg
@@ -678,9 +681,8 @@ TestStr: .byte 0,10
          .byte 0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77,0x78,0x79,0x7A,0x7B,0x7C,0x7D,0x7E,0x7F
          .byte 0x80,0x81,0x82,0x83,0x84,0x85
          .byte 0x00
-       .even
-# for some reason gas replaces the last byte with 0
-# so we add dummy word to avoid data/code corruption
-       .word 0xFFFF
+
+    .even
 end:
+
 BootstrapEnd:

@@ -30,7 +30,6 @@ slide08: .incbin "build/ep1-intro/ep1-intro-slide08.raw.lzsa1" # school2
          .even
 
 EventStreamArray:
-
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
     .word         prgBitShift
@@ -93,7 +92,7 @@ EventStreamArray:
     .word evtSetPalette, RealPalette
 
     #----------
-    .word 3, evtChangeStreamTime, 49, StartPoint
+   #.word 3, evtChangeStreamTime, 49, StartPoint
     #----------
 
     .word 10, evtCallAddress, ShowText1Init
@@ -106,36 +105,36 @@ StartPoint:
     .word 50, evtMultipleCommands | 4
     .word     evtLoadObjSettings | 3           # 1
     .word     evtSingleSprite, sprTwoFrame | 0 # 2
-    .byte         24+40-10, 24+160-24 # Y, X : 54, 160
+    .byte         24+40-10, 24+160-24 # Y, X : 30, 272
     .word     evtSingleSprite, sprTwoFrame | 1 # 3
-    .byte         24+40-10, 24+160-12 # Y, X : 54, 172
+    .byte         24+40-10, 24+160-12 # Y, X : 30, 296
     .word     evtSingleSprite, sprTwoFrame | 2 # 4
-    .byte         24+40-10, 24+160
+    .byte         24+40-10, 24+160    # Y, X : 30, 320    
     # cleanup Chibiko sprite
     .word 51, evtMultipleCommands | 5
     .word     evtSingleSprite, sprTwoFrame | 6
-    .byte         24+40-10,      24+160-12-6 # Y, X : 54, 166
+    .byte         24+40-10,      24+160-12-6 # Y, X : 30, 284
     .word     evtSingleSprite, sprTwoFrame | 6
-    .byte         24+40+24+8-10, 24+160-12-6 # Y, X : 86, 166
+    .byte         24+40+24+8-10, 24+160-12-6 # Y, X : 62, 284
     .word     evtSingleSprite, sprTwoFrame | 6
-    .byte         24+40-10,      24+160-12   # Y, X : 54, 172
+    .byte         24+40-10,      24+160-12   # Y, X : 30, 286
     .word     evtSingleSprite, sprTwoFrame | 6
-    .byte         24+40+24+8-10, 24+160-12   # Y, X : 86, 172
+    .byte         24+40+24+8-10, 24+160-12   # Y, X : 62, 286
     .word     evtSingleSprite, sprTwoFrame | 6
-    .byte         24+40-10+8,    24+160-12   # Y, X : 46, 172
+    .byte         24+40-10+8,    24+160-12   # Y, X : 22, 286
 
     .word 52, evtSetPalette, ChibikoAttacksPalette2
     # flying head
     .word 52, evtMultipleCommands | 7
     .word     evtLoadObjSettings | 4               # 1
     .word     evtAddToBackground                   # 2
-    .word     evtSingleSprite, sprTwoFrame | 6     # 3
-    .byte         24+80-4+10, 24+80-16
-    .word     evtSingleSprite, sprTwoFrame | 6     # 4
-    .byte         24+80+10, 24+80-16+8
+    .word     evtSingleSprite, sprTwoFrame | 6     # 3 cleanup sprite
+    .byte         24+80-4+10, 24+80-16 # Y, X : 86, 128
+    .word     evtSingleSprite, sprTwoFrame | 6     # 4 cleanup sprite
+    .byte         24+80+10, 24+80-16+8 # Y, X : 90, 144
     .word     evtAddToForeground                   # 5
     .word     evtSingleSprite, sprTwoFrame | 5     # 6
-    .byte         24+80+10, 24+80-16
+    .byte         24+80+10, 24+80-16   # Y, X :  9, 128
     .word     evtSaveLstObjToAdd, charnikohimehead # 7
 
     .word 52, evtCallAddress, Decapitate
@@ -943,7 +942,5 @@ HauntingPalette: #-----------------------------------------------------------{{{
 # 54=000, 5D=80F, 40=888, 4B=FFF
 # 54=000, 53=0FF, 5B=8FF, 4B=FFF
 
-# for some reason GAS(or LD) replaces the last byte with 0
-# so we add dummy word to avoid data/code corruption
-       .word 0xFFFF
+    .even
 end:
