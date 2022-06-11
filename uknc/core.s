@@ -343,54 +343,48 @@ null:   RETURN
 #                            End of aligned code                               #
 ################################################################################
 
-                                        ## ifdef CPC320
-       .include "virtual_screen_pos_320.s" #   read "../SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm"
-                                        ## else
-                                        ##     read "../SrcCPC/Akuyou_CPC_VirtualScreenPos_256.asm"
-                                        ## endif
-       .include "show_sprite.s"         # read "../SrcCPC/Akuyou_CPC_ShowSprite.asm"
-                                        #
-       .include "stararray.s"           # read "../SrcALL/Akuyou_Multiplatform_Stararray.asm"
-       .include "stararray_add.s"       # read "../SrcALL/Akuyou_Multiplatform_Stararray_Add.asm"
-       .include "do_moves.s"            # read "../SrcALL/Akuyou_Multiplatform_DoMoves.asm"
-                                        #
-                                        # ;;;;;;;;;;;;;;;;;;;;Input Driver;;;;;;;;;;;;;;;;;;;;;;;;
-                                        # read "../SrcCPC/Akuyou_CPC_KeyboardDriver.asm"
-                                        # ;;;;;;;;;;;;;;;;;;;;Disk Driver;;;;;;;;;;;;;;;;;;;;;;;;
-      #.include "disk_driver.s"         # read "../SrcCPC/Akuyou_CPC_DiskDriver.asm"
-       .include "execute_bootstrap.s"   # read "../SrcCPC/Akuyou_CPC_ExecuteBootstrap.asm"
-                                        # read "../SrcCPC/Akuyou_CPC_TextDriver.asm"
-                                        #
-       .include "sfx.s"                 # read "../SrcALL/Akuyou_Multiplatform_SFX.asm"
-                                        #
-       .include "compiled_sprite_viewer.s" # read "../SrcCPC/Akuyou_CPC_CompiledSpriteViewer.asm" ;also includes CLS
-                                        # read "../SrcCPC/Akuyou_CPC_BankSwapper.asm"
-                                        #
-       .include "player_driver.s"       # read "../SrcALL/Akuyou_Multiplatform_PlayerDriver.asm"
-       .include "timer.s"               # read "../SrcALL/Akuyou_Multiplatform_Timer.asm"
-                                        #
-       .include "gradient.s"            # read "../SrcCPC/Akuyou_CPC_Gradient.asm"
-                                        #
-       .include "object_driver.s"       # read "../SrcALL/Akuyou_Multiplatform_ObjectDriver.asm"
-       .include "event_stream.s"        # read "../SrcALL/Akuyou_Multiplatform_EventStream.asm"
-                                        # read "../SrcCPC/Akuyou_CPC_CpcPlus.asm"
-                                        # read "../SrcALL/Akuyou_Multiplatform_ArkosTrackerLite.asm"
-       .include "screen_memory.s"       # read "../SrcCPC/Akuyou_CPC_ScreenMemory.asm"
-                                        # read "../SrcALL/Akuyou_Multiplatform_AkuCommandVectorArray.asm"
-                                        #
-                                        ## ifdef Debug_Monitor
-                                        ## ;   read "../SrcALL/Multiplatform_Monitor.asm"
-                                        ## ;   read "../SrcALL/Multiplatform_MonitorMemdump.asm"
-                                        ## ;   read "../SrcALL/Multiplatform_MonitorSimple.asm"
-                                        ## endif
+       .include "core/virtual_screen_pos_320.s" #   read "../SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm"
+       .include "core/show_sprite.s"       # read "../SrcCPC/Akuyou_CPC_ShowSprite.asm"
+                                           #
+       .include "core/stararray.s"         # read "../SrcALL/Akuyou_Multiplatform_Stararray.asm"
+       .include "core/stararray_add.s"     # read "../SrcALL/Akuyou_Multiplatform_Stararray_Add.asm"
+       .include "core/do_moves.s"          # read "../SrcALL/Akuyou_Multiplatform_DoMoves.asm"
+                                           #
+                                           # ;;;;;;;;;;;;;;;;;;;;Input Driver;;;;;;;;;;;;;;;;;;;;;;;;
+                                           # read "../SrcCPC/Akuyou_CPC_KeyboardDriver.asm"
+                                           # ;;;;;;;;;;;;;;;;;;;;Disk Driver;;;;;;;;;;;;;;;;;;;;;;;;
+      #.include "disk_driver.s"            # read "../SrcCPC/Akuyou_CPC_DiskDriver.asm"
+       .include "core/execute_bootstrap.s" # read "../SrcCPC/Akuyou_CPC_ExecuteBootstrap.asm"
+                                           # read "../SrcCPC/Akuyou_CPC_TextDriver.asm"
+                                           #
+       .include "core/sfx.s"               # read "../SrcALL/Akuyou_Multiplatform_SFX.asm"
+                                           #
+       .include "core/compiled_sprite_viewer.s" # read "../SrcCPC/Akuyou_CPC_CompiledSpriteViewer.asm" ;also includes CLS
+                                           # read "../SrcCPC/Akuyou_CPC_BankSwapper.asm"
+                                           #
+       .include "core/player_driver.s"     # read "../SrcALL/Akuyou_Multiplatform_PlayerDriver.asm"
+       .include "core/timer.s"             # read "../SrcALL/Akuyou_Multiplatform_Timer.asm"
+                                           #
+       .include "core/gradient.s"          # read "../SrcCPC/Akuyou_CPC_Gradient.asm"
+                                           #
+       .include "core/object_driver.s"     # read "../SrcALL/Akuyou_Multiplatform_ObjectDriver.asm"
+       .include "core/event_stream.s"      # read "../SrcALL/Akuyou_Multiplatform_EventStream.asm"
+                                           # read "../SrcCPC/Akuyou_CPC_CpcPlus.asm"
+       .include "core/screen_memory.s"     # read "../SrcCPC/Akuyou_CPC_ScreenMemory.asm"
+                                           # read "../SrcALL/Akuyou_Multiplatform_AkuCommandVectorArray.asm"
+                                           #
+                                           ## ifdef Debug_Monitor
+                                           ## ;   read "../SrcALL/Multiplatform_Monitor.asm"
+                                           ## ;   read "../SrcALL/Multiplatform_MonitorMemdump.asm"
+                                           ## ;   read "../SrcALL/Multiplatform_MonitorSimple.asm"
+                                           ## endif
        .include "decoders/lzsa1.s"
 
 NotImplemented:
        .inform_and_hang "core: not implemented!"
 
+       .even
 end: FileEndCore:
 
 LevelStart:
-        JMP  .
-
        .nolist

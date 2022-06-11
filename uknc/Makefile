@@ -94,21 +94,21 @@ build/bootstrap.o : $(common) \
 	$(AS) -al bootstrap.s -o build/bootstrap.o | build_tools/format_list.rb
 
 build/core.o : $(common) \
-               compiled_sprite_viewer.s \
                core.s \
-               do_moves.s \
-               event_stream.s \
-               execute_bootstrap.s \
-               gradient.s \
-               object_driver.s \
-               player_driver.s \
-               screen_memory.s \
-               sfx.s \
-               show_sprite.s \
-               stararray.s \
-               stararray_add.s \
-               timer.s \
-               virtual_screen_pos_320.s
+               core/compiled_sprite_viewer.s \
+               core/do_moves.s \
+               core/event_stream.s \
+               core/execute_bootstrap.s \
+               core/gradient.s \
+               core/object_driver.s \
+               core/player_driver.s \
+               core/screen_memory.s \
+               core/sfx.s \
+               core/show_sprite.s \
+               core/stararray.s \
+               core/stararray_add.s \
+               core/timer.s \
+               core/virtual_screen_pos_320.s
 	$(AS) core.s -al -o build/core.o | build_tools/format_list.rb
 	build_tools/level_start_update.rb
 
