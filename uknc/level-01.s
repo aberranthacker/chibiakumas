@@ -13,6 +13,7 @@
                .=Akuyou_LevelStart
 
 start:
+#:bpt
         JMP  @$LevelInit
 
        .incbin "resources/level01.spr"
@@ -676,7 +677,7 @@ LevelInit:
 LevelLoop:
         CALL @$Background_Draw
 
-       #CALL @$EventStream_Process
+        CALL @$EventStream_Process
 
        #CALL @$ObjectArray_Redraw
 
@@ -700,12 +701,8 @@ LevelLoop:
 
         JMP  @$LevelLoop
 
-################################################################################
-#                          Generic Background Begin                            #
-################################################################################
-
+# Generic Background Begin -----------------------------------------------------
 Background_Draw:
-#:bpt
         MOV  $0,R0                           # ld a,0  ;0=left 1=right ;2=static
 
         CALL @$Background_GradientScroll     # call Akuyou_Background_GradientScroll
@@ -714,198 +711,143 @@ Background_Draw:
 
                                              # push af ; need to keep the smartbomb color
         # WARNING: supposed to return current timer in I
+        # for whatever reasons
         CALL @$Timer_GetTimer                # call Akuyou_Timer_GetTimer
         MOV  R0,@$srcBitShifter_TicksOccured # ld (BitshifterTicksOccured_Plus1 - 1),a
 
         MOV  @$ScreenBuffer_ActiveScreen, R5 # call Akuyou_ScreenBuffer_GetActiveScreen
                                              # ld h,a
-                                             ##ifdef CPC320
-                                             #     ld l,&4F+1
-                                             ##else
-                                             #      ld l,&40
-                                             ##endif
-
+                                             # ld l,&4F+1
                                              # pop af
 
                                              # or a
                                              # jp nz,Background_SmartBomb
-
        .equiv jmpBackgroundRender, .+2
         JMP  @$Background_DrawB              # jp Background_DrawB :BackgroundRender_Plus2
 
-
 Background_DrawB:
-        MOV  $GradientTop,R3                 #    ld de,GradientTop
-        MOV  $GradientTopStart,R1            #    ld b,GradientTopStart
-        MOV  $0b11111100,R2                  #    ld c,%11111100 ; Shift on Timer Ticks
-                                             #
-        CALL @$Background_Gradient           #    call Akuyou_Background_Gradient
-                                             #
-                                             #    ;Bottom
-                                             #    ld a,0
-                                             #    ld de,LevelTiles
-                                             #    call GetSpriteMempos
-                                             #    push de
-                                             #        ld b,16 ;Lines
-                                             #        call BackgroundFloodFillQuadSprite ;need pointer to sprite in HL
-                                             #
-                                             #        ld de,&0000
-                                             #        ld b,32
-                                             #        call BackgroundSolidFill ;need pointer to sprite in HL
-                                             #    pop de
-                                             #    push de
-                                             #
-                                             #        ex hl,de        ;Move down 16 lines
-                                             #            ld bc,8*16
-                                             #            add hl,bc
-                                             #        ex hl,de
-                                             #        push de
-                                             #
-                                             #            ld b,16 ;Lines
-                                             #
-                                             #            call BackgroundFloodFillQuadSprite ;need pointer to sprite in HL
-                                             #
-                                             #            ld de,&0000
-                                             ##           ifdef CPC320
-                                             #                ld b,200-48-16-32-16-8-32
-                                             ##           else
-                                             #                ld b,192-48-16-32-16-8-32
-                                             ##           endif
-                                             #            call BackgroundSolidFill ;need pointer to sprite in HL
-                                             #
+        MOV  $GradientTop,R3 # 48 lines
+        MOV  $GradientTopStart,R1
+        MOV  $0b11111100,R2  # Shift on Timer Ticks
+        CALL @$Background_Gradient
 
-        MOV  @$ScreenBuffer_ActiveScreen, R5
-        ADD  $13440,R5
+        CLR  R0 # sprite number
+        MOV  $LevelTiles,R4
+        CALL GetSpriteMempos
+        MOV  R4,-(SP) # we will need the position for bitshifts
+        MOV  $16,R1
+        CALL @$Background_FloodFillQuadSprite
 
-        MOV  $GradientBottom,R3              #            ld de,GradientBottom
-        MOV  $GradientBottomStart,R1         #            ld b,GradientBottomStart
-        MOV  $0b11111111,R2                  #            ld c,%11111111      ;Shift on Timer Ticks
-        CALL @$Background_Gradient           #            call Akuyou_Background_Gradient
-                                             #
-                                             #        pop de
-                                             #
-                                             #    ex hl,de        ;Move down 16 lines
-                                             #        ld bc,8*16
-                                             #        add hl,bc
-                                             #    ex hl,de
-                                             #
-                                             #    ld b,8 ;Lines
-                                             #
-                                             #    call BackgroundFloodFillQuadSprite ;need pointer to sprite in HL
-                                             #
-                                             #;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-                                             #;               Spectrum & CPC Tile Bitshifts (MSX doesn't need them)
-                                             #;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-                                             #    pop de ;needed to keep this for the bitshifts
-                                             #
-                                             #    ld hl,0007 ; shift to the right of the sprite
-                                             #    add hl,de
-                                             #    ld a,%11111100 ;Shift on Timer Ticks
-                                             #    ld b,&8     ; Bytes
-                                             #    ld c,16     ;lines
-                                             #
-                                             #    call BitShifter ;need pointer to sprite in HL
-                                             #
-                                             #    ;must be byte aligned
-                                             #    ld a,%11111110 ;Shift on Timer Ticks
-                                             #    ld b,&8     ; Bytes
-                                             #    ld c,16     ;lines
-                                             #
-                                             #    call BitShifter ;need pointer to sprite in HL
-                                             #
-                                             #    ;must be byte aligned - otherwise recalc!
-                                             #;   ld a,2
-                                             #;   ld de,LevelTiles
-                                             #;   call GetSpriteMempos
-                                             #;   ld hl,0007 ; shift to the right of the sprite
-                                             #;   add hl,de
-                                             #
-                                             #    inc h   ;Bitshifter wraps on byte align, so manually recalc, or force a move every 32 lines
-                                             #
-                                             #    ld a,%11111111 ;Shift on Timer Ticks
-                                             #    ld b,&8     ; Bytes
-                                             #    ld c,8      ;lines
-                                             #
-                                             #    call BitShifter ;need pointer to sprite in HL
-        RETURN                               #ret
-                                             #
+        CLR  R0
+        MOV  $32,R1
+        CALL @$Background_SolidFill
+
+        MOV  $16,R1 # number of lines
+        CALL @$Background_FloodFillQuadSprite
+
+        CLR  R0
+        MOV  $48,R1
+        CALL @$Background_SolidFill
+
+        MOV  R4,-(SP) # the subroutine below corrupts R4
+        MOV  $GradientBottom,R3 # 32 lines
+        MOV  $GradientBottomStart,R1
+        MOV  $0b11111111,R2 # Shift on Timer Ticks
+        CALL @$Background_Gradient
+
+        MOV  $8,R1 # number of lines
+        MOV  (SP)+,R4
+        CALL @$Background_FloodFillQuadSprite
+
+# Tile Bitshifts ---------------------------------------------------------------
+        MOV  (SP)+,R5 # ponter to the first tile
+       .equiv TileWidthBytes, 8
+        # we do MOV  -(R5),R0 to read words, to be able to use ASH for shifts
+        # so R5 should point to next line
+        ADD  $TileWidthBytes,R5
+
+        MOV  $0b11111100,R0     # shift on timer ticks
+        MOV  $TileWidthBytes,R1 # bytes
+        MOV  $16,R2             # lines
+        CALL @$BitShifter       #
+
+        MOV  $0b11111110,R0     # shift on timer ticks
+        MOV  $TileWidthBytes,R1 # bytes
+        MOV  $16,R2             # lines
+        CALL @$BitShifter       #
+
+        MOV  $0b11111111,R0     # shift on timer ticks
+        MOV  $TileWidthBytes,R1 # bytes
+        MOV  $8,R2              # lines
+        CALL @$BitShifter       #
+
+        RETURN
+
                                              #Background_SmartBomb:
                                              #    ld e,d
                                              #    jr Background_Fill
                                              #Background_Black:
                                              #    ld de,&0000
                                              #Background_Fill:
-                                             ##   ifdef CPC320
-                                             #        ld b,200
-                                             ##   else
-                                             #        ld b,192
-                                             ##   endif
+                                             #    ld b,200
                                              #
                                              #    jp BackgroundSolidFill
-                                             #
 
-# CPC Background Data -------------------------------------------------------{{{
+# Background Data -------------------------------------------------------{{{
    .equiv GradientTopStart, 48 # lines count
 GradientTop:
-#    defb &F0,&F0                 ;1 first line
-   .word 0xFF00, 0xFF00
-#    defb GradientTopStart-10,&D0 ;2 line num, New byte
-   .word GradientTopStart - 10, 0xDD00
-#    defb GradientTopStart-16,&70 ;3
+   .word 0xFF00, 0xFF00                # 1st line
+   .word GradientTopStart - 10, 0xDD00 # 2nd line num, new word
    .word GradientTopStart - 16, 0x7700
-#    defb GradientTopStart-20,&A0 ;4
    .word GradientTopStart - 20, 0xAA00
-#    defb GradientTopStart-26,&50 ;5
    .word GradientTopStart - 26, 0x5500
-#    defb GradientTopStart-30,&80 ;6
    .word GradientTopStart - 30, 0x8800
-#    defb GradientTopStart-36,&20 ;7
    .word GradientTopStart - 36, 0x2200
-#    defb GradientTopStart-40,&00 ;8
    .word GradientTopStart - 40, 0x0000
-#    defb GradientTopStart-46,&00 ;9
    .word GradientTopStart - 46, 0x0000
-#    defb 255
    .word 0xFFFF
 
    .equiv GradientBottomStart, 32 # lines count
 GradientBottom:
-#    defb &0,&0  ;1; first line
-   .word 0x0000, 0x0000
-#    defb 26,&20 ;10
-   .word 26, 0x2200
-#    defb 22,&80 ;11
+   .word 0x0000, 0x0000 # 1st line
+   .word 26, 0x2200     # 2nd line num, new word
    .word 22, 0x8800
-#    defb 18,&50 ;12
    .word 18, 0x5500
-#    defb 14,&A0 ;13
    .word 14, 0xAA00
-#    defb 10,&70 ;14
    .word 10, 0x7700
-#    defb 6,&D0  ;15
-   .word 6, 0xDD00
-#    defb 4,&F0  ;15
-   .word 4, 0xFF00
-#    defb 2,&F0  ;15
-   .word 2, 0xFF00
-#    defb 255
+   .word  6, 0xDD00
+   .word  4, 0xFF00
+   .word  2, 0xFF00
    .word 0xFFFF
-
-       .include "bit_shifter.s"
-
+#----------------------------------------------------------------------------}}}
+# 9 br.     # A br.     # B br.     # C br.     # D br.     # E br.     # F white
+# 1 blue    # 2 green   # 3 cyan    # 4 red     # 5 magenta # 6 yellow  # 7 gray
 RealPalette: #---------------------------------------------------------------{{{
     .byte 0, 0    # line number, 0 - set cursor/scale/palette
     .word 0x10    #  graphical cursor, YRGB color
-    .word 0b10100 #  320 dots per line, pallete 4
+    .word 0b10111 #  320 dots per line, palette 7
 
     .byte 1, 1    # line number, set colors
-    .byte 0x00, 0xEE, 0xDD, 0xFF
+    .byte 0x00, 0xEE, 0x99, 0xFF
+    .byte 49, 1    # line number, set colors
+    .byte 0x00, 0x55, 0x11, 0xFF
+    .byte 129, 1    # line number, set colors
+    .byte 0x00, 0xBB, 0xCC, 0xFF
+    .byte 193, 1    # line number, set colors
+    .byte 0x00, 0xCC, 0xBB, 0xFF
 
-    .byte 201     #--line number, 201 - end of the main screen params
+    .byte 201       # --line number, 201 - end of the main screen params
     .even
-#-------------------------------------------------------------------------------
-# for some reason GAS replaces the last byte with 0
-# so we add the dummy word to avoid data/code corruption
-       .word 0xFFFF
+#----------------------------------------------------------------------------}}}
+# 9 br.     # A br.     # B br.     # C br.     # D br.     # E br.     # F white
+# 1 blue    # 2 green   # 3 cyan    # 4 red     # 5 magenta # 6 yellow  # 7 gray
+   #read "..\SrcCPC\Akuyou_CPC_Level_GenericRasterSwitcher.asm"
+
+    .include "background_solid_fill.s"
+    .include "background_quad_sprite.s"
+    .include "background_bit_shifter.s"
+    .include "background_get_sprite_mem_pos.s"
+
+    .even
 end:
-               .nolist
+    .nolist
