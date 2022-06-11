@@ -7,9 +7,9 @@ OUTPUT(build/bootstrap.out)
 FileSizeCoreWords     = ((FileEndCore - FileBeginCore) / 2);
 FileSizeSettingsWords = ((SavedSettings - SavedSettings_Last) / 2);
 
-BootstrapBlockNum = 1;
 LoadingScreenSizeWords = 8000;
 
+BootstrapBlockNum = 1;
 PPUModuleBlockNum      = (BootstrapSizeWords      + 255) / 256 + BootstrapBlockNum;
 LoadingScreenBlockNum  = (PPU_ModuleSizeWords     + 255) / 256 + PPUModuleBlockNum;
 CoreBlockNum           = (LoadingScreenSizeWords  + 255) / 256 + LoadingScreenBlockNum;

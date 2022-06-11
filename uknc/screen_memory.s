@@ -47,7 +47,8 @@ ScreenBuffer_SetFB0Active:
        .ppudo $PPU_ShowFB1
         CLR  @$ScreenBuffer_ActiveScreenDirect
         CLRB @$srcFB_MSB
-        MOV  $FB0, @$ScreenBuffer_ActiveScreen
+        MOV  $FB0,R5
+        MOV  R5, @$ScreenBuffer_ActiveScreen
         MOV  $FB1, @$ScreenBuffer_VisibleScreen
         RETURN
 
@@ -56,11 +57,10 @@ ScreenBuffer_SetFB1Active:
        .ppudo $PPU_ShowFB0
         MOV  $0x4000, @$ScreenBuffer_ActiveScreenDirect
         MOVB $0x40, @$srcFB_MSB
-        MOV  $FB1, @$ScreenBuffer_ActiveScreen
+        MOV  $FB1,R5
+        MOV  R5, @$ScreenBuffer_ActiveScreen
         MOV  $FB0, @$ScreenBuffer_VisibleScreen
         RETURN
-
-
 
 scr_addr_table:
   .word 0x0180, 0x01D0, 0x0220, 0x0270, 0x02C0, 0x0310, 0x0360, 0x03B0 #  0
