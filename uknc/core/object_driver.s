@@ -596,10 +596,11 @@ ObjectAnimator:                                             # ObjectAnimator:
                                                             # ret
                                                             #
 ObjectProgram:                                              # ObjectProgram:
-        .inform_and_hang "no ObjectProgram"                 #     ret z       ; return if zero
-                                                            #     cp %00000001
-                                                            #     jp z,ObjectProgram_BitShiftSprite   ; Used by background, sprite bank based on X co-ord
-                                                            #     and %11111000           ;00000XXX = Powerup
+                                                            #     ret z       ; return if zero
+        CMP  R3,$0b00000001                                 #     cp %00000001
+        BNE  1$                                             #     jp z,ObjectProgram_BitShiftSprite   ; Used by background, sprite bank based on X co-ord
+        JMP  @$ObjectProgram_BitShiftSprite                 
+1$:                                                         #     and %11111000           ;00000XXX = Powerup
                                                             #     jr z,ObjectProgram_PowerUps
                                                             #     cp %11110000            ;11110XXX = Animate every X frames
                                                             #     jp z,ObjectProgram_FrameAnimate
@@ -628,6 +629,7 @@ ObjectProgram:                                              # ObjectProgram:
                                                             #
                                                             #     cp 255
                                                             #     ret nz  ;Only used by ep2 for a crap joke!
+        RETURN
                                                             # SpecialMoveChibiko:
                                                             #     push iy
                                                             #     jr ObjectProgram_MovePlayerB
@@ -698,12 +700,13 @@ ObjectProgram:                                              # ObjectProgram:
                                                             #     pop bc
                                                             #     ret
                                                             #
-                                                            # ObjectProgram_BitShiftSprite:   ; Every other X column uses an alternate sprite - for background anim
-                                                            #     ld a,b
-                                                            #     ld (SprShow_X),a    ; Makesure sprite pos is updated for Domoves
-                                                            #     bit 0,b ;2 pixel
-                                                            #     ret
-                                                            #
+# Every other X column uses an alternate sprite - for background anim ----------
+ObjectProgram_BitShiftSprite:
+                                #     ld a,b
+                                #     ld (SprShow_X),a    ; Makesure sprite pos is updated for Domoves
+                                #     bit 0,b ;2 pixel
+        RETURN                  #     ret
+
 ObjectProgram_SnailFire:                                    # ObjectProgram_SnailFire:
         MOV  $0b00010000,R0                                 #     ld a,%00010000  :FireFrequencyA_Plus1
        .equiv  srcFireFrequencyA, . - 2
