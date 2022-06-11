@@ -24,5 +24,6 @@ start:
   slide13: .incbin "build/ep1-intro/ep1-intro-slide13.raw.lzsa1"
   slide14: .incbin "build/ep1-intro/ep1-intro-slide14.raw.lzsa1"
   slide15: .incbin "build/ep1-intro/ep1-intro-slide15.raw.lzsa1"
-           .even
+
+    .even
 end:

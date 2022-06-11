@@ -122,7 +122,7 @@ DoMoves_Spec: # Special moves - various kinds
         RETURN
 
 DoMoves_Wave:
-         .inform_and_hang "no DoMoves_Wave"
+        .inform_and_hang "no DoMoves_Wave"
                                                             #     ;           3210
                                                             #     ; wave pattern  1010DSPP    D = Depth bit, S= Speed, PP Position
                                                             #

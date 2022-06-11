@@ -9,8 +9,8 @@
                .include "./hwdefs.s"
                .include "./core_defs.s"
 
-               .equiv  PPU_ModuleSizeWords, (end - start) >> 1
                .global PPU_ModuleSizeWords
+               .equiv  PPU_ModuleSizeWords, (end - start) >> 1
 
                .equiv SLTAB, 0x8000 # 0100000
                .equiv OffscreenAreaAddr, 0140000 # 0xC000
@@ -915,9 +915,9 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         RTI
 #----------------------------------------------------------------------------}}}
 
-       .include "./music/ep1_title_music_playerconfig.s"
-       .include "./music/ep1_intro_music_playerconfig.s"
-       .include "./music/ep1_level_music_playerconfig.s"
+       .include "music/ep1_title_music_playerconfig.s"
+       .include "music/ep1_intro_music_playerconfig.s"
+       .include "music/ep1_level_music_playerconfig.s"
        .include "../../akg_player/akg_player.s"
 
 FontBitmap: .space 8 # whitespace symbol

@@ -76,7 +76,7 @@ ShowSprite_ReadInfo: # ------------------------------------------------------{{{
         # R0 sprite attributes
         # R1 width
         # R3 sprite store address
-        # R5 sprite offset
+        # R5 points to sprite offset
     SpriteGiveUp$:
         RETURN                                              # ret
                                                             #
