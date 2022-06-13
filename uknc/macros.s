@@ -25,9 +25,9 @@
 
 .macro .inform_and_hang str
    .wait_ppu
-   .ppudo $PPU_PrintAt, $.+14
+   .ppudo $PPU_DebugPrintAt, $.+14
     BR   .
-   .byte 0,0
+   .byte 0,1
    .asciz "\str"
    .even
 .endm

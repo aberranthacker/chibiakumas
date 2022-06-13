@@ -265,7 +265,7 @@ PGM: #--------------------------------------------------------------------------
 ShortLoop:      MOV  $PPU_PPUCommand, @$PBPADR
                 MOV  @$PBP12D,R0
             .ifdef DebugMode
-                CMP  R0,$30
+                CMP  R0,$PPU_LastJMPTableIndex
                 BHI  .
             .endif
                 JMP  @JMPTable(R0)
@@ -285,6 +285,8 @@ JMPTable:      .word EventLoop            # do nothing
                .word LoadMusic            # PPU_LoadMusic
                .word MusicRestart         # PPU_MusicRestart
                .word MusicStop            # PPU_MusicStop
+               .word Debug_Print          # PPU_Debug_Print
+               .word Debug_PrintAt        # PPU_Debug_PrintAt
 #-------------------------------------------------------------------------------
 CommandExecuted: #-----------------------------------------------------------{{{
                 MOV  $PPU_PPUCommand, @$PBPADR
@@ -481,14 +483,9 @@ DonePrinting:   JMP  @$CommandExecuted
 
 #----------------------------------------------------------------------------}}}
 FlipFB: #--------------------------------------------------------------------{{{
-                TST  (PC)+; ActiveFrameBuffer: .word 0xFFFF
-                BNZ  10$
-
-                COM  @$ActiveFrameBuffer
-                BR   ShowFB1
-
-        10$:    CLR  @$ActiveFrameBuffer
-                BR   ShowFB0
+               .equiv ActiveFrameBuffer, .+2
+                CMP  $FB0>>1,$FB0>>1
+                BEQ  ShowFB1
 #----------------------------------------------------------------------------}}}
 ShowFB0: #-------------------------------------------------------------------{{{
                 MOV  @$PASWCR,-(SP) # PPU address space window control register
@@ -506,6 +503,7 @@ ShowFB0: #-------------------------------------------------------------------{{{
                 SOB  R2,100$
 
                 MOV  (SP)+, @$PASWCR
+                MOV  $FB0>>1,@$ActiveFrameBuffer
 
                 JMP  CommandExecuted
 #----------------------------------------------------------------------------}}}
@@ -525,6 +523,7 @@ ShowFB1: #-------------------------------------------------------------------{{{
                 SOB  R2,100$
 
                 MOV  (SP)+, @$PASWCR
+                MOV  $FB1>>1,@$ActiveFrameBuffer
 
                 JMP  CommandExecuted
 #----------------------------------------------------------------------------}}}
@@ -707,7 +706,7 @@ PrintDebugInfo: #------------------------------------------------------------{{{
         SOB  R0,10$
 
         MOV  $5,R0
-        MOV  $Font,R1
+        MOV  $CGAFontBitmap,R1
         MOV  $40,R2
         MOV  $LevelTimeStrEnd,R3
 20$:
@@ -730,11 +729,134 @@ PrintDebugInfo: #------------------------------------------------------------{{{
         POP  @$PASWCR
 
         RETURN
-LevelTimeStr:   .ascii "65535"
+LevelTimeStr:   .ascii "12345"
 LevelTimeStrEnd:
        .even
 
 
+#----------------------------------------------------------------------------}}}
+
+Debug_PrintAt: #-------------------------------------------------------------{{{
+        MOV  $PBP12D,R4
+        MOV  $PBPADR,R5
+        MOV  $PPU_PPUCommandArg,(R5)
+        MOV  (R4),R0
+        INC  (R4)
+        INC  (R4)
+        CLC
+        ROR  R0
+        MOV  R0,(R5)
+        MOV  (R4),R0
+        MOVB R0,@$Debug_srcCurrentChar
+        SWAB R0
+        MOVB R0,@$Debug_srcCurrentLine
+        BR   Debug_Print
+#----------------------------------------------------------------------------}}}
+Debug_Print: #---------------------------------------------------------------{{{
+        PUSH @$PASWCR
+        # enable write-only direct access to the RAM above 0100000
+    .if OffscreenAreaAddr < 0120000     # 0100000..0117777
+        MOV  $0x011,@$PASWCR
+    .elseif OffscreenAreaAddr < 0140000 # 0120000..0137777
+        MOV  $0x021,@$PASWCR
+    .elseif OffscreenAreaAddr < 0160000 # 0140000..0157777
+        MOV  $0x041,@$PASWCR
+    .else                               # 0160000..0176777
+        MOV  $0x081,@$PASWCR
+    .endif
+
+       .equiv Debug_LineWidth, 40
+       .equiv Debug_TextLinesCount, 10
+       .equiv Debug_CharHeight, 8
+       .equiv Debug_CharLineSize, Debug_LineWidth * Debug_CharHeight
+       .equiv Debug_FbStart, OffscreenAreaAddr
+       .equiv Debug_Font, CGAFontBitmap # - (32 * 8)
+
+        MOV  $Debug_LineWidth,R2
+        MOV  $StrBuffer,R3
+        MOV  $PBP12D,R4
+        MOV  $PBPADR,R5
+
+        MOV  $PPU_PPUCommandArg, (R5) # setup address register
+        MOV  (R4),R0  # get address of a string from CPU RAM
+        CLC
+        ROR  R0       # divide it by 2 to calculate bitplane address
+        MOV  R0,(R5)  # load address of a string into address register
+
+Debug_LoadNext2Bytes:
+        MOV  (R4),R0  # load 2 bytes from CPU RAM
+        MOV  R0,(R3)+ # store them into buffer
+        TSTB R0       #
+        BZE  3$       # end of text
+        BMI  2$       # end of string
+        SWAB R0       # swap bytes to test most significant one
+        TSTB R0       #
+        BZE  3$       # end of text
+        BMI  2$       # end of string
+        INC  (R5)     # next address
+        BR   Debug_LoadNext2Bytes
+
+2$:     INC  (R5)
+        MOV  (R5),@$Debug_srcNextStringAddr
+
+3$:     MOV  @$Debug_srcCurrentLine,R1 # prepare to calculate relative char address
+        MUL  $Debug_CharLineSize,R1    # calculate relative address of the line
+        ADD  @$Debug_srcCurrentChar,R1 # calculate relative address of the char
+        ADD  $Debug_FbStart,R1         # calculate absolute address of the next char
+
+        MOV  $StrBuffer,R3
+Debug_NextChar:
+        MOV  R1,R5        #
+        MOVB (R3)+,R0     # load character code from string buffer
+        TSTB R0           #
+        BZE  Debug_DonePrinting # end of text
+        BMI  Debug_NextString   # end of string
+        CMPB $'\n, R0           # new line?
+        BEQ  Debug_NewLine      #
+
+        ASH  $3,R0          # shift left by 3(multiply by 8)
+        ADD  $Debug_Font,R0 # calculate char bitmap address
+
+       .rept 8
+        MOVB (R0)+,(R5)
+        ADD  R2, R5
+       .endr
+
+        INC  R1
+       .equiv Debug_srcCurrentChar, .+2
+        INC  $0x00
+        CMP  @$Debug_srcCurrentChar,R2 # end of screen line? (R2 == 40)
+        BNE  Debug_NextChar            # no, print another character
+Debug_NewLine:
+        CLR  @$Debug_srcCurrentChar
+       .equiv Debug_srcCurrentLine, .+2
+        INC  $0x00
+        CMP  @$Debug_srcCurrentLine,$Debug_TextLinesCount # next line out of screen?
+        BNE  Debug_Recalculate      # no, recalculate screen address
+        CLR  @$Debug_srcCurrentLine # yes, print from the beginning
+Debug_Recalculate:
+        MOV  @$Debug_srcCurrentLine,R1 #
+        MUL  $Debug_CharLineSize,R1    # calculate relative line address
+        ADD  @$Debug_srcCurrentChar,R1 # calculate relative char dst address
+        ADD  $Debug_FbStart,R1         # calculate screen address of the next char
+        BR   Debug_NextChar
+
+Debug_NextString:
+        MOV  $StrBuffer,R3
+        MOV  $PBP12D,R4
+        MOV  $PBPADR,R5
+       .equiv Debug_srcNextStringAddr, .+2
+        MOV  $0x0000,(R5);
+        MOV  (R4),R0
+        MOVB R0,@$Debug_srcCurrentChar
+        SWAB R0
+        MOVB R0,@$Debug_srcCurrentLine
+        INC  (R5)
+        BR   Debug_LoadNext2Bytes
+
+Debug_DonePrinting:
+        POP  @$PASWCR
+        JMP  @$CommandExecuted
 #----------------------------------------------------------------------------}}}
 
 KeyboardIntHadler: #---------------------------------------------------------{{{
@@ -922,7 +1044,7 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
 
 FontBitmap: .space 8 # whitespace symbol
             .incbin "resources/font.raw"
-# FontBitmap: .incbin "resources/cga8x8b.raw"
+CGAFontBitmap: .incbin "resources/cga8x8b.raw"
 
 SYS100:  .word 0174612 # address of default vertical blank interrupt handler
 SYS272:  .word 02270   # address of default scanlines table
@@ -933,5 +1055,6 @@ FirstLineAddress: .word 0 #
 
 StrBuffer:  .space 320
 MusicBuffer:
-         .word 0xFFFF
+       .even
 end:
+       .nolist
