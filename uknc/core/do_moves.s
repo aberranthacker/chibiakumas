@@ -1,7 +1,6 @@
 /*
   See EventStreamDirections for details of how DoMoves works
 */
-       .global DoMoves
 DoMoves:
         # SDYYYXXX
         # S - 'special move'
@@ -10,13 +9,20 @@ DoMoves:
         # XXX - X movement bits
         # B =X, C =Y, D =Move
         #
-        # R4=X, R1=Y, R2 - LSB=Move, MSB=Sprite
+        # in:  R1 LSB=X MSB=Y
+        #      R2 LSB=Move, MSB=anything
+        #
+        # out: R1 new Y
+        #      R2 unmodified
+        #      R3 unmodified
+        #      R4 new X
+        #      R5 unmodified
         CLR  R4
         BISB R1,R4 # R4 = X
         CLRB R1
         SWAB R1    # R1 = Y
 
-        # Check  if we are using a SPECIAL move pattern
+        # Check if we are using a SPECIAL move pattern
         BIT  $0x80,R2
         BNZ  DoMoves_Spec
 

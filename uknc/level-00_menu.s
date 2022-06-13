@@ -75,7 +75,7 @@ LevelInit:
 
         MOV  $EventStreamArray_Ep1,R5 # Event Stream
         MOV  $Event_SavedSettings,R3  # Saved Settings
-        CALL @$Event_StreamInit
+        CALL @$EventStream_Init
 
        .ppudo_ensure $PPU_LoadMusic,$TitleMusic
        .ppudo_ensure $PPU_MusicRestart
@@ -213,7 +213,7 @@ ResetEventStream: #----------------------------------------------------------{{{
         SOB  R0,100$
 
         MOV  $Event_SavedSettings,R3  # Saved Settings
-        CALL @$Event_StreamInit
+        CALL @$EventStream_Init
 RETURN
 #----------------------------------------------------------------------------}}}
 

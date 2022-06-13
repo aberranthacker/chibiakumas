@@ -18,7 +18,6 @@ DoMovesBackground_ScrollDown:
                                             #     ld c,&0C
                                             #     jr DoMovesBackground_SetScroll2_V2
 
-       .global DoMovesBackground_SetScroll
 DoMovesBackground_SetScroll:
         # A=Direction 0-Left 1-Right 2-Up 3-Down
         # PUSH R3                           #     push hl
@@ -79,8 +78,7 @@ SetLevelTime: # This is used for jumping around the event stream # SetLevelTime:
         # Restart the event stream for a new level
 # ../SrcALL/Akuyou_Multiplatform_EventStream.asm:86
 
-       .global Event_StreamInit
-Event_StreamInit:
+EventStream_Init:
         # Store the address of our 2nd setting buffer (1st is contained in core)
        #MOV  R3,@$srcEvent_SavedSettings # uknc/event_stream.s:621
         CLR  R0
@@ -99,12 +97,11 @@ Event_StreamInit:
 EventStream_Process:
        .equiv srcEvent_LevelSpeed, .+2 # how often ticks occur
         BIT  $0x04,@$srcTimer_TicksOccured
-        BNZ  Event_Stream_ForceNow
+        BNZ  EventStream_ForceNow
 
         RETURN # no ticks occured
 
-Event_Stream_ForceNow:
-       .global srcEvent_LevelTime
+EventStream_ForceNow:
        .equiv srcEvent_LevelTime, .+2
         INC  $0xFFFF
 
@@ -186,9 +183,9 @@ Event_SetSpriteSize:                                        # Event_SpriteSizeSw
         MOV  R1,@$srcEventObjectSpriteSizeToAdd             #     ld de,EventObjectSpriteSizeToAdd_Plus1-1
         RETURN                                              #     jr Event_CoreReprogram_ByteCopy
                                                             #
-# Event_MoveSwitch: # Set the next move                       # Event_MoveSwitch_0011:
-#         MOV  (R5)+,@$srcEventObjectMoveToAdd                #     ld de,EventObjectMoveToAdd_Plus1-1
-# RETURN                                                      #     jr Event_CoreReprogram_ByteCopy
+Event_SetMove: # Set the next move                          # Event_MoveSwitch_0011:
+        MOV  (R5)+,@$srcEventObjectMoveToAdd                #     ld de,EventObjectMoveToAdd_Plus1-1
+        RETURN                                              #     jr Event_CoreReprogram_ByteCopy
                                                             #
 Event_SetProgMoveLife: # Set Prog,MoveLife                  # Event_ProgramMoveLifeSwitch_0100:
         MOV  (R5)+,@$srcEventObjectProgramToAdd             #     rst 6
@@ -536,15 +533,12 @@ Event_AddObject: # called by object_driver as well          # Event_AddObject:
                                                             # AddObjectTwoPlayer:
         MOVB R0,(R3)+    # LifeToAdd                        #     ld (hl),a
 
-       .global srcEventObjectProgramToAdd
        .equiv srcEventObjectProgramToAdd, .+2               #     dec h
         MOVB $0x00,(R3)+ # Program code                     #     ld (hl),&0 :EventObjectProgramToAdd_Plus1    ; Program code
 
-       .global srcEventObjectSpriteSizeToAdd
        .equiv srcEventObjectSpriteSizeToAdd, .+2
         MOVB $0x00,(R3)+ # Sprite size for collisions       #     ld (hl),&0 :EventObjectSpriteSizeToAdd_Plus1 ; Sprite size for collisions
 
-       .global srcEventObjectAnimatorToAdd
        .equiv srcEventObjectAnimatorToAdd, .+2
         MOVB $0x00,(R3)+ # Animator                         #     ld (hl),&0 :EventObjectAnimatorToAdd_Plus1   ; Animator
 

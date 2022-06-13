@@ -6,8 +6,6 @@
 *                               Background                                    *
 *******************************************************************************
 */
-       .global Background_GradientScroll
-       .global Background_Gradient
 
 Background_GradientScroll:
         # | 0-Left | 1-Right | 2-Up | 3-Down |

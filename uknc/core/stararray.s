@@ -107,7 +107,6 @@
                                                             #    pop af ;get back time
         MOV  $0006200,R2; StarSlowdown_Plus2: # ASR R0      #    ld de,&2FCB :StarSlowdown_Plus2 ; CB 2F == SRA A / C6 00 == ADD A,0
        .equiv  srcStarSlowdown, StarSlowdown_Plus2 - 2
-       .global srcStarSlowdown
                                                             #    and %00000010   :SlowdownFreq_Plus1
                                                             #    jr z,Starloop2_Start2
                                                             #

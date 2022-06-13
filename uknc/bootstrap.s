@@ -60,7 +60,6 @@ Bootstrap_Launch:
         SOB  R0, 1$
      .endif
 
-#:bpt
         # Load the game core - this is always in memory
         MOV  $core.bin,R0
         CALL Bootstrap_LoadDiskFile
@@ -140,7 +139,6 @@ Bootstrap_Level_Intro:
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
 Bootstrap_Level_1: # ../Aku/BootStrap.asm:838  main menu --------------------
-#:bpt
         CALL StartANewGame
         CALL LevelReset0000
 
@@ -364,7 +362,6 @@ RETURN
 #----------------------------------------------------------------------------}}}
 
 Bootstrap_LoadDiskFile: # ---------------------------------------------------{{{
-#:bpt
         MOV  (R0)+,@$PS.CPU_RAM_Address
         MOV  (R0)+,@$PS.WordsCount
         MOV  (R0),R0 # starting block number
@@ -395,7 +392,7 @@ Bootstrap_LoadDiskFile: # ---------------------------------------------------{{{
 3$:     TSTB @$PS.Status
         BMI  3$
         BZE  1237$
-        #:bpt
+
         SEC  # set carry flag to indicate that there was an error
         MOVB @$PS.Status,R0
        .ppudo $PPU_Print, $LoadingErrorMsg

@@ -21,7 +21,7 @@
 .equiv PPU_UserRamSizeWords, PPU_UserRamSize >> 1 # 0x2C22 026042 11298
 .equiv PPU_PPUCommand,    PPUCommand >> 1
 .equiv PPU_PPUCommandArg, PPUCommandArg >> 1
-.equiv PPU_MusicBuffer, 0x39E6 # 14822 034746 # auto-generated during a build
+.equiv PPU_MusicBuffer, 0x3EF6 # 16118 037366 # auto-generated during a build
 
 .equiv PPU_NOP,            2
 .equiv PPU_Finalize,       4
@@ -38,6 +38,9 @@
 .equiv PPU_LoadMusic,     26
 .equiv PPU_MusicRestart,  28
 .equiv PPU_MusicStop,     30
+.equiv PPU_DebugPrint,    32
+.equiv PPU_DebugPrintAt,  34
+.equiv PPU_LastJMPTableIndex, 34
 
 # memory map ------------------------------------------------------------------
 .equiv FB0, 384 # 0600 0x0180
@@ -49,7 +52,7 @@
 
 .equiv Akuyou_GameVarsStart, FB1 + 16000
 
-.equiv Akuyou_LevelStart, 0x9A3E # 39486 0115076 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0xA002 # 40962 0120002 # auto-generated during a build
 .equiv LevelSprites, Akuyou_LevelStart + 4
 
 .equiv SPReset,       0157770 # Initial stack pointer
@@ -168,7 +171,7 @@
 #-------------------------------------------------------------------------------
 .equiv Akuyou_FireStar, ObjectProgram_HyperFire # Fire a star
 .equiv Akuyou_DoSmartBombCall, DoSmartBombCall # Act as if the player has used a smartbomb, This occurs at the end of a level to kill remaining enemies
-.equiv AkuYou_Event_StreamInit, Event_StreamInit # Init the eventstream
+.equiv AkuYou_Event_StreamInit, EventStream_Init # Init the eventstream
 .equiv Akuyou_EventStream_Process, Event_Stream # Process level events
 .equiv Akuyou_GetLevelTime, GetLevelTime # Get the current level tick
 .equiv Akuyou_SetLevelTime, SetLevelTime # set the current level tick

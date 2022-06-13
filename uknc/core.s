@@ -4,40 +4,26 @@
        .global start # make entry point available to a linker
 
 # Global symbols ------------------------------------------------------------{{{
-       .global Akuyou_GameVarsStart
        .global Akuyou_GameVarsEnd
+       .global Akuyou_GameVarsStart
        .global ContinueMode
        .global ContinuesReset
-       .global CLS
-       .global Event_Stream
-       .global EventStream_Process
        .global Event_SavedSettings
-       .global ExecuteBootstrap
        .global FileBeginCore
        .global FileEndCore
-       .global GetMemPos
        .global KeyboardScanner_P1
        .global KeyboardScanner_P2
        .global LevelStart
        .global MultiplayConfig
-       .global NotImplemented
-       .global null
-       .global ObjectArray_Redraw
        .global Player_Array
        .global Player_Array2
        .global Player_ScoreBytes
        .global Player_ScoreBytes2
        .global SavedSettings
        .global SavedSettings_Last
-       .global ScreenBuffer_ActiveScreen
-       .global ScreenBuffer_Reset
-       .global ScreenBuffer_Init
-       .global ScreenBuffer_Flip
        .global SmartBombsReset
        .global StarArrayPointer
-       .global Timer_GetTimer
-       .global Timer_UpdateTimer
-       .global unlzsa1
+       .global null
 #----------------------------------------------------------------------------}}}
 
        .include "./hwdefs.s"
@@ -148,7 +134,8 @@ SavedSettings: # {{{
     # 25
     HighScoreBytes:     .space 8,0 # Highscore
 SavedSettings_Last: # 0x80 bytes --------------------------------------------}}}
-                                        #
+
+# some data we don't need on UKNC -------------------------------------------{{{
                                         # ;X,X,Y,Y,S,[0,0,0] - [] not used
                                         # PlusSprites_Config1:
                                         #     ;These go at &6030
@@ -241,7 +228,8 @@ SavedSettings_Last: # 0x80 bytes --------------------------------------------}}}
                                         #     defw &0000
                                         #     defw &0000
                                         #     defb 0      ;next split }}}
-                                        #
+# some data we don't need on UKNC -------------------------------------------}}}
+
 # Transparent colors are used by the sprite, if the byte matches it is skipped
 # to effect transparency without an 'alpha map'
 TranspColors: .byte 0x00 # 0b00000000
@@ -250,54 +238,26 @@ TranspColors: .byte 0x00 # 0b00000000
               .byte 0xFF # 0b11111111
               .byte 0xAC # 0b10101100
               .byte 0x53 # 0b10010011
+
 # Smartbomb effect shows a flashing background, these are the bytes used
 # Background_SmartBombColors: defb &FF, &0, &FF, &0, &FF
-                                        #
-                                        # ; table/array for screen addresses for each scan line
-                                        ##ifdef MinimizeCore
-                                        #     scr_addr_tableMajor: ; BYTES -XXXX--- %01111000
-                                        #         defw &0000,&0050,&00A0,&00F0,&0140,&0190,&01E0,&0230,&0280,&02D0,&0320,&0370,&03C0,&0410,&0460,&04B0
-                                        #     scr_addr_tableMinor: ; BYTES -----XXX ; do not need aligning
-                                        #         defb &00,&08,&10,&18,&20,&28,&30,&38
-                                        ##endif
-                                        #
-                                        # ;These are used by Arkostracker
-                                        # ;There are two holes in the l ist, because the Volume registers are set relatively to the Frequency of the same Channel (+7, always).
-                                        # ;Also, the Reg7 is passed as a register, so is not kept in the memory.
-                                        # PLY_PSGRegistersArray:
-                                        #     PLY_PSGReg0  db 0 ; +0
-                                        #     PLY_PSGReg1  db 0 ; +1
-                                        #     PLY_PSGReg2  db 0 ; +2
-                                        #     PLY_PSGReg3  db 0 ; +3
-                                        #     PLY_PSGReg4  db 0 ; +4
-                                        #     PLY_PSGReg5  db 0 ; +5
-                                        #     PLY_PSGReg6  db 0 ; +6
-                                        #     PLY_PSGReg8  db 0 ; +7
-                                        #                  db 0 ; +8
-                                        #     PLY_PSGReg9  db 0 ; +9
-                                        #                  db 0 ;+10
-                                        #     PLY_PSGReg10 db 0 ;+11
-                                        #     PLY_PSGReg11 db 0 ;+12
-                                        #     PLY_PSGReg12 db 0 ;+13
-                                        #     PLY_PSGReg13 db 0 ;+14
-                                        # PLY_PSGRegistersArray_End:
-                                        #
-                                        # StarsOneByteDirs:
-                                        #     defb &21,&09,&0C,&0F,&27,&3F,&3C,&39,&61,&49,&4c,&4f,&67,&7f,&7c,&79
+
+# StarsOneByteDirs:
+#     defb &21,&09,&0C,&0F,&27,&3F,&3C,&39,&61,&49,&4c,&4f,&67,&7f,&7c,&79
 
 Event_VectorArray:
        .word Event_OneObj                      # 0x00 0x00  evtSingleSprite
-       .word NotImplemented                    # 0x01 0x02  # defw Event_MultiObj
-       .word NotImplemented                    # 0x02 0x04  # defw Event_ObjColumn
-       .word NotImplemented                    # 0x03 0x06  # defw Event_ObjStrip
-       .word NotImplemented                    # 0x04 0x08  # defw Event_StarBust
+       .word Event_MultiObj_NotImplemented     # 0x01 0x02  # defw Event_MultiObj
+       .word Event_ObjColumn_NotImplemented    # 0x02 0x04  # defw Event_ObjColumn
+       .word Event_ObjStrip_NotImplemented     # 0x03 0x06  # defw Event_ObjStrip
+       .word Event_StarBurst_NotImplemented    # 0x04 0x08  # defw Event_StarBust
        .word null                              # 0x05 0x0A
        .word null                              # 0x06 0x0C
        .word Event_CoreMultipleEventsAtOneTime # 0x07 0x0E
        .word null                              # 0x08 0x10  Event_MoveSwitch, legacy
        .word Event_SaveObjSettings             # 0x09 0x12
        .word Event_LoadObjSettings             # 0x0A 0x14
-       .word NotImplemented                    # 0x0B 0x16  # defw Event_CoreSaveLoadSettings2
+       .word Event_CoreSaveLoadSettings2_NotImplemented # 0x0B 0x16  # defw Event_CoreSaveLoadSettings2
        .word null                              # 0x0C 0x18
        .word null                              # 0x0D 0x1A
        .word null                              # 0x0E 0x1C
@@ -306,82 +266,182 @@ Event_VectorArray:
        .word Event_SetMoveLife                 # 0x10 0x20  evtSetMoveLife
        .word Event_SetProgram                  # 0x11 0x22  # defw Event_ProgramSwitch_0001
        .word Event_SetLife                     # 0x12 0x24  evtSetLife
-       .word NotImplemented                    # 0x13 0x26    defw Event_MoveSwitch_0011
+       .word Event_SetMove                     # 0x13 0x26    defw Event_MoveSwitch_0011
        .word Event_SetProgMoveLife             # 0x14 0x28  evtSetProgMoveLife
-       .word NotImplemented                    # 0x15 0x2A    defw Event_SpriteSwitch_0101
+       .word Event_SpriteSwitch_0101_NotImplemented # 0x15 0x2A    defw Event_SpriteSwitch_0101
        .word Event_AddToBackground             # 0x16 0x2C  evtAddToBackground
        .word Event_AddToForeground             # 0x17 0x2E  evtAddToForeground
        .word Event_ChangeStreamTime            # 0x18 0x30  evtChangeStreamTime
        .word Event_Call                        # 0x19 0x32  evtCallAddress
-       .word Event_LoadLastAddedObjectToAddress# 0x1A 0x34  evtSaveLstObjToAdd
-       .word NotImplemented                    # 0x1B 0x36    defw Event_ClearPowerups
-       .word NotImplemented                    # 0x1C 0x38    defw Event_ChangeStreamSpeed_1100
+       .word Event_LoadLastAddedObjectToAddress # 0x1A 0x34  evtSaveLstObjToAdd
+       .word Event_ClearPowerups_NotImplemented # 0x1B 0x36    defw Event_ClearPowerups
+       .word Event_ChangeStreamSpeed_1100_NotImplemented # 0x1C 0x38    defw Event_ChangeStreamSpeed_1100
        .word Event_SetSpriteSize               # 0x1D 0x3A  evtSetObjectSize
        .word Event_SetAnimator                 # 0x1E 0x3C  evtSetAnimator
-       .word NotImplemented                    # 0x1F 0x3E    defw Event_CoreReprogram_AnimatorPointer
+       .word Event_CoreReprogram_AnimatorPointer_NotImplemented # 0x1F 0x3E    defw Event_CoreReprogram_AnimatorPointer
 # Event_ReprogramVector:
        .word Event_CoreReprogram_Palette       # 0x20 0x40
        .word null                              # 0x21 0x42  Obsolete - Reserver for Plus Palette
-       .word NotImplemented                    # 0x22 0x44  defw Event_CoreReprogram_ObjectHitHandler
-       .word NotImplemented                    # 0x23 0x46  defw Event_CoreReprogram_ShotToDeath
+       .word Event_CoreReprogram_ObjectHitHandler_NotImplemented # 0x22 0x44  defw Event_CoreReprogram_ObjectHitHandler
+       .word Event_CoreReprogram_ShotToDeath_NotImplemented # 0x23 0x46  defw Event_CoreReprogram_ShotToDeath
        .word Event_CoreReprogram_CustomMove1   # 0x24 0x48  mveCustom1
        .word Event_CoreReprogram_CustomMove2   # 0x25 0x4A  mveCustom2
-       .word NotImplemented                    # 0x26 0x4C  defw Event_CoreReprogram_PowerupSprites
+       .word Event_CoreReprogram_PowerupSprites_NotImplemented # 0x26 0x4C  defw Event_CoreReprogram_PowerupSprites
        .word Event_CoreReprogram_CustomMove3   # 0x27 0x4E  mveCustom3
        .word Event_CoreReprogram_CustomMove4   # 0x28 0x50  mveCustom4
-       .word NotImplemented                    # 0x29 0x52  defw Event_CustomProgram1
-       .word NotImplemented                    # 0x2A 0x54  defw Event_CustomProgram2
-       .word NotImplemented                    # 0x2B 0x56  defw Event_CustomPlayerHitter
-       .word NotImplemented                    # 0x2C 0x58  defw Event_CustomSmartBomb
-       .word NotImplemented                    # 0x2D 0x5A  defw Event_ReprogramObjectBurstPosition
-       .word NotImplemented                    # 0x2E 0x5C  defw Event_ObjectFullCustomMoves
-       .word NotImplemented                    # 0x2F 0x5E  defw Event_SmartBombSpecial
+       .word Event_CustomProgram1_NotImplemented # 0x29 0x52  defw Event_CustomProgram1
+       .word Event_CustomProgram2_NotImplemented # 0x2A 0x54  defw Event_CustomProgram2
+       .word Event_CustomPlayerHitter_NotImplemented # 0x2B 0x56  defw Event_CustomPlayerHitter
+       .word Event_CustomSmartBomb_NotImplemented # 0x2C 0x58  defw Event_CustomSmartBomb
+       .word Event_ReprogramObjectBurstPosition_NotImplemented # 0x2D 0x5A  defw Event_ReprogramObjectBurstPosition
+       .word Event_ObjectFullCustomMoves_NotImplemented # 0x2E 0x5C  defw Event_ObjectFullCustomMoves
+       .word Event_SmartBombSpecial_NotImplemented # 0x2F 0x5E  defw Event_SmartBombSpecial
 
                                         # read "..\SrcCPC\Akuyou_CPC_InterruptHandler.asm"
 null:   RETURN
-################################################################################
-#                            End of aligned code                               #
-################################################################################
 
-       .include "core/virtual_screen_pos_320.s" #   read "../SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm"
-       .include "core/show_sprite.s"       # read "../SrcCPC/Akuyou_CPC_ShowSprite.asm"
-                                           #
-       .include "core/stararray.s"         # read "../SrcALL/Akuyou_Multiplatform_Stararray.asm"
-       .include "core/stararray_add.s"     # read "../SrcALL/Akuyou_Multiplatform_Stararray_Add.asm"
-       .include "core/do_moves.s"          # read "../SrcALL/Akuyou_Multiplatform_DoMoves.asm"
-                                           #
-                                           # ;;;;;;;;;;;;;;;;;;;;Input Driver;;;;;;;;;;;;;;;;;;;;;;;;
-                                           # read "../SrcCPC/Akuyou_CPC_KeyboardDriver.asm"
-                                           # ;;;;;;;;;;;;;;;;;;;;Disk Driver;;;;;;;;;;;;;;;;;;;;;;;;
-      #.include "disk_driver.s"            # read "../SrcCPC/Akuyou_CPC_DiskDriver.asm"
-       .include "core/execute_bootstrap.s" # read "../SrcCPC/Akuyou_CPC_ExecuteBootstrap.asm"
-                                           # read "../SrcCPC/Akuyou_CPC_TextDriver.asm"
-                                           #
-       .include "core/sfx.s"               # read "../SrcALL/Akuyou_Multiplatform_SFX.asm"
-                                           #
-       .include "core/compiled_sprite_viewer.s" # read "../SrcCPC/Akuyou_CPC_CompiledSpriteViewer.asm" ;also includes CLS
-                                           # read "../SrcCPC/Akuyou_CPC_BankSwapper.asm"
-                                           #
-       .include "core/player_driver.s"     # read "../SrcALL/Akuyou_Multiplatform_PlayerDriver.asm"
-       .include "core/timer.s"             # read "../SrcALL/Akuyou_Multiplatform_Timer.asm"
-                                           #
-       .include "core/gradient.s"          # read "../SrcCPC/Akuyou_CPC_Gradient.asm"
-                                           #
-       .include "core/object_driver.s"     # read "../SrcALL/Akuyou_Multiplatform_ObjectDriver.asm"
-       .include "core/event_stream.s"      # read "../SrcALL/Akuyou_Multiplatform_EventStream.asm"
-                                           # read "../SrcCPC/Akuyou_CPC_CpcPlus.asm"
-       .include "core/screen_memory.s"     # read "../SrcCPC/Akuyou_CPC_ScreenMemory.asm"
-                                           # read "../SrcALL/Akuyou_Multiplatform_AkuCommandVectorArray.asm"
-                                           #
-                                           ## ifdef Debug_Monitor
-                                           ## ;   read "../SrcALL/Multiplatform_Monitor.asm"
-                                           ## ;   read "../SrcALL/Multiplatform_MonitorMemdump.asm"
-                                           ## ;   read "../SrcALL/Multiplatform_MonitorSimple.asm"
-                                           ## endif
+Event_MultiObj_NotImplemented:
+    .inform_and_hang "Event_MultiObj_NotImplemented"
+Event_ObjColumn_NotImplemented:
+    .inform_and_hang "Event_ObjColumn_NotImplemented"
+Event_ObjStrip_NotImplemented:
+    .inform_and_hang "Event_ObjStrip_NotImplemented"
+Event_StarBurst_NotImplemented:
+    .inform_and_hang "Event_StarBurst_NotImplemented"
+Event_CoreSaveLoadSettings2_NotImplemented:
+    .inform_and_hang "Event_CoreSaveLoadSettings2_NotImplemented"
+Event_SpriteSwitch_0101_NotImplemented:
+    .inform_and_hang "Event_SpriteSwitch_0101_NotImplemented"
+Event_ClearPowerups_NotImplemented:
+    .inform_and_hang "Event_ClearPowerups_NotImplemented"
+Event_ChangeStreamSpeed_1100_NotImplemented:
+    .inform_and_hang "Event_ChangeStreamSpeed_1100_NotImplemented"
+Event_CoreReprogram_AnimatorPointer_NotImplemented:
+    .inform_and_hang "Event_CoreReprogram_AnimatorPointer_NotImplemented"
+Event_CoreReprogram_ObjectHitHandler_NotImplemented:
+    .inform_and_hang "Event_CoreReprogram_ObjectHitHandler_NotImplemented"
+Event_CoreReprogram_ShotToDeath_NotImplemented:
+    .inform_and_hang "Event_CoreReprogram_ShotToDeath_NotImplemented"
+Event_CoreReprogram_PowerupSprites_NotImplemented:
+    .inform_and_hang "Event_CoreReprogram_PowerupSprites_NotImplemented"
+Event_CustomProgram1_NotImplemented:
+    .inform_and_hang "Event_CustomProgram1_NotImplemented"
+Event_CustomProgram2_NotImplemented:
+    .inform_and_hang "Event_CustomProgram2_NotImplemented"
+Event_CustomPlayerHitter_NotImplemented:
+    .inform_and_hang "Event_CustomPlayerHitter_NotImplemented"
+Event_CustomSmartBomb_NotImplemented:
+    .inform_and_hang "Event_CustomSmartBomb_NotImplemented"
+Event_ReprogramObjectBurstPosition_NotImplemented:
+    .inform_and_hang "Event_ReprogramObjectBurstPosition_NotImplemented"
+Event_ObjectFullCustomMoves_NotImplemented:
+    .inform_and_hang "Event_ObjectFullCustomMoves_NotImplemented"
+Event_SmartBombSpecial_NotImplemented:
+    .inform_and_hang "Event_SmartBombSpecial_NotImplemented"
+
+        # read "../SrcALL/Akuyou_Multiplatform_AkuCommandVectorArray.asm"
+        # read "../SrcCPC/Akuyou_CPC_BankSwapper.asm"
+       .include "core/compiled_sprite_viewer.s"
+       .global CLS
+
+       .include "core/do_moves.s"
+       .global DoMoves
+
+       .include "core/event_stream.s"
+       .global DoMovesBackground_SetScroll
+       .global EventStream_Process
+       .global EventStream_Init
+       .global srcEventObjectAnimatorToAdd
+       .global srcEventObjectProgramToAdd
+       .global srcEventObjectSpriteSizeToAdd
+       .global srcEvent_LevelTime
+
+       .include "core/execute_bootstrap.s"
+       .global ExecuteBootstrap
+
+       .include "core/gradient.s"
+       .global Background_Gradient
+       .global Background_GradientScroll
+
+       .include "core/object_driver.s"
+       .global ObjectArray_Redraw
+
+       .include "core/player_driver.s"
+       .global DroneFlipFire 
+       .global Player_GetPlayerVars
+       .global SetFireDir_DOWN
+       .global SetFireDir_Fire
+       .global SetFireDir_FireAndSaveRestore
+       .global SetFireDir_LEFT
+       .global SetFireDir_LEFTsave
+       .global SetFireDir_RIGHT
+       .global SetFireDir_RIGHTsave
+       .global SetFireDir_UP
+       .global ShowContinuesSelfMod
+       .global SpendCreditSelfMod
+       .global cmpDroneFlipCurrent
+       .global cmpDroneFlipFireCurrent
+       .global dstCustomPlayerHitter
+       .global dstCustomSmartBombEnemy
+       .global dstFire1Handler
+       .global dstFire2Handler
+       .global dstFireDownHandler
+       .global dstFireLeftHandler
+       .global dstFireRightHandler
+       .global dstFireUpHandler
+       .global dstSmartBombSpecial
+       .global srcContinuesScreenPos
+       .global srcShowContinueCounter
+
+       .include "core/screen_memory.s"
+       .global GetMemPos
+       .global ScreenBuffer_ActiveScreen
+       .global ScreenBuffer_Flip
+       .global ScreenBuffer_Init
+       .global ScreenBuffer_Reset
+
+       .include "core/sfx.s"
+       .global srcSfx_CurrentPriority
+       .global srcSfx_Sound
+
+       .include "core/show_sprite.s"
+
+       .include "core/stararray.s"
+       .global srcStarSlowdown
+
+       .include "core/stararray_add.s"
+       .global Stars_AddBurst_Top
+
+       .include "core/timer.s"
+       .global Timer_GetTimer
+       .global Timer_UpdateTimer
+       .global srcTimer_CurrentTick 
+       .global srcTimer_TicksOccured 
+
+       .include "core/virtual_screen_pos_320.s"
+       .global ShowSpriteReconfigureEnableDisable
+
        .include "decoders/lzsa1.s"
+       .global unlzsa1
 
-NotImplemented:
-       .inform_and_hang "core: not implemented!"
+       ## ifdef Debug_Monitor
+       ## ;   read "../SrcALL/Multiplatform_Monitor.asm"
+       ## ;   read "../SrcALL/Multiplatform_MonitorMemdump.asm"
+       ## ;   read "../SrcALL/Multiplatform_MonitorSimple.asm"
+       ## endif
+
+       .include "background_solid_fill.s"
+       .global Background_SolidFill
+
+       .include "background_quad_sprite.s"
+       .global Background_FloodFillQuadSprite
+
+       .include "background_bit_shifter.s"
+       .global BitShifter
+       .global srcBitShifter_TicksOccured
+
+       .include "background_get_sprite_mem_pos.s"
+       .global GetSpriteMempos
 
        .even
 end: FileEndCore:

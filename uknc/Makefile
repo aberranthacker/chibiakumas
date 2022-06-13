@@ -120,7 +120,7 @@ build/ppu.o : $(common) \
               ../../akg_player/akg_player.s \
               resources/font.raw \
               resources/cga8x8b.raw
-	$(AS) ppu.s -al -o build/ppu.o
+	$(AS) ppu.s -al -o build/ppu.o | build_tools/format_list.rb
 	build_tools/music_buffer_update.rb
 
 # level-00_menu.o ----------------------------------------------------------{{{
