@@ -19,8 +19,7 @@ Timer_UpdateTimer:                                          # Timer_UpdateTimer:
         RETURN                                              # ret
 
 NotPaused:                                                  # NotPaused:
-       .global srcTimer_CurrentTick                         #     ld a,&69 :Timer_CurrentTick_Plus1
-       .equiv srcTimer_CurrentTick, .+2
+       .equiv srcTimer_CurrentTick, .+2                     #     ld a,&69 :Timer_CurrentTick_Plus1
         MOV  $0x69,R0 # bootstrap's ResetCore resets the value to 0x69
 
         MOV  R0,R1                                          #     ld b,a
@@ -52,7 +51,7 @@ SmartBombCountdown$:
 Timer_GetTimer: # Return current timer in I
         MOV  @$srcTimer_CurrentTick,R0   # ld a,(Timer_CurrentTick) ; and 'Ticks occured' Xor bitmap
                                          # ld i,a
-       .global srcTimer_TicksOccured     # ld a, 0 :Timer_TicksOccured_Plus1
+                                         # ld a, 0 :Timer_TicksOccured_Plus1
        .equiv srcTimer_TicksOccured, .+2
         MOV  $0x00,R0 # bootstrap's ResetCore resets the value to 0x00
 

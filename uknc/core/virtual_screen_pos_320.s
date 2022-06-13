@@ -97,7 +97,6 @@ VirtualPosToScreenByte:
         RETURN
 
 #-------------------------------------------------------------------------------
-       .global ShowSpriteReconfigureEnableDisable
 ShowSpriteReconfigureEnableDisable:
         MOV  $null,R5
         TST  R0

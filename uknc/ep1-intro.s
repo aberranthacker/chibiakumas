@@ -185,7 +185,7 @@ LevelInit:
        .ppudo_ensure $PPU_LoadMusic,$IntroMusic
        .ppudo_ensure $PPU_MusicRestart
         MOV  $EventStreamArray,R5
-        CALL @$Event_StreamInit
+        CALL @$EventStream_Init
 
         MTPS $PR0 # enable interrupts
 LevelLoop:

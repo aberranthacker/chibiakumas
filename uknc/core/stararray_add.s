@@ -3,7 +3,7 @@
 # ; RST 6 calls IY
 # ; See EventStreamDefinitions for details of how the 'Directions' work
 
-Stars_AddBurst_Top: .global Stars_AddBurst_Top
+Stars_AddBurst_Top:
     .word 0x0705
     .word 0x0F0D
     .word 0x1715

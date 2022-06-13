@@ -7,7 +7,6 @@
                                                             #     ld hl,HighScoreBytes
                                                             #     ret
 Player_GetPlayerVars:                                       # Player_GetPlayerVars:
-       .global Player_GetPlayerVars
         MOV  $Player_Array,R5                               #     ld iy,Player_Array
         RETURN                                              # ret
                                                             #     ; iy = Pointer to player vars
@@ -29,7 +28,6 @@ SpendCheck:                                                 # SpendCheck:
 SpendCredit:                                                # SpendCredit:
          PUSH R5                                            #     push iy
          SpendCreditSelfMod:
-        .global SpendCreditSelfMod 
              MOV  $Player_Array,R5                          # SpendCreditSelfMod: ld iy,Player_Array ; All credits are (currently) stored in player 1's var!
          MOVB 5(R5),R0                                      #         ld a,(iy+5)
          DECB R0                                            #         sub 1
@@ -195,7 +193,6 @@ Players_Dead:                                               # Players_Dead:     
  Player_Handler_NoFireX:                                    # Player_Handler_NoFireX:
         CALL SetFireDir_RIGHTsave; Fire2Handler_Plus2:      #     call SetFireDir_RIGHTsave :Fire2Handler_Plus2
        .equiv  dstFire2Handler, Fire2Handler_Plus2 - 2
-       .global dstFire2Handler
                                                             #
                                                             # ;Player_ShootSkip
                                                             #     ld e,2  :PlayerMoveSpeedSlow1_Plus1 ; slow move speed as we're firing
@@ -210,7 +207,6 @@ Players_Dead:                                               # Players_Dead:     
                                                             #     ;fire bullets
         CALL SetFireDir_LEFTsave; Fire1Handler_Plus2:       #     call SetFireDir_LEFTsave    :Fire1Handler_Plus2
        .equiv  dstFire1Handler, Fire1Handler_Plus2 - 2
-       .global dstFire1Handler
                                                             #
                                                             # ;Player_ShootSkip2
                                                             #     ld e,2  :PlayerMoveSpeedSlow2_Plus1; Slow move speed as we're firing
@@ -228,7 +224,6 @@ Players_Dead:                                               # Players_Dead:     
                                                             #
         CALL null; FireUpHandler_Plus2:                     #     call null  :FireUpHandler_Plus2
        .equiv  dstFireUpHandler, FireUpHandler_Plus2 - 2
-       .global dstFireUpHandler
                                                             #
                                                             # Player_Handler_KeyreadJoy1DownPre:
                                                             #     ld a,ixl
@@ -246,7 +241,6 @@ Players_Dead:                                               # Players_Dead:     
                                                             #
         CALL null; FireDownHandler_Plus2:                   #     call null   :FireDownHandler_Plus2
        .equiv  dstFireDownHandler, FireDownHandler_Plus2 - 2
-       .global dstFireDownHandler
                                                             #
                                                             # Player_Handler_KeyreadJoy1LeftPre:
                                                             #     ld a,ixl
@@ -267,7 +261,6 @@ Players_Dead:                                               # Players_Dead:     
                                                             #
         CALL null; FireLeftHandler_Plus2:                   #     call null   :FireLeftHandler_Plus2
        .equiv  dstFireLeftHandler, FireLeftHandler_Plus2 - 2
-       .global dstFireLeftHandler
                                                             #
                                                             # Player_Handler_KeyreadJoy1RightPre:
                                                             #     ld a,ixl
@@ -288,7 +281,6 @@ Players_Dead:                                               # Players_Dead:     
                                                             #
         CALL null; FireRightHandler_Plus2:                  #     call null   :FireRightHandler_Plus2
        .equiv  dstFireRightHandler, FireRightHandler_Plus2 - 2
-       .global dstFireRightHandler
                                                             #
                                                             # Player_Handler_SmartBombPre:
                                                             #     ld a,ixl
@@ -329,7 +321,6 @@ Player_Handler_NoSaveFire:                                  # Player_Handler_NoS
         BIC  $!0x80,R0                                      #     and %10000000
         CMP  R0,$1; DroneFlipCurrent_Plus2:                 #     cp 1 :DroneFlipCurrent_Plus1
        .equiv  cmpDroneFlipCurrent, DroneFlipCurrent_Plus2 - 2
-       .global cmpDroneFlipCurrent
        .CALL NE, DroneFlip                                  #     call nz,DroneFlip
                                                             #
         TST  @$0; PlayerDoFire_Plus2:                       #     ld a,0 :PlayerDoFire_Plus1
@@ -493,7 +484,6 @@ Player_Fire4D:                                              # Player_Fire4D:  ; 
         BIC  $!0x80,R0                                      #     and %10000000
         CMP  R0,$0; DroneFlipFireCurrent_Plus2:             #     cp 0 :DroneFlipFireCurrent_Plus1
        .equiv  cmpDroneFlipFireCurrent, DroneFlipFireCurrent_Plus2 - 2
-       .global cmpDroneFlipFireCurrent
        .CALL NE, DroneFlipFire                              #     call nz,DroneFlipFire
                                                             #
                                                             #     ld a,(iy+15)
@@ -571,7 +561,7 @@ Player_Fire4D:                                              # Player_Fire4D:  ; 
                                                             #     pop bc
                                                             # ret
                                                             #
-DroneFlipFire: .global DroneFlipFire                        # DroneFlipFire:
+DroneFlipFire:                                              # DroneFlipFire:
         MOV  R0,@$cmpDroneFlipFireCurrent                   #     ld (DroneFlipFireCurrent_Plus1 - 1),a
         PUSH R2                                             #     push de
                                                             #     or a
@@ -630,32 +620,26 @@ DroneFlipFinish:                                            # DroneFlipFinish:
 RETURN                                                      # ret
                                                             #
 SetFireDir_UP:                                              # SetFireDir_UP:
-       .global SetFireDir_UP
         MOV  R1,-(SP)                                       #     push bc
         MOV  0x4C82,R1                                      #     ld bc,&4C82
         BR   SetFireDir_Any                                 #     jr SetFireDir_Any
                                                             #
  SetFireDir_DOWN:                                           # SetFireDir_DOWN:
-       .global SetFireDir_DOWN
                                                             #     push bc
                                                             #     ld bc,&7C80
                                                             #     jr SetFireDir_Any
                                                             #
 SetFireDir_LEFTsave:                                        # SetFireDir_LEFTsave:
-       .global SetFireDir_LEFTsave
         call SetFireDir_FireAndSave                         #     call SetFireDir_FireAndSave
 SetFireDir_LEFT:                                            # SetFireDir_LEFT:
-       .global SetFireDir_LEFT
         MOV  R1,-(SP)                                       #     push bc
         MOV  $0x6102,R1                                     #     ld bc,&6102
         BR   SetFireDir_Any                                 #     jr SetFireDir_Any
                                                             #
 SetFireDir_RIGHTsave:                                       # SetFireDir_RIGHTsave:
-       .global SetFireDir_RIGHTsave
         CALL SetFireDir_FireAndSave                         #     call SetFireDir_FireAndSave
                                                             #
 SetFireDir_RIGHT:                                           # SetFireDir_RIGHT:
-       .global SetFireDir_RIGHT
         MOV  R1,-(SP)                                       #     push bc
         MOV  0x6700,R1                                      #     ld bc,&6700
                                                             #
@@ -668,7 +652,6 @@ SetFireDir_Any:                                             # SetFireDir_Any:
         RETURN                                              # ret
                                                             #
 SetFireDir_FireAndSaveRestore:                              # SetFireDir_FireAndSaveRestore:
-       .global SetFireDir_FireAndSaveRestore
                                                             #     ld a,(iy+8)
         MOVB 8(R5), @$srcPlayerThisSprite                   #     ld (PlayerThisSprite_Plus1-1),a
                                                             #
@@ -680,7 +663,6 @@ SetFireDir_FireAndSave:                                     # SetFireDir_FireAnd
         MOV  R0,@$srcPlayerSaveShot                         #     ld (PlayerSaveShot_Plus1-1),a
                                                             #
 SetFireDir_Fire:                                            # SetFireDir_Fire:
-       .global SetFireDir_Fire
         MOV  R0,@$dstPlayerDoFire                           #     ld (PlayerDoFire_Plus1-1),a
 RETURN                                                      # ret
                                                             #
@@ -719,7 +701,6 @@ RETURN                                                      # ret
                                                             #
         CALL null; SmartBombSpecial_Plus2:                  #     call null :SmartBombSpecial_Plus2 ; We can hack in our own smartbomb handler
        .equiv  dstSmartBombSpecial, SmartBombSpecial_Plus2  - 2
-       .global dstSmartBombSpecial
                                                             #                                       ; this is needed to wipe omega array for
                                                             #                                       ; final boss as it's not handled by
                                                             #                                       ; normal core code
@@ -748,7 +729,6 @@ RETURN                                                      # ret
                                                             #
         CALL null; CustomSmartBombEnemy_Plus2:              #         call null : CustomSmartBombEnemy_Plus2
        .equiv  dstCustomSmartBombEnemy, CustomSmartBombEnemy_Plus2 - 2
-       .global dstCustomSmartBombEnemy
                                                             #
                                                             #         ld a,(hl)
                                                             #         or a
@@ -812,7 +792,6 @@ RETURN                                                      # ret
                                                             #         cp 16+2
        .CALL EQ,null; CustomPlayerHitter_Plus2:             #         call z,null :customPlayerHitter_Plus2
        .equiv  dstCustomPlayerHitter, CustomPlayerHitter_Plus2 - 2
-       .global dstCustomPlayerHitter
                                                             #
                                                             #         cp 3
                                                             #         jp nz,Player_Hit_Injure
@@ -976,7 +955,6 @@ RETURN                                                      # ret
 Player2DoContinue:                                          # Player2DoContinue:
         MOV  $100,R0; ShowContinueCounter_Plus2:            #     ld a,100    :ShowContinueCounter_Plus1
        .equiv  srcShowContinueCounter, ShowContinueCounter_Plus2 - 2
-       .global srcShowContinueCounter
         # MOV sets flags as well                            #     or a
        .CALL NE, Player2Continue                            #     call nz,Player2Continue
         JMP  Player2_DeadUI                                 #     jr Player2_DeadUI
@@ -1015,7 +993,6 @@ Player2_DeadUI:                                             # Player2_DeadUI:
 ShowContinues:                                              # ShowContinues:
         MOV  $0x0E,R3; ContinuesScreenPos_Plus2:            #     ld h,&0E    :ContinuesScreenpos_Plus1
        .equiv  srcContinuesScreenPos, ContinuesScreenPos_Plus2 - 2
-       .global srcContinuesScreenPos
                                                             #     ld bc,txtCreditsMsg2
                                                             #     call DrawText_LocateAndPrintStringUnlimited
                                                             #
@@ -1023,7 +1000,6 @@ ShowContinues:                                              # ShowContinues:
                                                             #     call DrawText_Decimal
                                                             #
 ShowContinuesSelfMod:                                       # ShowContinuesSelfMod:
-       .global ShowContinuesSelfMod
         MOV  $'/, R0                                        #     ld a,"/"
                                                             #     call Akuyou_DrawText_CharSprite
                                                             #

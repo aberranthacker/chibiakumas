@@ -1,22 +1,21 @@
 
 GetMemPos:
-    # input  R1 = XY (x=bytes - so 80 across)
-    # output R5 = screen mem pos
-    MOV  R4,R5
-    ASL  R5 # 4x ASL 29% faster than ASH $4,R5
-    ASL  R5
-    ASL  R5
-    ASL  R5
+        # input R3 = X char column
+        #       R4 = Y char row
+        # output R5 = screen mem pos
+        MOV  R4,R5
+        ASL  R5 # 4x ASL 29% faster than ASH $4,R5
+        ASL  R5
+        ASL  R5
+        ASL  R5
+        MOV  scr_addr_table(R5),R5
 
-    MOV  scr_addr_table(R5),R5
-
-    MOV  R3,R0
-    ASL  R0
-   .equiv ScreenBuffer_ActiveScreenDirect, .+2
-    BIS  $0x4000,R0
-
-    ADD  R0,R5
-RETURN
+        MOV  R3,R0
+        ASL  R0
+       .equiv ScreenBuffer_ActiveScreenDirect, .+2
+        BIS  $0x4000,R0
+        ADD  R0,R5
+        RETURN
 
 ScreenBuffer_Reset:
         MOV  $0x4000, @$ScreenBuffer_ActiveScreenDirect
@@ -25,7 +24,7 @@ ScreenBuffer_Reset:
         MOV  $FB1, @$ScreenBuffer_VisibleScreen
        .ppudo_ensure $PPU_ShowFB1
         CALL CLS
-RETURN
+        RETURN
 
 ScreenBuffer_Init:
         MOV  $0x4000, @$ScreenBuffer_ActiveScreenDirect
@@ -36,7 +35,7 @@ ScreenBuffer_Init:
         CALL CLS
         MOV  $FB0, @$ScreenBuffer_VisibleScreen
        .ppudo_ensure $PPU_ShowFB0
-RETURN
+        RETURN
 
 ScreenBuffer_Flip:
         TST  @$ScreenBuffer_ActiveScreenDirect

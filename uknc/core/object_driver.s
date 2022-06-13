@@ -15,66 +15,69 @@
 # P = Object Program (6)
 # R = Resolution     (7) bytes #XXXX1111
 # A = Animator       (8)
-ObjectArray_reConfigureForSize:                             # ObjectArray_reConfigureForSize:
-        TSTB R0                                             #     or a
-        BEQ  ConfigureForSize_Return$                       #     ret z
-ObjectArray_ConfigureForSizeB:                              # ObjectArray_ConfigureForSizeB:
+# ObjectArray_ConfigureForSize ----------------------------------------------{{{
+ObjectArray_reConfigureForSize:
+        TSTB R0
+        BNE  ObjectArray_ConfigureForSizeB
+        RETURN
+ObjectArray_ConfigureForSizeB:
         BIC  $0xFF00,R0
-        MOV  R0,@$srcObjectSpriteSizeCurrent                #     ld (ObjectSpriteSizeCurrent_Plus1 - 1),a
-        MOV  R0,@$srcSpriteSizeShiftFull                    #     ld (SpriteSizeShiftFull_Plus1 - 1),a
-        MOV  R0,@$srcSpriteSizeShiftFullB                   #     ld (SpriteSizeShiftFullB_Plus1 - 1),a
-        MOV  R0,@$srcSpriteSizeShiftFullC                   #     ld (SpriteSizeShiftFullC_Plus1 - 1),a
-        ASR  R0                                             #     srl a
-                                                            #
-        MOV  R0,@$srcSpriteSizeShiftHalfB                   #     ld (SpriteSizeShiftHalfB_Plus1 - 1),a
-        MOV  R0,@$srcSpriteSizeShiftHalfD                   #     ld (SpriteSizeShiftHalfD_Plus1 - 1),a
-                                                            #
-        BIS  $0b00000011,R0                                 #     or %00000011
-        MOV  R0,@$srcSpriteSizeShiftHalfH                   #     ld (SpriteSizeShiftHalfH_Plus1 - 1),a
+        MOV  R0,@$srcObjectSpriteSizeCurrent
+        MOV  R0,@$srcSpriteSizeShiftFull
+        MOV  R0,@$srcSpriteSizeShiftFullB
+        MOV  R0,@$srcSpriteSizeShiftFullC
+        ASR  R0
 
-ObjectArray_ConfigureForSize: # Define player 1 and 2 hitboxes # ObjectArray_ConfigureForSize:
+        MOV  R0,@$srcSpriteSizeShiftHalfB
+        MOV  R0,@$srcSpriteSizeShiftHalfD
+
+        BIS  $0b00000011,R0
+        MOV  R0,@$srcSpriteSizeShiftHalfH
+
+        # Define player 1 and 2 hitboxes
+ObjectArray_ConfigureForSize:
         # We update player location in advance for fast collision detection
         # Define player 1's hitbox
         CLR  R0
-        BISB @$P1_P00,R0                                    #     ld a,(P1_P00)   ;PlayerY
-        MOV  R0,@$srcPlayerY2                               #     ld (PlayerY2_Plus1 - 1),a
+        BISB @$P1_P00,R0 # PlayerY
+        MOV  R0,@$srcPlayerY2
        .equiv srcSpriteSizeShiftFull, .+2
-        SUB  $24,R0                                         #     sub 24  :SpriteSizeShiftFull_Plus1
-        BHIS 1$                                             #     call C,ZeroA
-        CLR  R0                                             #     ld (PlayerY1_Plus1 - 1),a
-1$:     MOV  R0,@$srcPlayerY1                               #
-                                                            #
-        CLR  R0
-        BISB @$P1_P01,R0                                    #     ld a,(P1_P01)   ;PlayerX
-        MOV  R0,@$srcPlayerX2                               #     ld (PlayerX2_Plus1 - 1),a
-        SUB  (PC)+,R0; srcSpriteSizeShiftHalfB: .word 12    #     sub 12  :SpriteSizeShiftHalfB_Plus1
-        BHIS 2$                                             #     call C,ZeroA
-        CLR  R0                                             #     ld (PlayerX1_Plus1 - 1),a
-2$:     MOV  R0,@$srcPlayerX1                               #
+        SUB  $24,R0
+        BHIS 1$
 
+        CLR  R0
+1$:     MOV  R0,@$srcPlayerY1
+        CLR  R0
+        BISB @$P1_P01,R0 # PlayerX
+        MOV  R0,@$srcPlayerX2
+       .equiv srcSpriteSizeShiftHalfB, .+2
+        SUB  $12,R0
+        BHIS 2$
+
+        CLR  R0
+2$:     MOV  R0,@$srcPlayerX1
         # Define player 2's hitbox
         CLR  R0
-        BISB @$P2_P00,R0                                    #     ld a,(P2_P00)   ;PlayerY
-        MOV  R0,@$srcPlayer2Y2                              #     ld (Player2Y2_Plus1 - 1),a
-        SUB  (PC)+,R0; srcSpriteSizeShiftFullB: .word 24    #     sub 24  :SpriteSizeShiftFullB_Plus1
-        BHIS 3$                                             #     call C,ZeroA
-        CLR  R0                                             #     ld (Player2Y1_Plus1 - 1),a
-3$:     MOV  R0,@$srcPlayer2Y1                              #
-                                                            #
-        CLR  R0
-        BISB @$P1_P01,R0                                    #     ld a,(P2_P01)   ;PlayerX
-        MOV  R0,@$srcPlayer2X2                              #     ld (Player2X2_Plus1 - 1),a
-        SUB  (PC)+,R0; srcSpriteSizeShiftHalfD: .word 12    #     sub 12  :SpriteSizeShiftHalfD_Plus1
-        BHIS 4$                                             #     call C,ZeroA
-        CLR  R0                                             #     ld (Player2X1_Plus1 - 1),a
-4$:     MOV  R0,@$srcPlayer2X1                              #
+        BISB @$P2_P00,R0 # PlayerY
+        MOV  R0,@$srcPlayer2Y2
+       .equiv srcSpriteSizeShiftFullB, .+2
+        SUB  $24,R0
+        BHIS 3$
 
-    ConfigureForSize_Return$:
-        RETURN                                              # ret
-                                                            # ZeroA:
-                                                            #     xor a
-                                                            # ret
-                                                            #
+        CLR  R0
+3$:     MOV  R0,@$srcPlayer2Y1
+        CLR  R0
+        BISB @$P1_P01,R0 # PlayerX
+        MOV  R0,@$srcPlayer2X2
+       .equiv srcSpriteSizeShiftHalfD, .+2
+        SUB  $12,R0
+        BHIS 4$
+
+        CLR  R0
+4$:     MOV  R0,@$srcPlayer2X1
+
+        RETURN
+# ObjectArray_ConfigureForSize ----------------------------------------------}}}
 ObjectArray_Redraw:                                         # ObjectArray_Redraw:
         TST  @$srcTimer_TicksOccured                        #     ld a,(Timer_TicksOccured)
                                                             #     or a
@@ -94,6 +97,7 @@ ObjectArray_Redraw:                                         # ObjectArray_Redraw
 ObjectArray_NextObject:                                     # ObjectArray_Turbo:
         ADD  $6,R5                                          #     inc l
         SOB  R4,object_loop$                                #     djnz Objectloop2
+
     game_paused$:                                           #
         RETURN                                              #     ret
                                                             #
@@ -101,7 +105,7 @@ ObjectArray_NextObject:                                     # ObjectArray_Turbo:
         PUSH R4                                             #     ld a,c
         PUSH R5                                             #     ld (SprShow_Y),a
                                                             #     push bc
-                                                            #     push hl
+#:bpt                                                       #     push hl
         MOVB R1,@$srcSprShow_Y # Y                          #     ;1
         SWAB R1                                             #         inc h
         MOVB R1,@$srcSprShow_X # X                          #         ld a,(hl) ; X
@@ -157,16 +161,19 @@ Objectloop_TwoFrameSprite$:                                 # Objectloop_TwoFram
                                                             #         and %00000010
                                                             #
 Objectloop_SpriteBankSet$:                                  # Objectloop_SpriteBankSet:
-        # Life BPxxxxx B=hurt by bullets, P=hurts player, xxxxxx = hit points (if not B then ages over time)
-        BIT  0x40,R3 # R3 Life=LSB, Program=MSB             #     ld a,ixl
-                                                            #     bit 6,a
-        BZE  ObjectLoopBothPlayerSkip                       #     jr z,ObjectLoopBothPlayerSkip ; Doesn't hurt player
-                                                            #
-                                                            #     ;used to modify this, but now we assume the player is alway vunurable
-                                                            #     ; we check anyway before deducting a life
-                                                            #     ;Jp Objectloop_PlayerVunrable ;Objectloop_DoPlayerCollisions_Plus2
-                                                            # Objectloop_PlayerVunrable:
-#------------------------------ player collisions ------------------------------
+        # Life BPxxxxx
+        # B=hurt by bullets,
+        # P=hurts player,
+        # xxxxxx = hit points (if not B then ages over time)
+        BIT  0x40,R3 # R3 Life=LSB, Program=MSB #     ld a,ixl
+                                                #     bit 6,a
+        BZE  ObjectLoopBothPlayerSkip           #     jr z,ObjectLoopBothPlayerSkip ; Doesn't hurt player
+                                                #
+# used to modify this, but now we assume the player is alway vunurable
+# we check anyway before deducting a life
+# ;Jp Objectloop_PlayerVunrable ;Objectloop_DoPlayerCollisions_Plus2
+# Objectloop_PlayerVunrable:
+#  Player collisions --------------------------------------------------------{{{
                                                             #             ld a,b
         CMPB (PC)+,R0; srcPlayerX1: .word 0                 #             cp 0 :PlayerX1_Plus1
                                                             #             jr c,ObjectLoopP1Skip
@@ -267,10 +274,6 @@ ObjectLoopBothPlayerSkip:                                   # ObjectLoopBothPlay
         ADD  (PC)+,R0; srcSpriteSizeShiftFullC: .word 24    #     add 24  :SpriteSizeShiftFullC_Plus1
                                                             #     ld (ObjectHitYB_Plus1-1),a
                                                             #
-                                                            #     ifdef Debug
-                                                            #         call Debug_NeedEXX
-                                                            #     endif
-                                                            #
                                                             #     push bc
                                                             #     push de
                                                             #     push hl
@@ -317,70 +320,67 @@ ObjectLoopBothPlayerSkip:                                   # ObjectLoopBothPlay
                                                             #     pop hl
                                                             #     pop de
                                                             #     pop bc
-                                                            #
-                                                            ##    ifdef Debug
-                                                            #         call Debug_ReleaseEXX
-                                                            ##    endif
-                                                            #
-ObjectLoopP1StarSkip:                                       # ObjectLoopP1StarSkip:
-        BR   ObjectLoop_NotShot$                            #         jr $+10 :ObjectLoop_IFShot_Plus1 ; 18 08 = JR 8
-        CALL @$Object_DecreaseLifeShot                      #   call Object_DecreaseLifeShot :ObjectShotOverride_Plus2 ;3 bytes
-       .equiv  dstObjectShotOverride, . - 2
-       .global dstObjectShotOverride
-                                                            #         ld a,8                             ;2 bytes
-        MOV  $0405,@$ObjectLoopP1StarSkip                   #         ld (ObjectLoop_IFShot_Plus1 -1 ),a ;3 bytes
-                                                            #
-ObjectLoop_NotShot$:                                        # ObjectLoop_NotShot:
-        SWAB R2                                             #         ld d,ixh
-        CALL @$DoMoves                                      #         call DoMoves :ObjectDoMovesOverride_Plus2
-       .equiv  dstObjectDoMovesOverride, . - 2
-       .global dstObjectDoMovesOverride
 
-                                                            #         ld ixh,d
-                                                            #
-ObjectLoop_SaveChanges$:                                    # ObjectLoop_SaveChanges:
-                                                            #         inc h;dec h ;    Animator
-                                                            #         inc h;dec h ;    Spritesize never changes
-                                                            #
-        # Animator and Spritesize never changes             #         ld a,iyl
-        MOV  R3,-(R5) # LSB=Life, MSB=Program Code          #         ld (hl),a ; Program Code
-                                                            #         inc h ;dec h
-                                                            #         ld a,ixl
-                                                            #         ld (hl),a ;Life
-                                                            #         res 6,l ;dec h
-                                                            #         ld a,iyh
-        MOV  R2,-(R5) # LSB=Move, MSB=Sprite                #         ld (hl),a ;spr
-                                                            #         dec h
-                                                            #         ld a,ixh
-                                                            #         ld (hl),a ;Move
-                                                            #         dec h
-        MOVB R4,-(R5) # X                                   #         ld (hl),b ;X
-                                                            #         dec h
-        MOVB R1,-(R5) # Y                                   #         ld (hl),c ;Y
-                                                            #
-                                                            #         ld a,iyl
-        BIT  R3,$0xFF00                                     #         or a
-       .call NZ,@$ObjectProgram                             #         call nz, ObjectProgram
-                                                            #
-ObjectLoop_ShowSprite:                                      # ObjectLoop_ShowSprite:
-                                                            #         ld b,Akuyou_LevelStart_Bank;&C0
-                                                            #         ld hl,Akuyou_LevelStart;&4000   ;ObjectSpritePointer_Plus2
-                                                            #
-                                                            # ObjectLoop_ShowSprite_BankSet:
-                                                            #         ld a,b
-                                                            #
-                                                            # ObjectLoop_ShowSprite_BankSetA:
-                                                            #         call BankSwitch_C0_SetCurrent
-                                                            #         ld (SprShow_BankAddr),hl
-        CALL @$ShowSprite                                   #         call ShowSprite
-                                                            #         call BankSwitch_C0_SetCurrentToC0
-                                                            #
-                                                            # ObjectArray_Next:
-        POP  R5                                             #     pop hl
-        POP  R4                                             #     pop bc
-       #CLR  R0                                             #     xor a ; Zero
-        JMP  @$ObjectArray_NextObject                       #     jp ObjectArray_Turbo
-                                                            #
+ObjectLoopP1StarSkip: # ObjectLoopP1StarSkip:
+        BR   ObjectLoop_NotShot$          # jr $+10 :ObjectLoop_IFShot_Plus1 ; 18 08 = JR 8
+       .global dstObjectShotOverride
+       .equiv  dstObjectShotOverride, .+2
+        CALL @$Object_DecreaseLifeShot    # call Object_DecreaseLifeShot :ObjectShotOverride_Plus2 ;3 bytes
+                                          # ld a,8                             ;2 bytes
+        MOV  $0405,@$ObjectLoopP1StarSkip # ld (ObjectLoop_IFShot_Plus1 -1 ),a ;3 bytes
+#  Player collisions --------------------------------------------------------}}}
+ObjectLoop_NotShot$:                                        # ObjectLoop_NotShot:
+        # we did SWAB to extract sprite number, now swapping bytes back
+        # DoMoves expects move to be in R2 LSB
+        SWAB R2                              #         ld d,ixh
+       .global dstObjectDoMovesOverride
+       .equiv  dstObjectDoMovesOverride, .+2
+        CALL @$DoMoves                       #         call DoMoves :ObjectDoMovesOverride_Plus2
+                                             #         ld ixh,d
+ObjectLoop_SaveChanges$:
+        # Animator and SpriteSize never changes
+                                      # inc h;dec h ;    Animator
+                                      # inc h;dec h ;    Spritesize never changes
+                                      #
+                                      # ld a,iyl
+        # LSB=Life, MSB=Program Code  # ld (hl),a ; Program Code
+        MOV  R3,-(R5)                 # inc h ;dec h
+                                      # ld a,ixl
+                                      # ld (hl),a ;Life
+                                      # res 6,l ;dec h
+                                      # ld a,iyh
+         # LSB=Move, MSB=Sprite       # ld (hl),a ;spr
+         MOV  R2,-(R5)                # dec h
+                                      # ld a,ixh
+                                      # ld (hl),a ;Move
+                                      # dec h
+        MOVB R4,-(R5) # X             # ld (hl),b ;X
+                                      # dec h
+        MOVB R1,-(R5) # Y             # ld (hl),c ;Y
+                                      #
+                                      # ld a,iyl
+        BIT  R3,$0xFF00               # or a
+       .call NZ,@$ObjectProgram       # call nz, ObjectProgram
+                                      #
+ObjectLoop_ShowSprite:
+                                      # ld b,Akuyou_LevelStart_Bank;&C0
+                                      # ld hl,Akuyou_LevelStart;&4000   ;ObjectSpritePointer_Plus2
+                                      #
+                                      # ObjectLoop_ShowSprite_BankSet:
+                                      #         ld a,b
+                                      #
+                                      # ObjectLoop_ShowSprite_BankSetA:
+                                      #         call BankSwitch_C0_SetCurrent
+                                      #         ld (SprShow_BankAddr),hl
+        CALL @$ShowSprite             #         call ShowSprite
+                                      #         call BankSwitch_C0_SetCurrentToC0
+                                      #
+        POP  R5                       #     pop hl
+        POP  R4                       #     pop bc
+                                      #     xor a ; Zero
+        JMP  @$ObjectArray_NextObject #     jp ObjectArray_Turbo
+
+# ObjectAnimator not implemented --------------------------------------------{{{
                                                             # Animator_VectorArray:
                                                             # defw ObjectAnimator_Update         ; 1
                                                             # defw ObjectAnimator_Sprite         ; 2
@@ -594,41 +594,43 @@ ObjectAnimator:                                             # ObjectAnimator:
                                                             # pop de
                                                             # ld hl,(Objects_LastAdded_Plus2-2)
                                                             # ret
-                                                            #
-ObjectProgram:                                              # ObjectProgram:
-                                                            #     ret z       ; return if zero
-        CMP  R3,$0b00000001                                 #     cp %00000001
-        BNE  1$                                             #     jp z,ObjectProgram_BitShiftSprite   ; Used by background, sprite bank based on X co-ord
-        JMP  @$ObjectProgram_BitShiftSprite                 
-1$:                                                         #     and %11111000           ;00000XXX = Powerup
-                                                            #     jr z,ObjectProgram_PowerUps
-                                                            #     cp %11110000            ;11110XXX = Animate every X frames
-                                                            #     jp z,ObjectProgram_FrameAnimate
-                                                            #     and %11100000
-                                                            #     jr z,ObjectProgram_PowerUps ;0001XXXX = Smartbombable Powerup
-                                                            #
-                                                            #     cp  %00100000           ;001XXXXX = Fastfire
-                                                            #     jp z,ObjectProgram_FastFire
-                                                            #     cp  %01000000           ;010XXXXX = Fastfire
-                                                            #     jp z,ObjectProgram_MidFire
-                                                            #     cp  %01100000           ;011XXXXX = Fastfire
-                                                            #     jp z,ObjectProgram_SlowFire
-                                                            #     cp  %10000000           ;100XXXXX = Fastfire
-                                                            #     jp z,ObjectProgram_SnailFire
-                                                            #     cp  %11000000           ;110XXXXX = Fastfire
-                                                            #     jp z,ObjectProgram_Mid2Fire
-                                                            #     cp  %10100000           ;110XXXXX = Fastfire
-                                                            #     jp z,ObjectProgram_HyperFire
-                                                            #     ld a,iyl
-                                                            #     cp %11111100            ;Custom 1
-                                                            #     jr z,ObjectProgram_Custom1
-                                                            #     cp %11111101            ;Custom 2
-                                                            #     jp z,null :CustomProgram2_Plus2
-                                                            #     cp %11111110            ;Custom 3
-                                                            #     jp z,null :CustomProgram3_Plus2
-                                                            #
-                                                            #     cp 255
-                                                            #     ret nz  ;Only used by ep2 for a crap joke!
+# ObjectAnimator end --------------------------------------------------------}}}
+
+ObjectProgram:
+                                            # ret z       ; return if zero
+        CMP  R3,$0b00000001                 # cp %00000001
+        BNE  1$                             # ; Used by background, sprite bank based on X co-ord
+        JMP  @$ObjectProgram_BitShiftSprite # jp z,ObjectProgram_BitShiftSprite
+1$:                                         # and %11111000           ;00000XXX = Powerup
+                                            # jr z,ObjectProgram_PowerUps
+       #.inform_and_hang "ObjectProgram not implemented"
+                                            # cp %11110000            ;11110XXX = Animate every X frames
+                                            # jp z,ObjectProgram_FrameAnimate
+                                            # and %11100000
+                                            # jr z,ObjectProgram_PowerUps ;0001XXXX = Smartbombable Powerup
+                                            #
+                                            # cp %00100000            ;001XXXXX = Fastfire
+                                            # jp z,ObjectProgram_FastFire
+                                            # cp %01000000            ;010XXXXX = Fastfire
+                                            # jp z,ObjectProgram_MidFire
+                                            # cp %01100000            ;011XXXXX = Fastfire
+                                            # jp z,ObjectProgram_SlowFire
+                                            # cp %10000000            ;100XXXXX = Fastfire
+                                            # jp z,ObjectProgram_SnailFire
+                                            # cp %11000000            ;110XXXXX = Fastfire
+                                            # jp z,ObjectProgram_Mid2Fire
+                                            # cp %10100000            ;110XXXXX = Fastfire
+                                            # jp z,ObjectProgram_HyperFire
+                                            # ld a,iyl
+                                            # cp %11111100            ;Custom 1
+                                            # jr z,ObjectProgram_Custom1
+                                            # cp %11111101            ;Custom 2
+                                            # jp z,null :CustomProgram2_Plus2
+                                            # cp %11111110            ;Custom 3
+                                            # jp z,null :CustomProgram3_Plus2
+                                            #
+                                            # cp 255
+                                            # ret nz  ;Only used by ep2 for a crap joke!
         RETURN
                                                             # SpecialMoveChibiko:
                                                             #     push iy
@@ -702,158 +704,154 @@ ObjectProgram:                                              # ObjectProgram:
                                                             #
 # Every other X column uses an alternate sprite - for background anim ----------
 ObjectProgram_BitShiftSprite:
-                                #     ld a,b
-                                #     ld (SprShow_X),a    ; Makesure sprite pos is updated for Domoves
-                                #     bit 0,b ;2 pixel
-        RETURN                  #     ret
+                                # ld a,b
+       #MOVB R4,@$srcSprShow_X  # ld (SprShow_X),a ; Makesure sprite pos is updated for Domoves
+                                # bit 0,b ;2 pixel
+        RETURN                  # ret
 
-ObjectProgram_SnailFire:                                    # ObjectProgram_SnailFire:
-        MOV  $0b00010000,R0                                 #     ld a,%00010000  :FireFrequencyA_Plus1
-       .equiv  srcFireFrequencyA, . - 2
        .global srcFireFrequencyA
-        BR   ObjectProgram_Fire                             #     jr ObjectProgram_Fire
-ObjectProgram_SlowFire:                                     # ObjectProgram_SlowFire:
-        MOV  $0b00001000,R0                                 #     ld a,%00001000  :FireFrequencyB_Plus1
-       .equiv  srcFireFrequencyB, . - 2
        .global srcFireFrequencyB
-        BR   ObjectProgram_Fire                             #     jr ObjectProgram_Fire
-ObjectProgram_MidFire:                                      # ObjectProgram_MidFire:
-        MOV  $0b00001000,R0                                 #     ld a,%00001000  :FireFrequencyC_Plus1
-       .equiv  srcFireFrequencyC, . - 2
        .global srcFireFrequencyC
-        BR   ObjectProgram_Fire                             #     jr ObjectProgram_Fire
-ObjectProgram_Mid2Fire:                                     # ObjectProgram_Mid2Fire:
-        MOV  $0b00000100,R0                                 #     ld a,%00000100; :FireFrequencyD_Plus1
-       .equiv  srcFireFrequencyD, . - 2
        .global srcFireFrequencyD
-        BR   ObjectProgram_Fire                             #     jr ObjectProgram_Fire
-ObjectProgram_FastFire:                                     # ObjectProgram_FastFire:
-        MOV  $0b00000010,R0                                 #     ld a,%00000010; :FireFrequencyE_Plus1
-       .equiv  srcFireFrequencyE, . - 2
        .global srcFireFrequencyE
-                                                            #
-ObjectProgram_Fire:                                         # ObjectProgram_Fire:
-                                                            #     ld d,a ;ld iyh,a
-                                                            #
-                                                            #     ei  ; Why is interrupts disabled here??
-                                                            #     ld a,(Timer_TicksOccured)
-                                                            #
-                                                            #     and d;iyh
-                                                            #     ret z
-                                                            #
-                                                            # ObjectProgram_HyperFire:
-                                                            #     ld a,2
-                                                            #     call SFX_QueueSFX_Generic
-                                                            #
-                                                            #     ld a,(SpriteSizeShiftHalfB_Plus1-1)
-                                                            #     ld d,a
-                                                            #     add c
-                                                            #     ;   add 12      ObjectFirePosY_Plus1
-                                                            #     ld c,a
-                                                            #
-                                                            #     ld a,d
-                                                            # ;   ld a,(SpriteSizeShiftHalfB_Plus1-1)
-                                                            #     rrca
-                                                            #     rrca
-                                                            #     add b
-                                                            # ;   ld a,b
-                                                            # ;   add 3       ;ObjectFirePosX_Plus1
-                                                            #     ld d,a
-                                                            #
-                                                            #     ld a,iyl
-                                                            #     and %00011111
-                                                            #     ld b,a  ; top left
-                                                            #
-                                                            # FireCustomStar:
-                                                            #     jp Stars_AddObjectBatchDefault
-                                                            #
-                                                            # Object_DecreaseShot_Player2:
-                                                            #     ld iy,Player_Array2
-                                                            #     jr Object_DecreaseShot_Start
-Object_DecreaseLifeShot: .global Object_DecreaseLifeShot    #  Object_DecreaseLifeShot:
-                                                            #     ld a,ixl
-                                                            #     and %00111111
-                                                            #     ret z   ; if life is zero drop out (For custom hit code callback)
-                                                            #     push bc
-                                                            #     push IY
-                                                            #         ;see if player has POWERSHOT!
-                                                            #         ;Uhh, this was soo much easier before 2 player support!
-                                                            #         ld b,a
-                                                            #         ld a,0:ObjectShotShooter_Plus1  ;1=Player 1, 129 = player 2
-                                                            #         dec a
-                                                            #         jr nz,Object_DecreaseShot_Player2
-                                                            #         ld iy,Player_Array
-                                                            #         ;Double power shot!
-                                                            #     ;   nop PlayerShootPower_Plus1 ;dec a
-                                                            # Object_DecreaseShot_Start:
-                                                            #         ld a,(IY+14)
-                                                            #         or a
-                                                            #         ld a,b
-                                                            #         jp z,Object_DecreaseShot_OnlyOne
-                                                            #         dec a
-                                                            #         jr z, Object_DecreaseShotToDeath
-                                                            # Object_DecreaseShot_OnlyOne:
-                                                            #     pop IY
-                                                            #     pop bc
-                                                            #     dec a
-                                                            #     jr nz,Object_DecreaseLife_AgeUpdate
-                                                            #
-                                                            #     jr Object_DecreaseShotToDeathB
-                                                            # Object_DecreaseShotToDeath:
-                                                            #     pop IY
-                                                            #     pop bc
-                                                            # Object_DecreaseShotToDeathB:
-                                                            #     ;object has been shot to death
-        # check if address mode is right                                                    #
-        CALL @$null                                         #     call null :CustomShotToDeathCall_Plus2
-       .equiv  dstCustomShotToDeathCall, .-2
+ObjectProgram_SnailFire:               # ObjectProgram_SnailFire:
+       .equiv  srcFireFrequencyA, .+2
+        MOV  $0b00010000,R0            #     ld a,%00010000  :FireFrequencyA_Plus1
+        BR   ObjectProgram_Fire        #     jr ObjectProgram_Fire
+ObjectProgram_SlowFire:                # ObjectProgram_SlowFire:
+       .equiv  srcFireFrequencyB, .+2
+        MOV  $0b00001000,R0            #     ld a,%00001000  :FireFrequencyB_Plus1
+        BR   ObjectProgram_Fire        #     jr ObjectProgram_Fire
+ObjectProgram_MidFire:                 # ObjectProgram_MidFire:
+       .equiv  srcFireFrequencyC, .+2
+        MOV  $0b00001000,R0            #     ld a,%00001000  :FireFrequencyC_Plus1
+        BR   ObjectProgram_Fire        #     jr ObjectProgram_Fire
+ObjectProgram_Mid2Fire:                # ObjectProgram_Mid2Fire:
+       .equiv  srcFireFrequencyD, .+2
+        MOV  $0b00000100,R0            #     ld a,%00000100; :FireFrequencyD_Plus1
+        BR   ObjectProgram_Fire        #     jr ObjectProgram_Fire
+ObjectProgram_FastFire:                # ObjectProgram_FastFire:
+       .equiv  srcFireFrequencyE, .+2
+        MOV  $0b00000010,R0            #     ld a,%00000010; :FireFrequencyE_Plus1
+                                       #
+ObjectProgram_Fire:                    # ObjectProgram_Fire:
+        .inform_and_hang "no ObjectProgram_Fire"
+                                                 #     ld d,a ;ld iyh,a
+                                                 #
+                                                 #     ei  ; Why is interrupts disabled here??
+                                                 #     ld a,(Timer_TicksOccured)
+                                                 #
+                                                 #     and d;iyh
+                                                 #     ret z
+                                                 #
+                                                 # ObjectProgram_HyperFire:
+                                                 #     ld a,2
+                                                 #     call SFX_QueueSFX_Generic
+                                                 #
+                                                 #     ld a,(SpriteSizeShiftHalfB_Plus1-1)
+                                                 #     ld d,a
+                                                 #     add c
+                                                 #     ;   add 12      ObjectFirePosY_Plus1
+                                                 #     ld c,a
+                                                 #
+                                                 #     ld a,d
+                                                 # ;   ld a,(SpriteSizeShiftHalfB_Plus1-1)
+                                                 #     rrca
+                                                 #     rrca
+                                                 #     add b
+                                                 # ;   ld a,b
+                                                 # ;   add 3       ;ObjectFirePosX_Plus1
+                                                 #     ld d,a
+                                                 #
+                                                 #     ld a,iyl
+                                                 #     and %00011111
+                                                 #     ld b,a  ; top left
+                                                 #
+                                                 # FireCustomStar:
+                                                 #     jp Stars_AddObjectBatchDefault
+                                                 #
+                                                 # Object_DecreaseShot_Player2:
+                                                 #     ld iy,Player_Array2
+                                                 #     jr Object_DecreaseShot_Start
+       .global Object_DecreaseLifeShot
+Object_DecreaseLifeShot:                         #  Object_DecreaseLifeShot:
+        .inform_and_hang "no Object_DecreaseLifeShot"
+                                                 #     ld a,ixl
+                                                 #     and %00111111
+                                                 #     ret z   ; if life is zero drop out (For custom hit code callback)
+                                                 #     push bc
+                                                 #     push IY
+                                                 #         ;see if player has POWERSHOT!
+                                                 #         ;Uhh, this was soo much easier before 2 player support!
+                                                 #         ld b,a
+                                                 #         ld a,0:ObjectShotShooter_Plus1  ;1=Player 1, 129 = player 2
+                                                 #         dec a
+                                                 #         jr nz,Object_DecreaseShot_Player2
+                                                 #         ld iy,Player_Array
+                                                 #         ;Double power shot!
+                                                 #     ;   nop PlayerShootPower_Plus1 ;dec a
+                                                 # Object_DecreaseShot_Start:
+                                                 #         ld a,(IY+14)
+                                                 #         or a
+                                                 #         ld a,b
+                                                 #         jp z,Object_DecreaseShot_OnlyOne
+                                                 #         dec a
+                                                 #         jr z, Object_DecreaseShotToDeath
+                                                 # Object_DecreaseShot_OnlyOne:
+                                                 #     pop IY
+                                                 #     pop bc
+                                                 #     dec a
+                                                 #     jr nz,Object_DecreaseLife_AgeUpdate
+                                                 #
+                                                 #     jr Object_DecreaseShotToDeathB
+                                                 # Object_DecreaseShotToDeath:
+                                                 #     pop IY
+                                                 #     pop bc
+                                                 # Object_DecreaseShotToDeathB:
+                                                 #     ;object has been shot to death
        .global dstCustomShotToDeathCall
-                                                            #
-                                                            #     xor a
-                                                            #     ld (hl),a ;Clear object animator
-                                                            #
-                                                            #     ld a,3
-                                                            #     call SFX_QueueSFX_Generic
-                                                            #
-                                                            #     ;create a coin
-        MOV  $128+16,R0                                     #     ld iyh,128+16 :PointsSpriteC_Plus1  ; Sprite
-       .equiv srcPointsSpriteC, .-2
-                                                            #     ld ixh,%10000111; Seaker Fast 1000001XX XX=Speed
-                                                            #     ld a,(ObjectShotShooter_Plus1-1)    ;1=Player 1, 129 = player 2
-                                                            #     dec a
-                                                            #     jr z,Object_DecreaseShotToDeath_Player1
-                                                            #     ld ixh,%10010011; Seaker Fast P2 1000100XX XX=Speed
-                                                            # Object_DecreaseShotToDeath_Player1:
-                                                            #     ld ixl,64+63    ; Life ; must "hurt" player for hit to be detected
-                                                            #     ld iyl,3    ; Program
-                                                            #
-                                                            #     ret
-                                                            #
-                                                            # Object_DecreaseLife:
-                                                            #     ld a,ixl
-                                                            #     and %00111111
-                                                            #     dec a
-                                                            #     jr nz,Object_DecreaseLife_AgeUpdate
-                                                            #     ;object has died of old age
-                                                            #     ld b,0
-                                                            #     ld C,b
-                                                            #     ld ixl,b
-                                                            #
-                                                            #     ret
-                                                            #     Object_DecreaseLife_AgeUpdate:
-                                                            #     ifdef Debug
-                                                            #         call Debug_NeedEXX
-                                                            #     endif
-                                                            #     di
-                                                            #     exx
-                                                            #         ld d,a
-                                                            #         ld a,ixl
-                                                            #         and %11000000       ; Keep the 1st 2 bytes, format is ;MMLLLLLL
-                                                            #         or d            ; MM = life mode, LLLLLL = life qty
-                                                            #     exx
-                                                            #     ei
-                                                            #     ifdef Debug
-                                                            #         call Debug_ReleaseEXX
-                                                            #     endif
-                                                            #     ld ixl,a
-                                                            # ret
+       .equiv  dstCustomShotToDeathCall, .+2
+        CALL @$null                              #     call null :CustomShotToDeathCall_Plus2
+                                                 #
+                                                 #     xor a
+                                                 #     ld (hl),a ;Clear object animator
+                                                 #
+                                                 #     ld a,3
+                                                 #     call SFX_QueueSFX_Generic
+                                                 #
+                                                 #     ;create a coin
+       .equiv srcPointsSpriteC, .+2
+        MOV  $128+16,R0                          #     ld iyh,128+16 :PointsSpriteC_Plus1  ; Sprite
+                                                 #     ld ixh,%10000111; Seaker Fast 1000001XX XX=Speed
+                                                 #     ld a,(ObjectShotShooter_Plus1-1)    ;1=Player 1, 129 = player 2
+                                                 #     dec a
+                                                 #     jr z,Object_DecreaseShotToDeath_Player1
+                                                 #     ld ixh,%10010011; Seaker Fast P2 1000100XX XX=Speed
+                                                 # Object_DecreaseShotToDeath_Player1:
+                                                 #     ld ixl,64+63    ; Life ; must "hurt" player for hit to be detected
+                                                 #     ld iyl,3    ; Program
+                                                 #
+                                                 #     ret
+                                                 #
+                                                 # Object_DecreaseLife:
+                                                 #     ld a,ixl
+                                                 #     and %00111111
+                                                 #     dec a
+                                                 #     jr nz,Object_DecreaseLife_AgeUpdate
+                                                 #     ;object has died of old age
+                                                 #     ld b,0
+                                                 #     ld C,b
+                                                 #     ld ixl,b
+                                                 #
+                                                 #     ret
+                                                 #     Object_DecreaseLife_AgeUpdate:
+                                                 #     di
+                                                 #     exx
+                                                 #         ld d,a
+                                                 #         ld a,ixl
+                                                 #         and %11000000       ; Keep the 1st 2 bytes, format is ;MMLLLLLL
+                                                 #         or d            ; MM = life mode, LLLLLL = life qty
+                                                 #     exx
+                                                 #     ei
+                                                 #     ld ixl,a
+                                                 # ret
