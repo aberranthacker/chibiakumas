@@ -72,7 +72,7 @@ header = []
   }
   rec[:y_offset] = 7 if rec[:y_offset] == 255
 
-  break if rec[:height].zero?
+  break if rec[:offset].zero?
 
   header << rec
 end
@@ -95,7 +95,7 @@ header.each do |md|
   print "h: #{md[:height].to_s.rjust(3, ' ')} "
   print "w: #{md[:width].to_s.rjust(2, ' ')} "
   print "y_offset: #{md[:y_offset].to_s.rjust(2, ' ')} "
-  print "settings: #{md[:settings].to_s.rjust(3, ' ')} "
+  print "attrs: #{md[:settings].to_s.rjust(3, ' ')} "
   puts  "offset: #{md[:offset]}"
 
   sprite = file[md[:offset], md[:height] * md[:width]].unpack('v*')
