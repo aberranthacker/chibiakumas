@@ -1,5 +1,5 @@
 
-PPEXEC:         #------------------------------------------------------------{{{
+PPEXEC: #-----------------------------------------------------------------------
        #MOV  2(R5),@$PS.A2      # Arg 2 - memory size, words
         MOV  $PPU_UserRamSizeWords,@$PS.A2      # Arg 2 - memory size, words
         MOVB $01,  @$PS.Request # 01 - allocate memory
@@ -16,11 +16,11 @@ PPEXEC:         #------------------------------------------------------------{{{
         BNE  MCpError           # If error, --> Memory copy error
        #CALL Info               #
                                 #
-        MOVB $030,@$PS.Request  # 030 - Execute programm
+        MOVB $030, @$PS.Request # 030 - Execute programm
         CALL PPUOut             # => Send request to PPU
         BNE  ExError            # IF error, --> Execution error
         RTS  R5
-#----------------------------------------------------------------------------}}}
+#-------------------------------------------------------------------------------
 PPFREE:         #------------------------------------------------------------{{{
         MOV  (R5)+,@$PS.A1      # Arg 1 - address of memory block
         MOV  (R5)+,@$PS.A2      # Arg 2 - size of the memory block, words
@@ -52,9 +52,9 @@ sMCpError: .asciz  "?PPU-F-memory copy error"
 sExError:  .asciz  "?PPU-F-execution error"
 sMFrError: .asciz  "?PPU-F-memory freeing error"
 
-        .Even
+       .even
 #----------------------------------------------------------------------------}}}
-PPUOut:         #------------------------------------------------------------{{{
+PPUOut: #--------------------------------------------------------------------{{{
         MOV  $AMP,R0        # R0 - pointer to channel's init sequence array
         MOV  $8,R1          # R1 - size of the array, 8 bytes
 1$:     MOVB (R0)+,@$CCH2OD # Send a byte to channel 2
@@ -67,9 +67,9 @@ PPUOut:         #------------------------------------------------------------{{{
         TSTB PS.Reply       # Test PPU's operation status code
         RETURN              #
 
-AMP:    .byte  0, 0, 0, 0xFF # init sequence
-        .word  PStruct       # address of parameters struct
-        .byte  0xFF, 0xFF    # two termination bytes 0xff, 0xff
+AMP:   .byte  0, 0, 0, 0xFF # init sequence
+       .word  PStruct       # address of parameters struct
+       .byte  0xFF, 0xFF    # two termination bytes 0xff, 0xff
 
 PStruct:    # Parameters struct (PS)
     PS.Reply:   .byte  0   # operation status code
@@ -85,40 +85,42 @@ PStruct:    # Parameters struct (PS)
     PS.A2:      .word  0   # Argument 2
     PS.A3:      .word  0   # Argument 3
 
-        .Even
+       .even
 #----------------------------------------------------------------------------}}}
-Info:           #------------------------------------------------------------{{{
+Info: #----------------------------------------------------------------------{{{
         MOV  $Arg1+7, R1
         MOV  @$PS.A1,R3
         CALL InsDecStr
-        .tty_print $Arg1
+       .tty_print $Arg1
         MOV  $Arg2+7, R1
         MOV  @$PS.A2,R3
         CALL InsDecStr
-        .tty_print $Arg2
+       .tty_print $Arg2
         MOV  $Arg3+7, R1
         MOV  @$PS.A3,R3
         CALL InsDecStr
-        .tty_print $Arg3
+       .tty_print $Arg3
         RETURN
                 #0         1         2         3         4         5         6         7
                 #01234567890123456789012345678901234567890123456789012345678901234567890123456789
-Arg1:   .asciz  "PS.A1: 123456"
-Arg2:   .asciz  "PS.A2: 123456"
-Arg3:   .asciz  "PS.A3: 123456"
-        .Even
+Arg1:  .asciz  "PS.A1: 123456"
+Arg2:  .asciz  "PS.A2: 123456"
+Arg3:  .asciz  "PS.A3: 123456"
+       .even
 #----------------------------------------------------------------------------}}}
-InsDecStr:      #------------------------------------------------------------{{{
+InsDecStr: #-----------------------------------------------------------------{{{
         MOV  $6,R0      # R0 - length of the number
                         # R1 - position of number in str (first argument)
                         # R3 - number (second argument)
         ADD  R0,R1
-1$:     CLR  R2         # R2 - most, R3 - least significant word
+        1$:
+            CLR  R2     # R2 - most, R3 - least significant word
             DIV  $10,R2
                         # R2 contains quotient, R3 - remainder
             ADD  $'0,R3 # add ASCII code for "0" to the remainder
             MOVB R3,-(R1)
             MOV  R2,R3
         SOB  R0,1$
+
         RETURN
 #----------------------------------------------------------------------------}}}

@@ -6,17 +6,18 @@
                 .global Bootstrap_Launch
                 .global Bootstrap_FromR5
                 .global BootstrapEnd
+                .global BootstrapSize
+                .global BootstrapSizeWords
+                .global BootstrapSizeDWords
                 .global LoadingScreenPalette
 
                 .include "./hwdefs.s"
                 .include "./macros.s"
                 .include "./core_defs.s"
 
-                .equiv BootstrapSizeWords, (end - start) >> 1
-                .global BootstrapSizeWords
-
-                .equiv BootstrapSizeDWords, BootstrapSizeWords >> 1
-                .global BootstrapSizeDWords
+                .equiv BootstrapSize, (end - start)
+                .equiv BootstrapSizeWords, BootstrapSize >> 1
+                .equiv BootstrapSizeDWords, BootstrapSize >> 2
 
                 .=BootstrapStart
 start:
@@ -40,9 +41,10 @@ Bootstrap_Launch:
         # PPU will clear the command code when it ready to execute a new one
        .ppudo $PPU_NOP
 
+        #:bpt
         JSR  R5,@$PPEXEC
        .word FB1 # PPU module location
-       .word PPU_ModuleSizeWords
+       .word ppu_module_size >> 1
 #-------------------------------------------------------------------------------
      .ifdef ShowLoadingScreen
        .ppudo_ensure $PPU_SetPalette, $TitleScreenPalette
@@ -62,8 +64,11 @@ Bootstrap_Launch:
 
         # Load the game core - this is always in memory
         MOV  $core.bin,R0
+       .wait_ppu
         CALL Bootstrap_LoadDiskFile
-
+#       BCC  1$
+#      .inform_and_hang3 "core.bin loading error"
+#   10$:
         # TODO: Load saved settings
         # TODO: player sprites load
         # TODO: Initialize the Sound Effects.
@@ -114,9 +119,12 @@ Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
         CALL LevelReset0000
 
         MOV  $level_00.bin,R0
+       .wait_ppu
         CALL Bootstrap_LoadDiskFile
+        BCC  1$
+       .inform_and_hang3 "level_00.bin loading error"
 
-       .ppudo_ensure $PPU_SingleProcess
+1$:    .ppudo_ensure $PPU_SingleProcess
 
         MOV  $SPReset,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
@@ -129,12 +137,17 @@ Bootstrap_Level_Intro:
        .ppudo_ensure $PPU_SetPalette, $BlackPalette
         # TODO: load music Aku/BootStrap.asm:1185
         MOV  $ep1_intro.bin,R0
+       .wait_ppu
         CALL Bootstrap_LoadDiskFile
+        BCC  1$
+       .inform_and_hang3 "ep1_intro.bin loading error"
 
-        MOV  $ep1_intro_slides.bin,R0
+1$:     MOV  $ep1_intro_slides.bin,R0
         CALL Bootstrap_LoadDiskFile
+        BCC  2$
+       .inform_and_hang3 "ep1_intro_slides.bin loading error"
 
-       .ppudo_ensure $PPU_SingleProcess
+2$:    .ppudo_ensure $PPU_SingleProcess
         MOV  $SPReset,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
@@ -142,11 +155,13 @@ Bootstrap_Level_1: # ../Aku/BootStrap.asm:838  main menu --------------------
         CALL StartANewGame
         CALL LevelReset0000
 
-       .ppudo_ensure $PPU_SetPalette, $TitleScreenPalette
+       .ppudo_ensure $PPU_SetPalette, $BlackPalette
         MOV  $level_01.bin,R0
         CALL Bootstrap_LoadDiskFile
+        BCC  1$
+       .inform_and_hang3 "level_01.bin loading error"
 
-       .ppudo_ensure $PPU_SingleProcess
+1$:    .ppudo_ensure $PPU_SingleProcess
 
         MOV  $SPReset,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
@@ -369,13 +384,15 @@ Bootstrap_LoadDiskFile: # ---------------------------------------------------{{{
         CLR  R2     # R2 - most significant word
         MOV  R0,R3  # R3 - least significant word
         DIV  $20,R2 # quotient -> R2, remainder -> R3
-        MOVB R2,@$PS.AddressOnDevice     # track number
+        MOVB R2,@$PS.AddressOnDevice     # track number (0-79)
+
         CLR  R2
         DIV  $10,R2
         INC  R3
-        MOVB R3,@$PS.AddressOnDevice + 1 # sector
+        MOVB R3,@$PS.AddressOnDevice + 1 # sector (1-10)
+
         ASH  $7,R2
-        MOVB R2,@$PS.DeviceNumber        # head
+        MOVB R2,@$PS.DeviceNumber        # head (0, 1)
 
         MOVB $-1,@$PS.Status
         CLC
@@ -389,16 +406,32 @@ Bootstrap_LoadDiskFile: # ---------------------------------------------------{{{
 
         SOB  R1,1$          # Next byte
 
-3$:     TSTB @$PS.Status
+3$:     MOVB @$PS.Status,R0
+        TSTB R0
         BMI  3$
         BZE  1237$
-
+        # +------------------------------------------------------+
+        # | Код ответа |  Значение                               |
+        # +------------+-----------------------------------------+
+        # |     00     | Операция завершилась нормально          |
+        # |     01     | Ошибка контрольной суммы зоны данных    |
+        # |     02     | Ошибка контрольной суммы зоны заголовка |
+        # |     03     | Не найден адресный маркер               |
+        # |    100     | Дискета не отформатированна             |
+        # |    101     | Не обнаружен межсекторный промежуток    |
+        # |    102     | Не найден сектор с заданным номером     |
+        # |     04     | Не найден маркер данных                 |
+        # |     05     | Сектор на найден                        |
+        # |     06     | Защита от записи                        |
+        # |     07     | Нулевая дорожка не обнаружена           |
+        # |     10     | Дорожка не обнаружена                   |
+        # |     11     | Неверный массив параметров              |
+        # |     12     | Резерв                                  |
+        # |     13     | Неверный формат сектора                 |
+        # |     14     | Не найден индекс (ошибка линии ИНДЕКС)  |
+        # +------------------------------------------------------+
         SEC  # set carry flag to indicate that there was an error
         MOVB @$PS.Status,R0
-       .ppudo $PPU_Print, $LoadingErrorMsg
-        BR   .
-LoadingErrorMsg: .asciz "Loading error"
-       .even
 
 1237$:  RETURN
 
@@ -410,40 +443,59 @@ ParamsStruct:
     PS.Command:         .byte 010 # read data from disk
     PS.DeviceType:      .byte 02       # double sided disk
     PS.DeviceNumber:    .byte 0x00 | 0 # bit 7: head(0-bottom, 1-top) ∨ drive number 0(0-3)
-    PS.AddressOnDevice: .byte 0,1      # track 0(0-79), sector 1(1-10)
+    PS.AddressOnDevice: .byte 0, 1     # track 0(0-79), sector 1(1-10)
     PS.CPU_RAM_Address: .word 0
     PS.WordsCount:      .word 0        # number of words to transfer
 #----------------------------------------------------------------------------}}}
 
 # files related data --------------------------------------------------------{{{
+# each record is 3 words:
+#    address for the data from a disk
+#    words count to read from a disk
+#    starting block of a file
+
 ppu_module.bin:
-       .word FB1                 # address for the data from a disk
-       .word PPU_ModuleSizeWords # words count to read from a disk
-       .word PPUModuleBlockNum   # starting block of a file
+    .word FB1
+    .equiv ppu_module_size, 5642
+    .word ppu_module_size >> 1
+    .equiv ppu_module_block_num, 5
+    .word ppu_module_block_num
 loading_screen.bin:
-       .word FB1
-       .word 8000
-       .word LoadingScreenBlockNum
+    .word FB1
+    .equiv loading_screen_size, 16000
+    .word loading_screen_size >> 1
+    .equiv loading_screen_block_num, (ppu_module_size + 511) >> 9 + ppu_module_block_num
+    .word loading_screen_block_num
 core.bin:
-       .word FileBeginCore
-       .word FileSizeCoreWords
-       .word CoreBlockNum
+    .word FileBeginCore
+    .equiv core_size, 5876
+    .word core_size >> 1
+    .equiv core_block_num, (loading_screen_size + 511) >> 9 + loading_screen_block_num
+    .word core_block_num
 ep1_intro.bin:
-       .word Akuyou_LevelStart
-       .word Ep1IntroSizeWords
-       .word Ep1IntroBlockNum
+    .word Akuyou_LevelStart
+    .equiv ep1_intro_size, 15822
+    .word ep1_intro_size >> 1
+    .equiv ep1_intro_block_num, (core_size + 511) >> 9 + core_block_num
+    .word ep1_intro_block_num
 ep1_intro_slides.bin:
-       .word Ep1IntroSlidesStart
-       .word Ep1IntroSlidesSizeWords
-       .word Ep1IntroSlidesBlockNum
+    .word Ep1IntroSlidesStart
+    .equiv ep1_intro_slides_size, 9022
+    .word ep1_intro_slides_size >> 1
+    .equiv ep1_intro_slides_block_num, ep1_intro_block_num + (ep1_intro_size + 511) >> 9
+    .word ep1_intro_slides_block_num
 level_00.bin:
-       .word Akuyou_LevelStart
-       .word Level00SizeWords
-       .word Level00BlockNum
+    .word Akuyou_LevelStart
+    .equiv level_00_size, 10196
+    .word level_00_size >> 1
+    .equiv level_00_block_num, ep1_intro_slides_block_num + (ep1_intro_slides_size + 511) >> 9
+    .word level_00_block_num
 level_01.bin:
-       .word Akuyou_LevelStart
-       .word Level01SizeWords
-       .word Level01BlockNum
+    .word Akuyou_LevelStart
+    .equiv level_01_size, 7824
+    .word level_01_size >> 1
+    .equiv level_01_block_num, level_00_block_num + (level_00_size + 511) >> 9
+    .word level_01_block_num
 #----------------------------------------------------------------------------}}}
 
        .include "./ppucmd.s"
@@ -667,8 +719,6 @@ TitleScreenPalette: #--------------------------------------------------------{{{
                    #0         1         2         3         4         5         6         7
                    #01234567890123456789012345678901234567890123456789012345678901234567890123456789
        .even # PPU reads strings word by word, so align
-YahooStr:   .asciz "Yippee! Whoopee! Woo-hoo! Yay! Hurrah!\n"
-       .even
 TestStr: .byte 0,10
          .byte        '!,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F
          .byte 0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x3A,0x3B,0x3C,0x3D,0x3E,0x3F

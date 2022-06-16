@@ -56,7 +56,7 @@ DoMovesBackground_SetScroll2:
         # POP  R4                           #     pop ix
         # POP  R3                           #     pop hl
                                             #
-RETURN                                      # ret
+        RETURN                              # ret
 
 SetLevelTime: # This is used for jumping around the event stream # SetLevelTime:
         # Make sure level time is LOWER than the first event, otherwise run Event_GetEventsNow
@@ -80,7 +80,7 @@ SetLevelTime: # This is used for jumping around the event stream # SetLevelTime:
 
 EventStream_Init:
         # Store the address of our 2nd setting buffer (1st is contained in core)
-       #MOV  R3,@$srcEvent_SavedSettings # uknc/event_stream.s:621
+       #MOV  R3,@$srcEvent_SavedSettings # uknc/core/event_stream.s:621
         CLR  R0
         MOV  R0,@$srcEvent_MultipleEventCount # uknc/event_stream.s:493
         CALL @$SetLevelTime # uknc/event_stream.s:70 # does MOV (R3)+,@$srcEvent_NextEventTime
@@ -98,7 +98,6 @@ EventStream_Process:
        .equiv srcEvent_LevelSpeed, .+2 # how often ticks occur
         BIT  $0x04,@$srcTimer_TicksOccured
         BNZ  EventStream_ForceNow
-
         RETURN # no ticks occured
 
 EventStream_ForceNow:
@@ -110,7 +109,6 @@ Event_MoreEvents:
        .equiv srcEvent_NextEventTime, .+2 # The time the event should occur
         CMP  $0x01, @$srcEvent_LevelTime
         BEQ  Event_GetEventsNow
-
         RETURN # event does not happen yet
 
 Event_GetEventsNow: # ../SrcALL/Akuyou_Multiplatform_EventStream.asm:121
@@ -355,9 +353,9 @@ Event_AddToBackground:                                      # Event_AddBack_0111
                                                             #     rst 6
                                                             #     ld (Event_LevelSpeed_Plus1-1),a
                                                             #     ret
-                                                            #
-                                                            # ; we don't have a tile array - this does spikes in stage 7 and 8 - this can work
-                                                            # ; horiz or vert depending on scroll
+
+# we don't have a tile array - this does spikes in stage 7 and 8 - this can work
+# horiz or vert depending on scroll
                                                             # Event_ObjStrip:
                                                             #     ld d,(hl)   ;X
                                                             #     inc hl
@@ -406,7 +404,7 @@ Event_AddToBackground:                                      # Event_AddBack_0111
                                                             #     djnz Event_MultiObj
                                                             #     ret
 
-Event_OneObj: # Type 0 - one Obj
+Event_SingleSprite: # Type 0 - one Obj
         CMP  R1,$1                 # ld a,b
                                    # cp 1
         BEQ  Event_OneObjYOnly$    # jr z,Event_OneObjYOnly

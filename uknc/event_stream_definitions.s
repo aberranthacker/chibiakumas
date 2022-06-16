@@ -64,7 +64,6 @@
 # evtStarburt             equ %01000000 ; 0100xxxx X Y   = (64) add stars to X,Y
 #                                       ; (pattern xxxx) - is this ever used???
 #-------------------------------------------------------------------------------
-# .equiv evtCoreReprogram, 0x1E << 8 # 30
 # evtReprogramPalette     equ %11110000 ; Reprogram the CPC palette - no effect on
 #                                       ; other systems
 .equiv evtSetPalette, (0x20 * 2) << 8 # 64
@@ -100,14 +99,13 @@
                                                             # evtReprogramSmartBombSpecial      equ %11111111   ;Smart bomb event calls to w1... used by omega array to wipe omega stars
                                                             #
 # evtSingleSprite equ 0 ; Single sprite... multiple options depending on V
-#                       ; 0+0        add one object...sprite b1.. at pos (b2,b3)
-#                       ; 0+1        Add one sprite to pos b1 Far right (sprite predefined)
-#                       ; 0+(2-13)   add one 24 pixel object far right X=160+24 Y=v*16 -8 (sprite predefined)
+#                       ; 0+0      add one object, sprite b1, at pos (b2,b3)
+#                       ; 0+1      add one sprite to pos b1 far right (sprite predefined)
+#                       ; 0+(2-13) add one 24 pixel object far right X=160+24 Y=v*16 -8 (sprite predefined)
 .equiv evtSingleSprite, 0
-#
 # evtBurstSprite equ 14 ; Add an object to the burst position
-# evtTileSprite  equ 48 ; add  V objects... all on column b1 starting at row b2..
-#                       ; Spaced b3 apart vertically
+# evtTileSprite  equ 48 ; add V objects all on column b1 starting at row b2
+#                       ; spaced b3 apart vertically
 
 # Time,type,Sprite,XY (16 px precision)
 #
@@ -288,15 +286,15 @@
 #  3  7  38  39  3A  3B  3C  3D  3E  3F
 
                                 # mveMisc       equ 0 ;used for visual clarity!
-.equiv mveBackground,0b11000000 # 1100xxxx, ----xxxx tick point
-.equiv mveSeaker_P1, 0b10000100 # 0b100001xx
-.equiv mveSeaker_P2, 0b10010000 # 0b100100xx
-.equiv mveSeaker,    0b10001000 # 0b100010xx seek! I can't spel!
-.equiv mveWave,      0b10100000 # 1010xxxx Wave pattern
-.equiv mveCustom1,   0b11110000 # 1111xxxx Level specific 1
-.equiv mveCustom2,   0b11100000 # 1110xxxx Level specific 2
-.equiv mveCustom3,   0b11010000 # 1101xxxx Level specific 3
-.equiv mveCustom4,   0b10110000 # 1011xxxx Level specific 4
+.equiv mveBackground, 0b11000000 # 1100xxxx, ----xxxx tick point
+.equiv mveSeaker_P1,  0b10000100 # 0b100001xx
+.equiv mveSeaker_P2,  0b10010000 # 0b100100xx
+.equiv mveSeaker,     0b10001000 # 0b100010xx seek! I can't spel!
+.equiv mveWave,       0b10100000 # 1010xxxx Wave pattern
+.equiv mveCustom1,    0b11110000 # 1111xxxx Level specific 1
+.equiv mveCustom2,    0b11100000 # 1110xxxx Level specific 2
+.equiv mveCustom3,    0b11010000 # 1101xxxx Level specific 3
+.equiv mveCustom4,    0b10110000 # 1011xxxx Level specific 4
 
                              # lifCustom   equ 255       ; We use 63 as a marker for custom code's INIT -
                              #                           ; a real life will be set by the custom code

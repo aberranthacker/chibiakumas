@@ -1,6 +1,8 @@
 #!/usr/bin/ruby
 require 'optparse'
 
+BINARIES_INFO_FILENAME = 'binaries_info.txt'
+
 options = Struct.new(:in_filename, :out_filename, :binary, :brief).new
 OptionParser.new do |opts|
   opts.banner = "Usage: ruby aout_info.rb FILENAME"
@@ -57,10 +59,14 @@ unless options.brief
  puts "entry: #{a_entry} size: #{a_text - a_entry} ends: #{a_text}"
 end
 
-info = ''
 output_info = ''
 entry_updated = false
-info = File.read('build/binary_info.txt') if File.exists?('build/binary_info.txt')
+info = if File.exists?("build/#{BINARIES_INFO_FILENAME}")
+         File.read("build/#{BINARIES_INFO_FILENAME}")
+       else
+         ''
+       end
+
 info.each_line do |line|
   if line.include?(options.out_filename)
     output_info << "#{options.out_filename},#{a_entry},#{a_text - a_entry},#{a_text}\n"
@@ -72,7 +78,7 @@ end
 unless entry_updated
   output_info << "#{options.out_filename},#{a_entry},#{a_text - a_entry},#{a_text}\n"
 end
-File.write('build/binary_info.txt', output_info)
+File.write("build/#{BINARIES_INFO_FILENAME}", output_info)
 
 # the start of the text segment in the file is 20(8)
 text = if options.binary
@@ -133,5 +139,3 @@ out_filename = if options.out_filename
                end
 
 File.binwrite(out_filename, sav)
-
-puts
