@@ -65,8 +65,8 @@ DoMoves:
 
 DoMoves_Background: # Background sprites move much more slowly, and only in 1 direction
         MOV  R2,R0
-        BICB $0b11110000,R0 # ----XXXX tick point
-        ROLB R0
+        BIC  $0xFFF0,R0 # ----XXXX tick point
+        ASL  R0
         BITB R0,@$srcTimer_TicksOccured
         BNZ  1$
         RETURN
@@ -74,7 +74,7 @@ DoMoves_Background: # Background sprites move much more slowly, and only in 1 di
     1$: # it's time for a left move
        .equiv opcDoMovesBGShift, . # check Xpos
         DEC  R4 # X
-        CMP  R4, $160+24+24 # we are offscreen
+        CMP  R4, $24+160+24 # we are offscreen
         BHIS DoMoves_Kill # over the page
         RETURN
 
@@ -84,9 +84,9 @@ DoMoves_Spec: # Special moves - various kinds
         BNZ  1$
         RETURN
 
-        # R2 - LSB=Move, MSB=Sprite
+    1$: # R2 - LSB=Move, MSB=Sprite
         MOV  R2,R0
-    1$: BICB $0b00001111,R0
+        BICB $0b00001111,R0
         CMPB R0,$0b11000000 # 1100xxxx Background
         BEQ  DoMoves_Background
 

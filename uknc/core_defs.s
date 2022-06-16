@@ -16,12 +16,8 @@
   .equiv ShowLoadingScreen, 1
 .endif
 
-.equiv PPU_UserRamStart, 0x27B6 # 023666 10166
-.equiv PPU_UserRamSize,  0x5844 # 054104 22596
-.equiv PPU_UserRamSizeWords, PPU_UserRamSize >> 1 # 0x2C22 026042 11298
 .equiv PPU_PPUCommand,    PPUCommand >> 1
 .equiv PPU_PPUCommandArg, PPUCommandArg >> 1
-.equiv PPU_MusicBuffer, 0x3EF6 # 16118 037366 # auto-generated during a build
 
 .equiv PPU_NOP,            2
 .equiv PPU_Finalize,       4
@@ -42,7 +38,7 @@
 .equiv PPU_DebugPrintAt,  34
 .equiv PPU_LastJMPTableIndex, 34
 
-# memory map ------------------------------------------------------------------
+# CPU memory map ---------------------------------------------------------------
 .equiv FB0, 384 # 0600 0x0180
 .equiv FB_gap, FB0 + 16000
 .equiv FB1, FB_gap + 384
@@ -52,14 +48,28 @@
 
 .equiv Akuyou_GameVarsStart, FB1 + 16000
 
-.equiv Akuyou_LevelStart, 0xA002 # 40962 0120002 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9F4A # 40778 0117512 # auto-generated during a build
 .equiv LevelSprites, Akuyou_LevelStart + 4
 
 .equiv SPReset,       0157770 # Initial stack pointer
 .equiv storedSP,      0157772 # place where we store SP, in case if we need yet another register
 .equiv PPUCommand,    0157774 # command for PPU code
 .equiv PPUCommandArg, 0157776 # command for PPU argument
-# 0xE000 57344 0160000 end of ram ---------------------------------------------
+# 0160000 57344 0xE000 end of RAM ----------------------------------------------
+
+.equiv PPU_UserRamSize,  0054104 # 22596 0x5844 
+.equiv PPU_UserRamSizeWords, PPU_UserRamSize >> 1 # 0026042 11298 0x2C22
+# PPU memory map ---------------------------------------------------------------
+.equiv PPU_UserRamStart, 0023666 # 10166 0x27B6 
+
+.equiv PPU_StrBuffer, 0036666 # 15798 0x3DB6 # auto-generated during a build
+.equiv PPU_MusicBuffer, PPU_StrBuffer + 320
+
+.equiv PPU_UserProcessMetadataAddr, 0077772 # 32762 0x7FFA
+
+.equiv SLTAB, 0100000# 32768 0x8000
+.equiv OffscreenAreaAddr, 0140000 # 49152 0xC000
+#-------------------------------------------------------------------------------
 
 .equiv StarArraySize, 256
 .equiv ObjectArraySize, 60

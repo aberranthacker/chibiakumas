@@ -1,19 +1,18 @@
                .nolist
 
                .title Chibi Akumas PPU module
-               .global start # make the entry point available to a linker
 
-               .global MusicBuffer
+               .global start # make the entry point available to a linker
+               .global StrBuffer
+               .global PPU_ModuleSize
+               .global PPU_ModuleSizeWords
 
                .include "./macros.s"
                .include "./hwdefs.s"
                .include "./core_defs.s"
 
-               .global PPU_ModuleSizeWords
-               .equiv  PPU_ModuleSizeWords, (end - start) >> 1
-
-               .equiv SLTAB, 0x8000 # 0100000
-               .equiv OffscreenAreaAddr, 0140000 # 0xC000
+               .equiv  PPU_ModuleSize, (end - start)
+               .equiv  PPU_ModuleSizeWords, PPU_ModuleSize >> 1
 
                .=PPU_UserRamStart
 
@@ -172,7 +171,7 @@ SLTABInit:      MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
                 BIC  $0b100,R0
 
                 MOV  $0b10000,(R0)+  #--cursor settings, graphical cursor
-                MOV  $0b10111,(R0)+  #  320 dots per line, pallete 7
+                MOV  $0b10111,(R0)+  #  320 dots per line, palette 7
                 CLR  (R0)+           #  address of line 18
                 BIS  $0b110,R1       #  next record is 4-word, color settings
                 ADD  $8,R1           #  calculate address to next record
@@ -291,7 +290,8 @@ JMPTable:      .word EventLoop            # do nothing
 CommandExecuted: #-----------------------------------------------------------{{{
                 MOV  $PPU_PPUCommand, @$PBPADR
                 CLR  @$PBP12D        # inform CPU's program that we are done
-EventLoop:      TST  (PC)+; SingleProcessFlag: .word 0
+               .equiv SingleProcessFlag, .+2
+EventLoop:      TST  $0x00
                 BNZ  ShortLoop       # non-zero, flag is set, loop
 
                 MOV  $PGM, @$07124   # add to processes table
@@ -640,7 +640,7 @@ MusicStop: #-----------------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 
 VblankIntHandler: #----------------------------------------------------------{{{
-        MTPS $PR7
+       #MTPS $PR7
         MOV  @$PBPADR,-(SP)
         MOV  R5,-(SP)
         MOV  R4,-(SP)
@@ -673,7 +673,7 @@ MusicPlayerCall:
         BNZ  1237$   # continue rotation unless the counter reaches zero
         CALL @07132  # stop floppy drive spindle
 
-1237$:  MTPS $PR0
+1237$: #MTPS $PR0
         RTI
 #----------------------------------------------------------------------------}}}
 
@@ -753,6 +753,7 @@ Debug_PrintAt: #-------------------------------------------------------------{{{
         BR   Debug_Print
 #----------------------------------------------------------------------------}}}
 Debug_Print: #---------------------------------------------------------------{{{
+       #MTPS $PR7
         PUSH @$PASWCR
         # enable write-only direct access to the RAM above 0100000
     .if OffscreenAreaAddr < 0120000     # 0100000..0117777
@@ -856,6 +857,7 @@ Debug_NextString:
 
 Debug_DonePrinting:
         POP  @$PASWCR
+       #MTPS $PR0
         JMP  @$CommandExecuted
 #----------------------------------------------------------------------------}}}
 
@@ -1053,8 +1055,8 @@ SYS300:  .word 0175412 # address of default keyboard interrupt handler
 FBSLTAB: .word 0          # adrress of main screen SLTAB
 FirstLineAddress: .word 0 #
 
-StrBuffer:  .space 320
-MusicBuffer:
+StrBuffer:
+.equiv MusicBuffer, StrBuffer + 320
        .even
 end:
        .nolist

@@ -26,6 +26,7 @@
 
 require 'optparse'
 require_relative 'reverse_tables'
+require 'pry'
 
 options = Struct.new(:in_filename, :out_filename, :font).new
 
@@ -41,6 +42,8 @@ OptionParser.new do |opts|
     options.font = true
   end
 end.parse!
+
+puts options.in_filename
 
 def transform(sprite_words)
   [].tap do |words|
@@ -59,7 +62,7 @@ file = File.binread(options.in_filename)
 file = file[0x80, file.size - 0x80] if file[0].ord.zero?
 
 data_offset = file[4, 2].unpack1('v')
-header = []
+sprites_metadata = []
 
 0.step(data_offset - 6, 6).each.with_index do |i, idx|
   rec = {
@@ -74,14 +77,31 @@ header = []
 
   break if rec[:offset].zero?
 
-  header << rec
+  sprites_metadata << rec
 end
 
-diff = data_offset - (header.size * 6)
+sprites_metadata.each do |md|
+  ascii_8bit_sprite = file[md[:offset], md[:height] * md[:width]]
+  if md[:width] % 2 == 1
+    padded_sprite = ascii_8bit_sprite.unpack('C*')
+                                     .each_slice(md[:width])
+                                     .map { _1 << 0x00 }
+                                     .flatten
+                                     .pack('C*')
+
+    sprites_metadata.each.with_index do |metadata, idx|
+      metadata[:offset] += md[:height] if idx > md[:idx]
+    end
+    file[md[:offset], md[:height] * md[:width]] = padded_sprite
+    md[:width] += 1
+  end
+end
+
+diff = data_offset - (sprites_metadata.size * 6)
 
 new_file = ''
 
-header.each do |rec|
+sprites_metadata.each do |rec|
   values = rec.values_at(:height, :width, :y_offset, :settings, :offset)
   values[-1] = values[-1] - diff
 
@@ -90,7 +110,7 @@ end
 
 new_file = '' if options.font
 
-header.each do |md|
+sprites_metadata.each do |md|
   print "i: #{md[:idx].to_s.rjust(3, ' ')} "
   print "h: #{md[:height].to_s.rjust(3, ' ')} "
   print "w: #{md[:width].to_s.rjust(2, ' ')} "

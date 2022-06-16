@@ -17,10 +17,10 @@ build/chibiakumas.dsk : build_tools/build_dsk.rb \
                         build/ppu_module.bin \
                         build/loading_screen.bin \
                         build/core.bin \
-                        build/ep1-intro.bin \
-                        build/ep1-intro-slides.bin \
-                        build/level-00.bin \
-                        build/level-01.bin
+                        build/ep1_intro.bin \
+                        build/ep1_intro_slides.bin \
+                        build/level_00.bin \
+                        build/level_01.bin
 	build_tools/build_dsk.rb
 
 # build/bootsector.bin ------------------------------------------------------{{{
@@ -35,16 +35,16 @@ build/bootstrap.bin : build/bootstrap.o \
                       build/ppu.o \
                       build/loading_screen.bin \
                       build/core.o \
-                      build/level-00_menu.o \
-                      build/ep1-intro.o \
-                      build/ep1-intro-slides.o \
-                      build/level-01.o
+                      build/level_00_menu.o \
+                      build/ep1_intro.o \
+                      build/ep1_intro_slides.o \
+                      build/level_01.o
 	$(LD) -s -T linker_scripts/bootstrap.cmd \
 	      -R build/core.o \
-	      -R build/ep1-intro-slides.o \
-	      -R build/ep1-intro.o \
-	      -R build/level-00_menu.o \
-	      -R build/level-01.o \
+	      -R build/ep1_intro_slides.o \
+	      -R build/ep1_intro.o \
+	      -R build/level_00_menu.o \
+	      -R build/level_01.o \
 	      -R build/ppu.o
 	ruby build_tools/aout2sav.rb build/bootstrap.out -b -s -o build/bootstrap.bin
 # build/bootsrap ------------------------------------------------------------}}}
@@ -62,26 +62,26 @@ build/core.bin : build/core.o \
 build/loading_screen.bin : ../ResCPC/Old/T38-SC1.D01
 	ruby build_tools/convert_bitmap.rb
 
-build/level-00.bin : build/core.o \
-                     build/level-00_menu.o
-	$(LD) build/level-00_menu.o -R build/core.o -o build/level-00_menu.out -s
-	ruby build_tools/aout2sav.rb build/level-00_menu.out -b -s -o build/level-00.bin
+build/level_00.bin : build/core.o \
+                     build/level_00_menu.o
+	$(LD) build/level_00_menu.o -R build/core.o -o build/level_00_menu.out -s
+	ruby build_tools/aout2sav.rb build/level_00_menu.out -b -s -o build/level_00.bin
 
-build/ep1-intro.bin : build/core.o \
-                      build/ep1-intro.o \
-                      build/ep1-intro-slides.o
-	$(LD) build/ep1-intro.o -R build/core.o -R build/ep1-intro-slides.o -o build/ep1-intro.out -s
-	ruby build_tools/aout2sav.rb build/ep1-intro.out -b -s -o build/ep1-intro.bin
+build/ep1_intro.bin : build/core.o \
+                      build/ep1_intro.o \
+                      build/ep1_intro_slides.o
+	$(LD) build/ep1_intro.o -R build/core.o -R build/ep1_intro_slides.o -o build/ep1_intro.out -s
+	ruby build_tools/aout2sav.rb build/ep1_intro.out -b -s -o build/ep1_intro.bin
 
-build/ep1-intro-slides.bin : build/ep1-intro-slides.o
-	$(LD) build/ep1-intro-slides.o -o build/ep1-intro-slides.out -s
-	ruby build_tools/aout2sav.rb build/ep1-intro-slides.out -b -s -o build/ep1-intro-slides.bin
+build/ep1_intro_slides.bin : build/ep1_intro_slides.o
+	$(LD) build/ep1_intro_slides.o -o build/ep1_intro_slides.out -s
+	ruby build_tools/aout2sav.rb build/ep1_intro_slides.out -b -s -o build/ep1_intro_slides.bin
 
-build/level-01.bin : build/core.o \
-                     build/level-01.o \
+build/level_01.bin : build/core.o \
+                     build/level_01.o \
                      build/ep1_level_music.bin
-	$(LD) build/level-01.o -R build/core.o -o build/level-01.out -s
-	ruby build_tools/aout2sav.rb build/level-01.out -b -s -o build/level-01.bin
+	$(LD) build/level_01.o -R build/core.o -o build/level_01.out -s
+	ruby build_tools/aout2sav.rb build/level_01.out -b -s -o build/level_01.bin
 
 build/bootsector.o : $(common) \
                      bootsector.s
@@ -121,15 +121,15 @@ build/ppu.o : $(common) \
               resources/font.raw \
               resources/cga8x8b.raw
 	$(AS) ppu.s -al -o build/ppu.o | build_tools/format_list.rb
-	build_tools/music_buffer_update.rb
+	build_tools/ppu_str_buffer_update.rb
 
-# level-00_menu.o ----------------------------------------------------------{{{
-build/level-00_menu.o : $(common) \
-                        level-00_menu.s \
+# level_00_menu.o ----------------------------------------------------------{{{
+build/level_00_menu.o : $(common) \
+                        level_00_menu.s \
                         resources/titletex.spr \
                         resources/menu_cursor.spr \
                         build/ep1_title_music.bin
-	$(AS) -al level-00_menu.s -o build/level-00_menu.o
+	$(AS) -al level_00_menu.s -o build/level_00_menu.o
 
 resources/titletex.spr : build_tools/spr_cpc_to_uknc.rb \
 	                 ../Aku/Sprites/TITLETEX.SPR
@@ -138,12 +138,12 @@ resources/titletex.spr : build_tools/spr_cpc_to_uknc.rb \
 resources/menu_cursor.spr : build_tools/bmp_to_uknc_raw.rb \
                             resources/menu_cursor-Sheet.bmp
 	build_tools/bmp_to_uknc_raw.rb
-# level-00_menu.o -----------------------------------------------------------}}}
+# level_00_menu.o -----------------------------------------------------------}}}
 
-# ep1-intro.o ---------------------------------------------------------------{{{
-build/ep1-intro.o : $(common) \
-                    ep1-intro.s \
-                    resources/ep1-intro.spr \
+# ep1_intro.o ---------------------------------------------------------------{{{
+build/ep1_intro.o : $(common) \
+                    ep1_intro.s \
+                    resources/ep1_intro.spr \
                     build/ep1_intro_music.bin \
                     build/ep1-intro/ep1-intro-slide01.raw.lzsa1 \
                     build/ep1-intro/ep1-intro-slide02.raw.lzsa1 \
@@ -153,9 +153,9 @@ build/ep1-intro.o : $(common) \
                     build/ep1-intro/ep1-intro-slide06.raw.lzsa1 \
                     build/ep1-intro/ep1-intro-slide07.raw.lzsa1 \
                     build/ep1-intro/ep1-intro-slide08.raw.lzsa1
-	$(AS) -al ep1-intro.s -o build/ep1-intro.o
+	$(AS) -al ep1_intro.s -o build/ep1_intro.o
 
-build/ep1-intro-slides.o : ep1-intro-slides.s \
+build/ep1_intro_slides.o : ep1_intro_slides.s \
                            build/ep1-intro/ep1-intro-slide09.raw.lzsa1 \
                            build/ep1-intro/ep1-intro-slide10.raw.lzsa1 \
                            build/ep1-intro/ep1-intro-slide11.raw.lzsa1 \
@@ -163,27 +163,27 @@ build/ep1-intro-slides.o : ep1-intro-slides.s \
                            build/ep1-intro/ep1-intro-slide13.raw.lzsa1 \
                            build/ep1-intro/ep1-intro-slide14.raw.lzsa1 \
                            build/ep1-intro/ep1-intro-slide15.raw.lzsa1
-	$(AS) -al ep1-intro-slides.s -o build/ep1-intro-slides.o
-# ep1-intro.o ---------------------------------------------------------------}}}
+	$(AS) -al ep1_intro_slides.s -o build/ep1_intro_slides.o
+# ep1_intro.o ---------------------------------------------------------------}}}
 
-# level-01.o ----------------------------------------------------------------{{{
-build/level-01.o : $(common) \
-                   level-01.s \
+# level_01.o ----------------------------------------------------------------{{{
+build/level_01.o : $(common) \
+                   level_01.s \
                    background_quad_sprite.s \
                    background_bit_shifter.s \
                    background_get_sprite_mem_pos.s \
 		   resources/level01.spr \
-		   resources/level01-tiles.spr
-	$(AS) -al level-01.s -o build/level-01.o | build_tools/format_list.rb
+		   resources/level01_tiles.spr
+	$(AS) -al level_01.s -o build/level_01.o | build_tools/format_list.rb
 
 resources/level01.spr : build_tools/spr_cpc_to_uknc.rb \
                         ../ResCPC/LEVEL1A.SPR
 	build_tools/spr_cpc_to_uknc.rb ../ResCPC/LEVEL1A.SPR -o resources/level01.spr
 
-resources/level01-tiles.spr : build_tools/spr_cpc_to_uknc.rb \
+resources/level01_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
 	                      ../ResCPC/Level01-Tiles.SPR
-	build_tools/spr_cpc_to_uknc.rb ../ResCPC/Level01-Tiles.SPR -o resources/level01-tiles.spr
-# level-01.o ----------------------------------------------------------------}}}
+	build_tools/spr_cpc_to_uknc.rb ../ResCPC/Level01-Tiles.SPR -o resources/level01_tiles.spr
+# level_01.o ----------------------------------------------------------------}}}
 
 resources/font.raw : build_tools/spr_cpc_to_uknc.rb \
 	             ../ResCPC/font.bin
@@ -238,9 +238,9 @@ build/ep1_level_music.formatted.s : build_tools/format_song.rb \
 	build_tools/format_song.rb music/ep1_level_music.s  build/ep1_level_music.formatted.s
 # ep1_level_music.bin -------------------------------------------------------}}}
 
-resources/ep1-intro.spr : build_tools/spr_cpc_to_uknc.rb \
+resources/ep1_intro.spr : build_tools/spr_cpc_to_uknc.rb \
 	                  ../ResCPC/LEVEL252A.SPR
-	build_tools/spr_cpc_to_uknc.rb ../ResCPC/LEVEL252A.SPR -o resources/ep1-intro.spr
+	build_tools/spr_cpc_to_uknc.rb ../ResCPC/LEVEL252A.SPR -o resources/ep1_intro.spr
 
 build/ep1-intro/ep1-intro-slide01.raw.lzsa1: resources/ep1-intro-slides-1.raw
 	ruby build_tools/build_intro_slides.rb

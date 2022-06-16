@@ -6,15 +6,17 @@
                .include "./event_stream_definitions.s"
 
                .global start # make the entry point available to a linker
-
-               .equiv  Ep1IntroSizeWords, (end - start) >> 1
+               .global Ep1IntroSize
                .global Ep1IntroSizeWords
+
+               .equiv  Ep1IntroSize, (end - start)
+               .equiv  Ep1IntroSizeWords, Ep1IntroSize >> 1
 
                .=Akuyou_LevelStart
 
 start:
         JMP  @$LevelInit
-       .incbin "resources/ep1-intro.spr"
+       .incbin "resources/ep1_intro.spr"
 IntroMusic:
        .incbin "build/ep1_intro_music.bin"
 

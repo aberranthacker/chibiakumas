@@ -246,7 +246,7 @@ TranspColors: .byte 0x00 # 0b00000000
 #     defb &21,&09,&0C,&0F,&27,&3F,&3C,&39,&61,&49,&4c,&4f,&67,&7f,&7c,&79
 
 Event_VectorArray:
-       .word Event_OneObj                      # 0x00 0x00  evtSingleSprite
+       .word Event_SingleSprite                # 0x00 0x00  # defw Event_OneObj
        .word Event_MultiObj_NotImplemented     # 0x01 0x02  # defw Event_MultiObj
        .word Event_ObjColumn_NotImplemented    # 0x02 0x04  # defw Event_ObjColumn
        .word Event_ObjStrip_NotImplemented     # 0x03 0x06  # defw Event_ObjStrip
@@ -301,43 +301,43 @@ Event_VectorArray:
 null:   RETURN
 
 Event_MultiObj_NotImplemented:
-    .inform_and_hang "Event_MultiObj_NotImplemented"
+    .inform_and_hang "no Event_MultiObj"
 Event_ObjColumn_NotImplemented:
-    .inform_and_hang "Event_ObjColumn_NotImplemented"
+    .inform_and_hang "no Event_ObjColumn"
 Event_ObjStrip_NotImplemented:
-    .inform_and_hang "Event_ObjStrip_NotImplemented"
+    .inform_and_hang "no Event_ObjStrip"
 Event_StarBurst_NotImplemented:
-    .inform_and_hang "Event_StarBurst_NotImplemented"
+    .inform_and_hang "no Event_StarBurst"
 Event_CoreSaveLoadSettings2_NotImplemented:
-    .inform_and_hang "Event_CoreSaveLoadSettings2_NotImplemented"
+    .inform_and_hang "no Event_CoreSaveLoadSettings2"
 Event_SpriteSwitch_0101_NotImplemented:
-    .inform_and_hang "Event_SpriteSwitch_0101_NotImplemented"
+    .inform_and_hang "no Event_SpriteSwitch"
 Event_ClearPowerups_NotImplemented:
-    .inform_and_hang "Event_ClearPowerups_NotImplemented"
+    .inform_and_hang "no Event_ClearPowerups"
 Event_ChangeStreamSpeed_1100_NotImplemented:
-    .inform_and_hang "Event_ChangeStreamSpeed_1100_NotImplemented"
+    .inform_and_hang "no Event_ChangeStreamSpeed"
 Event_CoreReprogram_AnimatorPointer_NotImplemented:
-    .inform_and_hang "Event_CoreReprogram_AnimatorPointer_NotImplemented"
+    .inform_and_hang "no Event_CoreReprogram_AnimatorPointer"
 Event_CoreReprogram_ObjectHitHandler_NotImplemented:
-    .inform_and_hang "Event_CoreReprogram_ObjectHitHandler_NotImplemented"
+    .inform_and_hang "no Event_CoreReprogram_ObjectHitHandler"
 Event_CoreReprogram_ShotToDeath_NotImplemented:
-    .inform_and_hang "Event_CoreReprogram_ShotToDeath_NotImplemented"
+    .inform_and_hang "no Event_CoreReprogram_ShotToDeath"
 Event_CoreReprogram_PowerupSprites_NotImplemented:
-    .inform_and_hang "Event_CoreReprogram_PowerupSprites_NotImplemented"
+    .inform_and_hang "no Event_CoreReprogram_PowerupSprites"
 Event_CustomProgram1_NotImplemented:
-    .inform_and_hang "Event_CustomProgram1_NotImplemented"
+    .inform_and_hang "no Event_CustomProgram1"
 Event_CustomProgram2_NotImplemented:
-    .inform_and_hang "Event_CustomProgram2_NotImplemented"
+    .inform_and_hang "no Event_CustomProgram2"
 Event_CustomPlayerHitter_NotImplemented:
-    .inform_and_hang "Event_CustomPlayerHitter_NotImplemented"
+    .inform_and_hang "no Event_CustomPlayerHitter"
 Event_CustomSmartBomb_NotImplemented:
-    .inform_and_hang "Event_CustomSmartBomb_NotImplemented"
+    .inform_and_hang "no Event_CustomSmartBomb"
 Event_ReprogramObjectBurstPosition_NotImplemented:
-    .inform_and_hang "Event_ReprogramObjectBurstPosition_NotImplemented"
+    .inform_and_hang "no Event_ReprogramObjectBurstPosition"
 Event_ObjectFullCustomMoves_NotImplemented:
-    .inform_and_hang "Event_ObjectFullCustomMoves_NotImplemented"
+    .inform_and_hang "no Event_ObjectFullCustomMoves"
 Event_SmartBombSpecial_NotImplemented:
-    .inform_and_hang "Event_SmartBombSpecial_NotImplemented"
+    .inform_and_hang "no Event_SmartBombSpecial"
 
         # read "../SrcALL/Akuyou_Multiplatform_AkuCommandVectorArray.asm"
         # read "../SrcCPC/Akuyou_CPC_BankSwapper.asm"
@@ -346,6 +346,15 @@ Event_SmartBombSpecial_NotImplemented:
 
        .include "core/do_moves.s"
        .global DoMoves
+       .global Object_DecreaseLifeShot
+       .global dstCustomShotToDeathCall
+       .global dstObjectDoMovesOverride
+       .global dstObjectShotOverride
+       .global srcFireFrequencyA
+       .global srcFireFrequencyB
+       .global srcFireFrequencyC
+       .global srcFireFrequencyD
+       .global srcFireFrequencyE
 
        .include "core/event_stream.s"
        .global DoMovesBackground_SetScroll

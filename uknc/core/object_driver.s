@@ -105,7 +105,7 @@ ObjectArray_NextObject:                                     # ObjectArray_Turbo:
         PUSH R4                                             #     ld a,c
         PUSH R5                                             #     ld (SprShow_Y),a
                                                             #     push bc
-#:bpt                                                       #     push hl
+                                                            #     push hl
         MOVB R1,@$srcSprShow_Y # Y                          #     ;1
         SWAB R1                                             #         inc h
         MOVB R1,@$srcSprShow_X # X                          #         ld a,(hl) ; X
@@ -323,7 +323,6 @@ ObjectLoopBothPlayerSkip:                                   # ObjectLoopBothPlay
 
 ObjectLoopP1StarSkip: # ObjectLoopP1StarSkip:
         BR   ObjectLoop_NotShot$          # jr $+10 :ObjectLoop_IFShot_Plus1 ; 18 08 = JR 8
-       .global dstObjectShotOverride
        .equiv  dstObjectShotOverride, .+2
         CALL @$Object_DecreaseLifeShot    # call Object_DecreaseLifeShot :ObjectShotOverride_Plus2 ;3 bytes
                                           # ld a,8                             ;2 bytes
@@ -333,7 +332,6 @@ ObjectLoop_NotShot$:                                        # ObjectLoop_NotShot
         # we did SWAB to extract sprite number, now swapping bytes back
         # DoMoves expects move to be in R2 LSB
         SWAB R2                              #         ld d,ixh
-       .global dstObjectDoMovesOverride
        .equiv  dstObjectDoMovesOverride, .+2
         CALL @$DoMoves                       #         call DoMoves :ObjectDoMovesOverride_Plus2
                                              #         ld ixh,d
@@ -359,7 +357,7 @@ ObjectLoop_SaveChanges$:
         MOVB R1,-(R5) # Y             # ld (hl),c ;Y
                                       #
                                       # ld a,iyl
-        BIT  R3,$0xFF00               # or a
+        BIC  $0x00FF,R3               # or a
        .call NZ,@$ObjectProgram       # call nz, ObjectProgram
                                       #
 ObjectLoop_ShowSprite:
@@ -597,13 +595,13 @@ ObjectAnimator:                                             # ObjectAnimator:
 # ObjectAnimator end --------------------------------------------------------}}}
 
 ObjectProgram:
-                                            # ret z       ; return if zero
+        SWAB R3 # MSB=Program, LSB=0        # ret z       ; return if zero
         CMP  R3,$0b00000001                 # cp %00000001
         BNE  1$                             # ; Used by background, sprite bank based on X co-ord
         JMP  @$ObjectProgram_BitShiftSprite # jp z,ObjectProgram_BitShiftSprite
 1$:                                         # and %11111000           ;00000XXX = Powerup
                                             # jr z,ObjectProgram_PowerUps
-       #.inform_and_hang "ObjectProgram not implemented"
+        .inform_and_hang "ObjectProgram not implemented"
                                             # cp %11110000            ;11110XXX = Animate every X frames
                                             # jp z,ObjectProgram_FrameAnimate
                                             # and %11100000
@@ -705,15 +703,10 @@ ObjectProgram:
 # Every other X column uses an alternate sprite - for background anim ----------
 ObjectProgram_BitShiftSprite:
                                 # ld a,b
-       #MOVB R4,@$srcSprShow_X  # ld (SprShow_X),a ; Makesure sprite pos is updated for Domoves
+       #MOV  R4,@$srcSprShow_X  # ld (SprShow_X),a ; Makesure sprite pos is updated for Domoves
                                 # bit 0,b ;2 pixel
         RETURN                  # ret
 
-       .global srcFireFrequencyA
-       .global srcFireFrequencyB
-       .global srcFireFrequencyC
-       .global srcFireFrequencyD
-       .global srcFireFrequencyE
 ObjectProgram_SnailFire:               # ObjectProgram_SnailFire:
        .equiv  srcFireFrequencyA, .+2
         MOV  $0b00010000,R0            #     ld a,%00010000  :FireFrequencyA_Plus1
@@ -773,7 +766,6 @@ ObjectProgram_Fire:                    # ObjectProgram_Fire:
                                                  # Object_DecreaseShot_Player2:
                                                  #     ld iy,Player_Array2
                                                  #     jr Object_DecreaseShot_Start
-       .global Object_DecreaseLifeShot
 Object_DecreaseLifeShot:                         #  Object_DecreaseLifeShot:
         .inform_and_hang "no Object_DecreaseLifeShot"
                                                  #     ld a,ixl
@@ -809,7 +801,6 @@ Object_DecreaseLifeShot:                         #  Object_DecreaseLifeShot:
                                                  #     pop bc
                                                  # Object_DecreaseShotToDeathB:
                                                  #     ;object has been shot to death
-       .global dstCustomShotToDeathCall
        .equiv  dstCustomShotToDeathCall, .+2
         CALL @$null                              #     call null :CustomShotToDeathCall_Plus2
                                                  #

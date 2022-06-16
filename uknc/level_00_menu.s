@@ -6,9 +6,11 @@
                .include "./event_stream_definitions.s"
 
                .global start # make entry point available to a linker
-
-               .equiv  Level00SizeWords, (end - start) >> 1
+               .global Level00Size
                .global Level00SizeWords
+
+               .equiv  Level00Size, (end - start)
+               .equiv  Level00SizeWords, Level00Size >> 1
 
                .=Akuyou_LevelStart
 
@@ -375,7 +377,7 @@ ShowKeysBitmap: # -----------------------------------------------------------{{{
 
         MOV  $ScanCodeStr+2,R1
         CALL @$NumToStr
-       .ppudo_ensure $PPU_PrintAt,$ScanCodeStr
+       .ppudo_ensure $PPU_DebugPrintAt, $ScanCodeStr
         MOV  (SP)+,R5
         MOV  (SP)+,R3
         MOV  (SP)+,R2
@@ -404,7 +406,7 @@ NumToStr: #------------------------------------------------------------------{{{
         RETURN
 #----------------------------------------------------------------------------}}}
 ScanCodeStr:
-        .byte 0,0
+        .byte 0,4
         .asciz "76543210"
         .even
 #----------------------------------------------------------------------------}}}

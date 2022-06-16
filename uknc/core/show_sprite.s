@@ -308,8 +308,10 @@ SprDrawLnStartBegin: #------------------------------------------------------{{{
        .equiv srcSprShow_DrawWidth, .+2
         MOV  $0x00,R1
         ASR  R1
-
    .if DebugMode
+   #    BNZ  dst_check$
+   #   .inform_and_hang "SprDrawLn line to draw is 0" 
+   #dst_check$:
         CMP  R5,$0077777
         BLOS SprDraw_PixelLoop$
        .inform_and_hang "SprDrawLn: dst out of FB"
@@ -421,9 +423,8 @@ SprDrawChooseRender: # Pick the render based on width
 
         # ********** A MUST BE the transparent byte for THIS WHOLE LOOP! ***********
 
-# draw chain {{{
     SprDraw24pxVer_Double$:                                 # SprDraw24pxVer_Double:  ;Line doubler - does two nextlines each time
-        BIT  $1,R2                                          #         bit 0,C
+        BIT  $0,R2                                          #         bit 0,C
         BNZ  SprDraw24pxVer$                                #         jp z,SprDrawTurbo_LineSkip
         ADD  $6,R5
         BR   SprDrawTurbo_LineSkip$                         #         jp SprDraw24pxVer
@@ -453,7 +454,6 @@ SprDrawChooseRender: # Pick the render based on width
         MOV  (R4)+,(R5)+
     SprDraw8pxVer$:
         MOV  (R4)+,(R5)+
-# }}}
     SprDrawTurbo_LineSkip$:
         DEC  R2
         BZE  SprDrawTurbo_Done$
@@ -472,7 +472,6 @@ SprDrawChooseRenderLineDoublerPset:
         MOV  $opcSOBToEndOfPsetDrawChain+20,@$SprDrawPset_SOB$
         BR   SprDrawPset_Double$
 
-#:bpt
 SprDrawChooseRenderPset:
         MOV  @$srcSprShow_DrawWidth,R1
 

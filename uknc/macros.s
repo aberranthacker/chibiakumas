@@ -32,6 +32,24 @@
    .even
 .endm
 
+.macro .inform_and_hang2 str
+   .wait_ppu
+   .ppudo $PPU_DebugPrintAt, $.+14
+    BR   .
+   .byte 0,2
+   .asciz "\str"
+   .even
+.endm
+
+.macro .inform_and_hang3 str
+   .wait_ppu
+   .ppudo $PPU_DebugPrintAt, $.+14
+    BR   .
+   .byte 0,3
+   .asciz "\str"
+   .even
+.endm
+
 # generic macros
 .macro call addr
     JSR  PC,\addr
