@@ -1,6 +1,8 @@
 AS=~/opt/binutils-pdp11/pdp11-dec-aout/bin/as
 LD=~/opt/binutils-pdp11/pdp11-dec-aout/bin/ld
 # 2.38
+MAKEFLAGS += --silent --jobs
+LDFLAGS += --strip-all
 
 .SUFFIXES:
 .SUFFIXES: .s .o
@@ -26,7 +28,7 @@ build/chibiakumas.dsk : build_tools/build_dsk.rb \
 # build/bootsector.bin ------------------------------------------------------{{{
 build/bootsector.bin : build/bootsector.o \
                        build/bootstrap.o
-	$(LD) -T linker_scripts/bootsector.cmd -R build/bootstrap.o -s
+	$(LD) $(LDFLAGS) -T linker_scripts/bootsector.cmd -R build/bootstrap.o
 	chmod -x build/bootsector.bin
 # build/bootsector.bin ------------------------------------------------------}}}
 
@@ -39,7 +41,8 @@ build/bootstrap.bin : build/bootstrap.o \
                       build/ep1_intro.o \
                       build/ep1_intro_slides.o \
                       build/level_01.o
-	$(LD) -s -T linker_scripts/bootstrap.cmd \
+	$(LD) $(LDFLAGS) \
+	      -T linker_scripts/bootstrap.cmd \
 	      -R build/core.o \
 	      -R build/ep1_intro_slides.o \
 	      -R build/ep1_intro.o \
@@ -51,12 +54,12 @@ build/bootstrap.bin : build/bootstrap.o \
 
 build/ppu_module.bin : build/ppu.o \
                        build/core.o
-	$(LD) -T linker_scripts/ppu.cmd -R build/core.o -s
+	$(LD) $(LDFLAGS) -T linker_scripts/ppu.cmd -R build/core.o
 	ruby build_tools/aout2sav.rb build/ppu.out -b -s -o build/ppu_module.bin
 
 build/core.bin : build/core.o \
                  build/bootstrap.o
-	$(LD) build/core.o -o build/core.out -R build/bootstrap.o -s
+	$(LD) $(LDFLAGS) build/core.o -o build/core.out -R build/bootstrap.o
 	ruby build_tools/aout2sav.rb build/core.out -b -s -o build/core.bin
 
 build/loading_screen.bin : ../ResCPC/Old/T38-SC1.D01
@@ -64,23 +67,27 @@ build/loading_screen.bin : ../ResCPC/Old/T38-SC1.D01
 
 build/level_00.bin : build/core.o \
                      build/level_00_menu.o
-	$(LD) build/level_00_menu.o -R build/core.o -o build/level_00_menu.out -s
+	$(LD) $(LDFLAGS) build/level_00_menu.o -R build/core.o -o build/level_00_menu.out
 	ruby build_tools/aout2sav.rb build/level_00_menu.out -b -s -o build/level_00.bin
 
 build/ep1_intro.bin : build/core.o \
                       build/ep1_intro.o \
                       build/ep1_intro_slides.o
-	$(LD) build/ep1_intro.o -R build/core.o -R build/ep1_intro_slides.o -o build/ep1_intro.out -s
+	$(LD) $(LDFLAGS) \
+	      build/ep1_intro.o \
+	      -R build/core.o \
+	      -R build/ep1_intro_slides.o \
+	      -o build/ep1_intro.out
 	ruby build_tools/aout2sav.rb build/ep1_intro.out -b -s -o build/ep1_intro.bin
 
 build/ep1_intro_slides.bin : build/ep1_intro_slides.o
-	$(LD) build/ep1_intro_slides.o -o build/ep1_intro_slides.out -s
+	$(LD) $(LDFLAGS) build/ep1_intro_slides.o -o build/ep1_intro_slides.out
 	ruby build_tools/aout2sav.rb build/ep1_intro_slides.out -b -s -o build/ep1_intro_slides.bin
 
 build/level_01.bin : build/core.o \
                      build/level_01.o \
                      build/ep1_level_music.bin
-	$(LD) build/level_01.o -R build/core.o -o build/level_01.out -s
+	$(LD) $(LDFLAGS) build/level_01.o -R build/core.o -o build/level_01.out
 	ruby build_tools/aout2sav.rb build/level_01.out -b -s -o build/level_01.bin
 
 build/bootsector.o : $(common) \
