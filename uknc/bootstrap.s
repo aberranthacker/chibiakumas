@@ -119,7 +119,6 @@ Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
         CALL LevelReset0000
 
         MOV  $level_00.bin,R0
-       .wait_ppu
         CALL Bootstrap_LoadDiskFile
         BCC  1$
        .inform_and_hang3 "level_00.bin loading error"
@@ -137,7 +136,6 @@ Bootstrap_Level_Intro:
        .ppudo_ensure $PPU_SetPalette, $BlackPalette
         # TODO: load music Aku/BootStrap.asm:1185
         MOV  $ep1_intro.bin,R0
-       .wait_ppu
         CALL Bootstrap_LoadDiskFile
         BCC  1$
        .inform_and_hang3 "ep1_intro.bin loading error"
@@ -468,13 +466,13 @@ loading_screen.bin:
     .word loading_screen_block_num
 core.bin:
     .word FileBeginCore
-    .equiv core_size, 5876
+    .equiv core_size, 5996
     .word core_size >> 1
     .equiv core_block_num, (loading_screen_size + 511) >> 9 + loading_screen_block_num
     .word core_block_num
 ep1_intro.bin:
     .word Akuyou_LevelStart
-    .equiv ep1_intro_size, 15822
+    .equiv ep1_intro_size, 15824
     .word ep1_intro_size >> 1
     .equiv ep1_intro_block_num, (core_size + 511) >> 9 + core_block_num
     .word ep1_intro_block_num
@@ -492,7 +490,7 @@ level_00.bin:
     .word level_00_block_num
 level_01.bin:
     .word Akuyou_LevelStart
-    .equiv level_01_size, 7824
+    .equiv level_01_size, 8300
     .word level_01_size >> 1
     .equiv level_01_block_num, level_00_block_num + (level_00_size + 511) >> 9
     .word level_01_block_num
