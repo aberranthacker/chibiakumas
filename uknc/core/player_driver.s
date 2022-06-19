@@ -1,212 +1,217 @@
 
-                                                            # ;*****************************************************************************;
-                                                            # ;*                              player Handler                               *;
-                                                            # ;*****************************************************************************;
-                                                            #
-                                                            # Player_GetHighscore:
-                                                            #     ld hl,HighScoreBytes
-                                                            #     ret
-Player_GetPlayerVars:                                       # Player_GetPlayerVars:
-        MOV  $Player_Array,R5                               #     ld iy,Player_Array
-        RETURN                                              # ret
-                                                            #     ; iy = Pointer to player vars
-NoSpend:                                                    # NoSpend:
-        MOV  R0,@$srcSpendTimeout                           #     ld (SpendTimeout_Plus1-1),a
-        RETURN                                              # ret
-                                                            #
-SpendCheck:                                                 # SpendCheck:
-        MOV  $1,R0; SpendTimeout_Plus2:                     #     ld a,1:SpendTimeout_Plus1   ;Dont let player continue right away!
-       .equiv  srcSpendTimeout, SpendTimeout_Plus2 - 2
-        DEC  R0                                             #     dec a
-        BNE  NoSpend                                        #     jr nz,NoSpend
-                                                            #
-        # TODO:                                             #     ld a, ixl ; read the keymap
-                                                            #     or Keymap_AnyFire
-        INC  R0                                             #     inc a
-        BNE  SpendCredit                                    #     ret z
-        RETURN                                              #
-SpendCredit:                                                # SpendCredit:
-         PUSH R5                                            #     push iy
+# *****************************************************************************
+# *                              player Handler                               *
+# *****************************************************************************
+                                        #
+                                        # Player_GetHighscore:
+                                        #     ld hl,HighScoreBytes
+                                        #     ret
+Player_GetPlayerVars:                   # Player_GetPlayerVars:
+        MOV  $Player_Array,R5           #     ld iy,Player_Array
+        RETURN                          # ret
+                                        #     ; iy = Pointer to player vars
+NoSpend:                                # NoSpend:
+        MOV  R0,@$srcSpendTimeout       #     ld (SpendTimeout_Plus1-1),a
+        RETURN                          # ret
+                                        #
+SpendCheck:                             # SpendCheck:
+       .equiv srcSpendTimeout, .+2
+        MOV  $1,R0                      #     ld a,1:SpendTimeout_Plus1   ;Dont let player continue right away!
+        DEC  R0                         #     dec a
+        BNE  NoSpend                    #     jr nz,NoSpend
+                                        #
+        # TODO:                         #     ld a, ixl ; read the keymap
+                                        #     or Keymap_AnyFire
+        INC  R0                         #     inc a
+        BNE  SpendCredit                #     ret z
+        RETURN                          #
+SpendCredit:                            # SpendCredit:
+         PUSH R5                        #     push iy
          SpendCreditSelfMod:
-             MOV  $Player_Array,R5                          # SpendCreditSelfMod: ld iy,Player_Array ; All credits are (currently) stored in player 1's var!
-         MOVB 5(R5),R0                                      #         ld a,(iy+5)
-         DECB R0                                            #         sub 1
-         POP  R4                                            #     pop ix
-         BMI  1$                                            #     ret c ;no credits left!
-         MOVB R0,5(R5)                                      #     ld (iy+5),a
-                                                            #
-                                                            #     ld a,3
-         MOVB $3,9(R4) # lives                              #     ld (ix+9),a
-                                                            #     ld a,(SmartbombsReset)
-         MOVB @$SmartBombsReset,3(R4)                       #     ld (ix+3),a
-1$:      RETURN                                             # ret
-                                                            #
-Players_Dead:                                               # Players_Dead:       ;Both players are dead, so pause the game and show the continue screen
-                                                            #     ld a,&3C
-                                                            #     ld (PlayerCounter),a
-                                                            #
-                                                            #     ld hl,(&0039)
-                                                            #     push hl
-                                                            #
-                                                            #     ld hl,&0001
-                                                            #     call ExecuteBootStrap
-                                                            #
-                                                            #     pop hl
-                                                            #     ld (&0039),hl
-                                                            #     jp ScreenBuffer_Init
-                                                            #
-                                                            # Player_Handler:
-                                                            #         ;Used to update the live player count
-                                                            #         xor a
-                                                            #
-                                                            # PlayerCounter:  inc a
-                                                            #         inc a
-                                                            #     ld (LivePlayers),a
-                                                            #         or a
-                                                            #         jr z, Players_Dead
-                                                            #
-                                                            #     ld hl,&0000     ;nop,nop
-                                                            #     ld (PlayerCounter),hl
-                                                            #
-                                                            #     call KeyboardScanner_Read
-                                                            #
-                                                            #     call Player_ReadControls
-                                                            #     ld iy,Player_Array
-                                                            #     ld a,(P1_P09)   ;See how many lives are left
-                                                            #     or a
-                                                            #     jr nz,Player1NotDead
-                                                            #
-                                                            #     ;if we got here, player 1 is dead
-                                                            #
-                                                            #     call SpendCheck
-                                                            #     jr Player2Start
-                                                            #
-                                                            # Player1NotDead:
-                                                            #     ld a,&3C
-                                                            #     ld (PlayerCounter),a
-                                                            #
-                                                            #     ld hl,Akuyou_PlayerSpritePos
-                                                            #     ld de,&C0C0
-                                                            #
-                                                            #     xor a
-                                                            #     ld b,4
-                                                            #     call Player_HandlerOne
-                                                            #     call BankSwitch_C0_SetCurrentToC0
-                                                            #
-                                                            # Player2Start:
-                                                            #     call Player_ReadControls2
-                                                            #
-                                                            #     ld iy,Player_Array2
-                                                            #     ld a,(P2_P09)
-                                                            #     or a
-                                                            #     jp z,SpendCheck
-                                                            #
-                                                            # Player2NotDead:
-                                                            #     ld a,&3C
-                                                            #     ld (PlayerCounter+1),a
-                                                            #
-                                                            #     ld de,&C0C0
-                                                            #     ld hl,Akuyou_PlayerSpritePos ; ChibikoPlayerSpriteBank_Plus2
-                                                            #
-                                                            # ifdef DualChibikoHack
-                                                            #     jr Player2NotDead64kver
-                                                            # endif
-                                                            #
-                                                            # Player2NotDead64kver:
-                                                            #     ld a,12
-                                                            #     ld b,16
-                                                            #     call Player_HandlerOne
-                                                            #
-                                                            #     jp BankSwitch_C0_SetCurrentToC0
-                                                            # Player_HandlerOne:
-                                                            #     ld (SprShow_BankAddr),hl
-                                                            #
-                                                            #     ld a,e
-                                                            #     ld (PlayerSpriteBank_Plus1-1),a;    call Akuyou_BankSwitch_C0_SetCurrent
-                                                            #
-                                                            #     ld a,ixl
-                                                            #
-                                                            #     ;Check if the game is paused
-                                                            #     Player_Handler_Pause:
-                                                            #     bit Keymap_Pause,a
-                                                            #     jr nz,Player_Handler_PauseCheckDone
-                                                            #     ;0=normal nz=paused
-                                                            #
-                                                            #     ld hl,Timer_Pause_Plus1-1
-                                                            #
-                                                            #     ld a,(hl)
-                                                            #     cpl
-                                                            #     ld (hl),a
-                                                            #     ld b,12
-                                                            #
-                                                            # WaitLoop:halt ; KeyboardScanner_ScanForOne
-                                                            #     djnz WaitLoop
-                                                            #     pop af
-                                                            # ret
-                                                            #
-                                                            # Player_Handler_PauseCheckDone:
-                                                            #     ld hl,Timer_TicksOccured
-                                                            #     ld a,(hl)
-                                                            #     or a
-                                                            #     ret z               ;abort handler if game paused
-                                                            #     xor a
-                                                            #     ld (PlayerSaveShot_Plus1-1),a
-                                                            #     ld (PlayerDoFire_Plus1-1),a
-                                                            #
-                                                            #     ld a,(hl)
-                                                            #
-                                                            #     and (iy+11)
-                                                            #
-                                                            #     jr z,Player_Handler_Start
-                                                            #
-                                                            #     ld (iy+2),0
-                                                            #
-                                                            #     ;Move the drones depending if the player is shooting
-                                                            # Player_Handler_Start:
-                                                            #     ld a,(iy+6) ;D1
-                                                            #     inc a
-                                                            #     cp 16
-                                                            #     jr c,Player_Handler_DronePosOk
-                                                            #     dec a
-                                                            #
-                                                            # Player_Handler_DronePosOk:
-                                                            #     ld (iy+6),a ;D1 - shots and drones
-                                                            #     add a
-                                                            #     ld (Player_DroneOffset1_Plus1-1),a
-                                                            #
-                                                            #     ld c,(iy)   ;Y
-                                                            #     ld b,(iy+1) ;X
-                                                            #
-                                                            #     ld e,8  :PlayerMoveSpeedFast_Plus1 ; Fast move speed - will be overriden if we're firing
-                                                            #
-                                                            # Player_Handler_KeyreadJoy1Fire2:
-                                                            #     ld a,ixl
-                                                            # SelfModifyingFire2: bit Keymap_F2,a
-                                                            #     jr nz,Player_Handler_KeyreadJoy1Fire1
-                                                            #     ;fire bullets
-                                                            # SelfModifyingFire1: bit Keymap_F1,a
-                                                            #     jr nz,Player_Handler_NoFireX
-                                                            #
-                                                            #     call Player_Handler_FireX       ; Xfire is a secret feature planned for the sequel
-                                                            #     jr Player_Handler_KeyreadJoy1Up ; it activates when both fire buttons are pressed
-                                                            #
- Player_Handler_NoFireX:                                    # Player_Handler_NoFireX:
-        CALL SetFireDir_RIGHTsave; Fire2Handler_Plus2:      #     call SetFireDir_RIGHTsave :Fire2Handler_Plus2
-       .equiv  dstFire2Handler, Fire2Handler_Plus2 - 2
-                                                            #
-                                                            # ;Player_ShootSkip
-                                                            #     ld e,2  :PlayerMoveSpeedSlow1_Plus1 ; slow move speed as we're firing
-                                                            #     ld a,ixl
-                                                            #     jr Player_Handler_KeyreadJoy1Up
-                                                            #
-                                                            # Player_Handler_KeyreadJoy1Fire1:
-                                                            #     ; Shoot left
-                                                            # SelfModifyingFire1B:    bit Keymap_F1,a
-                                                            #     jr nz,Player_Handler_KeyreadJoy1Up
-                                                            #
-                                                            #     ;fire bullets
-        CALL SetFireDir_LEFTsave; Fire1Handler_Plus2:       #     call SetFireDir_LEFTsave    :Fire1Handler_Plus2
-       .equiv  dstFire1Handler, Fire1Handler_Plus2 - 2
+             MOV  $Player_Array,R5      # SpendCreditSelfMod: ld iy,Player_Array ; All credits are (currently) stored in player 1's var!
+         MOVB 5(R5),R0                  #         ld a,(iy+5)
+         DECB R0                        #         sub 1
+         POP  R4                        #     pop ix
+         BMI  1$                        #     ret c ;no credits left!
+         MOVB R0,5(R5)                  #     ld (iy+5),a
+                                        #
+                                        #     ld a,3
+         MOVB $3,9(R4) # lives          #     ld (ix+9),a
+                                        #     ld a,(SmartbombsReset)
+         MOVB @$SmartBombsReset,3(R4)   #     ld (ix+3),a
+1$:      RETURN                         # ret
+                                        #
+# Both players are dead, so pause the game and show the continue screen
+PlayersDead:                            # Players_Dead:
+        RETURN # TODO: implement PlayersDead
+                                        #     ld a,&3C
+                                        #     ld (PlayerCounter),a
+                                        #
+                                        #     ld hl,(&0039)
+                                        #     push hl
+                                        #
+                                        #     ld hl,&0001
+                                        #     call ExecuteBootStrap
+                                        #
+                                        #     pop hl
+                                        #     ld (&0039),hl
+                                        #     jp ScreenBuffer_Init
+                                        #
+PlayerHandler:
+        # Used to update the live player count
+        CLR  R0                         #         xor a
+                                        #
+PlayerCounter:
+        INC  R0 # or NOP if player 1 is dead #         inc a
+        INC  R0 # or NOP if player 2 is dead #         inc a
+        MOVB R0,@$LivePlayers           #     ld (LivePlayers),a
+                                        #         or a
+        BZE  PlayersDead                #         jr z, Players_Dead
+                                        #
+                                        #     ld hl,&0000     ;nop,nop
+        MOV  $000240,@$PlayerCounter    #     ld (PlayerCounter),hl
+        MOV  $000240,@$PlayerCounter+2  #     ld (PlayerCounter),hl
+                                        #
+                                        #     call KeyboardScanner_Read
+                                        #
+                                        #     call Player_ReadControls
+                                        #     ld iy,Player_Array
+        TSTB @$P1_P09                   #     ld a,(P1_P09)   ;See how many lives are left
+                                        #     or a
+        BNZ  Player1NotDead             #     jr nz,Player1NotDead
+                                        #
+                                        #     ;if we got here, player 1 is dead
+                                        #
+                                        #     call SpendCheck
+                                        #     jr Player2Start
+                                        #
+Player1NotDead:                         # Player1NotDead:
+        MOV  $0005200,@$PlayerCounter   #     ld a,&3C
+                                        #     ld (PlayerCounter),a
+                                        #
+                                        #     ld hl,Akuyou_PlayerSpritePos
+                                        #     ld de,&C0C0
+                                        #
+                                        #     xor a
+                                        #     ld b,4
+                                        #     call Player_HandlerOne
+                                        #     call BankSwitch_C0_SetCurrentToC0
+                                        #
+                                        # Player2Start:
+                                        #     call Player_ReadControls2
+                                        #
+                                        #     ld iy,Player_Array2
+                                        #     ld a,(P2_P09)
+                                        #     or a
+                                        #     jp z,SpendCheck
+                                        #
+                                        # Player2NotDead:
+                                        #     ld a,&3C
+                                        #     ld (PlayerCounter+1),a
+                                        #
+                                        #     ld de,&C0C0
+                                        #     ld hl,Akuyou_PlayerSpritePos ; ChibikoPlayerSpriteBank_Plus2
+                                        #
+                                        ##ifdef DualChibikoHack
+                                        #     jr Player2NotDead64kver
+                                        ##endif
+                                        #
+                                        # Player2NotDead64kver:
+                                        #     ld a,12
+                                        #     ld b,16
+                                        #     call Player_HandlerOne
+                                        #
+                                        #     jp BankSwitch_C0_SetCurrentToC0
+Player_HandlerOne:
+                                        # Player_HandlerOne:
+                                        #     ld (SprShow_BankAddr),hl
+                                        #
+                                        #     ld a,e
+                                        #     ld (PlayerSpriteBank_Plus1-1),a;    call Akuyou_BankSwitch_C0_SetCurrent
+                                        #
+                                        #     ld a,ixl
+                                        #
+                                        #     ;Check if the game is paused
+                                        #     Player_Handler_Pause:
+                                        #     bit Keymap_Pause,a
+                                        #     jr nz,Player_Handler_PauseCheckDone
+                                        #     ;0=normal nz=paused
+                                        #
+                                        #     ld hl,Timer_Pause_Plus1-1
+                                        #
+                                        #     ld a,(hl)
+                                        #     cpl
+                                        #     ld (hl),a
+                                        #     ld b,12
+                                        #
+                                        # WaitLoop:halt ; KeyboardScanner_ScanForOne
+                                        #     djnz WaitLoop
+                                        #     pop af
+                                        # ret
+                                        #
+                                        # Player_Handler_PauseCheckDone:
+                                        #     ld hl,Timer_TicksOccured
+                                        #     ld a,(hl)
+                                        #     or a
+                                        #     ret z               ;abort handler if game paused
+                                        #     xor a
+                                        #     ld (PlayerSaveShot_Plus1-1),a
+                                        #     ld (PlayerDoFire_Plus1-1),a
+                                        #
+                                        #     ld a,(hl)
+                                        #
+                                        #     and (iy+11)
+                                        #
+                                        #     jr z,Player_Handler_Start
+                                        #
+                                        #     ld (iy+2),0
+                                        #
+                                        #     ;Move the drones depending if the player is shooting
+                                        # Player_Handler_Start:
+                                        #     ld a,(iy+6) ;D1
+                                        #     inc a
+                                        #     cp 16
+                                        #     jr c,Player_Handler_DronePosOk
+                                        #     dec a
+                                        #
+                                        # Player_Handler_DronePosOk:
+                                        #     ld (iy+6),a ;D1 - shots and drones
+                                        #     add a
+                                        #     ld (Player_DroneOffset1_Plus1-1),a
+                                        #
+                                        #     ld c,(iy)   ;Y
+                                        #     ld b,(iy+1) ;X
+                                        #
+                                        #     ld e,8  :PlayerMoveSpeedFast_Plus1 ; Fast move speed - will be overriden if we're firing
+                                        #
+                                        # Player_Handler_KeyreadJoy1Fire2:
+                                        #     ld a,ixl
+                                        # SelfModifyingFire2: bit Keymap_F2,a
+                                        #     jr nz,Player_Handler_KeyreadJoy1Fire1
+                                        #     ;fire bullets
+                                        # SelfModifyingFire1: bit Keymap_F1,a
+                                        #     jr nz,Player_Handler_NoFireX
+                                        #
+                                        #     call Player_Handler_FireX       ; Xfire is a secret feature planned for the sequel
+                                        #     jr Player_Handler_KeyreadJoy1Up ; it activates when both fire buttons are pressed
+                                        #
+ Player_Handler_NoFireX:                # Player_Handler_NoFireX:
+       .equiv dstFire2Handler, .+2
+        CALL @$SetFireDir_RIGHTsave     #     call SetFireDir_RIGHTsave :Fire2Handler_Plus2
+                                        #
+                                        # ;Player_ShootSkip
+                                        #     ld e,2  :PlayerMoveSpeedSlow1_Plus1 ; slow move speed as we're firing
+                                        #     ld a,ixl
+                                        #     jr Player_Handler_KeyreadJoy1Up
+                                        #
+                                        # Player_Handler_KeyreadJoy1Fire1:
+                                        #     ; Shoot left
+                                        # SelfModifyingFire1B:    bit Keymap_F1,a
+                                        #     jr nz,Player_Handler_KeyreadJoy1Up
+                                        #
+                                        #     ;fire bullets
+       .equiv dstFire1Handler, .+2
+        CALL @$SetFireDir_LEFTsave      #     call SetFireDir_LEFTsave    :Fire1Handler_Plus2
                                                             #
                                                             # ;Player_ShootSkip2
                                                             #     ld e,2  :PlayerMoveSpeedSlow2_Plus1; Slow move speed as we're firing
@@ -222,8 +227,8 @@ Players_Dead:                                               # Players_Dead:     
                                                             #     sub e
                                                             #     ld C,a
                                                             #
-        CALL null; FireUpHandler_Plus2:                     #     call null  :FireUpHandler_Plus2
-       .equiv  dstFireUpHandler, FireUpHandler_Plus2 - 2
+       .equiv dstFireUpHandler, .+2
+        CALL @$null                                         #     call null  :FireUpHandler_Plus2
                                                             #
                                                             # Player_Handler_KeyreadJoy1DownPre:
                                                             #     ld a,ixl
@@ -239,8 +244,8 @@ Players_Dead:                                               # Players_Dead:     
                                                             #     add e
                                                             #     ld C,a
                                                             #
-        CALL null; FireDownHandler_Plus2:                   #     call null   :FireDownHandler_Plus2
-       .equiv  dstFireDownHandler, FireDownHandler_Plus2 - 2
+       .equiv dstFireDownHandler, .+2
+        CALL @$null                                         #     call null   :FireDownHandler_Plus2
                                                             #
                                                             # Player_Handler_KeyreadJoy1LeftPre:
                                                             #     ld a,ixl
@@ -259,8 +264,8 @@ Players_Dead:                                               # Players_Dead:     
                                                             #     sub e
                                                             #     ld B,a
                                                             #
-        CALL null; FireLeftHandler_Plus2:                   #     call null   :FireLeftHandler_Plus2
-       .equiv  dstFireLeftHandler, FireLeftHandler_Plus2 - 2
+       .equiv dstFireLeftHandler, .+2
+        CALL @$null                                         #     call null   :FireLeftHandler_Plus2
                                                             #
                                                             # Player_Handler_KeyreadJoy1RightPre:
                                                             #     ld a,ixl
@@ -279,8 +284,8 @@ Players_Dead:                                               # Players_Dead:     
                                                             #     add e
                                                             #     ld B,a
                                                             #
-        CALL null; FireRightHandler_Plus2:                  #     call null   :FireRightHandler_Plus2
-       .equiv  dstFireRightHandler, FireRightHandler_Plus2 - 2
+       .equiv dstFireRightHandler, .+2
+        CALL @$null                                         #     call null   :FireRightHandler_Plus2
                                                             #
                                                             # Player_Handler_SmartBombPre:
                                                             #     ld a,ixl
@@ -302,29 +307,29 @@ Players_Dead:                                               # Players_Dead:     
                                                             #     call DoSmartBombFX
                                                             #
 Player_Handler_KeyreadDone:                                 # Player_Handler_KeyreadDone:
-        TST  $0; PlayerSaveShot_Plus2:                      #     ld a,0 :PlayerSaveShot_Plus1
-       .equiv  srcPlayerSaveShot, PlayerSaveShot_Plus2 - 2
+       .equiv srcPlayerSaveShot, .+2
+        TST  $0                                             #     ld a,0 :PlayerSaveShot_Plus1
         BEQ  Player_Handler_NoSaveFire                      #     or a
                                                             #     jr z,Player_Handler_NoSaveFire
                                                             #
                                                             #     ld a,0 :PlayerThisSprite_Plus1
-        MOVB $0,8(R5); PlayerThisSprite_Plus4:              #     ld (iy+8),a
-       .equiv  srcPlayerThisSprite, PlayerThisSprite_Plus4 - 4
+       .equiv srcPlayerThisSprite, .+2
+        MOVB $0,8(R5)                                       #     ld (iy+8),a
                                                             #
                                                             #     ld a,0 :PlayerThisShot_Plus1
-        MOVB $0,15(R5); PlayerThisShot_Plus4:               #     ld (iy+15),a
-       .equiv  srcPlayerThisShot,   PlayerThisShot_Plus4 - 4
+       .equiv srcPlayerThisShot, .+2
+        MOVB $0,15(R5)                                      #     ld (iy+15),a
                                                             #
 Player_Handler_NoSaveFire:                                  # Player_Handler_NoSaveFire:
         MOVB 8(R5),R0                                       #     ld a,(iy+8)
 
         BIC  $!0x80,R0                                      #     and %10000000
-        CMP  R0,$1; DroneFlipCurrent_Plus2:                 #     cp 1 :DroneFlipCurrent_Plus1
-       .equiv  cmpDroneFlipCurrent, DroneFlipCurrent_Plus2 - 2
+       .equiv cmpDroneFlipCurrent, .+2
+        CMP  R0,$1                                          #     cp 1 :DroneFlipCurrent_Plus1
        .CALL NE, DroneFlip                                  #     call nz,DroneFlip
                                                             #
-        TST  @$0; PlayerDoFire_Plus2:                       #     ld a,0 :PlayerDoFire_Plus1
-       .equiv  dstPlayerDoFire, PlayerDoFire_Plus2 - 2
+       .equiv dstPlayerDoFire, .+2
+        TST  @$0                                            #     ld a,0 :PlayerDoFire_Plus1
                                                             #     or a
        .CALL NE, Player_Fire4D                              #     call nz,Player_Fire4D
                                                             #
@@ -482,8 +487,8 @@ Player_Handler_NoSaveFire:                                  # Player_Handler_NoS
 Player_Fire4D:                                              # Player_Fire4D:  ; Fire bullets!
         MOVB 8(R5),R0                                       #     ld a,(iy+8)
         BIC  $!0x80,R0                                      #     and %10000000
-        CMP  R0,$0; DroneFlipFireCurrent_Plus2:             #     cp 0 :DroneFlipFireCurrent_Plus1
-       .equiv  cmpDroneFlipFireCurrent, DroneFlipFireCurrent_Plus2 - 2
+       .equiv cmpDroneFlipFireCurrent, .+2
+        CMP  R0,$0                                          #     cp 0 :DroneFlipFireCurrent_Plus1
        .CALL NE, DroneFlipFire                              #     call nz,DroneFlipFire
                                                             #
                                                             #     ld a,(iy+15)

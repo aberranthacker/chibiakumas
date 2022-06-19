@@ -3,7 +3,7 @@
  *                            Object Event Array                               *
  *******************************************************************************/
 
-DoMovesBackground_ScrollUp:                
+DoMovesBackground_ScrollUp:
                                             #     ; Move Up
                                             #     ld bc,&790D ; DEC C (OD) ; LD a,C (79)
                                             #     ld de,&F7FE ; CP    (FE) ; F7 (199+24+24=247)
@@ -165,9 +165,9 @@ Event_CoreMultipleEventsAtOneTime:                          # Event_CoreMultiple
         MOV  R1,@$srcEvent_MultipleEventCount               #     ld (Event_MultipleEventCount_Plus1 - 1),a
         RETURN # JMP Event_LoadNextEvt                      #     ret
                                                             #
-# Event_SpriteSwitch: # Set the next sprite                   # Event_SpriteSwitch_0101:          ;Set the next sprite
-#         MOV  (R5)+,@$srcEventObjectSpriteToAdd              #     ld de,EventObjectSpriteToAdd_Plus1-1
-# RETURN                                                      #     jr Event_CoreReprogram_ByteCopy
+Event_SpriteSwitch: # Set the next sprite                   # Event_SpriteSwitch_0101:          ;Set the next sprite
+        MOV  R1,@$srcEventObjectSpriteToAdd                 #     ld de,EventObjectSpriteToAdd_Plus1-1
+        RETURN                                              #     jr Event_CoreReprogram_ByteCopy
                                                             #
 Event_SetProgram: # Set the next program                    # Event_ProgramSwitch_0001:
         MOV  (R5)+,@$srcEventObjectProgramToAdd             #     ld de,EventObjectProgramToAdd_Plus1 - 1
@@ -223,7 +223,7 @@ Event_CoreReprogram_PowerupSprites:                         # Event_CoreReprogra
         RETURN                                              #     ret
 
 Event_ReprogramObjectBurstPosition:
-        MOV  (R5)+,@$srcBurstPosition # # Y: LSB, X: MSB 
+        MOV  (R5)+,@$srcBurstPosition # # Y: LSB, X: MSB
         RETURN # JMP @$Event_LoadNextEvt
 Event_CoreReprogram_CustomMove1:
         MOV  (R5)+,@$jmpLevelSpecificMoveA
@@ -417,31 +417,34 @@ Event_SingleSprite: # Type 0 - one Obj
         BR   Event_OneObject$      # jr EventoneObject
 
 Event_OneObjectBurst$: # Burst Object
-       .equiv srcBurstPosition, .+2 # Y: LSB, X: MSB 
+       .equiv srcBurstPosition, .+2 # Y: LSB, X: MSB
         MOV  $0x0000,R2             # ld bc,&0000 :BurstPosition_Plus2 # D: X, C: Y
                                     # ld d,b
         BR   Event_OneObjectStrip   # jr Event_OneObjectStrip
 
         # Type 1 - Read in Y and dump the same sprite to far right
 Event_OneObjYOnly$:
-        # ld c,(hl) ; Y
-        # inc hl
-        # jr Event_OneObjQuick_GO
+        MOV  $24+160,R2
+        SWAB R2
+        CLRB R2
+        BISB (R5)+,R2              # ld c,(hl) ; Y
+        INC  R5                    # inc hl
+        BR   Event_OneObjectStrip  # jr Event_OneObjQuick_GO
 
         # one sprite, same as last time Y * 16 (Y 2-13)
 Event_OneObjQuick$:
-        #     rla
-        #     rla
-        #     rla
-        #     rla
-        #     sub 8
-        #
-        # OneObjectQuick_Program:
-        #     ld C,a
-        #
-        # Event_OneObjQuick_GO:
-        #     ld D,160+24
-        #     jr Event_OneObjectStrip
+        ASL  R1                   #     rla
+        ASL  R1                   #     rla
+        ASL  R1                   #     rla
+        ASL  R1                   #     rla
+        SUB  $8,R1                #     sub 8
+                                  #
+        CLR  R2                   # OneObjectQuick_Program:
+        BISB $24+160, R2          #     ld C,a
+        SWAB R2                   #
+                                  # Event_OneObjQuick_GO:
+        BISB R1,R2                #     ld D,160+24
+        BR   Event_OneObjectStrip #     jr Event_OneObjectStrip
 
 Event_OneObject$:
                                                # rst 6
@@ -452,80 +455,76 @@ Event_OneObject$:
                                                # ld c,(hl)   ;Y
                                                # inc hl
 Event_OneObjectStrip: # look for a space in the object array
-                                                            # push hl
-        CALL Event_AddObject                                # call Event_AddObject
-                                                            # pop hl
-        RETURN                                              # ret
+                                               # push hl
+        CALL Event_AddObject                   # call Event_AddObject
+                                               # pop hl
+        RETURN                                 # ret
 
-Event_AddObject: # called by object_driver as well          # Event_AddObject:
-       .equiv srcObjectAddToForeBack, .+2                   #     ld a,0  :ObjectAddToForeBack_Plus1
-        TST  $0x00                                          #     or a
-        BEQ  Event_AddObjectBack$                           #     jr z,Event_AddObjectBack
-                                                            #
-        #     0062703 == ADD (PC)+,R3                       #     ;add object to the front
-        MOV  $0062703,@$opcAddObject_MoveDirection$         #     ld a,&23 ; 23 == INC HL
-
-                                                            #     ld (hl),a
-        CLR  R0                                             #     xor a   :BackgroundNoSpritesTurbo_Plus1
-        BR   Event_AddObjectStart$                          #     jr Event_AddObjectStart
-                                                            #
-    Event_AddObjectBack$:                                   # Event_AddObjectBack:
+Event_AddObject: # called by object_driver as well # Event_AddObject:
+       .equiv srcObjectAddToForeBack, .+2           # ld a,0  :ObjectAddToForeBack_Plus1
+        TST  $0x00                                  # or a
+        BNZ  Event_AddObjectBack$                   # jr z,Event_AddObjectBack
+        #     0062703 == ADD (PC)+,R3               # ;add object to the front
+        MOV  $0062703,@$opcAddObject_MoveDirection$ # ld a,&23 ; 23 == INC HL
+                                                    # ld (hl),a
+        CLR  R0                                     # xor a   :BackgroundNoSpritesTurbo_Plus1
+        BR   Event_AddObjectStart$                  # jr Event_AddObjectStart
+                                                    #
+    Event_AddObjectBack$:                       # Event_AddObjectBack:
         #     0162703 == SUB (PC)+,R3
-        MOV  $0162703,@$opcAddObject_MoveDirection$         #     ld a,&2B ; 2B == DEC HL
-                                                            #
-                                                            #     ld (hl),a
-        MOV  $(ObjectArraySize - 1) << 3,R0                 #     ld a,ObjectArraySize ;(ObjectArray_Size)
-                                                            #     dec a
-                                                            #
-    Event_AddObjectStart$:                                  # Event_AddObjectStart:
-        # R2=XY  Y=LSB, X=MSB                               #     ; D=X C=Y
-                                                            #
-        MOV  $ObjectArrayPointer,R3                         #     ld b,ObjectArraySize;a
-        ADD  R0,R3                                          #     ld hl,ObjectArrayPointer;(ObjectArrayAddress)
-                                                            #     add l       ; add l to a (start of loop)
-        MOV  $ObjectArraySize,R4                            #     ld l,a
+        MOV  $0162703,@$opcAddObject_MoveDirection$ # ld a,&2B ; 2B == DEC HL
+                                                    # ld (hl),a
+        MOV  $(ObjectArraySize - 1) * 8,R0          # ld a,ObjectArraySize ;(ObjectArray_Size)
+                                                    # dec a
 
-    Event_Objectloop$:                       # Event_Objectloop:
-                                             #     ld a,(hl)   ; Y check
-        TSTB (R3)                            #     or a
-        BNZ  Event_ObjectLoopNext$           #     jp NZ,Event_ObjectLoopNext
+    Event_AddObjectStart$:                      # Event_AddObjectStart:
+        # R2=XY  Y=LSB, X=MSB                       # ; D=X C=Y
+        MOV  $ObjectArrayPointer,R3                 # ld b,ObjectArraySize;a
+        ADD  R0,R3                                  # ld hl,ObjectArrayPointer;(ObjectArrayAddress)
+                                                    # add l       ; add l to a (start of loop)
+        MOV  $ObjectArraySize,R4                    # ld l,a
 
-                                             #     ;found a free slot!
-        MOV  R3,@$srcObjects_LastAdded       #     ld (Objects_LastAdded_Plus2 - 2),hl
+    Event_Objectloop$:                  # Event_Objectloop:
+                                             # ld a,(hl)   ; Y check
+        TSTB (R3)                            # or a
+        BNZ  Event_ObjectLoopNext$           # jp NZ,Event_ObjectLoopNext
 
-                                             #     ld a,c
-        BIC  $0b111,R2                       #     and %11111000
-                                             #     ld (hl),a
-                                             #     inc h;
-        MOV  R2,(R3)+ # Y=LSB, X=MSB         #     ld (hl),d ;X
+                                             # ;found a free slot!
+        MOV  R3,@$srcObjects_LastAdded       # ld (Objects_LastAdded_Plus2 - 2),hl
 
-       .equiv srcEventObjectMoveToAdd, .+2   #     inc h
-        MOVB $0x00,(R3)+                     #     ld (hl),&0 :EventObjectMoveToAdd_Plus1   ; Move
-       .equiv srcEventObjectSpriteToAdd, .+2 #     inc h
-        MOVB $0x00,(R3)+                     #     ld (hl),&0 :EventObjectSpriteToAdd_Plus1 ; sprite
-                                             #     set 6,l
+                                             # ld a,c
+        BIC  $0b111,R2                       # and %11111000
+                                             # ld (hl),a
+                                             # inc h;
+        MOV  R2,(R3)+ # Y=LSB, X=MSB         # ld (hl),d ;X
+
+       .equiv srcEventObjectMoveToAdd, .+2   # inc h
+        MOVB $0x00,(R3)+                     # ld (hl),&0 :EventObjectMoveToAdd_Plus1   ; Move
+       .equiv srcEventObjectSpriteToAdd, .+2 # inc h
+        MOVB $0x00,(R3)+                     # ld (hl),&0 :EventObjectSpriteToAdd_Plus1 ; sprite
+                                             # set 6,l
        .equiv srcEventObjectLifeToAdd, .+2   #
-        MOV  $0x00,R0                        #     ld a,&0 :EventObjectLifeToAdd_Plus1 ; life
-                                             #     push af
-        CMPB @$LivePlayers,$1                #         ld a,(LivePlayers)
-        BEQ  AddObjectOnePlayer$             #         dec a
-                                             #         jr z,AddObjectOnePlayer
-                                             #     pop af
-                                             #     cp %11000000
-                                             #     jr c,AddObjectTwoPlayer
-                                             #     cp 255  ;lifCustom
-                                             #     jr z,AddObjectTwoPlayer
-                                             #     push bc
-                                             #         ld b,a
-                                             #         sla a
+        MOV  $0x00,R0                        # ld a,&0 :EventObjectLifeToAdd_Plus1 ; life
+                                             # push af
+        CMPB @$LivePlayers,$1                #     ld a,(LivePlayers)
+        BEQ  AddObjectOnePlayer$             #     dec a
+                                             #     jr z,AddObjectOnePlayer
+                                             # pop af
+                                             # cp %11000000
+                                             # jr c,AddObjectTwoPlayer
+                                             # cp 255  ;lifCustom
+                                             # jr z,AddObjectTwoPlayer
+                                             # push bc
+                                             #     ld b,a
+                                             #     sla a
                                              #
-                                             #         or %11000000
-                                             #         cp b
-                                             #     pop bc
-                                             #     jr NC,AddObjectTwoPlayer
-                                             #     ld a,%11111110
-                                             #     jr AddObjectTwoPlayer
-                                             #
+                                             #     or %11000000
+                                             #     cp b
+                                             # pop bc
+                                             # jr NC,AddObjectTwoPlayer
+                                             # ld a,%11111110
+                                             # jr AddObjectTwoPlayer
+
     AddObjectOnePlayer$:                                    # AddObjectOnePlayer:
                                                             #     pop af
                                                             # AddObjectTwoPlayer:

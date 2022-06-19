@@ -268,7 +268,7 @@ Event_VectorArray:
        .word Event_SetLife                     # 0x12 0x24  evtSetLife
        .word Event_SetMove                     # 0x13 0x26    defw Event_MoveSwitch_0011
        .word Event_SetProgMoveLife             # 0x14 0x28  evtSetProgMoveLife
-       .word Event_SpriteSwitch_0101_NotImplemented # 0x15 0x2A    defw Event_SpriteSwitch_0101
+       .word Event_SpriteSwitch                # 0x15 0x2A    defw Event_SpriteSwitch_0101
        .word Event_AddToBackground             # 0x16 0x2C  evtAddToBackground
        .word Event_AddToForeground             # 0x17 0x2E  evtAddToForeground
        .word Event_ChangeStreamTime            # 0x18 0x30  evtChangeStreamTime
@@ -310,8 +310,6 @@ Event_StarBurst_NotImplemented:
     .inform_and_hang "no Event_StarBurst"
 Event_CoreSaveLoadSettings2_NotImplemented:
     .inform_and_hang "no Event_CoreSaveLoadSettings2"
-Event_SpriteSwitch_0101_NotImplemented:
-    .inform_and_hang "no Event_SpriteSwitch"
 Event_ClearPowerups_NotImplemented:
     .inform_and_hang "no Event_ClearPowerups"
 Event_ChangeStreamSpeed_1100_NotImplemented:
@@ -377,6 +375,7 @@ Event_SmartBombSpecial_NotImplemented:
 
        .include "core/player_driver.s"
        .global DroneFlipFire 
+       .global PlayerHandler
        .global Player_GetPlayerVars
        .global SetFireDir_DOWN
        .global SetFireDir_Fire

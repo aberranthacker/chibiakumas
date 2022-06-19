@@ -72,93 +72,93 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtAddToBackground               # 4
     .word     evtSaveObjSettings | 1           # 5
 
-#   # Rock Chick
-#   .word 0, evtMultipleCommands | 5
-#   .word     evtSetProgMoveLife               # 1
-#   .word         prgFireSlow | fireLeftWide
-#   .word         mvRegular | spdNormal | 0x22 # move - direction left, slow
-#   .word         lifeEnemy | 1
-#   .word     evtSetSprite | 1                 # 2
-#   .word     evtSetAnimator | anmNone         # 3
-#   .word     evtAddToForeground               # 4
-#   .word     evtSaveObjSettings | 2           # 5
+    # Rock Chick
+    .word 0, evtMultipleCommands | 5
+    .word    evtSetProgMoveLife               # 1
+    .word        prgFireSlow | fireLeftWide
+    .word        mvRegular | spdNormal | 0x22 # move - direction left, slow
+    .word        lifeEnemy | 1
+    .word    evtSetSprite | sprTwoFrame | 1                 # 2
+    .word    evtSetAnimator | anmNone         # 3
+    .word    evtAddToForeground               # 4
+    .word    evtSaveObjSettings | 2           # 5
 
-#   # Skull bomber
-#   .word 0, evtMultipleCommands | 5
-#   .word     evtSetProgMoveLife               # 1
-#   .word         prgFireFast | fireSingleSouth
-#   .word         mvRegular | spdNormal | 0x23 # move - direction left, slow
-#   .word         lifeEnemy | 4
-#   .word     evtSetSprite | 37                # 2
-#   .word     evtSetAnimator | anmNone         # 3
-#   .word     evtAddToForeground               # 4
-#   .word     evtSaveObjSettings | 3           # 5
+    # Skull bomber
+    .word 0, evtMultipleCommands | 5
+    .word     evtSetProgMoveLife               # 1
+    .word         prgFireFast | fireSingleSouth
+    .word         mvRegular | spdNormal | 0x23 # move - direction left, slow
+    .word         lifeEnemy | 4
+    .word     evtSetSprite | sprTwoFrame | 37  # 2
+    .word     evtSetAnimator | anmNone         # 3
+    .word     evtAddToForeground               # 4
+    .word     evtSaveObjSettings | 3           # 5
 
-#   # Ant Attacker
-#   .word 0, evtMultipleCommands | 5
-#   .word     evtSetProgMoveLife               # 1
-#   .word         prgFireSlow | fireTopLeft
-#   .word         mvRegular | spdNormal | 0x23 # move - direction left, slow
-#   .word         lifeEnemy | 4
-#   .word     evtSetSprite | 0                 # 2
-#   .word     evtSetAnimator | anmNone         # 3
-#   .word     evtAddToForeground               # 4
-#   .word     evtSaveObjSettings | 4           # 5
+    # Ant Attacker
+    .word 0, evtMultipleCommands | 5
+    .word     evtSetProgMoveLife               # 1
+    .word         prgFireSlow | fireTopLeft
+    .word         mvRegular | spdNormal | 0x23 # move - direction left, slow
+    .word         lifeEnemy | 4
+    .word     evtSetSprite | sprTwoFrame | 0   # 2
+    .word     evtSetAnimator | anmNone         # 3
+    .word     evtAddToForeground               # 4
+    .word     evtSaveObjSettings | 4           # 5
 
-#   # Skeleton Crawler
-#   .word 0, evtMultipleCommands | 5
-#   .word     evtSetProgMoveLife               # 1
-#   .word         prgFireSnail | fireLeftWide
-#   .word         mvRegular | spdNormal | 0x22 # move - direction left, slow
-#   .word         lifeEnemy | 3
-#   .word     evtSetSprite | 36                # 2
-#   .word     evtSetAnimator | anmNone         # 3
-#   .word     evtAddToForeground               # 4
-#   .word     evtSaveObjSettings | 5           # 5
+    # Skeleton Crawler
+    .word 0, evtMultipleCommands | 5
+    .word     evtSetProgMoveLife               # 1
+    .word         prgFireSnail | fireLeftWide
+    .word         mvRegular | spdNormal | 0x22 # move - direction left, slow
+    .word         lifeEnemy | 3
+    .word     evtSetSprite | sprTwoFrame | 36  # 2
+    .word     evtSetAnimator | anmNone         # 3
+    .word     evtAddToForeground               # 4
+    .word     evtSaveObjSettings | 5           # 5
 
-#   # SpliceFace
-#   .word 0, evtMultipleCommands | 5
-#   .word     evtSetProgMoveLife               # 1
-#   .word         prgFireSnail | fireBurst
-#   .word         mvRegular | spdNormal | 0x25 # move - direction right, slow
-#   .word         lifeEnemy | 4
-#   .word     evtSetSprite | 34                # 2
-#   .word     evtSetAnimator | anmNone         # 3
-#   .word     evtAddToForeground               # 4
-#   .word     evtSaveObjSettings | 6           # 5
+    # SpliceFace
+    .word 0, evtMultipleCommands | 5
+    .word     evtSetProgMoveLife               # 1
+    .word         prgFireSnail | fireBurst
+    .word         mvRegular | spdNormal | 0x25 # move - direction right, slow
+    .word         lifeEnemy | 4
+    .word     evtSetSprite | sprTwoFrame | 34  # 2
+    .word     evtSetAnimator | anmNone         # 3
+    .word     evtAddToForeground               # 4
+    .word     evtSaveObjSettings | 6           # 5
 
-#   # BoniBurd
-#   .word 0, evtMultipleCommands | 5
-#   .word     evtSetProgMoveLife               # 1
-#   .word         prgFireSnail | fireBottomLeft
-#   .word         mvRegular | spdNormal | 0x22 # move - direction left, slow
-#   .word         lifeEnemy | 3
-#   .word     evtSetSprite | 2                 # 2
-#   .word     evtSetAnimator | anmNone         # 3
-#   .word     evtAddToForeground               # 4
-#   .word     evtSaveObjSettings | 7           # 5
+    # BoniBurd
+    .word 0, evtMultipleCommands | 5
+    .word     evtSetProgMoveLife               # 1
+    .word         prgFireSnail | fireBottomLeft
+    .word         mvRegular | spdNormal | 0x22 # move - direction left, slow
+    .word         lifeEnemy | 3
+    .word     evtSetSprite | sprTwoFrame | 2   # 2
+    .word     evtSetAnimator | anmNone         # 3
+    .word     evtAddToForeground               # 4
+    .word     evtSaveObjSettings | 7           # 5
 
-#   # Skull Gang
-#   .word 0, evtMultipleCommands | 5
-#   .word     evtSetProgMoveLife               # 1
-#   .word         prgFireFast | fireSingleWest
-#   .word         mveWave | 0b0001
-#   .word         lifeEnemy | 3
-#   .word     evtSetSprite | 35                # 2
-#   .word     evtSetAnimator | anmNone         # 3
-#   .word     evtAddToForeground               # 4
-#   .word     evtSaveObjSettings | 8           # 5
+    # Skull Gang
+    .word 0, evtMultipleCommands | 5
+    .word     evtSetProgMoveLife               # 1
+    .word         prgFireFast | fireSingleWest
+    .word         mveWave | 0b0001
+    .word         lifeEnemy | 3
+    .word     evtSetSprite | sprTwoFrame | 35  # 2
+    .word     evtSetAnimator | anmNone         # 3
+    .word     evtAddToForeground               # 4
+    .word     evtSaveObjSettings | 8           # 5
 
-#   # Eyeclopse
-#   .word 0, evtMultipleCommands | 5
-#   .word     evtSetProgMoveLife               # 1
-#   .word         prgFireSlow | fireLeftWide
-#   .word         mveWave | 0b1100
-#   .word         lifeEnemy | 3
-#   .word     evtSetSprite | 7                 # 2
-#   .word     evtSetAnimator | anmNone         # 3
-#   .word     evtAddToForeground               # 4
-#   .word     evtSaveObjSettings | 9           # 5
+    # Eyeclopse
+    .word 0, evtMultipleCommands | 5
+    .word     evtSetProgMoveLife               # 1
+    .word         prgFireSlow | fireLeftWide
+    .word         mveWave | 0b1100
+    .word         lifeEnemy | 3
+    .word     evtSetSprite | sprTwoFrame | 7   # 2
+    .word     evtSetAnimator | anmNone         # 3
+    .word     evtAddToForeground               # 4
+    .word     evtSaveObjSettings | 9           # 5
 
    #.word 0, evtAddToBackground
    #.word 0, evtSetProgMoveLife, prgBitShift, mveBackground | 0b0001, lifeImmortal
@@ -176,7 +176,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .byte        24+ 50,    24+ 120  # Y, X :  74, 144 :  50, 240
     # some boulders
     .word 0, evtSingleSprite, sprSingleFrame | 14
-    .byte        24+ 40+90, 24+ 100  # Y, X : 154, 124 : 130, 200 
+    .byte        24+ 40+90, 24+ 100  # Y, X : 154, 124 : 130, 200
     .word 0, evtSingleSprite, sprSingleFrame | 13
     .byte        24+ 40+100, 24+ 90  # Y, X : 164, 114 : 140, 180
     .word 0, evtSingleSprite, sprSingleFrame | 13
@@ -207,24 +207,17 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word    evtSingleSprite, sprSingleFrame | 9
     .byte        24+ 48+128, 24+ 100
 
-# ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-# ;               Start of fade in block
-# FadeStartPoint equ 0    ;Start of fade point
-# ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+# Start of fade in block -------------------------------------------------------
     .equiv FadeStartPoint, 0
-
     .word FadeStartPoint + 1, evtSetPalette, BluePalette
     .word FadeStartPoint + 2, evtSetPalette, DarkRealPalette
     .word FadeStartPoint + 3, evtSetPalette, RealPalette
+# End of fade in block ---------------------------------------------------------
 
-# ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-# ;;              End of fade in block
-# ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-# ; rock chick enemy
-# defb 5,evtMultipleCommands+2   ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+2 ; Load Settings from bank 2
-# defb    0+8             ; Row 16, last Column, Last Sprite
+    # rock chick enemy
+    .word 5, evtMultipleCommands | 2
+    .word    evtLoadObjSettings | 2
+    .word    evtSingleSprite | 8 # Row 15, last Column, Last Sprite
 
     # Rock Pt 1
     .word 10, evtMultipleCommands | 2
@@ -238,11 +231,11 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtSingleSprite, sprSingleFrame | 17
     .byte         24+ 110, 24+ 160
 
-# ; rock chick enemy
-# defb 15,evtMultipleCommands+3  ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+2 ; Load Settings from bank 2
-# defb    0+6                    ; Row 16, last Column, Last Sprite
-# defb    0+10                   ; Row 16, last Column, Last Sprite
+    # rock chick enemy
+    .word 15, evtMultipleCommands | 3
+    .word     evtLoadObjSettings | 2
+    .word     evtSingleSprite | 6  # Row 11, last Column, Last Sprite
+    .word     evtSingleSprite | 10 # Row 19, last Column, Last Sprite
 
     # Rock Pt 2
     .word 16, evtMultipleCommands | 2
@@ -250,10 +243,11 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtSingleSprite, sprSingleFrame | 23
     .byte         24+ 176, 24+ 160
 
-# ; Powerup Rate
-# defb 17,evtMultipleCommands+2   ; 2 commands at the same timepoint
-# defb    evtSetProgMoveLife ,3,&22,64+63 ; Program - Bitshift Sprite... Move - dir Left Slow ... Hurt by bullets, hurts player, life 4
-# defb    0,128+ 39,160+24,50+24  ;   ; Single Object sprite 11 (animated)
+    # Powerup Rate
+    .word 17, evtMultipleCommands | 2
+    .word     evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 0x22), 64+63
+    .word     evtSingleSprite, sprTwoFrame | 39
+    .byte         24+ 50, 24+ 160
 
     # Rock Pt 3
     .word 22, evtMultipleCommands | 2
@@ -261,21 +255,21 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtSingleSprite, sprSingleFrame | 24
     .byte         24+ 176, 24+ 160
 
-# ; rock chick enemy
-# defb 25,evtMultipleCommands+2   ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+2  ; Load Settings from bank 2
-# defb    0+8             ; Row 16, last Column, Last Sprite
+    # rock chick enemy
+    .word 25, evtMultipleCommands | 2
+    .word     evtLoadObjSettings | 2
+    .word     evtSingleSprite | 8  # Row 15, last Column, Last Sprite
 
-# ;; rock chick enemy
-# defb 30,evtMultipleCommands+3   ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+2  ; Load Settings from bank 2
-# defb    0+6                     ; Row 16, last Column, Last Sprite
-# defb    0+10                    ; Row 16, last Column, Last Sprite
+    # rock chick enemy
+    .word 30, evtMultipleCommands | 3
+    .word     evtLoadObjSettings | 2
+    .word     evtSingleSprite | 6  # Row 11, last Column, Last Sprite
+    .word     evtSingleSprite | 10 # Row 19, last Column, Last Sprite
 
-# ; rock chick enemy
-# defb 35,evtMultipleCommands+2   ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+2  ; Load Settings from bank 2
-# defb    0+8             ; Row 16, last Column, Last Sprite
+    # rock chick enemy
+    .word 35, evtMultipleCommands | 2
+    .word     evtLoadObjSettings | 2
+    .word     evtSingleSprite | 8  # Row 15, last Column, Last Sprite
 
     # Cross
     .word 40, evtMultipleCommands | 2
@@ -283,15 +277,15 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtSingleSprite, sprSingleFrame | 18
     .byte         24+ 85, 24+ 160
 
-# ;Skull Bomber
-# defb 45,evtMultipleCommands+2   ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+3  ; Load Settings from bank 3
-# defb    0+3             ; Row 16, last Column, Last Sprite
+    # Skull Bomber
+    .word 45, evtMultipleCommands | 2
+    .word     evtLoadObjSettings | 3
+    .word     evtSingleSprite | 3  # Row 5, last Column, Last Sprite
 
-# ;Ant
-# defb 45,evtMultipleCommands+2   ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+4  ; Load Settings from bank 4
-# defb    0+12                    ; Row 16, last Column, Last Sprite
+    # Ant
+    .word 45, evtMultipleCommands | 2
+    .word     evtLoadObjSettings | 4
+    .word     evtSingleSprite | 12  # Row 23, last Column, Last Sprite
 
     # Burning bloke
     .word 55, evtMultipleCommands | 3
@@ -300,10 +294,11 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtSingleSprite, sprTwoFrame | 11
     .byte         24+ 85, 24+ 160
 
-# ; Boniburd
-# defb 65,evtMultipleCommands+2   ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+7  ; Load Settings from bank 5
-# defb    evtSingleSprite,TwoFrameSprite+ 2,160+24-24,24+16
+    # Boniburd
+    .word 65, evtMultipleCommands | 2
+    .word     evtLoadObjSettings | 7
+    .word     evtSingleSprite, sprTwoFrame | 2
+    .byte         24+ 16, 24+ 160-24
 
     # Spikeyrock
     .word 67, evtMultipleCommands | 4
@@ -316,26 +311,27 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtSingleSprite, sprSingleFrame | 10
     .byte         24+ 48+128, 24+ 160
 
-# ; rock chick enemy
-# defb 75,evtMultipleCommands+2           ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+2              ; Load Settings from bank 2
-# defb    0+8             ; Row 16, last Column, Last Sprite
+    # rock chick enemy
+    .word 75, evtMultipleCommands | 2
+    .word     evtLoadObjSettings | 2
+    .word     evtSingleSprite | 8  # Row 15, last Column, Last Sprite
 
-# ; rock chick enemy
-# defb 80,evtMultipleCommands+3           ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+2              ; Load Settings from bank 2
-# defb    0+6             ; Row 16, last Column, Last Sprite
-# defb    0+10                ; Row 16, last Column, Last Sprite
+    # rock chick enemy
+    .word 80, evtMultipleCommands | 3
+    .word     evtLoadObjSettings | 2
+    .word     evtSingleSprite | 6  # Row 11, last Column, Last Sprite
+    .word     evtSingleSprite | 10 # Row 19, last Column, Last Sprite
 
-# ; boniburd
-# defb 84,evtMultipleCommands+2           ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+7              ; Load Settings from bank 5
-# defb    evtSingleSprite,TwoFrameSprite+ 2,160+24-24,24+16
+    # boniburd
+    .word 84, evtMultipleCommands | 2
+    .word     evtLoadObjSettings | 7
+    .word     evtSingleSprite, sprTwoFrame | 2
+    .byte         24+ 16, 24+ 160-24
 
-# ;Skeleton walker
-# defb 85,evtMultipleCommands+2           ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+5              ; Load Settings from bank 5
-# defb    0+13                ; Row 16, last Column, Last Sprite
+    # Skeleton walker
+    .word 85, evtMultipleCommands | 2
+    .word     evtLoadObjSettings | 5
+    .word     evtSingleSprite | 13  # Row 25, last Column, Last Sprite
 
     # Cross
     .word 88, evtMultipleCommands | 2
@@ -343,10 +339,11 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtSingleSprite, sprSingleFrame | 18
     .byte         24+ 85, 24+ 160
 
-# ; Powerup Drone
-# defb 90,evtMultipleCommands+2           ; 2 commands at the same timepoint
-# defb    evtSetProgMoveLife ,3,&22,64+63 ; Program - Bitshift Sprite... Move - dir Left Slow ... Hurt by bullets, hurts player, life 4
-# defb    0,128+ 38,160+24,150+24 ;   ; Single Object sprite 11 (animated)
+    # Powerup Drone
+    .word 90, evtMultipleCommands | 2
+    .word     evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 0x22), 64+63
+    .word     evtSingleSprite, sprTwoFrame | 38
+    .byte         24+ 150, 24+ 160
 
     # Grave
     .word 95, evtMultipleCommands | 2
@@ -354,22 +351,24 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtSingleSprite, sprSingleFrame | 21
     .byte         24+ 170, 24+ 160
 
-# ; SpliceFace
-# defb 100,evtMultipleCommands+2          ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+6              ; Load Settings from bank 6
-# defb    0,128+34,24,100+24  ;   ; Single Object /
+    # SpliceFace
+    .word 100, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 6
+    .word      evtSingleSprite, sprTwoFrame | 34
+    .byte          24+ 100, 24
 
-# ; rock chick enemy
-# defb 110,evtMultipleCommands+3          ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+2              ; Load Settings from bank 2
-# defb    0+6             ; Row 16, last Column, Last Sprite
-# defb    0+10                ; Row 16, last Column, Last Sprite
+    # rock chick enemy
+    .word 110, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 2
+    .word      evtSingleSprite | 6  # Row 11, last Column, Last Sprite
+    .word      evtSingleSprite | 10 # Row 19, last Column, Last Sprite
 
-# ; rock chick enemy
-# defb 115,evtMultipleCommands+2          ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+2              ; Load Settings from bank 2
-# defb    0+8             ; Row 16, last Column, Last Sprite
+    # rock chick enemy
+    .word 115, evtMultipleCommands | 2
+    .word     evtLoadObjSettings | 2
+    .word     evtSingleSprite | 8  # Row 15, last Column, Last Sprite
 
+    # Clouds (3 wide)
     .word 120, evtMultipleCommands | 4
     .word      evtSetProgMoveLife, prgNone, mveBackground | 0b0100, lifeImmortal
     .word      evtSingleSprite, sprSingleFrame | 41
@@ -379,11 +378,11 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word      evtSingleSprite, sprSingleFrame | 43
     .byte          24+ 14, 24+ 159+24
 
-# ; rock chick enemy
-# defb 120,evtMultipleCommands+3          ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+2              ; Load Settings from bank 2
-# defb    0+6             ; Row 16, last Column, Last Sprite
-# defb    0+10                ; Row 16, last Column, Last Sprite
+    # rock chick enemy
+    .word 120, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 2
+    .word      evtSingleSprite | 6  # Row 11, last Column, Last Sprite
+    .word      evtSingleSprite | 10 # Row 19, last Column, Last Sprite
 
     # Grave
     .word 122, evtMultipleCommands | 2
@@ -391,15 +390,15 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word      evtSingleSprite, sprSingleFrame | 21
     .byte         24+ 170, 24+ 160
 
-# ; rock chick enemy
-# defb 125,evtMultipleCommands+2          ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+2              ; Load Settings from bank 2
-# defb    0+8             ; Row 16, last Column, Last Sprite
+    # rock chick enemy
+    .word 125, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 2
+    .word      evtSingleSprite | 8  # Row 15, last Column, Last Sprite
 
-# ; rock chick enemy
-# defb 127,evtMultipleCommands+2          ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+2              ; Load Settings from bank 2
-# defb    0+8             ; Row 16, last Column, Last Sprite
+    # rock chick enemy
+    .word 127, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 2
+    .word      evtSingleSprite | 8  # Row 15, last Column, Last Sprite
 
     # Burning bloke
     .word 129, evtMultipleCommands | 3
@@ -408,16 +407,16 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word      evtSingleSprite, sprTwoFrame | 11
     .byte          24+ 90, 24+ 160
 
-# ; rock chick enemy
-# defb 130,evtMultipleCommands+3          ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+2              ; Load Settings from bank 2
-# defb    0+6             ; Row 16, last Column, Last Sprite
-# defb    0+10                ; Row 16, last Column, Last Sprite
+    # rock chick enemy
+    .word 130, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 2
+    .word      evtSingleSprite | 6  # Row 11, last Column, Last Sprite
+    .word      evtSingleSprite | 10 # Row 19, last Column, Last Sprite
 
-# ; rock chick enemy
-# defb 135,evtMultipleCommands+2          ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+2              ; Load Settings from bank 2
-# defb    0+8             ; Row 16, last Column, Last Sprite
+    # rock chick enemy
+    .word 135, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 2
+    .word      evtSingleSprite | 8  # Row 15, last Column, Last Sprite
 
     # Cross
     .word 140, evtMultipleCommands | 2
@@ -425,28 +424,30 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word      evtSingleSprite, sprSingleFrame | 19
     .byte          24+ 103, 24+ 160
 
-# ; SpliceFace
-# defb 150,evtMultipleCommands+2          ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+6              ; Load Settings from bank 6
-# defb    0,128+34,24,100+24  ;   ; Single Object /
+    # SpliceFace
+    .word 150, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 6
+    .word      evtSingleSprite, sprSingleFrame | 34
+    .byte          24+ 100, 24
 
-# ; Powerup Drone
-# defb 150,evtMultipleCommands+2          ; 2 commands at the same timepoint
-# defb    evtSetProgMoveLife ,3,&22,64+63 ; Program - Bitshift Sprite... Move - dir Left Slow ... Hurt by bullets, hurts player, life 4
-# defb    0,128+ 38,160+24,150+24 ;   ; Single Object sprite 11 (animated)
+    # Powerup Drone
+    .word 150, evtMultipleCommands | 2
+    .word      evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 0x22), 64+63
+    .word      evtSingleSprite, sprTwoFrame | 38
+    .byte          24+ 150, 24+ 160
 
-# ; Eyeclopse s
-# defb 160,evtMultipleCommands+4          ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+9              ; Load Settings from bank 5
-# defb    0+7
-# defb    131,%10101111               ; change Move
-# defb    0+12
+    # Eyeclopse s
+    .word 160, evtMultipleCommands | 4
+    .word      evtLoadObjSettings | 9
+    .word      evtSingleSprite | 7  # Row 13, last Column, Last Sprite
+    .word      evtSetMove, mveWave | 0b1111
+    .word      evtSingleSprite | 12  # Row 23, last Column, Last Sprite
 
-# ; rock chick enemy
-# defb 165,evtMultipleCommands+3          ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+2              ; Load Settings from bank 2
-# defb    0+6             ; Row 16, last Column, Last Sprite
-# defb    0+10                ; Row 16, last Column, Last Sprite
+    # rock chick enemy
+    .word 165, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 2
+    .word      evtSingleSprite | 6  # Row 11, last Column, Last Sprite
+    .word      evtSingleSprite | 10 # Row 19, last Column, Last Sprite
 
     # Grave
     .word 167, evtMultipleCommands | 2
@@ -454,28 +455,28 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word      evtSingleSprite, sprSingleFrame | 20
     .byte          24+ 173, 24+ 160
 
-# ; rock chick enemy
-# defb 170,evtMultipleCommands+2          ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+2              ; Load Settings from bank 2
-# defb    0+8             ; Row 16, last Column, Last Sprite
+    # rock chick enemy
+    .word 170, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 2
+    .word      evtSingleSprite | 8  # Row 15, last Column, Last Sprite
 
-# ; Eyeclopse s
-# defb 180,evtMultipleCommands+4          ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+9              ; Load Settings from bank 5
-# defb    0+7
-# defb    131,%10101111               ; change Move
-# defb    0+12
+    # Eyeclopse s
+    .word 180, evtMultipleCommands | 4
+    .word      evtLoadObjSettings | 9
+    .word      evtSingleSprite | 7  # Row 13, last Column, Last Sprite
+    .word      evtSetMove, mveWave | 0b1111
+    .word      evtSingleSprite | 12  # Row 23, last Column, Last Sprite
 
     # Cross
     .word 185, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 1
     .word      evtSingleSprite, sprSingleFrame | 19
     .byte          24+ 107, 24+ 160
-#
-# ; Skull Gang
-# defb 190,evtMultipleCommands+2          ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+8              ; Load Settings from bank 5
-# defb    0+7
+
+    # Skull Gang
+    .word 190, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 8
+    .word      evtSingleSprite | 7  # Row 13, last Column, Last Sprite
 
     # Clouds (3 wide)
     .word 200, evtMultipleCommands | 4
@@ -487,21 +488,22 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word      evtSingleSprite, sprSingleFrame | 43
     .byte          24+ 14, 24+ 159+24
 
-# ; rock chick enemy
-# defb 200,evtMultipleCommands+3 ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+2 ; Load Settings from bank 2
-# defb    0+6                    ; Row 16, last Column, Last Sprite
-# defb    0+10                   ; Row 16, last Column, Last Sprite
+    # rock chick enemy
+    .word 200, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 2
+    .word      evtSingleSprite | 6  # Row 11, last Column, Last Sprite
+    .word      evtSingleSprite | 10 # Row 19, last Column, Last Sprite
 
-# ; boniburd
-# defb 220,evtMultipleCommands+2 ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+7 ; Load Settings from bank 5
-# defb    evtSingleSprite,TwoFrameSprite+ 2,160+24-24,24+16
+    # Boniburd
+    .word 220, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 7
+    .word      evtSingleSprite, sprTwoFrame | 2
+    .byte          24+ 16, 24+ 160-24
 
-# ;Skeleton walker
-# defb 220,evtMultipleCommands+2          ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+5              ; Load Settings from bank 5
-# defb    0+13                ; Row 16, last Column, Last Sprite
+    # Skeleton walker
+    .word 220, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 5
+    .word      evtSingleSprite | 13  # Row 25, last Column, Last Sprite
 
     # Grave
     .word 221, evtMultipleCommands | 2
@@ -509,127 +511,76 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word      evtSingleSprite, sprSingleFrame | 20
     .byte         24+ 176, 24+ 160
 
-# ;Skull Bomber
-# defb 225,evtMultipleCommands+2 ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+3 ; Load Settings from bank 3
-# defb    0+3                    ; Row 16, last Column, Last Sprite
+    # Skull Bomber
+    .word 225, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 3
+    .word      evtSingleSprite | 3  # Row 5, last Column, Last Sprite
 
-# ;Ant
-# defb 225,evtMultipleCommands+2 ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+4 ; Load Settings from bank 4
-# defb    0+12                   ; Row 16, last Column, Last Sprite
+    # Ant
+    .word 225, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 4
+    .word      evtSingleSprite | 12  # Row 23, last Column, Last Sprite
 
-# ; SpliceFace
-# defb 230,evtMultipleCommands+4 ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+6 ; Load Settings from bank 6
-# defb    %10000011,&23          ; Change Move
-# defb    0,128+34,24,50+24   ;  ; Single Object /
-# defb    0,128+34,24,150+24  ;  ; Single Object /
+    # SpliceFace
+    .word 230, evtMultipleCommands | 4
+    .word      evtLoadObjSettings | 6
+    .word      evtSetMove, mvRegular | spdNormal | 0x23
+    .word      evtSingleSprite, sprTwoFrame | 34
+    .byte          24+ 50, 24+ 138
+    .word      evtSingleSprite, sprTwoFrame | 34
+    .byte          24+ 150, 24+ 138
 
-# ; SpliceFace
-# defb 232,evtMultipleCommands+3 ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+6 ; Load Settings from bank 6
-# defb    0,128+34,24,50+24   ;  ; Single Object /
-# defb    0,128+34,24,150+24  ;  ; Single Object /
+    # SpliceFace
+    .word 232, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 6
+    .word      evtSingleSprite, sprTwoFrame | 34
+    .byte          24+ 50, 24+ 138
+    .word      evtSingleSprite, sprTwoFrame | 34
+    .byte          24+ 150, 24+ 138
 
-# ;Skull Bomber
-# defb 235,evtMultipleCommands+2 ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+3 ; Load Settings from bank 3
-# defb    0+3                    ; Row 16, last Column, Last Sprite
+    # Skull Bomber
+    .word 235, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 3
+    .word      evtSingleSprite | 3  # Row 5, last Column, Last Sprite
 
-# ;Ant
-# defb 235,evtMultipleCommands+2 ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+4 ; Load Settings from bank 4
-# defb    0+12                   ; Row 16, last Column, Last Sprite
+    # Ant
+    .word 235, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 4
+    .word      evtSingleSprite | 12  # Row 23, last Column, Last Sprite
 
-# ;Skull Bomber
-# defb 245,evtMultipleCommands+2 ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+3 ; Load Settings from bank 3
-# defb    0+3                    ; Row 16, last Column, Last Sprite
+    # Skull Bomber
+    .word 245, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 3
+    .word      evtSingleSprite | 3  # Row 5, last Column, Last Sprite
 
-# ;Ant
-# defb 245,evtMultipleCommands+2 ; 2 commands at the same timepoint
-# defb    evtSettingsBank_Load+4 ; Load Settings from bank 4
-# defb    0+12                   ; Row 16, last Column, Last Sprite
+    # Ant
+    .word 245, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 4
+    .word      evtSingleSprite | 12  # Row 23, last Column, Last Sprite
 
-# defb 250,evtMultipleCommands+2 ; 2 commands at the same timepoint
-# defb    evtSetProgMoveLife ,0,%11000100,0           ; Move    / dir Left Slow ... Life - immortal
-# defb    0, 43,160+24,10+28  ;   ; Single Object /
+    # cloud
+    .word 250, evtMultipleCommands | 2
+    .word      evtSetProgMoveLife, prgNone, mveBackground | 0b0100, lifeImmortal
+    .word      evtSingleSprite, sprSingleFrame | 43
+    .byte          24+ 14, 24+ 160
 
-# defb 5,%10001001            ;Call a memory location
-# defw    ClearBadguys
-# ;Palette Change
+   #.word, 256+ 5, evtCallAddress, DoSmartBombCall
+
 # LevelEndAnim:
 # defb 5,evtMultipleCommands+2            ; 3 commands at the same timepoint
 # defb evtSetProgMoveLife,prgMovePlayer,&24,10
 # defb    0,128+  47,140+24,100+24    ;   ; Single Object sprite 11 (animated)
 
-# ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-# FadeOutStartPoint equ 5
-# ;               Start of fade out block
-# ;               Fade out ends at FadeutStart+2, eg if FadeOut=5 then ends at 7
-# ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#
-#     ;CPC Plus
-#     defb FadeOutStartPoint,evtCallAddress
-#     defw FadeOut
-#
-#     ;Blue 6128
-#
-#     defb FadeOutStartPoint+1,evtMultipleCommands+4          ; 4 Commands
-#     defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
-#     defb 1
-#     defb 1
-#     defb &54,&54,&44,&40
-#
-#     defb 240,26*0+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
-#     defb 1
-#     defb 1
-#     defb &54,&54,&44,&40
-#
-#     defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
-#     defb 0
-#     defb 1
-#     defb &54,&54,&44,&40
-#
-#     defb 240,26*2+6,6               ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
-#     defb 1
-#     defb 1
-#     defb &54,&54,&44,&40
-#
-#     ;Black 6128
-#     defb FadeOutStartPoint+2,evtMultipleCommands+4          ; 4 Commands
-#     defb 240,0,6                ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
-#     defb 1
-#     defb 1
-#     defb &54,&54,&54,&54
-#
-#     defb 240,26*0+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
-#     defb 1
-#     defb 1
-#     defb &54,&54,&54,&54
-#
-#     defb 240,26*1+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 21*2+5
-#     defb 0
-#     defb 1
-#     defb &54,&54,&54,&54
-#
-#     defb 240,26*2+6,6       ; (Time,Cmd,Off,Bytes) load 5 bytes into the palette Offset 0
-#     defb 1
-#     defb 1
-#     defb &54,&54,&54,&54
-#
-# ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-# ;               End of fade out block
-# ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#
-# defb 8,evtCallAddress           ;Call a memory location
-# defw    EndLevel
+# Start of fade out block ------------------------------------------------------
+    .equiv FadeOutStartPoint, 256+ 5
+    .word FadeOutStartPoint + 1, evtSetPalette, DarkRealPalette
+    .word FadeOutStartPoint + 2, evtSetPalette, BluePalette
 
-
+    .word 256+ 8, evtCallAddress, EndLevel
 #----------------------------------------------------------------------------}}}
 
 EndLevel:
+        TST  (SP)+ # remove return address from the stack
         MOV  $0x8000,R5
         JMP  @$ExecuteBootstrap
 
@@ -653,7 +604,7 @@ LevelLoop:
 
         CALL @$ObjectArray_Redraw
 
-       #CALL Akuyou_Player_Handler
+       #CALL @$Player_Handler
 
        #CALL AkuYou_Player_StarArray_Redraw
 
@@ -822,9 +773,9 @@ RealPalette: #---------------------------------------------------------------{{{
 
     .byte 1, 1    # line number, set colors
     .byte 0x00, 0x99, 0xEE, 0xFF
-    .byte 49, 1    # line number, set colors
-    .byte 0x00, 0x55, 0x11, 0xFF
-    .byte 129, 1    # line number, set colors
+    .byte 41, 1    # line number, set colors
+    .byte 0x00, 0x55, 0x33, 0xFF
+    .byte 143, 1    # line number, set colors
     .byte 0x00, 0xCC, 0xBB, 0xFF
 
     .byte 201       # --line number, 201 - end of the main screen params
