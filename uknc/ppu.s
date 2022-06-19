@@ -640,7 +640,12 @@ MusicStop: #-----------------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 
 VblankIntHandler: #----------------------------------------------------------{{{
-       #MTPS $PR7
+        # we disabling "single process mode" to load data from disk only,
+        # and to avoid random disk loading issues, we disabling our
+        # Vblank handler as well
+        TST  @$SingleProcessFlag
+        BZE  SkipToFirmwareHandler
+
         MOV  @$PBPADR,-(SP)
         MOV  R5,-(SP)
         MOV  R4,-(SP)
@@ -665,6 +670,7 @@ MusicPlayerCall:
         MOV  (SP)+,R5
         MOV  (SP)+,@$PBPADR
 
+SkipToFirmwareHandler:
         # we do not need firmware interrupt handler except for this small
         # procedure
         TST  @$07130 # is floppy drive spindle rotating?
@@ -673,8 +679,7 @@ MusicPlayerCall:
         BNZ  1237$   # continue rotation unless the counter reaches zero
         CALL @07132  # stop floppy drive spindle
 
-1237$: #MTPS $PR0
-        RTI
+1237$:  RTI
 #----------------------------------------------------------------------------}}}
 
 PrintDebugInfo: #------------------------------------------------------------{{{
