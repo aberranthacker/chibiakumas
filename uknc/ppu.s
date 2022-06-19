@@ -320,7 +320,7 @@ GoMultiProcess: #------------------------------------------------------------{{{
                 JMP  CommandExecuted
 #----------------------------------------------------------------------------}}}
 SetPalette: #----------------------------------------------------------------{{{
-                MOV  @$PASWCR,-(SP)
+                PUSH @$PASWCR
                 MOV  $0x010,@$PASWCR
 
                 MOV  $PPU_PPUCommandArg, @$PBPADR
@@ -372,7 +372,7 @@ SetPalette: #----------------------------------------------------------------{{{
                 BNE  next_record$
 
     palette_is_set$:
-                MOV  (SP)+,@$PASWCR
+                POP  @$PASWCR
 
                 JMP  CommandExecuted
 #----------------------------------------------------------------------------}}}
@@ -655,7 +655,9 @@ VblankIntHandler: #----------------------------------------------------------{{{
         MOV  R0,-(SP)
 
     .ifdef DebugMode
+        MTPS $PR7
         CALL @$PrintDebugInfo
+        MTPS $PR0
     .endif
 
 MusicPlayerCall:
