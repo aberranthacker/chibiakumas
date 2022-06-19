@@ -179,6 +179,7 @@ charnikohime: .word 0
 charnikohimehead: .word 0
 
 EndLevel:
+        TST  (SP)+ # remove return address from the stack
         MOV  $0x8000,R5
         JMP  @$ExecuteBootstrap
 

@@ -347,8 +347,8 @@ ObjectLoop_SaveChanges$:
                                       # ld (hl),a ;Life
                                       # res 6,l ;dec h
                                       # ld a,iyh
-         # LSB=Move, MSB=Sprite       # ld (hl),a ;spr
-         MOV  R2,-(R5)                # dec h
+        # LSB=Move, MSB=Sprite        # ld (hl),a ;spr
+        MOV  R2,-(R5)                 # dec h
                                       # ld a,ixh
                                       # ld (hl),a ;Move
                                       # dec h
@@ -596,26 +596,29 @@ ObjectAnimator:                                             # ObjectAnimator:
 
 ObjectProgram:
         SWAB R3 # MSB=Program, LSB=0        # ret z       ; return if zero
-        CMP  R3,$0b00000001                 # cp %00000001
+        MOV  R3,R0
+        CMP  R0,$0b00000001                 # cp %00000001
         BNE  1$                             # ; Used by background, sprite bank based on X co-ord
         JMP  @$ObjectProgram_BitShiftSprite # jp z,ObjectProgram_BitShiftSprite
-1$:                                         # and %11111000           ;00000XXX = Powerup
-                                            # jr z,ObjectProgram_PowerUps
-        .inform_and_hang "ObjectProgram not implemented"
+    1$:
+        BIC  $0b00000111,R0                 # and %11111000           ;00000XXX = Powerup
+        BZE  ObjectProgram_PowerUps         # jr z,ObjectProgram_PowerUps
+                                            # 01101011
                                             # cp %11110000            ;11110XXX = Animate every X frames
                                             # jp z,ObjectProgram_FrameAnimate
-                                            # and %11100000
-                                            # jr z,ObjectProgram_PowerUps ;0001XXXX = Smartbombable Powerup
+        BIC  $0b00011111,R0                 # and %11100000
+        BZE  ObjectProgram_PowerUps         # jr z,ObjectProgram_PowerUps ;0001XXXX = Smartbombable Powerup
                                             #
-                                            # cp %00100000            ;001XXXXX = Fastfire
-                                            # jp z,ObjectProgram_FastFire
-                                            # cp %01000000            ;010XXXXX = Fastfire
-                                            # jp z,ObjectProgram_MidFire
-                                            # cp %01100000            ;011XXXXX = Fastfire
-                                            # jp z,ObjectProgram_SlowFire
-                                            # cp %10000000            ;100XXXXX = Fastfire
-                                            # jp z,ObjectProgram_SnailFire
+        CMP  R0,$0b001 << 5                 # cp %00100000            ;001XXXXX = fast fire
+        BEQ  ObjectProgram_FastFire         # jp z,ObjectProgram_FastFire
+        CMP  R0,$0b010 << 5                 # cp %01000000            ;010XXXXX = medium fire
+        BEQ  ObjectProgram_MidFire          # jp z,ObjectProgram_MidFire
+        CMP  R0,$0b011 << 5                 # cp %01100000            ;011XXXXX = slow fire
+        BEQ  ObjectProgram_SlowFire         # jp z,ObjectProgram_SlowFire
+        CMP  R0,$0b100 << 5                 # cp %10000000            ;100XXXXX = Fastfire
+        BEQ  ObjectProgram_SnailFire        # jp z,ObjectProgram_SnailFire
                                             # cp %11000000            ;110XXXXX = Fastfire
+       .inform_and_hang "ObjectProgram not implemented"
                                             # jp z,ObjectProgram_Mid2Fire
                                             # cp %10100000            ;110XXXXX = Fastfire
                                             # jp z,ObjectProgram_HyperFire
@@ -635,20 +638,14 @@ ObjectProgram:
                                                             #     jr ObjectProgram_MovePlayerB
                                                             # ObjectProgram_Custom1:
                                                             #     jp null :CustomProgram1_Plus2
-                                                            # ObjectProgram_PowerUps:
+ObjectProgram_PowerUps:
                                                             #     ld a,iyl
-                                                            #     and %00001111
+        BIC  $0xFFF0,R3                                     #     and %00001111
                                                             #     cp 4
                                                             #     jr z,ObjectProgram_MovePlayer
-                                                            #     cp 5 ; removed. some bank switching been here
-                                                            #     ret z
-                                                            #     cp 6
-                                                            #     ret z
-                                                            #     cp 7
-                                                            #     ret z
                                                             #     cp 8                ;Custom 1
                                                             #     jr z,ObjectProgram_Custom1
-                                                            #     ret
+1237$:  RETURN                                              #     ret
                                                             # ObjectProgram_MovePlayer:   ; Used by end of level code to make player fly to a point
                                                             #     ;b=x ;c=y
                                                             #     push iy
@@ -728,16 +725,17 @@ ObjectProgram_FastFire:                # ObjectProgram_FastFire:
         MOV  $0b00000010,R0            #     ld a,%00000010; :FireFrequencyE_Plus1
                                        #
 ObjectProgram_Fire:                    # ObjectProgram_Fire:
-        .inform_and_hang "no ObjectProgram_Fire"
                                                  #     ld d,a ;ld iyh,a
                                                  #
                                                  #     ei  ; Why is interrupts disabled here??
                                                  #     ld a,(Timer_TicksOccured)
+        BIT  @$srcTimer_TicksOccured,R0          #
+        BNZ  ObjectProgram_HyperFire             #     and d;iyh
+        RETURN                                   #     ret z
                                                  #
-                                                 #     and d;iyh
-                                                 #     ret z
-                                                 #
-                                                 # ObjectProgram_HyperFire:
+ObjectProgram_HyperFire:                         # ObjectProgram_HyperFire:
+        RETURN
+        .inform_and_hang "no ObjectProgram_HyperFire"
                                                  #     ld a,2
                                                  #     call SFX_QueueSFX_Generic
                                                  #
@@ -767,6 +765,7 @@ ObjectProgram_Fire:                    # ObjectProgram_Fire:
                                                  #     ld iy,Player_Array2
                                                  #     jr Object_DecreaseShot_Start
 Object_DecreaseLifeShot:                         #  Object_DecreaseLifeShot:
+        RETURN
         .inform_and_hang "no Object_DecreaseLifeShot"
                                                  #     ld a,ixl
                                                  #     and %00111111

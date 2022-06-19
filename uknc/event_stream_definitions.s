@@ -182,14 +182,14 @@
 
 .equiv prgNone, 0               # prgNothing     equ 0 ; PrgSpare
 .equiv prgBitShift, 1           # prgBitShift    equ 1 ; Change sprite bank according to X
-                                # prgSpecial     equ 2
-                                # prgBonus       equ 3
+                                # prgSpecial     equ 2 ; not used
+.equiv prgBonus, 3              # prgBonus       equ 3 ; not used
                                 # prgMovePlayer  equ 4
                                 #
-                                # prgSpriteBank0 equ 0
-                                # prgSpriteBank1 equ 5
-                                # prgSpriteBank2 equ 6
-                                # prgSpriteBank3 equ 7 ; use PrgNothing for Bank 0
+                                # prgSpriteBank0 equ 0 ; not used
+                                # prgSpriteBank1 equ 5 ; removed
+                                # prgSpriteBank2 equ 6 ; removed
+                                # prgSpriteBank3 equ 7 ; removed, use PrgNothing for Bank 0
                                 #
                                 # prgSpecialHitPlayer equ 2+16
                                 #
@@ -197,8 +197,8 @@
                                 # prgSmartBombableSpriteBank1 equ 5+16
                                 # prgSmartBombableSpriteBank2 equ 6+16
                                 # prgSmartBombableSpriteBank3 equ 7+16 ; use PrgNothing for Bank 0
-                                #
-                                # prgCustom1Protected equ 8 ; Custom 1 - protected from smart bomb
+                                # ; Custom 1 - protected from smart bomb
+                                # prgCustom1Protected equ 8 ; disabled(unreachable)
                                 #
                                 # ;move chibiko to a point - only used by ep 2
                                 #
@@ -261,17 +261,17 @@
                             # ;   Fire W               16
                             # ;   Fire NW              17
                             # ;   Fire N               18
-                                                            #
-                                                            # prgCustom1  equ %11111100           ;Custom 1
-                                                            # prgCustom2  equ %11111101           ;Custom 2
-                                                            # prgCustom3  equ %11111110           ;Custom 3
-                                                            # prgCustom4  equ %11111111           ;Custom 4
-                                                            # specMoveChibiko equ 255
+                            #
+                            # prgCustom1  equ %11111100 ;Custom 1
+                            # prgCustom2  equ %11111101 ;Custom 2
+                            # prgCustom3  equ %11111110 ;Custom 3
+                            # prgCustom4  equ %11111111 ;Custom 4
+                            # specMoveChibiko equ 255
 
 .equiv mvRegular, 0    # 0xxxxxxx
 .equiv mvSpecial, 0x80 # 1xxxxxxx
-.equiv spdNormal, 0    # 00xxxxxx
-.equiv spdFast,   0x40 # 01xxxxxx
+.equiv spdNormal, 0    # x0xxxxxx
+.equiv spdFast,   0x40 # x1xxxxxx
 .equiv mvStatic,  0x24 # 00100100
 # Moves
 #         0   1   2   3   4   5   6   7
@@ -285,11 +285,11 @@
 #  2  6  30  31  32  33  34  35  36  37
 #  3  7  38  39  3A  3B  3C  3D  3E  3F
 
-                                # mveMisc       equ 0 ;used for visual clarity!
+                                 # mveMisc       equ 0 ;used for visual clarity!
 .equiv mveBackground, 0b11000000 # 1100xxxx, ----xxxx tick point
-.equiv mveSeaker_P1,  0b10000100 # 0b100001xx
-.equiv mveSeaker_P2,  0b10010000 # 0b100100xx
-.equiv mveSeaker,     0b10001000 # 0b100010xx seek! I can't spel!
+.equiv mveSeaker_P1,  0b10000100 # 100001xx
+.equiv mveSeaker_P2,  0b10010000 # 100100xx
+.equiv mveSeaker,     0b10001000 # 100010xx seek! I can't spel!
 .equiv mveWave,       0b10100000 # 1010xxxx Wave pattern
 .equiv mveCustom1,    0b11110000 # 1111xxxx Level specific 1
 .equiv mveCustom2,    0b11100000 # 1110xxxx Level specific 2
