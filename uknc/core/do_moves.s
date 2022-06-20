@@ -37,11 +37,10 @@ DoMoves:
 
         ASL  R0
     DoMoves_NoMultY:
-        ADD  R1,R0
-        CMP  R0,$199+24    # we are at the bottom of the screen
+        ADD  R0,R1
+        CMP  R1,$199+24    # we are at the bottom of the screen
         BHIS DoMoves_Kill  # over the page
 
-        MOV  R0,R1
         # X move ---------------------------------------------------------------
         MOV  R2,R0
         BIC  $0177770,R0
@@ -51,11 +50,9 @@ DoMoves:
 
         ASL  R0
     DoMoves_NoMultX:
-        ADD  R4,R0
-        CMP  R0,$160+24   # we are at the bottom of the screen
+        ADD  R0,R4
+        CMP  R4,$160+24   # we are at the bottom of the screen
         BHIS DoMoves_Kill # over the page
-
-        MOV  R0,R4
 
         RETURN
 
