@@ -48,7 +48,7 @@
 
 .equiv Akuyou_GameVarsStart, FB1 + 16000
 
-.equiv Akuyou_LevelStart, 0x9FFE # 40958 0117776 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9FFA # 40954 0117772 # auto-generated during a build
 .equiv LevelSprites, Akuyou_LevelStart + 4
 
 .equiv SPReset,       0157770 # Initial stack pointer
