@@ -219,10 +219,10 @@ ContinueModeSet: # ../Aku/BootStrap.asm:2165
         # reset all the scores n stuff
         MOV  $Player_Array, R5                              #
                                                             #     ld a,(iy-15)
-        BITB $0x80,-15(R5)                                  #     and %10000000
+        BITB $0x80,-14(R5)                                  #     and %10000000
        .CALL NE, FireMode_4D                                #     call nz,FireMode_4D
                                                             #     ld a,1
-        MOVB $1,-7(R5)                                      #     ld (iy-7),a ;live players
+        MOVB $1,-6(R5)                                      #     ld (iy-7),a ;live players
                                                             #     ;multiplay support
         MOV  $0x003E,R3                                     #     ld hl,&003E
                                                             #     ld a,(MultiplayConfig)
@@ -250,26 +250,29 @@ StartANewGame_NoControlFlip: # ../Aku/BootStrap.asm:2206
         MOV  $Player_Array, R5 # AkuYou_Player_GetPlayerVars
 
         MOV  $0010000,R2 # MOV R0,R0 # slightly faster than NOP
-        BITB $0x40,-11(R5) # test bit 6
-        BNE  NoBulletSlowdown
+        BITB $0x40,-10(R5) # test bit 6
+        BNZ  NoBulletSlowdown
         MOV  $0006200,R2 # ASR R0
 NoBulletSlowdown: # ../Aku/BootStrap.asm:2206
         MOV  R2,@$opcStarSlowdown # ../SrcALL/Akuyou_Multiplatform_Stararray.asm:107
 
-       .equiv BulletConfigSize, BulletConfigHeaven_End - BulletConfigHeaven
+       .equiv BulletConfigSizeWords, (BulletConfigHeaven_End - BulletConfigHeaven) >> 1
         MOV  $Stars_AddBurst_Top,R2
-        MOV  $BulletConfigSize,R1
+        MOV  $BulletConfigSizeWords,R1
         MOV  $BulletConfigHeaven,R3
         MOV  $2,R0
-        BNE  useheaven
+        BITB $0x80,-10(R5) # test bit 7
+        BNZ  useheaven
         MOV  $BulletConfigHell,R3
         MOV  $1,R0
 useheaven: # ../Aku/BootStrap.asm:2242
-        MOVB (R3)+,(R2)+
-        SOB  R1,.-2
+        MOV  R0,@$srcBurstSpacing
+        100$:
+            MOV  (R3)+,(R2)+
+        SOB  R1,100$
 
-        MOVB -11(R5),R0
-        BIC  $!0b11,R0 # R0 & 0b11
+        MOVB -10(R5),R0
+        BIC  $0xFFFC,R0 # 0b11111100
         BEQ  Difficulty_Normal
         CMP  R0,$1
         BEQ  Difficulty_Easy
@@ -490,7 +493,7 @@ level_00.bin:
     .word level_00_block_num
 level_01.bin:
     .word Akuyou_LevelStart
-    .equiv level_01_size, 8640
+    .equiv level_01_size, 8440
     .word level_01_size >> 1
     .equiv level_01_block_num, level_00_block_num + (level_00_size + 511) >> 9
     .word level_01_block_num
@@ -511,7 +514,7 @@ BulletConfigHeaven: #--------------------------------------------------------{{{
     .word 0xFFFF
     .word 0xFFFF
     .word 0x1B19
-    .byte 0
+    .word 0
     # Stars_AddBurst_Right #
     .word 0x2725
     .word 0xFFFF
@@ -522,7 +525,7 @@ BulletConfigHeaven: #--------------------------------------------------------{{{
     .word 0xFFFF
     .word 0xFFFF
     .word 0x1F1D
-    .byte 0
+    .word 0
     # Stars_AddBurst_Left
     .word 0xFFFF
     .word 0xFFFF
@@ -533,7 +536,7 @@ BulletConfigHeaven: #--------------------------------------------------------{{{
     .word 0xFFFF
     .word 0xFFFF
     .word 0xFFFF
-    .byte 0
+    .word 0
     # Stars_AddBurst_Bottom
     .word 0x2321
     .word 0xFFFF
@@ -544,7 +547,7 @@ BulletConfigHeaven: #--------------------------------------------------------{{{
     .word 0xFFFF
     .word 0xFFFF
     .word 0xFFFF
-    .byte 0
+    .word 0
     # Stars_AddBurst_Outer
     .word 0xFFFF
     .word 0xFFFF
@@ -560,34 +563,37 @@ BulletConfigHeaven: #--------------------------------------------------------{{{
     .word 0x3F39
     .word 0x0F09
     # Stars_AddObjectOne
-    .byte 0
+    .word 0
     # Stars_AddBurst
     .word 0xFFFF
-    .byte 0xFF,0xFF
+    .word 0xFFFF
     # Stars_AddBurst_Small
     .word 0x3632
     .word 0x2e2A
     .word 0x2622
     .word 0x1e1A
     .word 0x1612
-    .byte 0
+    .word 0
+    # Stars_AddBurst_TopWide:
     .word 0x1d1b
     .word 0xFFFF
     .word 0xFFFF
-    .byte 0
+    .word 0
+    # Stars_AddBurst_RightWide:
     .word 0x2726
     .word 0xFFFF
     .word 0xFFFF
-    .byte 0
+    .word 0
+    # Stars_AddBurst_LeftWide:
     .word 0x2221
     .word 0xFFFF
     .word 0xFFFF
-
-    .byte 0
+    .word 0
+    # Stars_AddBurst_BottomWide:
     .word 0x2d2b
     .word 0xFFFF
     .word 0xFFFF
-    .byte 0
+    .word 0
 BulletConfigHeaven_End:
 #----------------------------------------------------------------------------}}}
 BulletConfigHell: #----------------------------------------------------------{{{
@@ -601,7 +607,7 @@ BulletConfigHell: #----------------------------------------------------------{{{
     .word 0x0b09
     .word 0x1311
     .word 0x1b19
-    .byte 0
+    .word 0
     # Stars_AddBurst_Right
     .word 0x2725
     .word 0x2f2D
@@ -612,7 +618,7 @@ BulletConfigHell: #----------------------------------------------------------{{{
     .word 0x0F0d
     .word 0x1715
     .word 0x1F1D
-    .byte 0
+    .word 0
     # Stars_AddBurst_Left
     .word 0x0301
     .word 0x0b09
@@ -623,7 +629,7 @@ BulletConfigHell: #----------------------------------------------------------{{{
     .word 0x2b29
     .word 0x3331
     .word 0x3b39
-    .byte 0
+    .word 0
     # Stars_AddBurst_Bottom
     .word 0x2321
     .word 0x2b29
@@ -634,7 +640,7 @@ BulletConfigHell: #----------------------------------------------------------{{{
     .word 0x2f2D
     .word 0x3735
     .word 0x3f3D
-    .byte 0
+    .word 0
     # Stars_AddBurst_Outer
     .word 0x3737
     .word 0x2727
@@ -650,37 +656,37 @@ BulletConfigHell: #----------------------------------------------------------{{{
     .word 0x3F39
     .word 0x0F09
     # Stars_AddObjectOne
-    .byte 0
+    .word 0
     # Stars_AddBurst
     .word 0x3f08
-    .byte 0,0
+    .word 0
     # Stars_AddBurst_Small
     .word 0x3632
     .word 0x2e2A
     .word 0x2622
     .word 0x1e1A
     .word 0x1612
-    .byte 0
+    .word 0
     # Stars_AddBurst_TopWide
     .word 0x1d1b
     .word 0x1513
     .word 0x0d0b
-    .byte 0
+    .word 0
     # Stars_AddBurst_RightWide
     .word 0x2726
     .word 0x2f2d
     .word 0x1f1d
-    .byte 0
+    .word 0
     # Stars_AddBurst_LeftWide
     .word 0x2221
     .word 0x1b19
     .word 0x2b29
-    .byte 0
+    .word 0
     # Stars_AddBurst_BottomWide
     .word 0x2d2b
     .word 0x3533
     .word 0x3d3b
-    .byte 0
+    .word 0
 BulletConfigHell_End:
 #----------------------------------------------------------------------------}}}
 BlackPalette: #------------------------------------------------------{{{

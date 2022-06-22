@@ -749,9 +749,9 @@ ObjectProgram_HyperFire:                         # ObjectProgram_HyperFire:
         ADD  R4,R2                               #     add b
                                                  #     ld d,a
                                                  #
-        MOV  R3,R4                               #     ld a,iyl
-        BIC  $0xFFE0,R4                          #     and %00011111
-        # B = R4 = pattern (0-15)                #     ld b,a  ; top left
+                                                 #     ld a,iyl
+        BIC  $0xFFE0,R3                          #     and %00011111
+        # B = R3 = pattern (0-15)                #     ld b,a  ; top left
         # C = R1 = Y pos                         #
         # D = R2 = X pos                         # FireCustomStar:
         JMP  @$Stars_AddObjectBatchDefault       #     jp Stars_AddObjectBatchDefault
