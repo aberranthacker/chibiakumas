@@ -1,6 +1,6 @@
 
     org &8000
-    
+
     jp Sprite0_Setup
     jp Sprite1_Setup
     jp Sprite2_Setup

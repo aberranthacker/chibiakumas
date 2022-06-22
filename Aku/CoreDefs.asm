@@ -1,7 +1,7 @@
 SPReset equ &BFFF
 
 Akuyou_CoreStart      equ &450
-Akuyou_BootStrapStart equ &8000 
+Akuyou_BootStrapStart equ &8000
 
 Akuyou_GameVars    equ &3100 ; Need &700 bytes!
 PlusSprite_ExtBank equ &C7

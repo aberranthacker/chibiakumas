@@ -14,7 +14,7 @@
 ;   ld b,16
 ;   ld de,&0000
 ;   call BackgroundFloodFillQuadSprite
-;   
+;
 ; where B is the number of lines, HL is the right hand side of the area to fill
 
 ;QuadSprite
@@ -74,7 +74,7 @@ BackgroundSolidFillAgain:
     ld a,h
     add a,&08
     ld h,a
-    
+
     BackgroundSolidFillNextLine_Minus1:
         bit 7,h
         jp nz,BackgroundSolidFillNextLineDone

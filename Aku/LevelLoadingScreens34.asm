@@ -74,7 +74,7 @@ NextLinePushDe3: push de
 NextLinePushDe2: push de
 NextLinePushDe1: push de
 
-NextLine: 
+NextLine:
 ld hl,&0800+24
 add hl,sp
 ld sp,hl
@@ -83,7 +83,7 @@ ld hl,&c050
 add hl,sp
 ld sp,hl
 
-JumpToNextLine: 
+JumpToNextLine:
 LD L,(IX)
 INC IX
 LD H,(IX)
@@ -108,7 +108,7 @@ jr NextLine
 CompiledSprite_GetNxtLinbc: defw &0000 :CompiledSprite_NextLineJumpBC_Plus2
 
 
-BitmapData: 
+BitmapData:
 
 defb &00,&00,&02,&00,&0C,&0C,&08,&04,&06,&09
 defb &03,&05,&06,&01,&03,&0B,&08,&09,&08,&08

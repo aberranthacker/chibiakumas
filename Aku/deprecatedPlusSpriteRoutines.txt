@@ -60,7 +60,7 @@ Plus_CopySprite_Loop:
 		;LD BC,&7F00 ;Gate array port
 		or %11000000 ; Switch memory
 		OUT (C),A ;Send it
-	
+
 ret
 
 
@@ -94,12 +94,12 @@ NextSpriteSwapper:
 	;jr z,NextSpriteSwapper_Set4
 	;cp &20+12
 	;jr z,NextSpriteSwapper_Set3
-NextSpriteSwapper_Set1:	
+NextSpriteSwapper_Set1:
 	;ld a,&20
 	;jr NextSpriteSwapper_Update
 NextSpriteSwapper_Set2:
 	;ld a,&20+4
-NextSpriteSwapper_Set3:	
+NextSpriteSwapper_Set3:
 	;ld a,&20+8
 	;jr NextSpriteSwapper_Update
 NextSpriteSwapper_Set4:

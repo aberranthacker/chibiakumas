@@ -538,7 +538,7 @@ defw BitmapData+367
 LD HL,&E0FE
   Push HL
 LD BC,&3000
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_54:
@@ -556,7 +556,7 @@ defw BitmapData+373
 LD HL,&7200
   Push HL
 LD BC,&E400
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_55:
@@ -567,7 +567,7 @@ call BitmapPush14
 defw BitmapData+387
   PUSH DE
 LD HL,&0010
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicFinalBattle1bmp_Line_56:
@@ -583,7 +583,7 @@ call BitmapPush8
 defw BitmapData+395
   PUSH DE
 LD HL,&0020
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicFinalBattle1bmp_Line_57:
@@ -630,7 +630,7 @@ call BitmapPush8
 defw BitmapData+451
   PUSH DE
 LD HL,&FC10
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicFinalBattle1bmp_Line_61:
@@ -673,7 +673,7 @@ call BitmapPush16
 defw BitmapData+485
   PUSH DE
 LD HL,&1000
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicFinalBattle1bmp_Line_64:
@@ -773,7 +773,7 @@ call MultiPushDe10
 LD HL,&EF11
   Push HL
 LD BC,&7732
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_74:
@@ -781,7 +781,7 @@ call MultiPushDe10
 LD HL,&88FF
   Push HL
 LD BC,&3376
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_75:
@@ -789,7 +789,7 @@ call MultiPushDe10
 LD HL,&00CC
   Push HL
 LD BC,&1376
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_76:
@@ -797,7 +797,7 @@ call MultiPushDe10
 LD HL,&0004
   Push HL
 LD BC,&0576
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_77:
@@ -805,7 +805,7 @@ call MultiPushDe10
 LD HL,&0002
   Push HL
 LD BC,&08F6
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_78:
@@ -813,7 +813,7 @@ call MultiPushDe10
 LD HL,&000D
   Push HL
 LD BC,&0177
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_79:
@@ -821,7 +821,7 @@ call MultiPushDe10
 LD HL,&0001
   Push HL
 LD BC,&0255
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_80:
@@ -829,7 +829,7 @@ call MultiPushDe10
 LD HL,&4405
   Push HL
 LD BC,&04DD
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_81:
@@ -837,7 +837,7 @@ call MultiPushDe10
 LD HL,&2202
   Push HL
 LD BC,&8C99
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_82:
@@ -845,7 +845,7 @@ call MultiPushDe10
 LD HL,&8813
   Push HL
 LD BC,&8CB8
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_83:
@@ -853,7 +853,7 @@ call MultiPushDe10
 LD HL,&AA37
   Push HL
 LD BC,&8DE8
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_84:
@@ -861,7 +861,7 @@ call MultiPushDe10
 LD HL,&22BB
   Push HL
 LD BC,&BBAA
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_85:
@@ -869,7 +869,7 @@ call MultiPushDe10
 LD HL,&6675
   Push HL
 LD BC,&BBAA
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_86:
@@ -877,7 +877,7 @@ call MultiPushDe10
 LD HL,&4466
   Push HL
 LD BC,&BBAA
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_87:
@@ -885,7 +885,7 @@ call MultiPushDe10
 LD HL,&00AA
   Push HL
 LD BC,&BBAA
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_88:
@@ -893,7 +893,7 @@ call MultiPushDe10
 LD HL,&04DD
   Push HL
 LD BC,&BBAA
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_89:
@@ -901,7 +901,7 @@ call MultiPushDe10
 LD HL,&04EE
   Push HL
 LD BC,&BB44
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_90:
@@ -909,7 +909,7 @@ call MultiPushDe10
 LD HL,&02CC
   Push HL
 LD BC,&9966
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_91:
@@ -917,7 +917,7 @@ call MultiPushDe10
 LD HL,&0206
   Push HL
 LD BC,&4422
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_92:
@@ -925,7 +925,7 @@ call MultiPushDe10
 LD HL,&0208
   Push HL
 LD BC,&4533
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_93:
@@ -933,7 +933,7 @@ call MultiPushDe10
 LD HL,&0100
   Push HL
 LD BC,&4411
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_94:
@@ -941,7 +941,7 @@ call MultiPushDe10
 LD HL,&0100
   Push HL
 LD BC,&CC00
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFinalBattle1bmp_Line_95:
@@ -949,11 +949,11 @@ call MultiPushDe10
 LD HL,&0E0C
   Push HL
 LD BC,&4600
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 
-PicFinalBattle1bmp_DrawOrder: 
+PicFinalBattle1bmp_DrawOrder:
 
   DEFW PicFinalBattle1bmp_Line_0
   DEFW PicFinalBattle1bmp_Line_1
@@ -1066,21 +1066,21 @@ ei
 ret
 
 MultiPushDeLast12: ld HL,NextLine
-jr MultiPushDe12B 
+jr MultiPushDe12B
 MultiPushDe12: pop HL
-jr MultiPushDe12B 
+jr MultiPushDe12B
 MultiPushDe10: pop HL
-jr MultiPushDe10B 
+jr MultiPushDe10B
 MultiPushDe9: pop HL
-jr MultiPushDe9B 
+jr MultiPushDe9B
 MultiPushDeLast6: ld HL,NextLine
-jr MultiPushDe6B 
+jr MultiPushDe6B
 MultiPushDe6: pop HL
-jr MultiPushDe6B 
+jr MultiPushDe6B
 MultiPushDeLast5: ld HL,NextLine
-jr MultiPushDe5B 
+jr MultiPushDe5B
 MultiPushDe5: pop HL
-jr MultiPushDe5B 
+jr MultiPushDe5B
 MultiPushDe12B: Push DE
 MultiPushDe11B: Push DE
 MultiPushDe10B: Push DE
@@ -1150,7 +1150,7 @@ NextLinePushDe3: push de
 NextLinePushDe2: push de
 NextLinePushDe1: push de
 
-NextLine: 
+NextLine:
 ld hl,&0800+24
 add hl,sp
 ei
@@ -1172,7 +1172,7 @@ add hl,sp
 ld sp,hl
 ;push hl
 jp JumpToNextLine
-JumpToNextLine: 
+JumpToNextLine:
 LD L,(IX)
 INC IX
 LD H,(IX)
@@ -1198,7 +1198,7 @@ jr NextLine
 CompiledSprite_GetNxtLinbc: defw &0000 :CompiledSprite_NextLineJumpBC_Plus2
 
 
-BitmapData: 
+BitmapData:
 
 defb &00,&10,&70,&F0,&40,&00,&00,&20,&F0,&FE
 defb &A0,&00,&00,&50,&F1,&FF,&C0,&00,&00,&A0

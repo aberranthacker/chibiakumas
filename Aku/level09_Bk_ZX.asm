@@ -341,7 +341,7 @@ LD HL,&0001
   Push HL
 call MultiPushDe14
 LD BC,&8000
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicClipImage_Line_44_Reuse:
@@ -383,7 +383,7 @@ LD HL,&0440
 Ld B,E
 Ld C,H
 
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicClipImage_Line_51:
@@ -405,7 +405,7 @@ LD HL,&0440
 Ld B,E
 Ld C,H
 
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicClipImage_Line_51_Reuse:
@@ -420,7 +420,7 @@ call MultiPushDe12
 LD HL,&0040
   Push HL
 LD BC,&0004
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicClipImage_Line_55:
@@ -436,7 +436,7 @@ LD HL,&0220
   Push HL
 call MultiPushDe14
 LD BC,&0440
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicClipImage_Line_57:
@@ -455,7 +455,7 @@ LD HL,&0200
   Push HL
 call MultiPushDe14
 LD BC,&0040
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicClipImage_Line_61:
@@ -512,7 +512,7 @@ LD HL,&4044
 Ld B,L
 Ld C,L
 
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicClipImage_Line_60_Reuse:
@@ -532,7 +532,7 @@ LD DE,&4444
   PUSH DE
   PUSH DE
 LD HL,&4454
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicClipImage_Line_131:
@@ -543,7 +543,7 @@ Ld E,L
 
 call MultiPushDe14
 LD BC,&0040
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicClipImage_Line_57_Reuse:
@@ -881,7 +881,7 @@ push de
 call MultiPushDe4
   jp EndCode
 
-PicClipImage_DrawOrder: 
+PicClipImage_DrawOrder:
 
   DEFW PicClipImage_Line_0
   DEFW PicClipImage_Line_1
@@ -1053,57 +1053,57 @@ defw looper
 ;Global Code
 RLE_ImageWidth equ 0
 RLE_NextScreenLineHL:
-	push de
-	ld b,RLE_ImageWidth :ImageWidthE_Plus1
-	ld de,&000+RLE_ImageWidth :ImageWidthD_Plus2
-	add hl,de
-	inc h
-	ld a,h
-	and  %00000111;7
-	jp nz,JumpToNextLineBB
-	ld a,l
-	add a,%00100000;32
-	ld l,a
-	jp c,JumpToNextLineBB
-	ld a,h
-	sub %00001000;8
-	ld h,a
-JumpToNextLineBB: 
-	pop de
-	ret
+    push de
+    ld b,RLE_ImageWidth :ImageWidthE_Plus1
+    ld de,&000+RLE_ImageWidth :ImageWidthD_Plus2
+    add hl,de
+    inc h
+    ld a,h
+    and  %00000111;7
+    jp nz,JumpToNextLineBB
+    ld a,l
+    add a,%00100000;32
+    ld l,a
+    jp c,JumpToNextLineBB
+    ld a,h
+    sub %00001000;8
+    ld h,a
+JumpToNextLineBB:
+    pop de
+    ret
 
 EndCode:
 ld sp,&0000:StackRestore_Plus2
 ei
 ret
 MultiPushDe23: pop HL
-jp MultiPushDe23B 
+jp MultiPushDe23B
 MultiPushDe40: pop HL
-jp MultiPushDe40B 
+jp MultiPushDe40B
 MultiPushDeLast16: ld HL,NextLine
-jr MultiPushDe16B 
+jr MultiPushDe16B
 MultiPushDe16: pop HL
-jr MultiPushDe16B 
+jr MultiPushDe16B
 MultiPushDe14: pop HL
-jr MultiPushDe14B 
+jr MultiPushDe14B
 MultiPushDe12: pop HL
-jr MultiPushDe12B 
+jr MultiPushDe12B
 MultiPushDe11: pop HL
-jr MultiPushDe11B 
+jr MultiPushDe11B
 MultiPushDe10: pop HL
-jr MultiPushDe10B 
+jr MultiPushDe10B
 MultiPushDe9: pop HL
-jr MultiPushDe9B 
+jr MultiPushDe9B
 MultiPushDe8: pop HL
-jr MultiPushDe8B 
+jr MultiPushDe8B
 MultiPushDe7: pop HL
-jr MultiPushDe7B 
+jr MultiPushDe7B
 MultiPushDe6: pop HL
-jr MultiPushDe6B 
+jr MultiPushDe6B
 MultiPushDe5: pop HL
-jr MultiPushDe5B 
+jr MultiPushDe5B
 MultiPushDe4: pop HL
-jr MultiPushDe4B 
+jr MultiPushDe4B
 MultiPushDe40B: Push DE
 MultiPushDe39B: Push DE
 MultiPushDe38B: Push DE
@@ -1194,25 +1194,25 @@ NextLinePushDe3: push de
 NextLinePushDe2: push de
 NextLinePushDe1: push de
 
-NextLine: 
+NextLine:
 ld hl,&0000+31
 add hl,sp
 inc h
-	ld a,h
-	and  %00000111;7
-	jp nz,JumpToNextLineB
-	ld a,l
-	add a,%00100000;32
-	ld l,a
-	jp c,JumpToNextLineB
-	ld a,h
-	sub %00001000;8
-	ld h,a
-JumpToNextLineB: 
+    ld a,h
+    and  %00000111;7
+    jp nz,JumpToNextLineB
+    ld a,l
+    add a,%00100000;32
+    ld l,a
+    jp c,JumpToNextLineB
+    ld a,h
+    sub %00001000;8
+    ld h,a
+JumpToNextLineB:
 inc hl
 ld sp,hl
 
-JumpToNextLine: 
+JumpToNextLine:
 LD L,(IX)
 INC IX
 LD H,(IX)
@@ -1248,29 +1248,29 @@ INC bc
 ld (Looper_CountSize_Plus1-1),a
 ld (RestoreLooperAddress_Plus2-2),bc
 LooperNextStage:
-	ld hl,&0000 :RestoreLooperAddress_Plus2
-	ld (Looper_Address_Plus2-2),hl
-	ld a,0:Looper_CountB_Plus1
-	ld (Looper_Count_Plus1-1),a
-	LooperRepeat:
-		ld hl,&0000 :Looper_Address_Plus2
-		LD c,(hl)
-		INC hl
-		LD b,(hl)
-		INC hl
-		ld (Looper_Address_Plus2-2),hl
-		ld h,b
-		ld l,c
-		ld ix,LooperContinueAddress
-		jp (hl)
+    ld hl,&0000 :RestoreLooperAddress_Plus2
+    ld (Looper_Address_Plus2-2),hl
+    ld a,0:Looper_CountB_Plus1
+    ld (Looper_Count_Plus1-1),a
+    LooperRepeat:
+        ld hl,&0000 :Looper_Address_Plus2
+        LD c,(hl)
+        INC hl
+        LD b,(hl)
+        INC hl
+        ld (Looper_Address_Plus2-2),hl
+        ld h,b
+        ld l,c
+        ld ix,LooperContinueAddress
+        jp (hl)
    LooperContinue:
-		ld a,0:Looper_Count_Plus1
-		dec a
-		ld (Looper_Count_Plus1-1),a
-	jp nz,LooperRepeat
-	ld a,0:Looper_CountSize_Plus1
-	dec a
-	ld (Looper_CountSize_Plus1-1),a
+        ld a,0:Looper_Count_Plus1
+        dec a
+        ld (Looper_Count_Plus1-1),a
+    jp nz,LooperRepeat
+    ld a,0:Looper_CountSize_Plus1
+    dec a
+    ld (Looper_CountSize_Plus1-1),a
 jp nz,LooperNextStage
 ld ix,(Looper_Address_Plus2-2)
 LD L,(IX)
@@ -1280,7 +1280,7 @@ INC IX
 JP (HL)
 
 
-BitmapData: 
+BitmapData:
 
 defb &04,&00,&40,&04,&00,&40,&02,&00,&20,&02
 defb &00,&20,&00,&40,&04,&00,&40,&04,&20,&02
