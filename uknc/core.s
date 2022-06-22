@@ -241,8 +241,10 @@ TranspColors: .byte 0x00 # 0b00000000
 # Smartbomb effect shows a flashing background, these are the bytes used
 # Background_SmartBombColors: defb &FF, &0, &FF, &0, &FF
 
-# StarsOneByteDirs:
-#     defb &21,&09,&0C,&0F,&27,&3F,&3C,&39,&61,&49,&4c,&4f,&67,&7f,&7c,&79
+StarsOneByteDirs:
+       .byte 0x21,0x09,0x0C,0x0F,0x27,0x3F,0x3C,0x39,0x61,0x49,0x4c,0x4f,0x67,0x7f,0x7c,0x79
+       #       16   17   18   19   20   21   22   23   24   25   26   27   28   29   30   31
+       .even
 
 Event_VectorArray:
        .word Event_SingleSprite                # 0x00 0x00  # defw Event_OneObj
@@ -420,6 +422,7 @@ Event_SmartBombSpecial_NotImplemented:
 
        .include "core/stararray_add.s"
        .global Stars_AddBurst_Top
+       .global srcBurstSpacing
 
        .include "core/timer.s"
        .global Timer_GetTimer

@@ -594,79 +594,79 @@ LevelInit:
         CALL ScreenBuffer_Init
         MTPS $PR0
 
-        MOV  $PlayerStarArrayPointer,R0
+       #MOV  $PlayerStarArrayPointer,R0
        #MOVB $24+ 100,(R0)+ # static
        #MOVB $24+ 80,(R0)+
        #MOVB $0x24,(R0)+
 
-        MOVB $24+ 0x64,(R0)+ # 12 o'clock
-        MOVB $24+ 0x50,(R0)+
-        MOVB $0x1C,(R0)+
+       #MOVB $24+ 0x64,(R0)+ # 12 o'clock
+       #MOVB $24+ 0x50,(R0)+
+       #MOVB $0x1C,(R0)+
 
-        MOVB $24+ 0x64,(R0)+ # 1:30
-        MOVB $24+ 0x50,(R0)+
-        MOVB $0x1E,(R0)+
+       #MOVB $24+ 0x64,(R0)+ # 1:30
+       #MOVB $24+ 0x50,(R0)+
+       #MOVB $0x1E,(R0)+
 
-        MOVB $24+ 0x64,(R0)+ # 3 o'clock
-        MOVB $24+ 0x50,(R0)+
-        MOVB $0x26,(R0)+
+       #MOVB $24+ 0x64,(R0)+ # 3 o'clock
+       #MOVB $24+ 0x50,(R0)+
+       #MOVB $0x26,(R0)+
 
-        MOVB $24+ 0x64,(R0)+ # 4:30
-        MOVB $24+ 0x50,(R0)+
-        MOVB $0x2E,(R0)+
+       #MOVB $24+ 0x64,(R0)+ # 4:30
+       #MOVB $24+ 0x50,(R0)+
+       #MOVB $0x2E,(R0)+
 
-        MOVB $24+ 0x64,(R0)+ # 6 o'clock
-        MOVB $24+ 0x50,(R0)+
-        MOVB $0x2C,(R0)+
+       #MOVB $24+ 0x64,(R0)+ # 6 o'clock
+       #MOVB $24+ 0x50,(R0)+
+       #MOVB $0x2C,(R0)+
 
-        MOVB $24+ 0x64,(R0)+ # 7:30
-        MOVB $24+ 0x50,(R0)+
-        MOVB $0x2A,(R0)+
+       #MOVB $24+ 0x64,(R0)+ # 7:30
+       #MOVB $24+ 0x50,(R0)+
+       #MOVB $0x2A,(R0)+
 
-        MOVB $24+ 0x64,(R0)+ # 9 o'clock
-        MOVB $24+ 0x50,(R0)+
-        MOVB $0x22,(R0)+
+       #MOVB $24+ 0x64,(R0)+ # 9 o'clock
+       #MOVB $24+ 0x50,(R0)+
+       #MOVB $0x22,(R0)+
 
-        MOVB $24+ 0x64,(R0)+ # 10:30
-        MOVB $24+ 0x50,(R0)+
-        MOVB $0x1A,(R0)+
+       #MOVB $24+ 0x64,(R0)+ # 10:30
+       #MOVB $24+ 0x50,(R0)+
+       #MOVB $0x1A,(R0)+
 
-        MOV  $StarArrayPointer,R0
+       #MOV  $StarArrayPointer,R0
        #MOVB $24+ 100,(R0)+ # static
        #MOVB $24+ 80,(R0)+
        #MOVB $0x24,(R0)+
 
-        MOVB $24+ 0x64,(R0)+ # 12 o'clock
-        MOVB $24+ 0x50,(R0)+
-        MOVB $0x1C,(R0)+
+       #MOVB $24+ 0x64,(R0)+ # 12 o'clock
+       #MOVB $24+ 0x50,(R0)+
+       #MOVB $0x1C,(R0)+
 
-        MOVB $24+ 0x64,(R0)+ # 1:30
-        MOVB $24+ 0x50,(R0)+
-        MOVB $0x1E,(R0)+
+       #MOVB $24+ 0x64,(R0)+ # 1:30
+       #MOVB $24+ 0x50,(R0)+
+       #MOVB $0x1E,(R0)+
 
-        MOVB $24+ 0x64,(R0)+ # 3 o'clock
-        MOVB $24+ 0x50,(R0)+
-        MOVB $0x26,(R0)+
+       #MOVB $24+ 0x64,(R0)+ # 3 o'clock
+       #MOVB $24+ 0x50,(R0)+
+       #MOVB $0x26,(R0)+
 
-        MOVB $24+ 0x64,(R0)+ # 4:30
-        MOVB $24+ 0x50,(R0)+
-        MOVB $0x2E,(R0)+
+       #MOVB $24+ 0x64,(R0)+ # 4:30
+       #MOVB $24+ 0x50,(R0)+
+       #MOVB $0x2E,(R0)+
 
-        MOVB $24+ 0x64,(R0)+ # 6 o'clock
-        MOVB $24+ 0x50,(R0)+
-        MOVB $0x2C,(R0)+
+       #MOVB $24+ 0x64,(R0)+ # 6 o'clock
+       #MOVB $24+ 0x50,(R0)+
+       #MOVB $0x2C,(R0)+
 
-        MOVB $24+ 0x64,(R0)+ # 7:30
-        MOVB $24+ 0x50,(R0)+
-        MOVB $0x2A,(R0)+
+       #MOVB $24+ 0x64,(R0)+ # 7:30
+       #MOVB $24+ 0x50,(R0)+
+       #MOVB $0x2A,(R0)+
 
-        MOVB $24+ 0x64,(R0)+ # 9 o'clock
-        MOVB $24+ 0x50,(R0)+
-        MOVB $0x22,(R0)+
+       #MOVB $24+ 0x64,(R0)+ # 9 o'clock
+       #MOVB $24+ 0x50,(R0)+
+       #MOVB $0x22,(R0)+
 
-        MOVB $24+ 0x64,(R0)+ # 10:30
-        MOVB $24+ 0x50,(R0)+
-        MOVB $0x1A,(R0)+
+       #MOVB $24+ 0x64,(R0)+ # 10:30
+       #MOVB $24+ 0x50,(R0)+
+       #MOVB $0x1A,(R0)+
 LevelLoop:
         CALL @$Background_Draw
 

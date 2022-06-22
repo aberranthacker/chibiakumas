@@ -164,12 +164,7 @@
 # Life decreases either over time or due to hits %00000000 means an immortal
 # object which will only dissapear if it goes ofscreen
 #
-# Domoves
-# 0MYYYXXX   ; Linear move
-# 11ddXXXX   ; Background (Slow) move
-# 100001XX   ; Seek player 1 speed -----XX1
-# 1010DSPP   D = Depth bit, S= Speed, PP Position
-#
+
 # 1 =   4 px
 # 2 =   8 px
 # 3 =  16 px
@@ -268,12 +263,34 @@
                             # prgCustom4  equ %11111111 ;Custom 4
                             # specMoveChibiko equ 255
 
+# Domoves
+# 0MYYYXXX   ; Linear move
+# 11ddXXXX   ; Background (Slow) move
+# 100001XX   ; Seek player 1 speed -----XX1
+# 1010DSPP   D = Depth bit, S= Speed, PP Position
+
 .equiv mvRegular, 0    # 0xxxxxxx
 .equiv mvSpecial, 0x80 # 1xxxxxxx
 .equiv spdNormal, 0    # x0xxxxxx
 .equiv spdFast,   0x40 # x1xxxxxx
 .equiv mvStatic,  0x24 # 00100100
-# Moves
+# Moves octal
+#           |  0   1   2   3   4   5   6   7
+#           |  -   -   -   -   -   -   -   -
+#           |  4   4   4   4   4   4   4   4
+#           |  =   =   =   =   =   =   =   =
+#           | -4  -3  -2  -1   0   1   2   3
+# ----------+-------------------------------
+# 0 - 4 = -4| 00  01  02  03  04  05  06  07
+# 1 - 4 = -3| 10  11  12  13  14  15  16  17
+# 2 - 4 = -2| 20  21  22  23  24  25  26  27
+# 3 - 4 = -1| 30  31  32  33  34  35  36  37
+# 4 - 4 =  0| 40  41  42  43 [44] 45  46  47
+# 5 - 4 =  1| 50  51  52  53  54  55  56  57
+# 6 - 4 =  2| 60  61  62  63  64  65  66  67
+# 7 - 4 =  3| 70  71  72  73  74  75  76  77
+
+# Moves hexadecimal
 #         0   1   2   3   4   5   6   7
 #        -4  -3  -2  -1  0    1   2   3
 # -4  0  00  01  02  03  04  05  06  07
