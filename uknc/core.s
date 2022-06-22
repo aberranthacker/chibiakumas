@@ -241,11 +241,6 @@ TranspColors: .byte 0x00 # 0b00000000
 # Smartbomb effect shows a flashing background, these are the bytes used
 # Background_SmartBombColors: defb &FF, &0, &FF, &0, &FF
 
-StarsOneByteDirs:
-       .byte 0x21,0x09,0x0C,0x0F,0x27,0x3F,0x3C,0x39,0x61,0x49,0x4c,0x4f,0x67,0x7f,0x7c,0x79
-       #       16   17   18   19   20   21   22   23   24   25   26   27   28   29   30   31
-       .even
-
 Event_VectorArray:
        .word Event_SingleSprite                # 0x00 0x00  # defw Event_OneObj
        .word Event_MultiObj_NotImplemented     # 0x01 0x02  # defw Event_MultiObj
@@ -298,7 +293,6 @@ Event_VectorArray:
        .word Event_ObjectFullCustomMoves_NotImplemented # 0x2E 0x5C  defw Event_ObjectFullCustomMoves
        .word Event_SmartBombSpecial_NotImplemented # 0x2F 0x5E  defw Event_SmartBombSpecial
 
-                                        # read "..\SrcCPC\Akuyou_CPC_InterruptHandler.asm"
 null:   RETURN
 
 Event_MultiObj_NotImplemented:

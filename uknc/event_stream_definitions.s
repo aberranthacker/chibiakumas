@@ -131,7 +131,7 @@
 #      10000100 P M L = (132) Change object Program Move and Life
 #      10000101 S     = (133) Change object Sprite (only works with 0000XXXX)
 #      10000110         (134) Add Objects to Front of list first (Background)
-#      10000111         (135) Add Objects to Back of list first (Foreground) 
+#      10000111         (135) Add Objects to Back of list first (Foreground)
 #                             Background objects may not be shown in turbo mode!
 #      10001000 L H T = (136) Load HL as next event pointer, change time to T
 #      10001001 L H   = (137) Call HL
@@ -159,7 +159,7 @@
 # 11110100 LH   = Reprogram Custom Move1
 # 11110101 LH   = Reprogram Custom Move2
 #
-# Life BPxxxxx  B=hurt by bullets, P hurts player, xxxxxx = Life ... 
+# Life BPxxxxx  B=hurt by bullets, P hurts player, xxxxxx = Life ...
 #
 # Life decreases either over time or due to hits %00000000 means an immortal
 # object which will only dissapear if it goes ofscreen

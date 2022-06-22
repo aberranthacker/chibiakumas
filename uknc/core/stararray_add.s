@@ -96,18 +96,18 @@ Stars_AddToPlayer: # used by player_driver.s
         CLR  @$srcStarArrayStartPoint
         RETURN
 
-                                      # OuterBurstPatternLoop:
-                                      #     ld a,(hl)
-                                      #     or a
-                                      #     ret z
-                                      #     push hl
-                                      #         ld h,a
-                                      #         rst 6
-                                      #     pop hl
-                                      #     inc hl
-                                      #     jr OuterBurstPatternLoop
+# OuterBurstPatternLoop:
+#     ld a,(hl)
+#     or a
+#     ret z
+#     push hl
+#         ld h,a
+#         rst 6
+#     pop hl
+#     inc hl
+#     jr OuterBurstPatternLoop
 
-Stars_AddObjectBatchDefault:          # Stars_AddObjectBatchDefault:
+Stars_AddObjectBatchDefault:
         MOV  $StarArraySizeBytes,@$cmpStars_AddObject_StarArraySize
         MOV  $StarArrayPointer,@$srcStars_AddObject_StarArrayPointer
         CLR  @$srcStarArrayStartPoint
@@ -116,12 +116,11 @@ Stars_AddObjectBatch:
         # B = R3 = pattern (0-15)
         # C = R1 = Y pos
         # D = R2 = X pos
-        MOV  R3,R0
         CMP  R3,$16 # radial blast!
         BHIS Stars_AddObjectBatch2
-        ASL  R0
-        MOV  Stars_VectorArray(R0),R5
 
+        ASL  R3
+        MOV  Stars_VectorArray(R3),R5
 
 Stars_AddBursts_Loop:
         MOV  (R5)+,R0
@@ -166,7 +165,7 @@ Stars_AddBurst_Loop:
         CLR  R4
         BISB R0,R4
        .equiv srcBurstSpacing, .+2
-        SUB  $2,R4  # alter to reduce fire
+        SUB  $2,R4 # alter to reduce fire
         BLO  1237$
         SWAB R0
         CMPB R4,R0
@@ -174,7 +173,7 @@ Stars_AddBurst_Loop:
 
         CMP  R4,$044
         BNE  1$
-        DEC  R4 # don't add a static star!
+        DEC  R4    # don't add a static star!
     1$:
         SWAB R0
         CLRB R0
@@ -224,3 +223,8 @@ Stars_AddObjectBatch2:
         SUB  $16,R3
         MOVB StarsOneByteDirs(R3),R0
         BR   Stars_AddObjectFromR0
+
+StarsOneByteDirs:
+       .byte 0x21,0x09,0x0C,0x0F,0x27,0x3F,0x3C,0x39,0x61,0x49,0x4c,0x4f,0x67,0x7f,0x7c,0x79
+       #       16   17   18   19   20   21   22   23   24   25   26   27   28   29   30   31
+       .even

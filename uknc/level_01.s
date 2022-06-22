@@ -209,9 +209,9 @@ EventStreamArray_Ep1: #---------------------------------------------------------
 
 # Start of fade in block -------------------------------------------------------
     .equiv FadeStartPoint, 0
-#   .word FadeStartPoint + 1, evtSetPalette, BluePalette
-#   .word FadeStartPoint + 2, evtSetPalette, DarkRealPalette
-    .word FadeStartPoint + 0, evtSetPalette, RealPalette
+    .word FadeStartPoint + 1, evtSetPalette, BluePalette
+    .word FadeStartPoint + 2, evtSetPalette, DarkRealPalette
+    .word FadeStartPoint + 3, evtSetPalette, RealPalette
 # End of fade in block ---------------------------------------------------------
 
     # rock chick enemy
@@ -594,79 +594,6 @@ LevelInit:
         CALL ScreenBuffer_Init
         MTPS $PR0
 
-       #MOV  $PlayerStarArrayPointer,R0
-       #MOVB $24+ 100,(R0)+ # static
-       #MOVB $24+ 80,(R0)+
-       #MOVB $0x24,(R0)+
-
-       #MOVB $24+ 0x64,(R0)+ # 12 o'clock
-       #MOVB $24+ 0x50,(R0)+
-       #MOVB $0x1C,(R0)+
-
-       #MOVB $24+ 0x64,(R0)+ # 1:30
-       #MOVB $24+ 0x50,(R0)+
-       #MOVB $0x1E,(R0)+
-
-       #MOVB $24+ 0x64,(R0)+ # 3 o'clock
-       #MOVB $24+ 0x50,(R0)+
-       #MOVB $0x26,(R0)+
-
-       #MOVB $24+ 0x64,(R0)+ # 4:30
-       #MOVB $24+ 0x50,(R0)+
-       #MOVB $0x2E,(R0)+
-
-       #MOVB $24+ 0x64,(R0)+ # 6 o'clock
-       #MOVB $24+ 0x50,(R0)+
-       #MOVB $0x2C,(R0)+
-
-       #MOVB $24+ 0x64,(R0)+ # 7:30
-       #MOVB $24+ 0x50,(R0)+
-       #MOVB $0x2A,(R0)+
-
-       #MOVB $24+ 0x64,(R0)+ # 9 o'clock
-       #MOVB $24+ 0x50,(R0)+
-       #MOVB $0x22,(R0)+
-
-       #MOVB $24+ 0x64,(R0)+ # 10:30
-       #MOVB $24+ 0x50,(R0)+
-       #MOVB $0x1A,(R0)+
-
-       #MOV  $StarArrayPointer,R0
-       #MOVB $24+ 100,(R0)+ # static
-       #MOVB $24+ 80,(R0)+
-       #MOVB $0x24,(R0)+
-
-       #MOVB $24+ 0x64,(R0)+ # 12 o'clock
-       #MOVB $24+ 0x50,(R0)+
-       #MOVB $0x1C,(R0)+
-
-       #MOVB $24+ 0x64,(R0)+ # 1:30
-       #MOVB $24+ 0x50,(R0)+
-       #MOVB $0x1E,(R0)+
-
-       #MOVB $24+ 0x64,(R0)+ # 3 o'clock
-       #MOVB $24+ 0x50,(R0)+
-       #MOVB $0x26,(R0)+
-
-       #MOVB $24+ 0x64,(R0)+ # 4:30
-       #MOVB $24+ 0x50,(R0)+
-       #MOVB $0x2E,(R0)+
-
-       #MOVB $24+ 0x64,(R0)+ # 6 o'clock
-       #MOVB $24+ 0x50,(R0)+
-       #MOVB $0x2C,(R0)+
-
-       #MOVB $24+ 0x64,(R0)+ # 7:30
-       #MOVB $24+ 0x50,(R0)+
-       #MOVB $0x2A,(R0)+
-
-       #MOVB $24+ 0x64,(R0)+ # 9 o'clock
-       #MOVB $24+ 0x50,(R0)+
-       #MOVB $0x22,(R0)+
-
-       #MOVB $24+ 0x64,(R0)+ # 10:30
-       #MOVB $24+ 0x50,(R0)+
-       #MOVB $0x1A,(R0)+
 LevelLoop:
         CALL @$Background_Draw
 
@@ -680,16 +607,13 @@ LevelLoop:
 
         CALL @$StarArray_Redraw
 
-       #CALL AkuYou_Player_DrawUI
+       #CALL @$Player_DrawUI
 
-       #CALL Akuyou_PlaySfx
-
-       .equiv FadeCommand, .+2
-        CALL @$null
+       #CALL @$PlaySfx
 
         CALL @$ScreenBuffer_Flip
 
-        JMP  @$LevelLoop
+        BR   LevelLoop
 
 # Generic Background Begin -----------------------------------------------------
 Background_Draw:
@@ -853,8 +777,6 @@ RealPalette: #---------------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 # 9 br.     # A br.     # B br.     # C br.     # D br.     # E br.     # F white
 # 1 blue    # 2 green   # 3 cyan    # 4 red     # 5 magenta # 6 yellow  # 7 gray
-   #read "..\SrcCPC\Akuyou_CPC_Level_GenericRasterSwitcher.asm"
-
 
     .even
 end:
