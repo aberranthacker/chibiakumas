@@ -41,7 +41,6 @@ Bootstrap_Launch:
         # PPU will clear the command code when it ready to execute a new one
        .ppudo $PPU_NOP
 
-        #:bpt
         JSR  R5,@$PPEXEC
        .word FB1 # PPU module location
        .word ppu_module_size >> 1
@@ -469,7 +468,7 @@ loading_screen.bin:
     .word loading_screen_block_num
 core.bin:
     .word FileBeginCore
-    .equiv core_size, 6684
+    .equiv core_size, 6692
     .word core_size >> 1
     .equiv core_block_num, (loading_screen_size + 511) >> 9 + loading_screen_block_num
     .word core_block_num
@@ -493,7 +492,7 @@ level_00.bin:
     .word level_00_block_num
 level_01.bin:
     .word Akuyou_LevelStart
-    .equiv level_01_size, 8440
+    .equiv level_01_size, 8446
     .word level_01_size >> 1
     .equiv level_01_block_num, level_00_block_num + (level_00_size + 511) >> 9
     .word level_01_block_num

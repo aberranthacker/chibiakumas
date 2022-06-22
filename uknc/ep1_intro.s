@@ -111,7 +111,7 @@ StartPoint:
     .word     evtSingleSprite, sprTwoFrame | 1 # 3
     .byte         24+40-10, 24+160-12 # Y, X : 30, 296
     .word     evtSingleSprite, sprTwoFrame | 2 # 4
-    .byte         24+40-10, 24+160    # Y, X : 30, 320    
+    .byte         24+40-10, 24+160    # Y, X : 30, 320
     # cleanup Chibiko sprite
     .word 51, evtMultipleCommands | 5
     .word     evtSingleSprite, sprTwoFrame | 6
