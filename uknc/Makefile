@@ -41,6 +41,7 @@ build/bootstrap.bin : build/bootstrap.o \
                       build/ep1_intro.o \
                       build/ep1_intro_slides.o \
                       build/level_01.o
+	build_tools/disk_map.rb
 	$(LD) $(LDFLAGS) \
 	      -T linker_scripts/bootstrap.cmd \
 	      -R build/core.o \

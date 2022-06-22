@@ -19,6 +19,7 @@ GetMemPos:
 
 ScreenBuffer_Reset:
         MOV  $0x4000, @$ScreenBuffer_ActiveScreenDirect
+        MOV  $0x4000, @$StarArray_ActiveScreen
         MOVB $0x40, @$srcFB_MSB
         MOV  $FB1, @$ScreenBuffer_ActiveScreen
         MOV  $FB1, @$ScreenBuffer_VisibleScreen
@@ -28,6 +29,7 @@ ScreenBuffer_Reset:
 
 ScreenBuffer_Init:
         MOV  $0x4000, @$ScreenBuffer_ActiveScreenDirect
+        MOV  $0x4000, @$StarArray_ActiveScreen
         MOVB $0x40, @$srcFB_MSB
         MOV  $FB0, @$ScreenBuffer_ActiveScreen
         CALL CLS
@@ -45,6 +47,7 @@ ScreenBuffer_SetFB0Active:
         # FB1 active, switch to FB0
        .ppudo $PPU_ShowFB1
         CLR  @$ScreenBuffer_ActiveScreenDirect
+        CLR  @$StarArray_ActiveScreen
         CLRB @$srcFB_MSB
         MOV  $FB0,R5
         MOV  R5, @$ScreenBuffer_ActiveScreen
@@ -55,6 +58,7 @@ ScreenBuffer_SetFB1Active:
         # FB0 active, switch to FB1
        .ppudo $PPU_ShowFB0
         MOV  $0x4000, @$ScreenBuffer_ActiveScreenDirect
+        MOV  $0x4000, @$StarArray_ActiveScreen
         MOVB $0x40, @$srcFB_MSB
         MOV  $FB1,R5
         MOV  R5, @$ScreenBuffer_ActiveScreen

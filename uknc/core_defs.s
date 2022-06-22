@@ -48,7 +48,7 @@
 
 .equiv Akuyou_GameVarsStart, FB1 + 16000
 
-.equiv Akuyou_LevelStart, 0x9FFA # 40954 0117772 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0xA274 # 41588 0121164 # auto-generated during a build
 .equiv LevelSprites, Akuyou_LevelStart + 4
 
 .equiv SPReset,       0157770 # Initial stack pointer
@@ -57,10 +57,10 @@
 .equiv PPUCommandArg, 0157776 # command for PPU argument
 # 0160000 57344 0xE000 end of RAM ----------------------------------------------
 
-.equiv PPU_UserRamSize,  0054104 # 22596 0x5844 
+.equiv PPU_UserRamSize,  0054104 # 22596 0x5844
 .equiv PPU_UserRamSizeWords, PPU_UserRamSize >> 1 # 0026042 11298 0x2C22
 # PPU memory map ---------------------------------------------------------------
-.equiv PPU_UserRamStart, 0023666 # 10166 0x27B6 
+.equiv PPU_UserRamStart, 0023666 # 10166 0x27B6
 
 .equiv PPU_StrBuffer, 0036666 # 15798 0x3DB6 # auto-generated during a build
 .equiv PPU_MusicBuffer, PPU_StrBuffer + 320

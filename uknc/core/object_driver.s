@@ -725,48 +725,43 @@ ObjectProgram_FastFire:                # ObjectProgram_FastFire:
         MOV  $0b00000010,R0            #     ld a,%00000010; :FireFrequencyE_Plus1
                                        #
 ObjectProgram_Fire:                    # ObjectProgram_Fire:
-                                                 #     ld d,a ;ld iyh,a
-                                                 #
+                                                 #     ld d,a
                                                  #     ei  ; Why is interrupts disabled here??
                                                  #     ld a,(Timer_TicksOccured)
         BIT  @$srcTimer_TicksOccured,R0          #
-        BNZ  ObjectProgram_HyperFire             #     and d;iyh
+        BNZ  ObjectProgram_HyperFire             #     and d
         RETURN                                   #     ret z
                                                  #
 ObjectProgram_HyperFire:                         # ObjectProgram_HyperFire:
-        RETURN
-        .inform_and_hang "no ObjectProgram_HyperFire"
-                                                 #     ld a,2
-                                                 #     call SFX_QueueSFX_Generic
-                                                 #
-                                                 #     ld a,(SpriteSizeShiftHalfB_Plus1-1)
+        MOV  $2,R0                               #     ld a,2
+        # TODO: implement QueueSFX
+       #CALL @$SFX_QueueSFX_Generic              #     call SFX_QueueSFX_Generic
+        # B=R4=X, C=R1=Y, IYL=R3=Prg             #
+        MOV  @$srcSpriteSizeShiftHalfB,R2
+        ADD  R2,R1                               #     ld a,(SpriteSizeShiftHalfB_Plus1 - 1)
                                                  #     ld d,a
                                                  #     add c
-                                                 #     ;   add 12      ObjectFirePosY_Plus1
                                                  #     ld c,a
                                                  #
                                                  #     ld a,d
-                                                 # ;   ld a,(SpriteSizeShiftHalfB_Plus1-1)
-                                                 #     rrca
-                                                 #     rrca
-                                                 #     add b
-                                                 # ;   ld a,b
-                                                 # ;   add 3       ;ObjectFirePosX_Plus1
+        RORB R2                                  #     rrca
+        RORB R2                                  #     rrca
+        ADD  R4,R2                               #     add b
                                                  #     ld d,a
                                                  #
-                                                 #     ld a,iyl
-                                                 #     and %00011111
-                                                 #     ld b,a  ; top left
-                                                 #
-                                                 # FireCustomStar:
-                                                 #     jp Stars_AddObjectBatchDefault
+        MOV  R3,R4                               #     ld a,iyl
+        BIC  $0xFFE0,R4                          #     and %00011111
+        # B = R4 = pattern (0-15)                #     ld b,a  ; top left
+        # C = R1 = Y pos                         #
+        # D = R2 = X pos                         # FireCustomStar:
+        JMP  @$Stars_AddObjectBatchDefault       #     jp Stars_AddObjectBatchDefault
                                                  #
                                                  # Object_DecreaseShot_Player2:
                                                  #     ld iy,Player_Array2
                                                  #     jr Object_DecreaseShot_Start
 Object_DecreaseLifeShot:                         #  Object_DecreaseLifeShot:
         RETURN
-        .inform_and_hang "no Object_DecreaseLifeShot"
+       .inform_and_hang "no Object_DecreaseLifeShot"
                                                  #     ld a,ixl
                                                  #     and %00111111
                                                  #     ret z   ; if life is zero drop out (For custom hit code callback)

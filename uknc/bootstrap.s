@@ -254,7 +254,7 @@ StartANewGame_NoControlFlip: # ../Aku/BootStrap.asm:2206
         BNE  NoBulletSlowdown
         MOV  $0006200,R2 # ASR R0
 NoBulletSlowdown: # ../Aku/BootStrap.asm:2206
-        MOV  R2,@$srcStarSlowdown # ../SrcALL/Akuyou_Multiplatform_Stararray.asm:107
+        MOV  R2,@$opcStarSlowdown # ../SrcALL/Akuyou_Multiplatform_Stararray.asm:107
 
        .equiv BulletConfigSize, BulletConfigHeaven_End - BulletConfigHeaven
         MOV  $Stars_AddBurst_Top,R2
@@ -466,7 +466,7 @@ loading_screen.bin:
     .word loading_screen_block_num
 core.bin:
     .word FileBeginCore
-    .equiv core_size, 6052
+    .equiv core_size, 6684
     .word core_size >> 1
     .equiv core_block_num, (loading_screen_size + 511) >> 9 + loading_screen_block_num
     .word core_block_num
@@ -490,7 +490,7 @@ level_00.bin:
     .word level_00_block_num
 level_01.bin:
     .word Akuyou_LevelStart
-    .equiv level_01_size, 8444
+    .equiv level_01_size, 8640
     .word level_01_size >> 1
     .equiv level_01_block_num, level_00_block_num + (level_00_size + 511) >> 9
     .word level_01_block_num

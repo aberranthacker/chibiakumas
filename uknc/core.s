@@ -23,6 +23,7 @@
        .global SavedSettings_Last
        .global SmartBombsReset
        .global StarArrayPointer
+       .global PlayerStarArrayPointer
        .global null
 #----------------------------------------------------------------------------}}}
 
@@ -80,7 +81,7 @@ SavedSettings: # {{{
         P1_P04: .byte 0          #  4 - drones (0/1/2)
         P1_P05: .byte 60         #  5 - continues
         P1_P06: .byte 0          #  6 - drone pos
-        P1_P07: .byte 0b00000111 #  7 - Invincibility
+        P1_P07: .byte 1          #  7 - Invincibility
         P1_P08: .byte 0          #  8 - Player SpriteNum
         P1_P09: .byte 3          #  9 - Lives
         P1_P10: .byte 100        # 10 - Burst Fire (Xfire)
@@ -98,7 +99,7 @@ SavedSettings: # {{{
         P2_P04: .byte 0          #  4 - Drones (0/1/2)
         P2_P05: .byte 60         #  5 - continues
         P2_P06: .byte 0          #  6 - Drone Pos
-        P2_P07: .byte 0b00000111 #  7 - Invincibility
+        P2_P07: .byte 1          #  7 - Invincibility
         P2_P08: .byte 0          #  8 - Player SpriteNum
         P2_P09: .byte 0          #  9 - Lives
         P2_P10: .byte 0          # 10 - Burst Fire
@@ -374,7 +375,7 @@ Event_SmartBombSpecial_NotImplemented:
        .global ObjectArray_Redraw
 
        .include "core/player_driver.s"
-       .global DroneFlipFire 
+       .global DroneFlipFire
        .global PlayerHandler
        .global Player_GetPlayerVars
        .global SetFireDir_DOWN
@@ -415,7 +416,9 @@ Event_SmartBombSpecial_NotImplemented:
        .include "core/show_sprite.s"
 
        .include "core/stararray.s"
-       .global srcStarSlowdown
+       .global opcStarSlowdown
+       .global StarArray_Redraw
+       .global Player_StarArray_Redraw
 
        .include "core/stararray_add.s"
        .global Stars_AddBurst_Top
@@ -423,8 +426,8 @@ Event_SmartBombSpecial_NotImplemented:
        .include "core/timer.s"
        .global Timer_GetTimer
        .global Timer_UpdateTimer
-       .global srcTimer_CurrentTick 
-       .global srcTimer_TicksOccured 
+       .global srcTimer_CurrentTick
+       .global srcTimer_TicksOccured
 
        .include "core/virtual_screen_pos_320.s"
        .global ShowSpriteReconfigureEnableDisable
