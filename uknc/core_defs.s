@@ -48,7 +48,7 @@
 
 .equiv Akuyou_GameVarsStart, FB1 + 16000
 
-.equiv Akuyou_LevelStart, 0xA274 # 41588 0121164 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0xA0F4 # 41204 0120364 # auto-generated during a build
 .equiv LevelSprites, Akuyou_LevelStart + 4
 
 .equiv SPReset,       0157770 # Initial stack pointer
@@ -71,11 +71,23 @@
 .equiv OffscreenAreaAddr, 0140000 # 49152 0xC000
 #-------------------------------------------------------------------------------
 
-.equiv StarArraySize, 256
 .equiv ObjectArraySize, 60
+.equiv ObjectArrayElementSize, 8
+.equiv ObjectArraySizeBytes, ObjectArraySize * ObjectArrayElementSize
+
+.equiv StarArraySize, 256
+.equiv StarArrayElementSize, 3
+.equiv StarArraySizeBytes, StarArraySize * StarArrayElementSize
+
 .equiv PlayerStarArraySize, 128
-# WARNING: Update `core.s` if you changed array element size (multiplicator)
-.equiv GameVarsArraySize, ObjectArraySize * 8 + StarArraySize * 4 + PlayerStarArraySize * 4 + 15 * 8
+.equiv PlayerStarArrayElementSize, 3
+.equiv PlayerStarArraySizeBytes, PlayerStarArraySize * PlayerStarArrayElementSize
+
+.equiv Event_SavedSettingsSize, 15
+.equiv Event_SavedSettingsElementSize, 8
+.equiv Event_SavedSettingsSizeBytes, Event_SavedSettingsSize * Event_SavedSettingsElementSize
+
+.equiv GameVarsArraySize, ObjectArraySizeBytes + StarArraySizeBytes + PlayerStarArraySizeBytes + Event_SavedSettingsSizeBytes
 .equiv GameVarsArraySizeWords, GameVarsArraySize >> 1
 
 

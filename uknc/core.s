@@ -34,14 +34,12 @@
 #******************************************************************************#
 #*                             Main Project Code                              *#
 #******************************************************************************#
-                .=Akuyou_GameVarsStart # Need about 2136 bytes
+                .=Akuyou_GameVarsStart # Need about 1752 bytes
 
-    # WARNING: update GameVarsArraySize calculation in `core_defs.s`
-    # in case you changed values below
-    ObjectArrayPointer:     .space ObjectArraySize * 8
-    StarArrayPointer:       .space StarArraySize * 4
-    PlayerStarArrayPointer: .space PlayerStarArraySize * 4
-    Event_SavedSettings:    .space 15 * 8
+    ObjectArrayPointer:     .space ObjectArraySizeBytes
+    StarArrayPointer:       .space StarArraySizeBytes
+    PlayerStarArrayPointer: .space PlayerStarArraySizeBytes
+    Event_SavedSettings:    .space Event_SavedSettingsSizeBytes
 
     KeyboardScanner_P1: .word 0
     KeyboardScanner_P2: .word 0
