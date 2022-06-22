@@ -1,19 +1,7 @@
 #!/bin/ruby
 # frozen_string_literal: true
 
-require 'pry'
-
-FILES = [
-  'build/bootsector.bin',
-  'build/bootstrap.bin',
-  'build/ppu_module.bin',
-  'build/loading_screen.bin',
-  'build/core.bin',
-  'build/ep1_intro.bin',
-  'build/ep1_intro_slides.bin',
-  'build/level_00.bin',
-  'build/level_01.bin'
-]
+require_relative 'dsk_image_constants'
 
 binaries_info = File.read('build/binaries_info.txt').each_line.map do |line|
   data = line.split(',')

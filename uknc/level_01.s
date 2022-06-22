@@ -209,9 +209,9 @@ EventStreamArray_Ep1: #---------------------------------------------------------
 
 # Start of fade in block -------------------------------------------------------
     .equiv FadeStartPoint, 0
-    .word FadeStartPoint + 1, evtSetPalette, BluePalette
-    .word FadeStartPoint + 2, evtSetPalette, DarkRealPalette
-    .word FadeStartPoint + 3, evtSetPalette, RealPalette
+#   .word FadeStartPoint + 1, evtSetPalette, BluePalette
+#   .word FadeStartPoint + 2, evtSetPalette, DarkRealPalette
+    .word FadeStartPoint + 0, evtSetPalette, RealPalette
 # End of fade in block ---------------------------------------------------------
 
     # rock chick enemy
@@ -585,9 +585,6 @@ EndLevel:
         JMP  @$ExecuteBootstrap
 
 LevelInit:
-      #.ppudo_ensure $PPU_LoadMusic,$TitleMusic
-      #.ppudo_ensure $PPU_MusicRestart
-
         CALL @$AkuYou_Player_GetPlayerVars
 
         MOV  $EventStreamArray_Ep1,R5 # Event Stream
@@ -597,6 +594,79 @@ LevelInit:
         CALL ScreenBuffer_Init
         MTPS $PR0
 
+        MOV  $PlayerStarArrayPointer,R0
+       #MOVB $24+ 100,(R0)+ # static
+       #MOVB $24+ 80,(R0)+
+       #MOVB $0x24,(R0)+
+
+        MOVB $24+ 0x64,(R0)+ # 12 o'clock
+        MOVB $24+ 0x50,(R0)+
+        MOVB $0x1C,(R0)+
+
+        MOVB $24+ 0x64,(R0)+ # 1:30
+        MOVB $24+ 0x50,(R0)+
+        MOVB $0x1E,(R0)+
+
+        MOVB $24+ 0x64,(R0)+ # 3 o'clock
+        MOVB $24+ 0x50,(R0)+
+        MOVB $0x26,(R0)+
+
+        MOVB $24+ 0x64,(R0)+ # 4:30
+        MOVB $24+ 0x50,(R0)+
+        MOVB $0x2E,(R0)+
+
+        MOVB $24+ 0x64,(R0)+ # 6 o'clock
+        MOVB $24+ 0x50,(R0)+
+        MOVB $0x2C,(R0)+
+
+        MOVB $24+ 0x64,(R0)+ # 7:30
+        MOVB $24+ 0x50,(R0)+
+        MOVB $0x2A,(R0)+
+
+        MOVB $24+ 0x64,(R0)+ # 9 o'clock
+        MOVB $24+ 0x50,(R0)+
+        MOVB $0x22,(R0)+
+
+        MOVB $24+ 0x64,(R0)+ # 10:30
+        MOVB $24+ 0x50,(R0)+
+        MOVB $0x1A,(R0)+
+
+        MOV  $StarArrayPointer,R0
+       #MOVB $24+ 100,(R0)+ # static
+       #MOVB $24+ 80,(R0)+
+       #MOVB $0x24,(R0)+
+
+        MOVB $24+ 0x64,(R0)+ # 12 o'clock
+        MOVB $24+ 0x50,(R0)+
+        MOVB $0x1C,(R0)+
+
+        MOVB $24+ 0x64,(R0)+ # 1:30
+        MOVB $24+ 0x50,(R0)+
+        MOVB $0x1E,(R0)+
+
+        MOVB $24+ 0x64,(R0)+ # 3 o'clock
+        MOVB $24+ 0x50,(R0)+
+        MOVB $0x26,(R0)+
+
+        MOVB $24+ 0x64,(R0)+ # 4:30
+        MOVB $24+ 0x50,(R0)+
+        MOVB $0x2E,(R0)+
+
+        MOVB $24+ 0x64,(R0)+ # 6 o'clock
+        MOVB $24+ 0x50,(R0)+
+        MOVB $0x2C,(R0)+
+
+        MOVB $24+ 0x64,(R0)+ # 7:30
+        MOVB $24+ 0x50,(R0)+
+        MOVB $0x2A,(R0)+
+
+        MOVB $24+ 0x64,(R0)+ # 9 o'clock
+        MOVB $24+ 0x50,(R0)+
+        MOVB $0x22,(R0)+
+
+        MOVB $24+ 0x64,(R0)+ # 10:30
+        MOVB $24+ 0x50,(R0)+
+        MOVB $0x1A,(R0)+
 LevelLoop:
         CALL @$Background_Draw
 
@@ -606,9 +676,9 @@ LevelLoop:
 
        #CALL @$Player_Handler
 
-       #CALL AkuYou_Player_StarArray_Redraw
+        CALL @$Player_StarArray_Redraw
 
-       #CALL Akuyou_StarArray_Redraw
+        CALL @$StarArray_Redraw
 
        #CALL AkuYou_Player_DrawUI
 

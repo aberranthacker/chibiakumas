@@ -201,7 +201,7 @@ Event_SetLife:                                              # Event_LifeSwitch_0
                                                             #
                                                             # Reconfigure the core for custom actions this level
 # Event_CoreReprogram: # not used, legacy                   # Event_CoreReprogram:    ;1111????
-#         JMP  @Event_ReprogramVector(R1)                    #     ld a,b
+#         JMP  @Event_ReprogramVector(R1)                   #     ld a,b
                                                             #     push hl
                                                             #     ld hl,Event_ReprogramVector
         #JMP  VectorJump_PushHlFirst # uknc/stararray_add.s:149 #     jp VectorJump_PushHlFirst
