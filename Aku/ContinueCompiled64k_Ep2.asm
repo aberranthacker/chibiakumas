@@ -19,7 +19,7 @@ ld sp,BitmapData+0
 jp DrawRawBmp
 ret
 
-BitmapData: 
+BitmapData:
 defb &00,&00,&00,&00,&70,&F0,&03,&00,&03,&00
 defb &00,&00,&00,&00,&00,&00,&06,&00,&03,&00
 defb &00,&00,&00,&00,&00,&00,&C0,&00,&F0,&F0

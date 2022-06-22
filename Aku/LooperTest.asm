@@ -1601,7 +1601,7 @@ LD BC,&0011
 Ld E,&44
   PUSH DE
   PUSH DE
-  Push HL 
+  Push HL
 
 Ld E,H
 
@@ -1768,7 +1768,7 @@ defw BitmapData+1731
 
 
 
-PicStage18_backsbmp_DrawOrder: 
+PicStage18_backsbmp_DrawOrder:
 
   DEFW PicStage18_backsbmp_Line_0
   DEFW PicStage18_backsbmp_Line_1
@@ -1871,55 +1871,55 @@ ei
 ret
 
 MultiPushDeLast40: ld HL,NextLine
-jr MultiPushDe40B 
+jr MultiPushDe40B
 MultiPushDe40: pop HL
-jr MultiPushDe40B 
+jr MultiPushDe40B
 MultiPushDe34: pop HL
-jr MultiPushDe34B 
+jr MultiPushDe34B
 MultiPushDe30: pop HL
-jr MultiPushDe30B 
+jr MultiPushDe30B
 MultiPushDe27: pop HL
-jr MultiPushDe27B 
+jr MultiPushDe27B
 MultiPushDeLast19: ld HL,NextLine
-jr MultiPushDe19B 
+jr MultiPushDe19B
 MultiPushDe19: pop HL
-jr MultiPushDe19B 
+jr MultiPushDe19B
 MultiPushDeLast18: ld HL,NextLine
-jr MultiPushDe18B 
+jr MultiPushDe18B
 MultiPushDe18: pop HL
-jr MultiPushDe18B 
+jr MultiPushDe18B
 MultiPushDeLast17: ld HL,NextLine
-jr MultiPushDe17B 
+jr MultiPushDe17B
 MultiPushDe17: pop HL
-jr MultiPushDe17B 
+jr MultiPushDe17B
 MultiPushDe16: pop HL
-jr MultiPushDe16B 
+jr MultiPushDe16B
 MultiPushDe15: pop HL
-jr MultiPushDe15B 
+jr MultiPushDe15B
 MultiPushDe14: pop HL
-jr MultiPushDe14B 
+jr MultiPushDe14B
 MultiPushDe12: pop HL
-jr MultiPushDe12B 
+jr MultiPushDe12B
 MultiPushDe11: pop HL
-jr MultiPushDe11B 
+jr MultiPushDe11B
 MultiPushDe10: pop HL
-jr MultiPushDe10B 
+jr MultiPushDe10B
 MultiPushDe9: pop HL
-jr MultiPushDe9B 
+jr MultiPushDe9B
 MultiPushDeLast8: ld HL,NextLine
-jr MultiPushDe8B 
+jr MultiPushDe8B
 MultiPushDe8: pop HL
-jr MultiPushDe8B 
+jr MultiPushDe8B
 MultiPushDeLast7: ld HL,NextLine
-jr MultiPushDe7B 
+jr MultiPushDe7B
 MultiPushDe7: pop HL
-jr MultiPushDe7B 
+jr MultiPushDe7B
 MultiPushDeLast6: ld HL,NextLine
-jr MultiPushDe6B 
+jr MultiPushDe6B
 MultiPushDe6: pop HL
-jr MultiPushDe6B 
+jr MultiPushDe6B
 MultiPushDe5: pop HL
-jr MultiPushDe5B 
+jr MultiPushDe5B
 MultiPushDe40B: Push DE
 MultiPushDe39B: Push DE
 MultiPushDe38B: Push DE
@@ -2030,7 +2030,7 @@ NextLinePushDe3: push de
 NextLinePushDe2: push de
 NextLinePushDe1: push de
 
-NextLine: 
+NextLine:
 ld hl,&0800+80
 add hl,sp
 ld sp,hl
@@ -2039,7 +2039,7 @@ ld hl,&c050
 add hl,sp
 ld sp,hl
 
-JumpToNextLine: 
+JumpToNextLine:
 LD L,(IX)
 INC IX
 LD H,(IX)
@@ -2064,7 +2064,7 @@ jr NextLine
 CompiledSprite_GetNxtLinbc: defw &0000 :CompiledSprite_NextLineJumpBC_Plus2
 
 
-BitmapData: 
+BitmapData:
 
 defb &11,&00,&88,&00,&00,&00,&40,&40,&00,&88
 defb &11,&00,&00,&88,&11,&00,&20,&20,&40,&40
@@ -2288,29 +2288,29 @@ INC bc
 ld (Looper_CountSize_Plus1-1),a
 ld (RestoreLooperAddress_Plus2-2),bc
 LooperNextStage:
-	ld hl,&0000 :RestoreLooperAddress_Plus2
-	ld (Looper_Address_Plus2-2),hl
-	ld a,0:Looper_CountB_Plus1
-	ld (Looper_Count_Plus1-1),a
-	LooperRepeat:
-		ld hl,&0000 :Looper_Address_Plus2
-		LD c,(hl)
-		INC hl
-		LD b,(hl)
-		INC hl
-		ld (Looper_Address_Plus2-2),hl
-		ld h,b
-		ld l,c
-		ld ix,LooperContinueAddress
-		jp (hl)
+    ld hl,&0000 :RestoreLooperAddress_Plus2
+    ld (Looper_Address_Plus2-2),hl
+    ld a,0:Looper_CountB_Plus1
+    ld (Looper_Count_Plus1-1),a
+    LooperRepeat:
+        ld hl,&0000 :Looper_Address_Plus2
+        LD c,(hl)
+        INC hl
+        LD b,(hl)
+        INC hl
+        ld (Looper_Address_Plus2-2),hl
+        ld h,b
+        ld l,c
+        ld ix,LooperContinueAddress
+        jp (hl)
    LooperContinue:
-		ld a,0:Looper_Count_Plus1
-		dec a
-		ld (Looper_Count_Plus1-1),a
-	jp nz,LooperRepeat
-	ld a,0:Looper_CountSize_Plus1
-	dec a
-	ld (Looper_CountSize_Plus1-1),a
+        ld a,0:Looper_Count_Plus1
+        dec a
+        ld (Looper_Count_Plus1-1),a
+    jp nz,LooperRepeat
+    ld a,0:Looper_CountSize_Plus1
+    dec a
+    ld (Looper_CountSize_Plus1-1),a
 jp nz,LooperNextStage
 ld ix,(Looper_Address_Plus2-2)
 LD L,(IX)

@@ -1,13 +1,13 @@
 ;read "BootStrap.asm"
 
 
-	ld (Background_CompiledSprite_Minus1+1),de
-	call Akuyou_ScreenBuffer_GetActiveScreen
-	ld h,a
-	ld l,&50
-	ld (StackRestore_Plus2-2),sp
-	di
-	ld sp,hl
+    ld (Background_CompiledSprite_Minus1+1),de
+    call Akuyou_ScreenBuffer_GetActiveScreen
+    ld h,a
+    ld l,&50
+    ld (StackRestore_Plus2-2),sp
+    di
+    ld sp,hl
 
 PicStage18backsbmp:
 LD IX,PicStage18backsbmp_DrawOrder
@@ -1593,7 +1593,7 @@ Ld B,&11
 
 
 
-PicStage18backsbmp_DrawOrder: 
+PicStage18backsbmp_DrawOrder:
 
   DEFW PicStage18backsbmp_Line_0
   DEFW PicStage18backsbmp_Line_1
@@ -1810,41 +1810,41 @@ ei
 ret
 
 MultiPushDeLast40: ld HL,NextLine
-jr MultiPushDe40B 
+jr MultiPushDe40B
 MultiPushDe40: pop HL
-jr MultiPushDe40B 
+jr MultiPushDe40B
 MultiPushDe34: pop HL
-jr MultiPushDe34B 
+jr MultiPushDe34B
 MultiPushDe30: pop HL
-jr MultiPushDe30B 
+jr MultiPushDe30B
 MultiPushDe27: pop HL
-jr MultiPushDe27B 
+jr MultiPushDe27B
 MultiPushDeLast17: ld HL,NextLine
-jr MultiPushDe17B 
+jr MultiPushDe17B
 MultiPushDe17: pop HL
-jr MultiPushDe17B 
+jr MultiPushDe17B
 MultiPushDe14: pop HL
-jr MultiPushDe14B 
+jr MultiPushDe14B
 MultiPushDe12: pop HL
-jr MultiPushDe12B 
+jr MultiPushDe12B
 MultiPushDe10: pop HL
-jr MultiPushDe10B 
+jr MultiPushDe10B
 MultiPushDe9: pop HL
-jr MultiPushDe9B 
+jr MultiPushDe9B
 MultiPushDeLast8: ld HL,NextLine
-jr MultiPushDe8B 
+jr MultiPushDe8B
 MultiPushDe8: pop HL
-jr MultiPushDe8B 
+jr MultiPushDe8B
 MultiPushDeLast7: ld HL,NextLine
-jr MultiPushDe7B 
+jr MultiPushDe7B
 MultiPushDe7: pop HL
-jr MultiPushDe7B 
+jr MultiPushDe7B
 MultiPushDeLast6: ld HL,NextLine
-jr MultiPushDe6B 
+jr MultiPushDe6B
 MultiPushDe6: pop HL
-jr MultiPushDe6B 
+jr MultiPushDe6B
 MultiPushDe5: pop HL
-jr MultiPushDe5B 
+jr MultiPushDe5B
 MultiPushDe40B: Push DE
 MultiPushDe39B: Push DE
 MultiPushDe38B: Push DE
@@ -1976,7 +1976,7 @@ NextLinePushDe3: push de
 NextLinePushDe2: push de
 NextLinePushDe1: push de
 
-NextLine: 
+NextLine:
 ld hl,&0850
 add hl,sp
 ei
@@ -1991,7 +1991,7 @@ add hl,sp
 ld sp,hl
 ;push hl
 jp JumpToNextLine
-JumpToNextLine: 
+JumpToNextLine:
 LD L,(IX)
 INC IX
 LD H,(IX)
@@ -2017,7 +2017,7 @@ jr NextLine
 CompiledSprite_GetNxtLinbc: defw &0000 :CompiledSprite_NextLineJumpBC_Plus2
 
 
-BitmapData: 
+BitmapData:
 
 defb &11,&00,&88,&00,&00,&00,&40,&40,&44,&00
 defb &88,&33,&CC,&11,&00,&22,&20,&20,&40,&40

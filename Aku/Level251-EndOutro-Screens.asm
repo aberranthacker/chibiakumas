@@ -547,7 +547,7 @@ LD BC,&0002
   Push BC
   PUSH DE
 LD HL,&CC00
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicFinalBattle2bmp_Line_75:
@@ -560,7 +560,7 @@ LD BC,&0F01
   Push BC
   PUSH DE
 LD HL,&6600
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicFinalBattle2bmp_Line_76:
@@ -736,7 +736,7 @@ jp MultiPushDeLast5
 
 
 
-PicFinalBattle2bmp_DrawOrder: 
+PicFinalBattle2bmp_DrawOrder:
 
   DEFW PicFinalBattle2bmp_Line_0
   DEFW PicFinalBattle2bmp_Line_1
@@ -909,7 +909,7 @@ Ld D,L
 
 Ld L,E
 
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicIntro_Campingbmp_Line_10:
@@ -976,7 +976,7 @@ LD BC,&0E00
 Ld H,D
 
 
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicIntro_Campingbmp_Line_16:
@@ -1299,7 +1299,7 @@ Ld B,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   PUSH DE
 Ld H,E
 Ld L,B
@@ -1379,7 +1379,7 @@ LD HL,&0080
   PUSH DE
 LD BC,&A000
   Push BC
-  Push HL 
+  Push HL
  jp NextLinePushDe1
 
 
@@ -1494,11 +1494,11 @@ Ld C,H
   PUSH DE
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
 LD HL,&3C30
   Push HL
 LD BC,&8000
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicIntro_Campingbmp_Line_56:
@@ -1527,7 +1527,7 @@ LD HL,&0080
   PUSH DE
 LD BC,&0010
   Push BC
-  Push HL 
+  Push HL
  jp NextLinePushDe1
 
 
@@ -1573,7 +1573,7 @@ LD BC,&8000
 LD HL,&9048
   Push HL
 Ld B,&10
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicIntro_Campingbmp_Line_61:
@@ -1597,7 +1597,7 @@ Ld D,L
 LD HL,&2058
   Push HL
 LD BC,&3000
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicIntro_Campingbmp_Line_62:
@@ -1995,7 +1995,7 @@ LD BC,&00CC
 
 
 
-PicIntro_Campingbmp_DrawOrder: 
+PicIntro_Campingbmp_DrawOrder:
 
   DEFW PicFinalBattle2bmp_Line_0
   DEFW PicFinalBattle2bmp_Line_1_Reuse
@@ -2119,7 +2119,7 @@ LD HL,&0002
 LD BC,&000E
   Push BC
 LD HL,&0700
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicFinalBattle3bmp_Line_2:
@@ -2134,7 +2134,7 @@ defw BitmapData+6319
 LD BC,&0002
   Push BC
 LD HL,&0100
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicFinalBattle3bmp_Line_3:
@@ -2197,7 +2197,7 @@ LD HL,&0080
   Push HL
   PUSH DE
   PUSH DE
-  Push HL 
+  Push HL
  jp NextLinePushDe3
 
 
@@ -3087,7 +3087,7 @@ LD BC,&9900
 
 
 
-PicFinalBattle3bmp_DrawOrder: 
+PicFinalBattle3bmp_DrawOrder:
 
   DEFW PicFinalBattle2bmp_Line_0
   DEFW PicFinalBattle3bmp_Line_1
@@ -3200,21 +3200,21 @@ ei
 ret
 
 MultiPushDeLast12: ld HL,NextLine
-jr MultiPushDe12B 
+jr MultiPushDe12B
 MultiPushDe12: pop HL
-jr MultiPushDe12B 
+jr MultiPushDe12B
 MultiPushDe9: pop HL
-jr MultiPushDe9B 
+jr MultiPushDe9B
 MultiPushDe8: pop HL
-jr MultiPushDe8B 
+jr MultiPushDe8B
 MultiPushDe7: pop HL
-jr MultiPushDe7B 
+jr MultiPushDe7B
 MultiPushDe6: pop HL
-jr MultiPushDe6B 
+jr MultiPushDe6B
 MultiPushDeLast5: ld HL,NextLine
-jr MultiPushDe5B 
+jr MultiPushDe5B
 MultiPushDe5: pop HL
-jr MultiPushDe5B 
+jr MultiPushDe5B
 MultiPushDe12B: Push DE
 MultiPushDe11B: Push DE
 MultiPushDe10B: Push DE
@@ -3304,7 +3304,7 @@ NextLinePushDe3: push de
 NextLinePushDe2: push de
 NextLinePushDe1: push de
 
-NextLine: 
+NextLine:
 ld hl,&0800+24
 add hl,sp
 ld sp,hl
@@ -3313,7 +3313,7 @@ ld hl,&c050
 add hl,sp
 ld sp,hl
 
-JumpToNextLine: 
+JumpToNextLine:
 LD L,(IX)
 INC IX
 LD H,(IX)
@@ -3349,29 +3349,29 @@ INC bc
 ld (Looper_CountSize_Plus1-1),a
 ld (RestoreLooperAddress_Plus2-2),bc
 LooperNextStage:
-	ld hl,&0000 :RestoreLooperAddress_Plus2
-	ld (Looper_Address_Plus2-2),hl
-	ld a,0:Looper_CountB_Plus1
-	ld (Looper_Count_Plus1-1),a
-	LooperRepeat:
-		ld hl,&0000 :Looper_Address_Plus2
-		LD c,(hl)
-		INC hl
-		LD b,(hl)
-		INC hl
-		ld (Looper_Address_Plus2-2),hl
-		ld h,b
-		ld l,c
-		ld ix,LooperContinueAddress
-		jp (hl)
+    ld hl,&0000 :RestoreLooperAddress_Plus2
+    ld (Looper_Address_Plus2-2),hl
+    ld a,0:Looper_CountB_Plus1
+    ld (Looper_Count_Plus1-1),a
+    LooperRepeat:
+        ld hl,&0000 :Looper_Address_Plus2
+        LD c,(hl)
+        INC hl
+        LD b,(hl)
+        INC hl
+        ld (Looper_Address_Plus2-2),hl
+        ld h,b
+        ld l,c
+        ld ix,LooperContinueAddress
+        jp (hl)
    LooperContinue:
-		ld a,0:Looper_Count_Plus1
-		dec a
-		ld (Looper_Count_Plus1-1),a
-	jp nz,LooperRepeat
-	ld a,0:Looper_CountSize_Plus1
-	dec a
-	ld (Looper_CountSize_Plus1-1),a
+        ld a,0:Looper_Count_Plus1
+        dec a
+        ld (Looper_Count_Plus1-1),a
+    jp nz,LooperRepeat
+    ld a,0:Looper_CountSize_Plus1
+    dec a
+    ld (Looper_CountSize_Plus1-1),a
 jp nz,LooperNextStage
 ld ix,(Looper_Address_Plus2-2)
 LD L,(IX)
@@ -3381,7 +3381,7 @@ INC IX
 JP (HL)
 
 
-BitmapData: 
+BitmapData:
 
 defb &31,&F0,&F7,&E0,&00,&10,&CC,&00,&00,&10
 defb &88,&10,&70,&C8,&20,&00,&80,&00,&00,&80
@@ -4162,6 +4162,6 @@ ret
 
 
 
-;save direct "T53-SC1.D02",&4000,&3000	;address,size...}[,exec_address]
+;save direct "T53-SC1.D02",&4000,&3000  ;address,size...}[,exec_address]
 
 

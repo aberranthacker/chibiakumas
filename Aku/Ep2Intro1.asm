@@ -19,7 +19,7 @@ PicFR041childsbedroompng_DrawGetNextLine:
 jr z,PicFR041childsbedroompng_DrawGotLine
 call RLE_NextScreenLineHL
 dec a
-		jr PicFR041childsbedroompng_DrawGetNextLine
+        jr PicFR041childsbedroompng_DrawGetNextLine
 PicFR041childsbedroompng_DrawGotLine:
 ld sp,hl
 LD IX,PicFR041childsbedroompng_DrawOrder
@@ -84,7 +84,7 @@ LD DE,&F0F0
   PUSH DE
   PUSH DE
 LD HL,&0088
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicFR041childsbedroompng_Line_4:
@@ -95,7 +95,7 @@ LD HL,&00C0
   PUSH DE
   PUSH DE
 LD BC,&1088
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFR041childsbedroompng_Line_5:
@@ -106,7 +106,7 @@ LD HL,&00E0
   PUSH DE
   PUSH DE
 LD BC,&7088
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFR041childsbedroompng_Line_6:
@@ -479,7 +479,7 @@ LD DE,&0F0F
   PUSH DE
   PUSH DE
 LD HL,&0088
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicFR041childsbedroompng_Line_36:
@@ -647,7 +647,7 @@ LD DE,&0F0F
 LD BC,&0E07
   Push BC
 LD HL,&0088
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicFR041childsbedroompng_Line_47:
@@ -814,7 +814,7 @@ defw BitmapData+1601
 LD BC,&9911
   Push BC
 LD HL,&0088
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicFR041childsbedroompng_Line_58:
@@ -826,7 +826,7 @@ LD DE,&0000
 call BitmapPush30
 defw BitmapData+1631
 LD BC,&0088
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFR041childsbedroompng_Line_59:
@@ -837,7 +837,7 @@ LD HL,&1122
 call BitmapPush30
 defw BitmapData+1661
 LD BC,&0088
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFR041childsbedroompng_Line_60:
@@ -877,7 +877,7 @@ DEC DE
 call BitmapPush30
 defw BitmapData+1749
 LD BC,&0088
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFR041childsbedroompng_Line_63:
@@ -1290,7 +1290,7 @@ LD DE,&0000
   PUSH DE
   PUSH DE
 LD BC,&0088
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFR041childsbedroompng_Line_88:
@@ -1320,7 +1320,7 @@ LD DE,&0000
   PUSH DE
   PUSH DE
 LD BC,&0088
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFR041childsbedroompng_Line_89:
@@ -1349,7 +1349,7 @@ LD DE,&0000
   PUSH DE
   PUSH DE
 LD HL,&0088
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicFR041childsbedroompng_Line_90:
@@ -1380,7 +1380,7 @@ LD DE,&0000
   PUSH DE
   PUSH DE
 LD HL,&0088
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicFR041childsbedroompng_Line_91:
@@ -1411,7 +1411,7 @@ LD DE,&0000
   PUSH DE
   PUSH DE
 LD HL,&0088
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicFR041childsbedroompng_Line_92:
@@ -1439,7 +1439,7 @@ LD DE,&0000
   PUSH DE
   PUSH DE
 LD BC,&0088
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFR041childsbedroompng_Line_93:
@@ -1465,7 +1465,7 @@ LD DE,&0000
   PUSH DE
   PUSH DE
 LD BC,&0088
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFR041childsbedroompng_Line_94:
@@ -1501,7 +1501,7 @@ LD DE,&0000
   PUSH DE
   PUSH DE
 LD BC,&0088
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFR041childsbedroompng_Line_95:
@@ -1539,7 +1539,7 @@ LD DE,&0000
   PUSH DE
   PUSH DE
 LD BC,&0088
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicFR041childsbedroompng_Line_96:
@@ -1576,7 +1576,7 @@ LD DE,&0000
   PUSH DE
   PUSH DE
 LD HL,&0088
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicFR041childsbedroompng_Line_97:
@@ -1586,7 +1586,7 @@ jp MultiPushDeLast19
 
 
 
-PicFR041childsbedroompng_DrawOrder: 
+PicFR041childsbedroompng_DrawOrder:
 
   DEFW PicFR041childsbedroompng_Line_0
   DEFW PicFR041childsbedroompng_Line_1
@@ -1700,7 +1700,7 @@ PicFR083childsbedroomV2png_DrawGetNextLine:
 jr z,PicFR083childsbedroomV2png_DrawGotLine
 call RLE_NextScreenLineHL
 dec a
-		jr PicFR083childsbedroomV2png_DrawGetNextLine
+        jr PicFR083childsbedroomV2png_DrawGetNextLine
 PicFR083childsbedroomV2png_DrawGotLine:
 ld sp,hl
 LD IX,PicFR083childsbedroomV2png_DrawOrder
@@ -2117,7 +2117,7 @@ jp NextLineDecSP4
 
 
 
-PicFR083childsbedroomV2png_DrawOrder: 
+PicFR083childsbedroomV2png_DrawOrder:
 
 defw looper
   DEFB 1,10
@@ -2177,7 +2177,7 @@ PicFR084childsbedroomV3png_DrawGetNextLine:
 jr z,PicFR084childsbedroomV3png_DrawGotLine
 call RLE_NextScreenLineHL
 dec a
-		jr PicFR084childsbedroomV3png_DrawGetNextLine
+        jr PicFR084childsbedroomV3png_DrawGetNextLine
 PicFR084childsbedroomV3png_DrawGotLine:
 ld sp,hl
 LD IX,PicFR084childsbedroomV3png_DrawOrder
@@ -2603,7 +2603,7 @@ jp NextLineSPshift
 
 
 
-PicFR084childsbedroomV3png_DrawOrder: 
+PicFR084childsbedroomV3png_DrawOrder:
 
 defw looper
   DEFB 1,10
@@ -2677,7 +2677,7 @@ PicFR085childsbedroomV4png_DrawGetNextLine:
 jr z,PicFR085childsbedroomV4png_DrawGotLine
 call RLE_NextScreenLineHL
 dec a
-		jr PicFR085childsbedroomV4png_DrawGetNextLine
+        jr PicFR085childsbedroomV4png_DrawGetNextLine
 PicFR085childsbedroomV4png_DrawGotLine:
 ld sp,hl
 LD IX,PicFR085childsbedroomV4png_DrawOrder
@@ -3399,7 +3399,7 @@ jp NextLineDecSP4
 
 
 
-PicFR085childsbedroomV4png_DrawOrder: 
+PicFR085childsbedroomV4png_DrawOrder:
 
 defw looper
   DEFB 1,10
@@ -3480,17 +3480,17 @@ defw looper
 ;Global Code
 RLE_ImageWidth equ 0
 RLE_NextScreenLineHL:
-	push de
-				ld b,RLE_ImageWidth :ImageWidthE_Plus1
-		ld de,&800+RLE_ImageWidth :ImageWidthD_Plus2
-		add hl,de
-	pop de
-	ret nc
-	push de
-		ld de,&c050
-		add hl,de
-	pop de
-	ret
+    push de
+                ld b,RLE_ImageWidth :ImageWidthE_Plus1
+        ld de,&800+RLE_ImageWidth :ImageWidthD_Plus2
+        add hl,de
+    pop de
+    ret nc
+    push de
+        ld de,&c050
+        add hl,de
+    pop de
+    ret
 
 
 EndCode:
@@ -3499,11 +3499,11 @@ ei
 ret
 
 MultiPushDeLast19: ld HL,NextLine
-jr MultiPushDe19B 
+jr MultiPushDe19B
 MultiPushDe19: pop HL
-jr MultiPushDe19B 
+jr MultiPushDe19B
 MultiPushDe8: pop HL
-jr MultiPushDe8B 
+jr MultiPushDe8B
 MultiPushDe19B: Push DE
 MultiPushDe18B: Push DE
 MultiPushDe17B: Push DE
@@ -3610,7 +3610,7 @@ NextLinePushDe3: push de
 NextLinePushDe2: push de
 NextLinePushDe1: push de
 
-NextLine: 
+NextLine:
 ld hl,&0800+38
 add hl,sp
 ld sp,hl
@@ -3619,7 +3619,7 @@ ld hl,&c050
 add hl,sp
 ld sp,hl
 
-JumpToNextLine: 
+JumpToNextLine:
 LD L,(IX)
 INC IX
 LD H,(IX)
@@ -3655,29 +3655,29 @@ INC bc
 ld (Looper_CountSize_Plus1-1),a
 ld (RestoreLooperAddress_Plus2-2),bc
 LooperNextStage:
-	ld hl,&0000 :RestoreLooperAddress_Plus2
-	ld (Looper_Address_Plus2-2),hl
-	ld a,0:Looper_CountB_Plus1
-	ld (Looper_Count_Plus1-1),a
-	LooperRepeat:
-		ld hl,&0000 :Looper_Address_Plus2
-		LD c,(hl)
-		INC hl
-		LD b,(hl)
-		INC hl
-		ld (Looper_Address_Plus2-2),hl
-		ld h,b
-		ld l,c
-		ld ix,LooperContinueAddress
-		jp (hl)
+    ld hl,&0000 :RestoreLooperAddress_Plus2
+    ld (Looper_Address_Plus2-2),hl
+    ld a,0:Looper_CountB_Plus1
+    ld (Looper_Count_Plus1-1),a
+    LooperRepeat:
+        ld hl,&0000 :Looper_Address_Plus2
+        LD c,(hl)
+        INC hl
+        LD b,(hl)
+        INC hl
+        ld (Looper_Address_Plus2-2),hl
+        ld h,b
+        ld l,c
+        ld ix,LooperContinueAddress
+        jp (hl)
    LooperContinue:
-		ld a,0:Looper_Count_Plus1
-		dec a
-		ld (Looper_Count_Plus1-1),a
-	jp nz,LooperRepeat
-	ld a,0:Looper_CountSize_Plus1
-	dec a
-	ld (Looper_CountSize_Plus1-1),a
+        ld a,0:Looper_Count_Plus1
+        dec a
+        ld (Looper_Count_Plus1-1),a
+    jp nz,LooperRepeat
+    ld a,0:Looper_CountSize_Plus1
+    dec a
+    ld (Looper_CountSize_Plus1-1),a
 jp nz,LooperNextStage
 ld ix,(Looper_Address_Plus2-2)
 LD L,(IX)
@@ -3687,7 +3687,7 @@ INC IX
 JP (HL)
 
 
-BitmapData: 
+BitmapData:
 
 defb &04,&EE,&05,&05,&05,&15,&00,&10,&80,&00
 defb &00,&30,&88,&00,&00,&70,&F0,&80,&0A,&77

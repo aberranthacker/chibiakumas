@@ -7,13 +7,13 @@ jp PicStage18bbmp
 
 PicStage18bmp:
 
-	ld (Background_CompiledSprite_Minus1+1),de
-	call Akuyou_ScreenBuffer_GetActiveScreen
-	ld h,a
-	ld l,&50
-	ld (StackRestore_Plus2-2),sp
-	di
-	ld sp,hl
+    ld (Background_CompiledSprite_Minus1+1),de
+    call Akuyou_ScreenBuffer_GetActiveScreen
+    ld h,a
+    ld l,&50
+    ld (StackRestore_Plus2-2),sp
+    di
+    ld sp,hl
 
 LD IX,PicStage18bmp_DrawOrder
 JP JumpToNextLine
@@ -1147,7 +1147,7 @@ LD BC,&8000
   Push BC
   PUSH DE
   PUSH DE
-  Push HL 
+  Push HL
 LD HL,&C000
   Push HL
   PUSH DE
@@ -1169,7 +1169,7 @@ Ld H,&80
   PUSH DE
 Ld C,&10
   Push BC
-  Push HL 
+  Push HL
  jp NextLinePushDe2
 
 
@@ -1442,7 +1442,7 @@ defw BitmapData+1049
 LD HL,&6000
   Push HL
 LD BC,&1000
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicStage18bmp_Line_94:
@@ -2086,7 +2086,7 @@ LD BC,&1000
   Push BC
   PUSH DE
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 call MultiPushDe20
 LD HL,&0080
@@ -2095,7 +2095,7 @@ LD BC,&0040
   Push BC
   PUSH DE
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
 call FinalBitmapPush6
@@ -2945,7 +2945,7 @@ LD BC,&0011
 Ld E,&44
   PUSH DE
   PUSH DE
-  Push HL 
+  Push HL
 
 Ld E,H
 
@@ -3112,7 +3112,7 @@ defw BitmapData+2575
 
 
 
-PicStage18bmp_DrawOrder: 
+PicStage18bmp_DrawOrder:
 
   DEFW PicStage18bmp_Line_0
   DEFW PicStage18bmp_Line_1
@@ -3317,13 +3317,13 @@ PicStage18bmp_DrawOrder:
   DEFW EndCode
 PicStage18bbmp:
 
-	ld (Background_CompiledSprite_Minus1+1),de
-	call Akuyou_ScreenBuffer_GetActiveScreen
-	ld h,a
-	ld l,&50
-	ld (StackRestore_Plus2-2),sp
-	di
-	ld sp,hl
+    ld (Background_CompiledSprite_Minus1+1),de
+    call Akuyou_ScreenBuffer_GetActiveScreen
+    ld h,a
+    ld l,&50
+    ld (StackRestore_Plus2-2),sp
+    di
+    ld sp,hl
 
 
 LD IX,PicStage18bbmp_DrawOrder
@@ -4444,7 +4444,7 @@ call MultiPushDe7
 LD HL,&0030
   Push HL
   PUSH DE
-  Push HL 
+  Push HL
 call MultiPushDe20
 LD BC,&C000
   Push BC
@@ -4506,7 +4506,7 @@ defw BitmapData+3181
 Ld H,E
 Ld L,E
 
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicStage18bbmp_Line_85:
@@ -4620,7 +4620,7 @@ defw BitmapData+3373
 Ld H,E
 Ld L,E
 
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicStage18bbmp_Line_91:
@@ -4664,7 +4664,7 @@ LD HL,&2000
   PUSH DE
 Ld C,&30
   Push BC
-  Push HL 
+  Push HL
 LD HL,&4080
   Push HL
   PUSH DE
@@ -4849,7 +4849,7 @@ defw BitmapData+3561
 LD HL,&1020
   Push HL
 LD BC,&0040
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicStage18bbmp_Line_99:
@@ -4893,7 +4893,7 @@ LD HL,&4040
 Ld B,E
 Ld C,L
 
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicStage18bbmp_Line_101:
@@ -5051,7 +5051,7 @@ defw BitmapData+3811
 LD HL,&0030
   Push HL
   PUSH DE
-  Push HL 
+  Push HL
 call MultiPushDe20
 LD BC,&C000
   Push BC
@@ -5095,7 +5095,7 @@ LD BC,&2020
 LD HL,&4040
   Push HL
 LD BC,&8030
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicStage18bbmp_Line_111:
@@ -5153,7 +5153,7 @@ LD BC,&4040
 Ld L,&20
   Push HL
 Ld B,&00
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicStage18bbmp_Line_113:
@@ -5258,7 +5258,7 @@ LD BC,&2000
   Push BC
   PUSH DE
   PUSH DE
-  Push HL 
+  Push HL
   PUSH DE
 LD HL,&8000
   Push HL
@@ -5274,7 +5274,7 @@ Ld C,&40
   Push BC
   PUSH DE
   PUSH DE
-  Push HL 
+  Push HL
  jp NextLinePushDe1
 
 
@@ -6208,7 +6208,7 @@ defw BitmapData+4915
 
 
 
-PicStage18bbmp_DrawOrder: 
+PicStage18bbmp_DrawOrder:
 
   DEFW PicStage18bbmp_Line_0
   DEFW PicStage18bbmp_Line_1
@@ -6425,65 +6425,65 @@ ei
 ret
 
 MultiPushDeLast40: ld HL,NextLine
-jr MultiPushDe40B 
+jr MultiPushDe40B
 MultiPushDe40: pop HL
-jr MultiPushDe40B 
+jr MultiPushDe40B
 MultiPushDe34: pop HL
-jr MultiPushDe34B 
+jr MultiPushDe34B
 MultiPushDe32: pop HL
-jr MultiPushDe32B 
+jr MultiPushDe32B
 MultiPushDe31: pop HL
-jr MultiPushDe31B 
+jr MultiPushDe31B
 MultiPushDe30: pop HL
-jr MultiPushDe30B 
+jr MultiPushDe30B
 MultiPushDe28: pop HL
-jr MultiPushDe28B 
+jr MultiPushDe28B
 MultiPushDe27: pop HL
-jr MultiPushDe27B 
+jr MultiPushDe27B
 MultiPushDe20: pop HL
-jr MultiPushDe20B 
+jr MultiPushDe20B
 MultiPushDeLast19: ld HL,NextLine
-jr MultiPushDe19B 
+jr MultiPushDe19B
 MultiPushDe19: pop HL
-jr MultiPushDe19B 
+jr MultiPushDe19B
 MultiPushDeLast18: ld HL,NextLine
-jr MultiPushDe18B 
+jr MultiPushDe18B
 MultiPushDe18: pop HL
-jr MultiPushDe18B 
+jr MultiPushDe18B
 MultiPushDeLast17: ld HL,NextLine
-jr MultiPushDe17B 
+jr MultiPushDe17B
 MultiPushDe17: pop HL
-jr MultiPushDe17B 
+jr MultiPushDe17B
 MultiPushDe16: pop HL
-jr MultiPushDe16B 
+jr MultiPushDe16B
 MultiPushDe15: pop HL
-jr MultiPushDe15B 
+jr MultiPushDe15B
 MultiPushDe14: pop HL
-jr MultiPushDe14B 
+jr MultiPushDe14B
 MultiPushDe12: pop HL
-jr MultiPushDe12B 
+jr MultiPushDe12B
 MultiPushDe11: pop HL
-jr MultiPushDe11B 
+jr MultiPushDe11B
 MultiPushDe10: pop HL
-jr MultiPushDe10B 
+jr MultiPushDe10B
 MultiPushDe9: pop HL
-jr MultiPushDe9B 
+jr MultiPushDe9B
 MultiPushDeLast8: ld HL,NextLine
-jr MultiPushDe8B 
+jr MultiPushDe8B
 MultiPushDe8: pop HL
-jr MultiPushDe8B 
+jr MultiPushDe8B
 MultiPushDeLast7: ld HL,NextLine
-jr MultiPushDe7B 
+jr MultiPushDe7B
 MultiPushDe7: pop HL
-jr MultiPushDe7B 
+jr MultiPushDe7B
 MultiPushDeLast6: ld HL,NextLine
-jr MultiPushDe6B 
+jr MultiPushDe6B
 MultiPushDe6: pop HL
-jr MultiPushDe6B 
+jr MultiPushDe6B
 MultiPushDeLast5: ld HL,NextLine
-jr MultiPushDe5B 
+jr MultiPushDe5B
 MultiPushDe5: pop HL
-jr MultiPushDe5B 
+jr MultiPushDe5B
 MultiPushDe40B: Push DE
 MultiPushDe39B: Push DE
 MultiPushDe38B: Push DE
@@ -6615,7 +6615,7 @@ NextLinePushDe3: push de
 NextLinePushDe2: push de
 NextLinePushDe1: push de
 
-NextLine: 
+NextLine:
 ld hl,&0850
 add hl,sp
 ei
@@ -6630,7 +6630,7 @@ add hl,sp
 ld sp,hl
 ;push hl
 jp JumpToNextLine
-JumpToNextLine: 
+JumpToNextLine:
 LD L,(IX)
 INC IX
 LD H,(IX)
@@ -6656,7 +6656,7 @@ jr NextLine
 CompiledSprite_GetNxtLinbc: defw &0000 :CompiledSprite_NextLineJumpBC_Plus2
 
 
-BitmapData: 
+BitmapData:
 
 defb &11,&00,&88,&00,&00,&00,&40,&40,&00,&88
 defb &11,&00,&00,&88,&11,&00,&20,&20,&40,&40
@@ -7182,4 +7182,4 @@ jp (hl)
 DataEnd:
 defb 00
 
-save direct "T24-SC3.D02",&4000,DataEnd-&4000	;address,size...}[,exec_address]
+save direct "T24-SC3.D02",&4000,DataEnd-&4000   ;address,size...}[,exec_address]

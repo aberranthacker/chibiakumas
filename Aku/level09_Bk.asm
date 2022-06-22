@@ -1,6 +1,6 @@
 
 ifdef BuildCPC
-	ld (Background_CompiledSprite_Minus1+1),de
+    ld (Background_CompiledSprite_Minus1+1),de
 Endif
 
 call Akuyou_ScreenBuffer_GetActiveScreen
@@ -31,13 +31,13 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
 jp NextLine
 
 
@@ -49,13 +49,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 call MultiPushDe18
 LD HL,&0200
@@ -65,13 +65,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 jp NextLine
 
@@ -84,13 +84,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
 call MultiPushDe20
 LD HL,&0002
   Push HL
@@ -99,13 +99,13 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
 jp NextLine
 
 
@@ -141,10 +141,10 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
 jp NextLine
@@ -159,13 +159,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
 call MultiPushDe18
 LD HL,&0002
   Push HL
@@ -174,13 +174,13 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
 jp NextLine
 
@@ -194,10 +194,10 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 call MultiPushDe22
 LD HL,&0200
@@ -207,10 +207,10 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
 jp NextLine
@@ -234,13 +234,13 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
 jp NextLine
@@ -254,16 +254,16 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
 call MultiPushDe14
 LD HL,&0400
   Push HL
@@ -272,16 +272,16 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
 jp NextLine
 
 
@@ -293,13 +293,13 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
 call MultiPushDe16
@@ -310,13 +310,13 @@ Ld B,L
 
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
 jp NextLine
@@ -390,13 +390,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
 jp NextLine
 
 
@@ -408,13 +408,13 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
 call MultiPushDe20
 LD HL,&0400
   Push HL
@@ -423,13 +423,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
 jp NextLine
 
 
@@ -468,13 +468,13 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
 jp NextLine
 
 
@@ -486,16 +486,16 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
 call MultiPushDe14
 LD HL,&0004
   Push HL
@@ -504,16 +504,16 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
 jp NextLine
 
 
@@ -525,13 +525,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
 call MultiPushDe20
 LD HL,&0004
   Push HL
@@ -540,13 +540,13 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
 jp NextLine
 
 
@@ -606,10 +606,10 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
 jp NextLine
@@ -624,13 +624,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 call MultiPushDe16
 LD HL,&0400
@@ -640,13 +640,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
 jp NextLine
@@ -661,10 +661,10 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 call MultiPushDe22
 LD HL,&0400
@@ -674,10 +674,10 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
 jp NextLine
@@ -733,10 +733,10 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
 jp NextLine
@@ -750,7 +750,7 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
 call MultiPushDe28
@@ -761,7 +761,7 @@ Ld B,L
 
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
 jp NextLine
@@ -775,10 +775,10 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
 call MultiPushDe22
@@ -789,10 +789,10 @@ Ld B,L
 
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
 jp NextLine
@@ -870,10 +870,10 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   PUSH DE
 jp NextLine
 
@@ -886,13 +886,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 call MultiPushDe18
 LD HL,&0400
@@ -902,13 +902,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 jp NextLine
 
@@ -922,10 +922,10 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
 call MultiPushDe24
 LD HL,&0400
   Push HL
@@ -934,10 +934,10 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   PUSH DE
 jp NextLine
 
@@ -954,7 +954,7 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
 call MultiPushDe26
@@ -965,7 +965,7 @@ Ld B,L
 
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
   PUSH DE
@@ -1021,7 +1021,7 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
 call MultiPushDe28
 LD HL,&0400
   Push HL
@@ -1030,7 +1030,7 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
  jp NextLinePushDe2
 
 
@@ -1043,13 +1043,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
 call MultiPushDe18
 LD HL,&0004
   Push HL
@@ -1058,13 +1058,13 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
 jp NextLine
 
@@ -1139,10 +1139,10 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 call MultiPushDe24
 LD HL,&0400
@@ -1152,10 +1152,10 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 jp NextLine
 
@@ -1182,7 +1182,7 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 call MultiPushDe28
 LD HL,&0400
@@ -1192,7 +1192,7 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
 jp NextLine
@@ -1249,7 +1249,7 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 call MultiPushDe28
 LD HL,&4000
@@ -1259,7 +1259,7 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
 jp NextLine
@@ -1283,10 +1283,10 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 call MultiPushDe24
 LD HL,&4000
@@ -1296,10 +1296,10 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 jp NextLine
 
@@ -1343,10 +1343,10 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 call MultiPushDe22
 LD HL,&4000
@@ -1356,10 +1356,10 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
 jp NextLine
@@ -1395,13 +1395,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
 call MultiPushDe18
 LD HL,&0040
   Push HL
@@ -1410,13 +1410,13 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
 jp NextLine
 
@@ -1431,7 +1431,7 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
 call MultiPushDe28
 LD HL,&4000
   Push HL
@@ -1440,7 +1440,7 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
  jp NextLinePushDe2
 
 
@@ -1494,7 +1494,7 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
   PUSH DE
@@ -1509,13 +1509,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 call MultiPushDe18
 LD HL,&4000
@@ -1525,13 +1525,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 jp NextLine
 
@@ -1545,10 +1545,10 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
 call MultiPushDe24
 LD HL,&4000
   Push HL
@@ -1557,10 +1557,10 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   PUSH DE
 jp NextLine
 
@@ -1621,10 +1621,10 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
 jp NextLine
@@ -1657,10 +1657,10 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
 call MultiPushDe22
@@ -1671,10 +1671,10 @@ Ld B,L
 
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
 jp NextLine
@@ -1688,7 +1688,7 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
 call MultiPushDe28
@@ -1699,7 +1699,7 @@ Ld B,L
 
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
 jp NextLine
@@ -1752,10 +1752,10 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
 jp NextLine
@@ -1770,13 +1770,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 call MultiPushDe16
 LD HL,&4000
@@ -1786,13 +1786,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
 jp NextLine
@@ -1854,13 +1854,13 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
 jp NextLine
 
 
@@ -1872,16 +1872,16 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
 call MultiPushDe14
 LD HL,&0040
   Push HL
@@ -1890,16 +1890,16 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
 jp NextLine
 
 
@@ -1911,13 +1911,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
 call MultiPushDe20
 LD HL,&0040
   Push HL
@@ -1926,13 +1926,13 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
 jp NextLine
 
 
@@ -1974,13 +1974,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
 jp NextLine
 
 
@@ -1992,16 +1992,16 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
 call MultiPushDe14
 LD HL,&4000
   Push HL
@@ -2010,16 +2010,16 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
 jp NextLine
 
 
@@ -2031,13 +2031,13 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
 call MultiPushDe20
 LD HL,&4000
   Push HL
@@ -2046,13 +2046,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
 jp NextLine
 
 
@@ -2096,10 +2096,10 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
 jp NextLine
@@ -2114,13 +2114,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
 call MultiPushDe18
 LD HL,&0020
   Push HL
@@ -2129,13 +2129,13 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
 jp NextLine
 
@@ -2149,10 +2149,10 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 call MultiPushDe22
 LD HL,&2000
@@ -2162,10 +2162,10 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
 jp NextLine
@@ -2203,13 +2203,13 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
 jp NextLine
 
 
@@ -2221,13 +2221,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 call MultiPushDe18
 LD HL,&2000
@@ -2237,13 +2237,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
 jp NextLine
 
@@ -2256,13 +2256,13 @@ Ld C,H
 
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
   Push BC
   PUSH DE
-  Push HL 
+  Push HL
 call MultiPushDe20
 LD HL,&0020
   Push HL
@@ -2271,13 +2271,13 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
 jp NextLine
 
 
@@ -2313,13 +2313,13 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
 jp NextLine
@@ -2333,13 +2333,13 @@ Ld B,L
 Ld C,E
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
 call MultiPushDe16
@@ -2350,13 +2350,13 @@ Ld B,L
 
 
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
-  Push HL 
+  Push HL
   PUSH DE
   Push BC
 jp NextLine
@@ -2380,7 +2380,7 @@ jp NextLine
 
 
 
-PicLevel8Cpng_DrawOrder: 
+PicLevel8Cpng_DrawOrder:
 
   DEFW PicLevel8Cpng_Line_0
   DEFW PicLevel8Cpng_Line_1
@@ -2597,41 +2597,41 @@ ei
 ret
 
 MultiPushDe40: pop HL
-jr MultiPushDe40B 
+jr MultiPushDe40B
 MultiPushDe32: pop HL
-jr MultiPushDe32B 
+jr MultiPushDe32B
 MultiPushDe30: pop HL
-jr MultiPushDe30B 
+jr MultiPushDe30B
 MultiPushDe28: pop HL
-jr MultiPushDe28B 
+jr MultiPushDe28B
 MultiPushDe26: pop HL
-jr MultiPushDe26B 
+jr MultiPushDe26B
 MultiPushDe24: pop HL
-jr MultiPushDe24B 
+jr MultiPushDe24B
 MultiPushDe22: pop HL
-jr MultiPushDe22B 
+jr MultiPushDe22B
 MultiPushDe20: pop HL
-jr MultiPushDe20B 
+jr MultiPushDe20B
 MultiPushDe18: pop HL
-jr MultiPushDe18B 
+jr MultiPushDe18B
 MultiPushDe16: pop HL
-jr MultiPushDe16B 
+jr MultiPushDe16B
 MultiPushDe14: pop HL
-jr MultiPushDe14B 
+jr MultiPushDe14B
 MultiPushDe12: pop HL
-jr MultiPushDe12B 
+jr MultiPushDe12B
 MultiPushDe10: pop HL
-jr MultiPushDe10B 
+jr MultiPushDe10B
 MultiPushDe9: pop HL
-jr MultiPushDe9B 
+jr MultiPushDe9B
 MultiPushDe8: pop HL
-jr MultiPushDe8B 
+jr MultiPushDe8B
 MultiPushDe7: pop HL
-jr MultiPushDe7B 
+jr MultiPushDe7B
 MultiPushDe6: pop HL
-jr MultiPushDe6B 
+jr MultiPushDe6B
 MultiPushDe5: pop HL
-jr MultiPushDe5B 
+jr MultiPushDe5B
 MultiPushDe40B: Push DE
 MultiPushDe39B: Push DE
 MultiPushDe38B: Push DE
@@ -2716,35 +2716,35 @@ NextLinePushDe3: push de
 NextLinePushDe2: push de
 NextLinePushDe1: push de
 
-NextLine: 
+NextLine:
 
 ifdef BuildCPC
-	ld hl,&0850
-	add hl,sp
-	ei
-	ld sp,&0000:StackRestore_Plus2
-	di
-	ld sp,hl
-	Background_CompiledSprite_Minus1:
-	bit 7,h
-	jp z,JumpToNextLine
-	ld hl,&c050
-	add hl,sp
-	ld sp,hl
-	;push hl
-	jp JumpToNextLine
+    ld hl,&0850
+    add hl,sp
+    ei
+    ld sp,&0000:StackRestore_Plus2
+    di
+    ld sp,hl
+    Background_CompiledSprite_Minus1:
+    bit 7,h
+    jp z,JumpToNextLine
+    ld hl,&c050
+    add hl,sp
+    ld sp,hl
+    ;push hl
+    jp JumpToNextLine
 endif
 ifdef BuildENT
-	ld hl,&00A0
-	add hl,sp
-	ei
-	ld sp,&0000:StackRestore_Plus2
-	di
-	ld sp,hl
+    ld hl,&00A0
+    add hl,sp
+    ei
+    ld sp,&0000:StackRestore_Plus2
+    di
+    ld sp,hl
 
 endif
 
-JumpToNextLine: 
+JumpToNextLine:
 LD L,(IX)
 INC IX
 LD H,(IX)
@@ -2754,7 +2754,7 @@ JP (HL)
 CompiledSprite_GetNxtLinbc: defw &0000 :CompiledSprite_NextLineJumpBC_Plus2
 
 
-BitmapData: 
+BitmapData:
 
 defb &00,&40,&00,&00,&40,&00,&00,&40,&00,&00
 defb &40,&00,&00,&40,&00,&00,&40,&00,&00,&40

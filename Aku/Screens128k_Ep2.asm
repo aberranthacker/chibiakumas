@@ -82,7 +82,7 @@ Ld E,&10
 
 Ld L,D
 
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicLoading2png_Line_54:
@@ -106,7 +106,7 @@ Ld E,&60
 
 Ld L,D
 
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicLoading2png_Line_56:
@@ -166,7 +166,7 @@ LD BC,&1120
   Push BC
   PUSH DE
 LD HL,&3000
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicLoading2png_Line_62:
@@ -708,7 +708,7 @@ defw BitmapData+749
 LD HL,&F070
   Push HL
   PUSH DE
-  Push HL 
+  Push HL
 LD BC,&F030
   Push BC
   PUSH DE
@@ -736,7 +736,7 @@ defw BitmapData+749
 LD HL,&F070
   Push HL
   PUSH DE
-  Push HL 
+  Push HL
 LD BC,&F030
   Push BC
   PUSH DE
@@ -1385,7 +1385,7 @@ call MultiPushDe6
 LD HL,&BB10
   Push HL
 LD BC,&0000
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicLoading2png_Line_139:
@@ -1399,7 +1399,7 @@ call MultiPushDe5
 LD HL,&9810
   Push HL
 LD BC,&0000
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicLoading2png_Line_140:
@@ -1441,7 +1441,7 @@ call MultiPushDe6
 LD HL,&FF10
   Push HL
 LD BC,&0000
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicLoading2png_Line_143:
@@ -1455,11 +1455,11 @@ call MultiPushDe6
 LD BC,&F010
   Push BC
 LD HL,&0000
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 
-PicLoading2png_DrawOrder: 
+PicLoading2png_DrawOrder:
 
   DEFW PicLoading2png_Line_0
   DEFW PicLoading2png_Line_1
@@ -1831,7 +1831,7 @@ LD DE,&F0F0
   PUSH DE
   PUSH DE
 LD HL,&3000
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicEp2Continuepng_Processedpng_Line_55:
@@ -1850,7 +1850,7 @@ Ld E,C
   PUSH DE
   PUSH DE
 LD HL,&3000
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicEp2Continuepng_Processedpng_Line_56:
@@ -1862,7 +1862,7 @@ LD DE,&F0F0
   PUSH DE
   PUSH DE
 LD HL,&7000
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicEp2Continuepng_Processedpng_Line_57:
@@ -1874,7 +1874,7 @@ LD DE,&F0F0
   PUSH DE
   PUSH DE
 LD HL,&F000
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicEp2Continuepng_Processedpng_Line_58:
@@ -1886,7 +1886,7 @@ LD DE,&F0F0
   PUSH DE
   PUSH DE
 LD HL,&F000
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicEp2Continuepng_Processedpng_Line_59:
@@ -2049,7 +2049,7 @@ call BitmapPush20
 defw BitmapData+2215
   PUSH DE
 LD HL,&8020
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicEp2Continuepng_Processedpng_Line_74:
@@ -2070,7 +2070,7 @@ call BitmapPush20
 defw BitmapData+2243
   PUSH DE
 LD HL,&0030
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicEp2Continuepng_Processedpng_Line_75:
@@ -2091,7 +2091,7 @@ call BitmapPush20
 defw BitmapData+2263
   PUSH DE
 LD HL,&8030
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicEp2Continuepng_Processedpng_Line_76:
@@ -2118,7 +2118,7 @@ call BitmapPush6
 defw BitmapData+2287
   PUSH DE
 LD HL,&0030
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicEp2Continuepng_Processedpng_Line_77:
@@ -2142,7 +2142,7 @@ call BitmapPush20
 defw BitmapData+2307
   PUSH DE
 LD HL,&0030
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicEp2Continuepng_Processedpng_Line_78:
@@ -2176,7 +2176,7 @@ call BitmapPush14
 defw BitmapData+2343
   PUSH DE
 LD BC,&0030
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicEp2Continuepng_Processedpng_Line_79:
@@ -2449,7 +2449,7 @@ call BitmapPush20
 defw BitmapData+2655
   PUSH DE
 LD BC,&7000
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicEp2Continuepng_Processedpng_Line_88:
@@ -2469,7 +2469,7 @@ call BitmapPush20
 defw BitmapData+2719
   PUSH DE
 LD HL,&6000
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicEp2Continuepng_Processedpng_Line_89:
@@ -2492,7 +2492,7 @@ LD HL,&7200
   Push HL
   PUSH DE
 LD BC,&E000
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicEp2Continuepng_Processedpng_Line_90:
@@ -2521,7 +2521,7 @@ LD BC,&7000
   Push BC
   PUSH DE
 LD HL,&C000
-  jp NextLinePushHl 
+  jp NextLinePushHl
 
 
 PicEp2Continuepng_Processedpng_Line_91:
@@ -2624,7 +2624,7 @@ defw BitmapData+2913
 LD HL,&C0F0
   Push HL
 LD BC,&0010
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicEp2Continuepng_Processedpng_Line_95:
@@ -2933,7 +2933,7 @@ LD HL,&EEFF
   Push HL
   PUSH DE
 LD BC,&0044
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicEp2Continuepng_Processedpng_Line_113:
@@ -2993,7 +2993,7 @@ DEC DE
 LD HL,&FF3B
   Push HL
 LD BC,&0088
- jp NextLinePushBC 
+ jp NextLinePushBC
 
 
 PicEp2Continuepng_Processedpng_Line_118:
@@ -3111,7 +3111,7 @@ defw BitmapData+3875
 
 
 
-PicEp2Continuepng_Processedpng_DrawOrder: 
+PicEp2Continuepng_Processedpng_DrawOrder:
 
   DEFW PicLoading2png_Line_0
 defw looper
@@ -3224,7 +3224,7 @@ ld b,0
 ld ixh,80
 ld IXL,79
 di
-exx 
+exx
 push bc
 exx
 jp RLE_Draw
@@ -4951,17 +4951,17 @@ PicSetDisk3png_rledataEnd: defb 0
 ;Global Code
 RLE_ImageWidth equ 0
 RLE_NextScreenLineHL:
-	push de
-				ld b,RLE_ImageWidth :ImageWidthE_Plus1
-		ld de,&800+RLE_ImageWidth :ImageWidthD_Plus2
-		add hl,de
-	pop de
-	ret nc
-	push de
-		ld de,&c050
-		add hl,de
-	pop de
-	ret
+    push de
+                ld b,RLE_ImageWidth :ImageWidthE_Plus1
+        ld de,&800+RLE_ImageWidth :ImageWidthD_Plus2
+        add hl,de
+    pop de
+    ret nc
+    push de
+        ld de,&c050
+        add hl,de
+    pop de
+    ret
 
 
 EndCode:
@@ -4970,53 +4970,53 @@ ei
 ret
 
 MultiPushDeLast40: ld HL,NextLine
-jp MultiPushDe40B 
+jp MultiPushDe40B
 MultiPushDe40: pop HL
-jp MultiPushDe40B 
+jp MultiPushDe40B
 MultiPushDe35: pop HL
-jp MultiPushDe35B 
+jp MultiPushDe35B
 MultiPushDe34: pop HL
-jp MultiPushDe34B 
+jp MultiPushDe34B
 MultiPushDe33: pop HL
-jp MultiPushDe33B 
+jp MultiPushDe33B
 MultiPushDe32: pop HL
-jp MultiPushDe32B 
+jp MultiPushDe32B
 MultiPushDe31: pop HL
-jp MultiPushDe31B 
+jp MultiPushDe31B
 MultiPushDe30: pop HL
-jp MultiPushDe30B 
+jp MultiPushDe30B
 MultiPushDe29: pop HL
-jr MultiPushDe29B 
+jr MultiPushDe29B
 MultiPushDe28: pop HL
-jr MultiPushDe28B 
+jr MultiPushDe28B
 MultiPushDe27: pop HL
-jr MultiPushDe27B 
+jr MultiPushDe27B
 MultiPushDe23: pop HL
-jr MultiPushDe23B 
+jr MultiPushDe23B
 MultiPushDe19: pop HL
-jr MultiPushDe19B 
+jr MultiPushDe19B
 MultiPushDe16: pop HL
-jr MultiPushDe16B 
+jr MultiPushDe16B
 MultiPushDe15: pop HL
-jr MultiPushDe15B 
+jr MultiPushDe15B
 MultiPushDe11: pop HL
-jr MultiPushDe11B 
+jr MultiPushDe11B
 MultiPushDe10: pop HL
-jr MultiPushDe10B 
+jr MultiPushDe10B
 MultiPushDe9: pop HL
-jr MultiPushDe9B 
+jr MultiPushDe9B
 MultiPushDe8: pop HL
-jr MultiPushDe8B 
+jr MultiPushDe8B
 MultiPushDeLast7: ld HL,NextLine
-jr MultiPushDe7B 
+jr MultiPushDe7B
 MultiPushDe7: pop HL
-jr MultiPushDe7B 
+jr MultiPushDe7B
 MultiPushDeLast6: ld HL,NextLine
-jr MultiPushDe6B 
+jr MultiPushDe6B
 MultiPushDe6: pop HL
-jr MultiPushDe6B 
+jr MultiPushDe6B
 MultiPushDe5: pop HL
-jr MultiPushDe5B 
+jr MultiPushDe5B
 MultiPushDe40B: Push DE
 MultiPushDe39B: Push DE
 MultiPushDe38B: Push DE
@@ -5148,7 +5148,7 @@ NextLinePushDe3: push de
 NextLinePushDe2: push de
 NextLinePushDe1: push de
 
-NextLine: 
+NextLine:
 ld hl,&0800+80
 add hl,sp
 ld sp,hl
@@ -5157,7 +5157,7 @@ ld hl,&c050
 add hl,sp
 ld sp,hl
 
-JumpToNextLine: 
+JumpToNextLine:
 LD L,(IX)
 INC IX
 LD H,(IX)
@@ -5193,29 +5193,29 @@ INC bc
 ld (Looper_CountSize_Plus1-1),a
 ld (RestoreLooperAddress_Plus2-2),bc
 LooperNextStage:
-	ld hl,&0000 :RestoreLooperAddress_Plus2
-	ld (Looper_Address_Plus2-2),hl
-	ld a,0:Looper_CountB_Plus1
-	ld (Looper_Count_Plus1-1),a
-	LooperRepeat:
-		ld hl,&0000 :Looper_Address_Plus2
-		LD c,(hl)
-		INC hl
-		LD b,(hl)
-		INC hl
-		ld (Looper_Address_Plus2-2),hl
-		ld h,b
-		ld l,c
-		ld ix,LooperContinueAddress
-		jp (hl)
+    ld hl,&0000 :RestoreLooperAddress_Plus2
+    ld (Looper_Address_Plus2-2),hl
+    ld a,0:Looper_CountB_Plus1
+    ld (Looper_Count_Plus1-1),a
+    LooperRepeat:
+        ld hl,&0000 :Looper_Address_Plus2
+        LD c,(hl)
+        INC hl
+        LD b,(hl)
+        INC hl
+        ld (Looper_Address_Plus2-2),hl
+        ld h,b
+        ld l,c
+        ld ix,LooperContinueAddress
+        jp (hl)
    LooperContinue:
-		ld a,0:Looper_Count_Plus1
-		dec a
-		ld (Looper_Count_Plus1-1),a
-	jp nz,LooperRepeat
-	ld a,0:Looper_CountSize_Plus1
-	dec a
-	ld (Looper_CountSize_Plus1-1),a
+        ld a,0:Looper_Count_Plus1
+        dec a
+        ld (Looper_Count_Plus1-1),a
+    jp nz,LooperRepeat
+    ld a,0:Looper_CountSize_Plus1
+    dec a
+    ld (Looper_CountSize_Plus1-1),a
 jp nz,LooperNextStage
 ld ix,(Looper_Address_Plus2-2)
 LD L,(IX)
@@ -5225,7 +5225,7 @@ INC IX
 JP (HL)
 
 
-BitmapData: 
+BitmapData:
 
 defb &00,&10,&F0,&80,&30,&C0,&F0,&00,&00,&32
 defb &F8,&E0,&C0,&00,&00,&C0,&00,&C8,&00,&C0
@@ -5646,315 +5646,315 @@ jp (hl)
 
 
 RLE_Draw:
-  		ld a,ixh
-		ld (ImageWidthA_Plus1-1),a
-		ld (ImageWidthB_Plus2-2),a
-		ld (ImageWidthC_Plus1-1),a
-		ld (ImageWidthD_Plus2-2),a
-		ld (ImageWidthE_Plus1-1),a
-		cpl
-		inc a
-		ld (NegativeImageWidth_Plus2-2),a
-		ld a,d
-		ld (RLE_LastByteH_Plus1-1),a
-		ld a,e
-		ld (RLE_LastByteL_Plus1-1),a
-	push hl
-		ld a,IXL
-		ld h,&C0
-		LD L,a
-		ld a,b
-				ld de,&FFFF :NegativeImageWidth_Plus2
-		or a
+        ld a,ixh
+        ld (ImageWidthA_Plus1-1),a
+        ld (ImageWidthB_Plus2-2),a
+        ld (ImageWidthC_Plus1-1),a
+        ld (ImageWidthD_Plus2-2),a
+        ld (ImageWidthE_Plus1-1),a
+        cpl
+        inc a
+        ld (NegativeImageWidth_Plus2-2),a
+        ld a,d
+        ld (RLE_LastByteH_Plus1-1),a
+        ld a,e
+        ld (RLE_LastByteL_Plus1-1),a
+    push hl
+        ld a,IXL
+        ld h,&C0
+        LD L,a
+        ld a,b
+                ld de,&FFFF :NegativeImageWidth_Plus2
+        or a
 RLE_DrawGetNextLine:
-		jr z,RLE_DrawGotLine
-		call RLE_NextScreenLineHL
-		add hl,de
-		dec a
-		jr RLE_DrawGetNextLine
+        jr z,RLE_DrawGotLine
+        call RLE_NextScreenLineHL
+        add hl,de
+        dec a
+        jr RLE_DrawGetNextLine
 RLE_DrawGotLine:
-		ld (RLE_ScrPos_Plus2-2),hl
-	;	xor a
-				ld iyl,RLE_ImageWidth :ImageWidthA_Plus1
-		ld a,255
-		ld e,a
-		;ld (Nibble_Plus1-1),a
-	pop hl
+        ld (RLE_ScrPos_Plus2-2),hl
+    ;   xor a
+                ld iyl,RLE_ImageWidth :ImageWidthA_Plus1
+        ld a,255
+        ld e,a
+        ;ld (Nibble_Plus1-1),a
+    pop hl
 
 
 RLE_MoreBytesLoop:
 
-	inc hl
-	ld a,(hl)
-	ld b,a
-	or a
-	jp z,RLE_OneByteData
-	and %00001111
-	jp z,RLE_PlainBitmapData
-	ld ixh,0
-	ld ixl,a
+    inc hl
+    ld a,(hl)
+    ld b,a
+    or a
+    jp z,RLE_OneByteData
+    and %00001111
+    jp z,RLE_PlainBitmapData
+    ld ixh,0
+    ld ixl,a
 
-	;we're doing Nibble data, Expand the data into two pixels of Mode 1 and duplicate
+    ;we're doing Nibble data, Expand the data into two pixels of Mode 1 and duplicate
 
-	ld a,b
-	and %00110000
-	rrca
-	rrca
-	ld c,a
-	ld a,b
-	and %11000000
-	or c
-	ld c,a
-	rrca	;Remove these for Left->right
-	rrca
-	or c
-	ld c,a
+    ld a,b
+    and %00110000
+    rrca
+    rrca
+    ld c,a
+    ld a,b
+    and %11000000
+    or c
+    ld c,a
+    rrca    ;Remove these for Left->right
+    rrca
+    or c
+    ld c,a
 
-	ld a,ixl
-	cp 15
-	jp nz,RLE_NoMoreNibbleBytes
-	push de
+    ld a,ixl
+    cp 15
+    jp nz,RLE_NoMoreNibbleBytes
+    push de
 RLE_MoreNibbleBytes:
-		inc hl
-		ld a,(hl)
-		ld d,0
-		ld e,a
-		add ix,de
-		cp 255
-		jp z,RLE_MoreNibbleBytes
-	pop de
+        inc hl
+        ld a,(hl)
+        ld d,0
+        ld e,a
+        add ix,de
+        cp 255
+        jp z,RLE_MoreNibbleBytes
+    pop de
 
 RLE_NoMoreNibbleBytes:
 
 
-	ld a,e
-	or a
-	jp z,RLE_MoreBytesPart2Flip
+    ld a,e
+    or a
+    jp z,RLE_MoreBytesPart2Flip
 
 
-	ld a,ixl
-	cp 4
-	call nc,RLE_ByteNibbles
+    ld a,ixl
+    cp 4
+    call nc,RLE_ByteNibbles
 
 
 
-	xor a
-	ld d,a ;byte for screen
-	push hl
-	ld hl,&C050 :RLE_ScrPos_Plus2
-	ld b,iyl
+    xor a
+    ld d,a ;byte for screen
+    push hl
+    ld hl,&C050 :RLE_ScrPos_Plus2
+    ld b,iyl
 RLE_MoreBytes:
-	ld a,c
-	and %00110011
-	or d
-	ld d,a
-	dec ix
-	ld a,ixl
-	or ixh
-	jr z,RLE_LastByteFlip
+    ld a,c
+    and %00110011
+    or d
+    ld d,a
+    dec ix
+    ld a,ixl
+    or ixh
+    jr z,RLE_LastByteFlip
 
 
 RLE_MoreBytesPart2:
-	ld a,c
-	and %11001100
-	or d
-	ld d,a
+    ld a,c
+    and %11001100
+    or d
+    ld d,a
 
-	dec ix
+    dec ix
 
-		ld (hl),d
-		dec hl
-		dec b
-		call z,RLE_NextScreenLineHL
+        ld (hl),d
+        dec hl
+        dec b
+        call z,RLE_NextScreenLineHL
 
-	xor a
-	ld d,a ;byte for screen
+    xor a
+    ld d,a ;byte for screen
 
-	ld a,ixl
-	or ixh
-	jr nz,RLE_MoreBytes
+    ld a,ixl
+    or ixh
+    jr nz,RLE_MoreBytes
 
 RLE_LastByte:
-	ld iyl,b
-	ld (RLE_ScrPos_Plus2-2),hl
-	pop hl
-;	ld iyl,b
-	ld a,&00:RLE_LastByteH_Plus1
-	cp h
-	jp nz,RLE_MoreBytesLoop
+    ld iyl,b
+    ld (RLE_ScrPos_Plus2-2),hl
+    pop hl
+;   ld iyl,b
+    ld a,&00:RLE_LastByteH_Plus1
+    cp h
+    jp nz,RLE_MoreBytesLoop
 
-	ld a,&00:RLE_LastByteL_Plus1
-	cp l
-	jp nz,RLE_MoreBytesLoop
-
-
+    ld a,&00:RLE_LastByteL_Plus1
+    cp l
+    jp nz,RLE_MoreBytesLoop
 
 
-	exx 			;keep the firmware working!
-	pop bc
-	exx
 
-	ret
+
+    exx             ;keep the firmware working!
+    pop bc
+    exx
+
+    ret
 RLE_LastByteFlip:
-	ld a,e
-	cpl
-	ld e,a
-	jp RLE_LastByte
+    ld a,e
+    cpl
+    ld e,a
+    jp RLE_LastByte
 RLE_MoreBytesPart2Flip:
-	push hl
-	ld b,iyl
-	ld hl,(RLE_ScrPos_Plus2-2)
-	ld a,e
-	cpl
-	ld e,a
-	jp RLE_MoreBytesPart2
+    push hl
+    ld b,iyl
+    ld hl,(RLE_ScrPos_Plus2-2)
+    ld a,e
+    cpl
+    ld e,a
+    jp RLE_MoreBytesPart2
 
 
 RLE_NextScreenLine:
-	push hl
-		ld iyl,RLE_ImageWidth :ImageWidthC_Plus1
-		ld hl,&800+RLE_ImageWidth :ImageWidthB_Plus2
-		add hl,de
-		ex hl,de
-	pop hl
-	ret nc
-	push hl
-		ld hl,&c050
-		add hl,de
-		ex hl,de
-	pop hl
-	ret
+    push hl
+        ld iyl,RLE_ImageWidth :ImageWidthC_Plus1
+        ld hl,&800+RLE_ImageWidth :ImageWidthB_Plus2
+        add hl,de
+        ex hl,de
+    pop hl
+    ret nc
+    push hl
+        ld hl,&c050
+        add hl,de
+        ex hl,de
+    pop hl
+    ret
 
 RLE_PlainBitmapData:
-	push de
-		ld a,(hl)
-		rrca
-		rrca
-		rrca
-		rrca
-		ld b,0
-		ld c,a
+    push de
+        ld a,(hl)
+        rrca
+        rrca
+        rrca
+        rrca
+        ld b,0
+        ld c,a
 
-		cp 15
-		jp nz,RLE_PlainBitmapDataNoExtras
-	;More than 14 bytes, load an extra byte into the count
+        cp 15
+        jp nz,RLE_PlainBitmapDataNoExtras
+    ;More than 14 bytes, load an extra byte into the count
 RLE_PlainBitmapDataHasExtras:
-		inc hl
-		ld a,(hl)
-		or a
-		jr z,RLE_PlainBitmapDataNoExtras	; no more bytes
-		push hl
-			ld h,0
-			ld l,a
-			add hl,bc
-			ld b,h
-			ld c,l
-		pop hl
+        inc hl
+        ld a,(hl)
+        or a
+        jr z,RLE_PlainBitmapDataNoExtras    ; no more bytes
+        push hl
+            ld h,0
+            ld l,a
+            add hl,bc
+            ld b,h
+            ld c,l
+        pop hl
 
-		cp 255
-		jr z,RLE_PlainBitmapDataHasExtras
+        cp 255
+        jr z,RLE_PlainBitmapDataHasExtras
 RLE_PlainBitmapDataNoExtras:
 
-	
-		ld de,(RLE_ScrPos_Plus2-2)
-		RLE_PlainBitmapData_More:
-		inc hl
-		ld a,(hl)
-		ld (de),a
-		dec de
+
+        ld de,(RLE_ScrPos_Plus2-2)
+        RLE_PlainBitmapData_More:
+        inc hl
+        ld a,(hl)
+        ld (de),a
+        dec de
 
 
 
-		dec iyl
-		call z,RLE_NextScreenLine
-		dec bc
-		ld a,b
-		or c
-		jp nz,RLE_PlainBitmapData_More
+        dec iyl
+        call z,RLE_NextScreenLine
+        dec bc
+        ld a,b
+        or c
+        jp nz,RLE_PlainBitmapData_More
 
-		ld (RLE_ScrPos_Plus2-2),de
+        ld (RLE_ScrPos_Plus2-2),de
 ;ret
-	pop de
-	jp RLE_MoreBytesLoop
+    pop de
+    jp RLE_MoreBytesLoop
 
 RLE_OneByteData:
-	push de
-		xor a 
-		ld b,a
-		ld c,a
+    push de
+        xor a
+        ld b,a
+        ld c,a
 RLE_OneByteDataExtras:
-		inc hl
-		ld a,(hl)
-		push hl
-			ld h,0
-			ld l,a
-			add hl,bc
-			ld b,h
-			ld c,l
-		pop hl
+        inc hl
+        ld a,(hl)
+        push hl
+            ld h,0
+            ld l,a
+            add hl,bc
+            ld b,h
+            ld c,l
+        pop hl
 
-		cp 255
-		jp z,RLE_OneByteDataExtras
+        cp 255
+        jp z,RLE_OneByteDataExtras
 
-		inc hl
-		ld a,(hl)
-		ld (RLE_ThisOneByte_Plus1-1),a
+        inc hl
+        ld a,(hl)
+        ld (RLE_ThisOneByte_Plus1-1),a
 
 
-		ld de,(RLE_ScrPos_Plus2-2)
+        ld de,(RLE_ScrPos_Plus2-2)
 RLE_OneByteData_More:
-		ld a,00:RLE_ThisOneByte_Plus1
-		ld (de),a
-		dec de
-		dec iyl
-		call z,RLE_NextScreenLine
+        ld a,00:RLE_ThisOneByte_Plus1
+        ld (de),a
+        dec de
+        dec iyl
+        call z,RLE_NextScreenLine
 
 
 
 
-		dec bc
-		ld a,b
-		or c
-		jp nz,RLE_OneByteData_More
+        dec bc
+        ld a,b
+        or c
+        jp nz,RLE_OneByteData_More
 
-		ld (RLE_ScrPos_Plus2-2),de
-		;ret
+        ld (RLE_ScrPos_Plus2-2),de
+        ;ret
 
-	pop de
-	jp RLE_MoreBytesLoop
+    pop de
+    jp RLE_MoreBytesLoop
 RLE_ByteNibbles:
-	di
-	ld a,c
-	exx
-	ld b,iyl
-	ld c,a
-	ld d,ixh
-	ld e,ixl
-		ld hl,(RLE_ScrPos_Plus2-2)
+    di
+    ld a,c
+    exx
+    ld b,iyl
+    ld c,a
+    ld d,ixh
+    ld e,ixl
+        ld hl,(RLE_ScrPos_Plus2-2)
 RLE_ByteNibblesMore3:
-		ld a,3
+        ld a,3
 RLE_ByteNibblesMore:
-		ld (hl),c
-		dec hl 
-		dec b;iyl
-		call z,RLE_NextScreenLineHL
+        ld (hl),c
+        dec hl
+        dec b;iyl
+        call z,RLE_NextScreenLineHL
 
-		dec de
-		dec de
-		cp e
-		jp c,RLE_ByteNibblesMore
+        dec de
+        dec de
+        cp e
+        jp c,RLE_ByteNibblesMore
 
-		ld a,d
-		or a
-		jp nz,RLE_ByteNibblesMore3
+        ld a,d
+        or a
+        jp nz,RLE_ByteNibblesMore3
 
-	ld (RLE_ScrPos_Plus2-2),hl
-	ld iyl,b
-	ld ixh,d
-	ld ixl,e
-	exx
+    ld (RLE_ScrPos_Plus2-2),hl
+    ld iyl,b
+    ld ixh,d
+    ld ixl,e
+    exx
 list
 ret
 LastByte:defb 0
 ;read "CoreDefs.asm";read "BootStrap.asm"
-save "lz48\T29-SC1.D01",&4000,LastByte-&4000	;address,size...}[,exec_address]
+save "lz48\T29-SC1.D01",&4000,LastByte-&4000    ;address,size...}[,exec_address]
