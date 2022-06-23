@@ -26,7 +26,6 @@
 
 require 'optparse'
 require_relative 'reverse_tables'
-require 'pry'
 
 options = Struct.new(:in_filename, :out_filename, :font).new
 
@@ -116,7 +115,7 @@ sprites_metadata.each do |md|
   print "w: #{md[:width].to_s.rjust(2, ' ')} "
   print "y_offset: #{md[:y_offset].to_s.rjust(2, ' ')} "
   print "attrs: #{md[:settings].to_s.rjust(3, ' ')} "
-  puts  "offset: #{md[:offset]}"
+  puts  "offset: #{(md[:offset] - diff).to_s.rjust(5, ' ')}"
 
   sprite = file[md[:offset], md[:height] * md[:width]].unpack('v*')
   uknc_sprite = []

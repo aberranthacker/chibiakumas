@@ -181,7 +181,8 @@ build/level_01.o : $(common) \
                    background_bit_shifter.s \
                    background_get_sprite_mem_pos.s \
 		   resources/level01.spr \
-		   resources/level01_tiles.spr
+		   resources/level01_tiles.spr \
+		   resources/chibi_lr.spr
 	$(AS) -al level_01.s -o build/level_01.o | build_tools/format_list.rb
 
 resources/level01.spr : build_tools/spr_cpc_to_uknc.rb \
@@ -245,6 +246,10 @@ build/ep1_level_music.formatted.s : build_tools/format_song.rb \
 	                            music/ep1_level_music.s
 	build_tools/format_song.rb music/ep1_level_music.s  build/ep1_level_music.formatted.s
 # ep1_level_music.bin -------------------------------------------------------}}}
+
+resources/chibi_lr.spr : build_tools/spr_cpc_to_uknc.rb \
+			 resources/chibi_lr.cpc.spr
+	build_tools/spr_cpc_to_uknc.rb resources/chibi_lr.cpc.spr -o resources/chibi_lr.spr
 
 resources/ep1_intro.spr : build_tools/spr_cpc_to_uknc.rb \
 	                  ../ResCPC/LEVEL252A.SPR
