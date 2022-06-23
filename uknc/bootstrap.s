@@ -21,17 +21,18 @@
 
                 .=BootstrapStart
 start:
-Bootstrap_Launch:
+Bootstrap_Launch: # used by bootsector linker script
         MOV  $BootstrapSizeDWords,R0
         MOV  $CBPADR,R1
         MOV  $CBP12D,R2
         MOV  $BootstrapStart,R3
         MOV  $0x8000,(R1)
 
-  100$:.rept 2
-        MOV  (R3)+,(R2)
-        INC  (R1)
-       .endr
+        100$:
+            .rept 2
+             MOV  (R3)+,(R2)
+             INC  (R1)
+            .endr
         SOB  R0,100$
 
 # Load core modules ---------------------------------------------------------{{{
@@ -44,7 +45,7 @@ Bootstrap_Launch:
         JSR  R5,@$PPEXEC
        .word FB1 # PPU module location
        .word ppu_module_size >> 1
-#-------------------------------------------------------------------------------
+        #-----------------------------------------------------------------------
      .ifdef ShowLoadingScreen
        .ppudo_ensure $PPU_SetPalette, $TitleScreenPalette
 
@@ -55,19 +56,30 @@ Bootstrap_Launch:
         MOV  $8000>>3, R0
         MOV  $FB1, R1
         CLR  R3
-1$:    .rept 1<<3
-        MOV  R3, (R1)+
-       .endr
+        1$:
+           .rept 1<<3
+            MOV  R3, (R1)+
+           .endr
         SOB  R0, 1$
      .endif
-
+        #-----------------------------------------------------------------------
         # Load the game core - this is always in memory
         MOV  $core.bin,R0
        .wait_ppu
         CALL Bootstrap_LoadDiskFile
-#       BCC  1$
-#      .inform_and_hang3 "core.bin loading error"
-#   10$:
+       .ifdef ExtMemCore # copy core to extended memory
+            MOV  $GameVarsEnd,R4
+            MOV  $CoreStart,R5
+            MOV  $ExtMemSizeBytes>>2,R1
+            200$:
+                MOV  (R4)+, (R5)+
+                MOV  (R4)+, (R5)+
+            SOB R1,200$
+       .endif
+
+        BCC  10$
+       .inform_and_hang3 "core.bin loading error"
+10$:
         # TODO: Load saved settings
         # TODO: player sprites load
         # TODO: Initialize the Sound Effects.
@@ -487,8 +499,8 @@ loading_screen.bin:
     .equiv loading_screen_block_num, (ppu_module_size + 511) >> 9 + ppu_module_block_num
     .word loading_screen_block_num
 core.bin:
-    .word FileBeginCore
-    .equiv core_size, 6680
+    .word GameVarsEnd
+    .equiv core_size, 6676
     .word core_size >> 1
     .equiv core_block_num, (loading_screen_size + 511) >> 9 + loading_screen_block_num
     .word core_block_num
@@ -755,4 +767,4 @@ TestStr: .byte 0,10
     .even
 end:
 
-BootstrapEnd:
+BootstrapEnd: # used by bootsector linker script

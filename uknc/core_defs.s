@@ -3,6 +3,7 @@
 .equiv DebugMode, 1
 #.equiv DebugSprite, 1
 .equiv SkipPSGSend, 1
+#.equiv ExtMemCore, 1
 #-------------------------------------------------------------------------------
 .equiv MainMenu, 0x8000
 .equiv Episode1_Intro, 0x0000
@@ -37,44 +38,8 @@
 .equiv PPU_DebugPrint,    32
 .equiv PPU_DebugPrintAt,  34
 .equiv PPU_LastJMPTableIndex, 34
-
-# CPU memory map ---------------------------------------------------------------
-.equiv FB0, 384 # 0600 0x0180
-.equiv FB_gap, FB0 + 16000
-.equiv PlayerStarArrayPointer, FB_gap # it fits nicely into the gap
-.equiv FB1, FB_gap + 384
-
-.equiv BootstrapStart,  FB0
-.equiv Ep1IntroSlidesStart, FB0 + 4096
-
-.equiv GameVarsStart, FB1 + 16000
-.equiv ObjectArrayPointer,  GameVarsStart
-.equiv StarArrayPointer,    ObjectArrayPointer + ObjectArraySizeBytes
-.equiv Event_SavedSettings, StarArrayPointer + StarArraySizeBytes
-.equiv CoreStart,           Event_SavedSettings + Event_SavedSettingsSizeBytes
-
-.equiv Akuyou_LevelStart, 0x9F70 # 40816 0117560 # auto-generated during a build
-.equiv LevelSprites, Akuyou_LevelStart + 4
-
-.equiv SPReset,       0157770 # Initial stack pointer
-.equiv storedSP,      0157772 # place where we store SP, in case if we need yet another register
-.equiv PPUCommand,    0157774 # command for PPU code
-.equiv PPUCommandArg, 0157776 # command for PPU argument
-# 0160000 57344 0xE000 end of RAM ----------------------------------------------
-
-.equiv PPU_UserRamSize,  0054104 # 22596 0x5844
-.equiv PPU_UserRamSizeWords, PPU_UserRamSize >> 1 # 0026042 11298 0x2C22
-# PPU memory map ---------------------------------------------------------------
-.equiv PPU_UserRamStart, 0023666 # 10166 0x27B6
-
-.equiv PPU_StrBuffer, 0036666 # 15798 0x3DB6 # auto-generated during a build
-.equiv PPU_MusicBuffer, PPU_StrBuffer + 320
-
-.equiv PPU_UserProcessMetadataAddr, 0077772 # 32762 0x7FFA
-
-.equiv SLTAB, 0100000# 32768 0x8000
-.equiv OffscreenAreaAddr, 0140000 # 49152 0xC000
 #-------------------------------------------------------------------------------
+.equiv ExtMemSizeBytes, 7616
 
 .equiv ObjectArraySize, 60
 .equiv ObjectArrayElementSize, 8
@@ -98,7 +63,58 @@
 # used to clean up game vars between level
 .equiv GameVarsArraySize, ObjectArraySizeBytes + StarArraySizeBytes + Event_SavedSettingsSizeBytes
 .equiv GameVarsArraySizeWords, GameVarsArraySize >> 1
+#-------------------------------------------------------------------------------
+# CPU memory map ---------------------------------------------------------------
+.equiv FB0, 384 # 0600 0x0180
+.equiv FB_gap, FB0 + 16000
+.equiv PlayerStarArrayPointer, FB_gap # it fits nicely into the gap
+.equiv FB1, FB_gap + 384
 
+.equiv BootstrapStart,  FB0
+.equiv Ep1IntroSlidesStart, FB0 + 4096
+
+.equiv GameVarsStart, FB1 + 16000
+    .equiv ObjectArrayPointer,  GameVarsStart
+    .equiv StarArrayPointer,    ObjectArrayPointer + ObjectArraySizeBytes
+    .equiv Event_SavedSettings, StarArrayPointer + StarArraySizeBytes
+    .equiv KeyboardScanner_P1, Event_SavedSettings + Event_SavedSettingsSizeBytes
+    .equiv KeyboardScanner_P2, KeyboardScanner_P1 + 2
+.equiv GameVarsEnd,   KeyboardScanner_P2 + 2
+
+    .ifdef ExtMemCore
+.equiv CoreStart, 0160000
+    .else
+.equiv CoreStart, GameVarsEnd
+    .endif
+
+    .ifndef ExtMemCore
+.equiv Akuyou_LevelStart, 0x9F70 # 40816 0117560 # auto-generated during a build
+    .else
+.equiv Akuyou_LevelStart, GameVarsEnd
+    .endif
+
+.equiv LevelSprites, Akuyou_LevelStart + 4
+
+.equiv SPReset,       0157770 # Initial stack pointer
+.equiv storedSP,      0157772 # place where we store SP, in case if we need yet another register
+.equiv PPUCommand,    0157774 # command for PPU code
+.equiv PPUCommandArg, 0157776 # command for PPU argument
+# 0160000 57344 0xE000 end of RAM ----------------------------------------------
+#-------------------------------------------------------------------------------
+.equiv PPU_UserRamSize,  0054104 # 22596 0x5844
+.equiv PPU_UserRamSizeWords, PPU_UserRamSize >> 1 # 0026042 11298 0x2C22
+#-------------------------------------------------------------------------------
+# PPU memory map ---------------------------------------------------------------
+.equiv PPU_UserRamStart, 0023666 # 10166 0x27B6
+
+.equiv PPU_StrBuffer, 0036666 # 15798 0x3DB6 # auto-generated during a build
+.equiv PPU_MusicBuffer, PPU_StrBuffer + 320
+
+.equiv PPU_UserProcessMetadataAddr, 0077772 # 32762 0x7FFA
+
+.equiv SLTAB, 0100000# 32768 0x8000
+.equiv OffscreenAreaAddr, 0140000 # 49152 0xC000
+#-------------------------------------------------------------------------------
 
 .equiv TextScreen_MaxX, 39
 .equiv TextScreen_MinX, 0
