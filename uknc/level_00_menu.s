@@ -127,7 +127,8 @@ ShowMenu:
     .else
         MOV  $EventStreamArray_Menu_EP1, R5
     .endif
-        CALL @$ResetEventStream
+        MOV  $Event_SavedSettings,R3  # Saved Settings
+        CALL @$EventStream_Init
         # TODO: show hiscore value
         CALL @$Timer_UpdateTimer # Aku/Level00-Menu.asm:1180
         CALL @$EventStream_Process
@@ -205,18 +206,6 @@ doGameplaySettings: #--------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 DoShowCredits: #-------------------------------------------------------------{{{
         JMP  @$ShowMenu_Loop
-#----------------------------------------------------------------------------}}}
-
-ResetEventStream: #----------------------------------------------------------{{{
-        MOV  $GameVarsArraySizeWords,R0
-        MOV  $Akuyou_GameVarsStart,R1
-
-100$:   CLR  (R1)+
-        SOB  R0,100$
-
-        MOV  $Event_SavedSettings,R3  # Saved Settings
-        CALL @$EventStream_Init
-RETURN
 #----------------------------------------------------------------------------}}}
 
 OnscreenCursorDefine: #------------------------------------------------------{{{

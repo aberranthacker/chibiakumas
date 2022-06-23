@@ -41,14 +41,19 @@
 # CPU memory map ---------------------------------------------------------------
 .equiv FB0, 384 # 0600 0x0180
 .equiv FB_gap, FB0 + 16000
+.equiv PlayerStarArrayPointer, FB_gap # it fits nicely into the gap
 .equiv FB1, FB_gap + 384
 
 .equiv BootstrapStart,  FB0
 .equiv Ep1IntroSlidesStart, FB0 + 4096
 
-.equiv Akuyou_GameVarsStart, FB1 + 16000
+.equiv GameVarsStart, FB1 + 16000
+.equiv ObjectArrayPointer,  GameVarsStart
+.equiv StarArrayPointer,    ObjectArrayPointer + ObjectArraySizeBytes
+.equiv Event_SavedSettings, StarArrayPointer + StarArraySizeBytes
+.equiv CoreStart,           Event_SavedSettings + Event_SavedSettingsSizeBytes
 
-.equiv Akuyou_LevelStart, 0xA0F0 # 41200 0120360 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9F70 # 40816 0117560 # auto-generated during a build
 .equiv LevelSprites, Akuyou_LevelStart + 4
 
 .equiv SPReset,       0157770 # Initial stack pointer
@@ -79,6 +84,9 @@
 .equiv StarArrayElementSize, 3
 .equiv StarArraySizeBytes, StarArraySize * StarArrayElementSize
 
+# WARNING: if you want to change PlayerArray size
+# check if it fits into a gap between framebuffers (CPU memory map section)
+# the gap size is 384 bytes
 .equiv PlayerStarArraySize, 128
 .equiv PlayerStarArrayElementSize, 3
 .equiv PlayerStarArraySizeBytes, PlayerStarArraySize * PlayerStarArrayElementSize
@@ -87,7 +95,8 @@
 .equiv Event_SavedSettingsElementSize, 8
 .equiv Event_SavedSettingsSizeBytes, Event_SavedSettingsSize * Event_SavedSettingsElementSize
 
-.equiv GameVarsArraySize, ObjectArraySizeBytes + StarArraySizeBytes + PlayerStarArraySizeBytes + Event_SavedSettingsSizeBytes
+# used to clean up game vars between level
+.equiv GameVarsArraySize, ObjectArraySizeBytes + StarArraySizeBytes + Event_SavedSettingsSizeBytes
 .equiv GameVarsArraySizeWords, GameVarsArraySize >> 1
 
 
