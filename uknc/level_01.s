@@ -16,6 +16,8 @@ start:
         JMP  @$LevelInit
 
        .incbin "resources/level01.spr"
+ChibiSprites:
+       .incbin "resources/chibi_lr.spr"
 LevelTiles:
        .incbin "resources/level01_tiles.spr"
 
