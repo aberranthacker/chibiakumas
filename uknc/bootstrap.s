@@ -323,10 +323,30 @@ RETURN
 
 LevelReset0000: # ../Aku/BootStrap.asm:2306 ---------------------------------{{{
         # wipe our memory, to clear out any junk from old levels
-        MOV  $GameVarsArraySizeWords,R1
-        MOV  $Akuyou_GameVarsStart,R3
-  100$: CLR  (R3)+
+        MOV  $ObjectArraySizeBytes >> 1,R1
+        MOV  $ObjectArrayPointer,R3
+        100$:
+            CLR  (R3)+
         SOB  R1, 100$
+
+        MOV  $StarArraySizeBytes >> 1,R1
+        MOV  $StarArrayPointer,R3
+        110$:
+            CLR  (R3)+
+        SOB  R1, 110$
+
+        MOV  $PlayerStarArraySizeBytes >> 1,R1
+        MOV  $PlayerStarArrayPointer,R3
+        120$:
+            CLR  (R3)+
+        SOB  R1, 120$
+
+        MOV  $Event_SavedSettingsSizeBytes >> 1,R1
+        MOV  $Event_SavedSettings,R3
+        130$:
+            CLR  (R3)+
+        SOB  R1, 130$
+
         # This resets anything the last level may have messed with during
         # play so we can start a new level with everything back to normal
 ResetCore: # ../Aku/BootStrap.asm:2318
@@ -458,7 +478,7 @@ ppu_module.bin:
     .word FB1
     .equiv ppu_module_size, 5642
     .word ppu_module_size >> 1
-    .equiv ppu_module_block_num, 5
+    .equiv ppu_module_block_num, 6
     .word ppu_module_block_num
 loading_screen.bin:
     .word FB1
@@ -468,7 +488,7 @@ loading_screen.bin:
     .word loading_screen_block_num
 core.bin:
     .word FileBeginCore
-    .equiv core_size, 6676
+    .equiv core_size, 6680
     .word core_size >> 1
     .equiv core_block_num, (loading_screen_size + 511) >> 9 + loading_screen_block_num
     .word core_block_num
@@ -486,13 +506,13 @@ ep1_intro_slides.bin:
     .word ep1_intro_slides_block_num
 level_00.bin:
     .word Akuyou_LevelStart
-    .equiv level_00_size, 10196
+    .equiv level_00_size, 10178
     .word level_00_size >> 1
     .equiv level_00_block_num, ep1_intro_slides_block_num + (ep1_intro_slides_size + 511) >> 9
     .word level_00_block_num
 level_01.bin:
     .word Akuyou_LevelStart
-    .equiv level_01_size, 9770
+    .equiv level_01_size, 9774
     .word level_01_size >> 1
     .equiv level_01_block_num, level_00_block_num + (level_00_size + 511) >> 9
     .word level_01_block_num

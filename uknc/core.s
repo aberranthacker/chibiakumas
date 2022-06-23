@@ -4,8 +4,6 @@
        .global start # make entry point available to a linker
 
 # Global symbols ------------------------------------------------------------{{{
-       .global Akuyou_GameVarsEnd
-       .global Akuyou_GameVarsStart
        .global ContinueMode
        .global ContinuesReset
        .global Event_SavedSettings
@@ -23,7 +21,6 @@
        .global SavedSettings_Last
        .global SmartBombsReset
        .global StarArrayPointer
-       .global PlayerStarArrayPointer
        .global null
 #----------------------------------------------------------------------------}}}
 
@@ -34,19 +31,11 @@
 #******************************************************************************#
 #*                             Main Project Code                              *#
 #******************************************************************************#
-                .=Akuyou_GameVarsStart # Need about 1752 bytes
-
-    ObjectArrayPointer:     .space ObjectArraySizeBytes
-    StarArrayPointer:       .space StarArraySizeBytes
-    PlayerStarArrayPointer: .space PlayerStarArraySizeBytes
-    Event_SavedSettings:    .space Event_SavedSettingsSizeBytes
-
-    KeyboardScanner_P1: .word 0
-    KeyboardScanner_P2: .word 0
+       .=CoreStart
 
 start:
 FileBeginCore:
-SavedSettings: # {{{
+SavedSettings: #-------------------------------------------------------------{{{
                      .byte 255          # pos -20 spare
                      .byte   0          # pos -19 spare
                      .byte   0          # pos -18 spare
@@ -127,12 +116,14 @@ SavedSettings: # {{{
        .byte 0xFB,       0x00 # Down      14
        .byte 0xFE,       0x00 # Up        13
 
-       .balign 8,0
-    Player_ScoreBytes:  .space 8,0 # Player 2 current score
-    Player_ScoreBytes2: .space 8,0 # Player 1 current score
+    Player_ScoreBytes:  .space 8,0 # Player 1 current score
+    Player_ScoreBytes2: .space 8,0 # Player 2 current score
     # 25
     HighScoreBytes:     .space 8,0 # Highscore
 SavedSettings_Last: # 0x80 bytes --------------------------------------------}}}
+
+KeyboardScanner_P1: .word 0
+KeyboardScanner_P2: .word 0
 
 # some data we don't need on UKNC -------------------------------------------{{{
                                         # ;X,X,Y,Y,S,[0,0,0] - [] not used
