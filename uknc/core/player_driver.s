@@ -18,7 +18,7 @@ SpendCheck:                             # SpendCheck:
        .equiv srcSpendTimeout, .+2
         MOV  $1,R0                      #     ld a,1:SpendTimeout_Plus1   ;Dont let player continue right away!
         DEC  R0                         #     dec a
-        BNE  NoSpend                    #     jr nz,NoSpend
+        BNZ  NoSpend                    #     jr nz,NoSpend
                                         #
         # TODO:                         #     ld a, ixl ; read the keymap
                                         #     or Keymap_AnyFire
@@ -79,8 +79,8 @@ PlayerCounter:
         TSTB @$P1_P09                   #     ld a,(P1_P09)   ;See how many lives are left
                                         #     or a
         BNZ  Player1NotDead             #     jr nz,Player1NotDead
-                                        #
-                                        #     ;if we got here, player 1 is dead
+        #* if, for some reason we got here, player 1 is dead
+        RETURN                          #     ;if we got here, player 1 is dead
                                         #
                                         #     call SpendCheck
                                         #     jr Player2Start
@@ -254,11 +254,7 @@ Player_HandlerOne:
                                                             #     bit Keymap_L,a
                                                             #     jr nz,Player_Handler_KeyreadJoy1Right
                                                             #     ld a,B
-                                                            # ifdef CPC320
-                                                            #     cp 12+24                ;Check we're onscreen
-                                                            # else
-                                                            #     cp 24+24                ;Check we're onscreen
-                                                            # endif
+                                                            #     cp 12+24 ;Check we're onscreen
                                                             #     jr C,Player_Handler_KeyreadJoy1RightPre
                                                             #
                                                             #     sub e
@@ -274,18 +270,14 @@ Player_HandlerOne:
                                                             #     bit Keymap_R,a
                                                             #     jr nz,Player_Handler_SmartBomb
                                                             #     ld a,B
-                                                            # ifdef CPC320
-                                                            #     cp 160-12+24                ;Check we're onscreen
-                                                            # else
-                                                            #     cp 160-24+24                ;Check we're onscreen
-                                                            # endif
+                                                            #     cp 24+ 160-12 ;Check we're onscreen
                                                             #     jr NC,Player_Handler_SmartBombPre
                                                             #
                                                             #     add e
                                                             #     ld B,a
                                                             #
        .equiv dstFireRightHandler, .+2
-        CALL @$null                                         #     call null   :FireRightHandler_Plus2
+        CALL @$null                                         #     call null :FireRightHandler_Plus2
                                                             #
                                                             # Player_Handler_SmartBombPre:
                                                             #     ld a,ixl
@@ -1012,19 +1004,11 @@ ShowContinuesSelfMod:                                       # ShowContinuesSelfM
                                                             #     jp DrawText_Decimal
                                                             #
 Player2Continue:                                            # Player2Continue:
-                                                            # ifdef CPC320
                                                             #     ld hl,&1e01;14              ; show how many credits are left
-                                                            # else
-                                                            #     ld hl,&1a01;14              ; show how many credits are left
-                                                            # endif
                                                             #     jr Player1ContinueB
                                                             #
                                                             # Player1Continue:
-                                                            # ifdef CPC320
                                                             #     ld hl,&0101;14              ; show how many credits are left
-                                                            # else
-                                                            #     ld hl,&0501;14              ; show how many credits are left
-                                                            # endif
                                                             #
                                                             # Player1ContinueB:
                                                             #     push hl
@@ -1068,11 +1052,7 @@ Player2Continue:                                            # Player2Continue:
                                                             #         ld a,6
                                                             #         ld (SprShow_SprNum),a
                                                             #
-                                                            #     ifdef CPC320
                                                             #         ld a,180
-                                                            #     else
-                                                            #         ld a,192-16
-                                                            #     endif
                                                             #         ld (SprShow_Y),a
                                                             #
                                                             #     pop bc
@@ -1088,13 +1068,8 @@ Player2Continue:                                            # Player2Continue:
                                                             #     ld hl,PlusSprites_Config2+3
                                                             #
                                                             #     call Player_DrawUIDual
-                                                            # ifdef CPC320
                                                             #     ld a,7
                                                             #     ld hl,&0003
-                                                            # else
-                                                            #     ld a,7+4
-                                                            #     ld hl,&0403     ;Burst postition
-                                                            # endif
                                                             #     ld iy,Player_Array
                                                             #     ld de, Player_ScoreBytes
                                                             #
@@ -1103,24 +1078,15 @@ Player2Continue:                                            # Player2Continue:
                                                             # Player2DrawUI:
                                                             #     ld a,-4
                                                             #
-                                                            #     ifdef CPC320
                                                             #         ld b,80-4
-                                                            #     else
-                                                            #         ld b,64-4
-                                                            #     endif
                                                             #
                                                             #     ld de,3*4+PlusSprites_Config2+3
                                                             #     ld hl,PlusSprites_Config1+3
                                                             #
                                                             #     call Player_DrawUIDual
                                                             #
-                                                            # ifdef CPC320
                                                             #     ld hl,&2503
                                                             #     ld a,40-1
-                                                            # else
-                                                            #     ld hl,&2103 ;Burst postition
-                                                            #     ld a,36-1
-                                                            # endif
                                                             #     ld iy,Player_Array2
                                                             #     ld de, Player_ScoreBytes2
                                                             #

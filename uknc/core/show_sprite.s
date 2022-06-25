@@ -45,12 +45,12 @@
 # The object loop now assumes the sprite is 24x24, this was done to save time
 # as 97% of the time - it is
 ShowSprite_ReadInfo: # ------------------------------------------------------{{{
+       .equiv srcSprShow_SprNum, .+2
         MOV  $0,R0
-       .equiv srcSprShow_SprNum, .-2
         ASL  R0
 
+       .equiv srcSprShow_BankAddr, .+2
         MOV  $LevelSprites,R5
-       .equiv srcSprShow_BankAddr, .-2
         MOV  R5,R3
         # 6 bytes per sprite
         ADD  R0,R5

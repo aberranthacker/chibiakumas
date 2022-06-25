@@ -619,27 +619,25 @@ LevelLoop:
 
 # Generic Background Begin -----------------------------------------------------
 Background_Draw:
-        MOV  $0,R0                           # ld a,0  ;0=left 1=right ;2=static
+        MOV  $0,R0 # 0=left
+        CALL @$Background_GradientScroll
 
-        CALL @$Background_GradientScroll     # call Akuyou_Background_GradientScroll
+        CALL @$Timer_UpdateTimer
+        PUSH R0 # need to keep the smartbomb color
 
-        CALL @$Timer_UpdateTimer             # call Akuyou_Timer_UpdateTimer
+        CALL @$Timer_GetTimer
+        MOV  R0,@$srcBitShifter_TicksOccured
 
-                                             # push af ; need to keep the smartbomb color
-        # WARNING: supposed to return current timer in I
-        # for whatever reasons
-        CALL @$Timer_GetTimer                # call Akuyou_Timer_GetTimer
-        MOV  R0,@$srcBitShifter_TicksOccured # ld (BitshifterTicksOccured_Plus1 - 1),a
+        MOV  @$ScreenBuffer_ActiveScreen, R5
 
-        MOV  @$ScreenBuffer_ActiveScreen, R5 # call Akuyou_ScreenBuffer_GetActiveScreen
-                                             # ld h,a
-                                             # ld l,&4F+1
-                                             # pop af
-
-                                             # or a
-                                             # jp nz,Background_SmartBomb
+        POP  R0
+        BNZ  Background_SmartBomb
        .equiv jmpBackgroundRender, .+2
-        JMP  @$Background_DrawB              # jp Background_DrawB :BackgroundRender_Plus2
+        JMP  @$Background_DrawB
+
+Background_SmartBomb:
+        MOV  $200,R1
+        JMP  @$Background_SolidFill
 
 Background_DrawB:
         MOV  $GradientTop,R3 # 48 lines
@@ -650,7 +648,7 @@ Background_DrawB:
         CLR  R0 # sprite number
         MOV  $LevelTiles,R4
         CALL GetSpriteMempos
-        MOV  R4,-(SP) # we will need the position later for bitshifts
+        MOV  R4,-(SP) # we will need the position later for Tile bitshifts
         MOV  $16,R1
         CALL @$Background_FloodFillQuadSprite
 
@@ -698,15 +696,6 @@ Background_DrawB:
         CALL @$BitShifter       #
 
         RETURN
-                                #Background_SmartBomb:
-                                #    ld e,d
-                                #    jr Background_Fill
-                                #Background_Black:
-                                #    ld de,&0000
-                                #Background_Fill:
-                                #    ld b,200
-                                #
-                                #    jp BackgroundSolidFill
 
 # Background Data -------------------------------------------------------{{{
    .equiv GradientTopStart, 48 # lines count
@@ -770,7 +759,7 @@ RealPalette: #---------------------------------------------------------------{{{
     .byte 1, 1    # line number, set colors
     .byte 0x00, 0x99, 0xEE, 0xFF
     .byte 41, 1    # line number, set colors
-    .byte 0x00, 0x55, 0x33, 0xFF
+    .byte 0x00, 0x55, 0x11, 0xFF
     .byte 143, 1    # line number, set colors
     .byte 0x00, 0xCC, 0xBB, 0xFF
 

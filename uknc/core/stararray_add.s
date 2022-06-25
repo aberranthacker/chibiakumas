@@ -112,10 +112,11 @@ Stars_AddObjectBatchDefault:
         MOV  $StarArrayPointer,@$srcStars_AddObject_StarArrayPointer
         CLR  @$srcStarArrayStartPoint
 
+        # input  B = R3 = pattern (0-15)
+        #        C = R1 = Y pos
+        #        D = R2 = X pos
+        # corrupts R0, R3, R4, R5
 Stars_AddObjectBatch:
-        # B = R3 = pattern (0-15)
-        # C = R1 = Y pos
-        # D = R2 = X pos
         CMP  R3,$16 # radial blast!
         BHIS Stars_AddObjectBatch2
 

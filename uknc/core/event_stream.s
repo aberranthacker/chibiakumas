@@ -24,6 +24,7 @@ DoMovesBackground_SetScroll:
         # PUSH R4                           #     push ix
         # CMP  R0,$2                        #         cp 2
         # BHIS DoMovesBackground_ScrollUp   #         jr nc,DoMovesBackground_ScrollUp
+
         # Move left                         #         ; Move Left
         # MOV  $0x7805,R1                   #         ld bc,&7805 ; INC B (05); LD a,B (78)
         # MOV  $0xD0FE,R2                   #         ld de,&D0FE ; CP    (FE); D0 (160+24+24=208)
@@ -145,19 +146,18 @@ events_processed$:
 
         JMP  @$Event_MoreEvents
 
-Event_StarBust:                                             # Event_StarBust:
-        .inform_and_hang "no Event_StarBust"
-                                                            #     ld d,(hl)   ;X
-                                                            #     inc hl
-                                                            #     ld c,(hl)   ;Y
-                                                            #     inc hl
-                                                            #     push hl
-                                                            #     push iy
-                                                            #         call Stars_AddObjectBatchDefault
-                                                            #     pop iy
-                                                            #     pop hl
-        RETURN                                              #     ret
-                                                            #
+Event_StarBust:
+        MOV  R1,R3     # pattern
+        CLR  R1
+        BISB (R5)+,R1  # Y
+        CLR  R2
+        BISB (R5)+,R2  # X
+        PUSH R5
+        CALL @$Stars_AddObjectBatchDefault
+        POP  R5
+
+        RETURN
+
 # By default each time can only have ONE event, but we can use this commend to declare
 # XX events will occur at this time to save memory!
 Event_CoreMultipleEventsAtOneTime:                          # Event_CoreMultipleEventsAtOneTime:
@@ -165,7 +165,7 @@ Event_CoreMultipleEventsAtOneTime:                          # Event_CoreMultiple
         MOV  R1,@$srcEvent_MultipleEventCount               #     ld (Event_MultipleEventCount_Plus1 - 1),a
         RETURN # JMP Event_LoadNextEvt                      #     ret
                                                             #
-Event_SpriteSwitch: # Set the next sprite                   # Event_SpriteSwitch_0101:          ;Set the next sprite
+Event_SetSprite: # Set the next sprite                      # Event_SpriteSwitch_0101:          ;Set the next sprite
         MOV  R1,@$srcEventObjectSpriteToAdd                 #     ld de,EventObjectSpriteToAdd_Plus1-1
         RETURN                                              #     jr Event_CoreReprogram_ByteCopy
                                                             #
@@ -193,7 +193,7 @@ Event_SetMoveLife:                                          # Event_MoveLifeSwit
                                                             #     ld (EventObjectMoveToAdd_Plus1 - 1),a
 Event_SetLife:                                              # Event_LifeSwitch_0010:
         MOV  (R5)+,@$srcEventObjectLifeToAdd                #     ld de,EventObjectLifeToAdd_Plus1 - 1
-        RETURN                                              #
+        RETURN
                                                             # Event_CoreReprogram_ByteCopy:
                                                             #     rst 6
                                                             #     ld (de),a   ; put it at DE
@@ -303,7 +303,7 @@ Event_LoadLastAddedObjectToAddress:
 # call a function - be very careful what you do, as registers must be pretty
 # much untouched otherwise a crash will occur on return. it's best to set a flag
 # and do some action in your level loop, as that won't corrupt any registers.
-Event_Call:                                                 # Event_Call_1001:
+Event_CallSubroutine:                                       # Event_Call_1001:
         JMP @(R5)+ # Event_LoadNextEvt is on top of the stack #     ld c,(hl)
                                                             #     inc hl
                                                             #     ld b,(hl)

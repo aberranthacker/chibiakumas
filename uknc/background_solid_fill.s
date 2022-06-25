@@ -13,10 +13,10 @@
 #    CALL @$Background_SolidFill # expects pointer to screen memory in R5
 
 Background_SolidFill:
-       .rept 40
-        MOV  R0,(R5)+
-       .endr
-
-        SOB  R1, Background_SolidFill
+        100$:
+            .rept 40
+             MOV  R0,(R5)+
+            .endr
+        SOB  R1,100$
 
         RETURN
