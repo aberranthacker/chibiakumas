@@ -6,7 +6,7 @@
 CallDE
     push de
     ret
-CallHL:         
+CallHL:
     push hl
     ret
 
@@ -55,10 +55,10 @@ ret
 
 Firmware_Kill:  ; firmwares? we don't need no steenking firmwares!
     di
-    
+
     ld bc,&7f8D ; Reset the firmware to OFF
     out (c),c
-    
+
     call RasterColors_Disable
 
     ;wipe the memory the Firmware had
@@ -108,7 +108,7 @@ DoRestoreLowJumpBlock:
 DoRestoreLowJumpBlockEnd:            ;and high kernal jumpblock (&b800-&bae4)
 
 Firmware_Restore:   ; About that firmware...
-    di  
+    di
     call RasterColors_Disable
 
     ;restore colors

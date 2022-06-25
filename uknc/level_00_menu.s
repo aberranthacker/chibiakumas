@@ -144,7 +144,8 @@ ShowMenu:
     .ifdef CompileEP2
        .byte 0x0C,0x12 # MinY,MaxY
     .else
-       .byte 0x0C,0x11 # MinY,MaxY
+      #.byte 0x0C,0x11 # MinY,MaxY
+       .byte 0x0C,0x0F # disable settings and credits menu entries
     .endif
 
 ShowMenu_Loop: #-------------------------------------------------------------{{{
@@ -224,8 +225,10 @@ OnscreenCursorDefine: #------------------------------------------------------{{{
         RTS  R5
 #----------------------------------------------------------------------------}}}
 OnscreenCursor: #------------------------------------------------------------{{{
-        MOV  (PC)+,R3; CursorCurrentPosX: .word 0x09
-        MOV  (PC)+,R4; CursorCurrentPosY: .word 0x0C
+       .equiv CursorCurrentPosX, .+2
+        MOV  $0x09,R3
+       .equiv CursorCurrentPosY, .+2
+        MOV  $0x0C,R4
 
         CALL ClearChar
 
@@ -233,38 +236,45 @@ OnscreenCursor: #------------------------------------------------------------{{{
         MOVB (PC)+,R2; CursorMoveSpeedY: .word 0x01
 
         MOV  @$KeyboardScanner_P1,R0
-        CMP  R0,(PC)+; LastKeyMapChange: .word 0
+       .equiv LastKeyMapChange, .+2
+        CMP  R0,$0x00
         BEQ  draw_cursor$
+
         MOV  R0,@$LastKeyMapChange
     # is down pressed?
         ROR  R0
         BCC  not_down$
 
-        CMP  R4,(PC)+; CursorMaxY: .word 0x11
+       .equiv CursorMaxY, .+2
+        CMP  R4,$0x11
         BHIS draw_cursor$
         ADD  R2,R4
 
-        CMP  R4,$0x0E
+        CMP  R4,$0x0D # Start as Bochan?
         BNE  not_down$
-        INC  R4
+        INC  R4 # skip "Start as Bochan"
+        INC  R4 # skip "Start 2 Players Game"
 
     not_down$:
         ROR  R0
         BCC  not_up$
 
-        CMP  R4,(PC)+; CursorMinY: .word 0x0C
+       .equiv CursorMinY, .+2
+        CMP  R4,$0x0C
         BLOS draw_cursor$
         SUB  R2,R4
 
-        CMP  R4,$0x0E
+        CMP  R4,$0x0E # Start 2 Player Game?
         BNE  not_up$
-        DEC  R4
+        DEC  R4 # skip "Start 2 Player Game"
+        DEC  R4 # skip "Start as Bochan"
 
     not_up$:
         ROR  R0
         BCC  not_right$
 
-        CMP  R3,(PC)+; CursorMaxX: .word 0x26
+       .equiv CursorMaxX, .+2
+        CMP  R3,$0x26
         BHIS draw_cursor$
         ADD  R1,R3
 
@@ -272,7 +282,8 @@ OnscreenCursor: #------------------------------------------------------------{{{
         ROR  R0
         BCC  not_left$
 
-        CMP  R3,(PC)+; CursorMinX: .word 0x02
+       .equiv CursorMinX, .+2
+        CMP  R3,$0x02
         BLOS draw_cursor$
         SUB  R1,R3
 
@@ -284,18 +295,20 @@ OnscreenCursor: #------------------------------------------------------------{{{
         CALL @$GetMemPos
 
         INC  @$CursorFrame
-        MOV  (PC)+,R1; CursorFrame: .word 0
+       .equiv CursorFrame, .+2
+        MOV  $0,R1
         BIC  $0xFFF3,R1
         ASL  R1
         ASL  R1
         ADD  $CursorSpr,R1
 
         MOV  $8,R0
-    100$:
-        MOV  (R1)+,(R5)
-        ADD  $80,R5
+        100$:
+            MOV  (R1)+,(R5)
+            ADD  $80,R5
         SOB  R0,100$
-RETURN
+
+        RETURN
 #----------------------------------------------------------------------------}}}
 ClearChar: #-----------------------------------------------------------------{{{
         CALL @$GetMemPos
@@ -446,7 +459,7 @@ MenuPalette: #---------------------------------------------------------------{{{
     .byte 0x00, 0x55, 0xCC, 0xFF
     .byte 88, 1
     .byte 0x00, 0x55, 0xBB, 0xFF
-    .byte 113, 1
+    .byte 105, 1
     .byte 0x00, 0x55, 0x33, 0xFF
     .byte 117, 1
     .byte 0x00, 0x77, 0x33, 0xFF
@@ -457,12 +470,16 @@ MenuPalette: #---------------------------------------------------------------{{{
 
     .byte 121, 1
     .byte 0x00, 0x77, 0xDD, 0xFF
+    .byte 129, 1
+    .byte 0x00, 0x77, 0x55, 0xFF
 
-    .byte 136, 0  #--line number, 0 - set cursor/scale/palette
+    .byte 137, 0  #--line number, 0 - set cursor/scale/palette
     .word 0b10000 #  graphical cursor
     .word 0b10111 #  320 dots per line, pallete 7
 
-    .byte 137, 1
+    .byte 138, 1
+    .byte 0x00, 0x77, 0x44, 0xAA
+    .byte 145, 1
     .byte 0x00, 0x77, 0xCC, 0xAA
 
     .byte 190, 0  #--line number, 0 - set cursor/scale/palette

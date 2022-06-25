@@ -133,45 +133,42 @@ Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
         CALL Bootstrap_LoadDiskFile
         BCC  1$
        .inform_and_hang3 "level_00.bin loading error"
-
-1$:    .ppudo_ensure $PPU_SingleProcess
-
+1$:
+       .ppudo_ensure $PPU_SingleProcess
         MOV  $SPReset,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
 Bootstrap_Level_Intro:
-        # TODO: show loadnig screen
+        # TODO: show loading screen
         # call Akuyou_ShowCompiledSprite
+       .ppudo_ensure $PPU_SetPalette, $BlackPalette
         CALL LevelReset0000
 
-       .ppudo_ensure $PPU_SetPalette, $BlackPalette
-        # TODO: load music Aku/BootStrap.asm:1185
         MOV  $ep1_intro.bin,R0
         CALL Bootstrap_LoadDiskFile
         BCC  1$
        .inform_and_hang3 "ep1_intro.bin loading error"
-
-1$:     MOV  $ep1_intro_slides.bin,R0
+    1$:
+        MOV  $ep1_intro_slides.bin,R0
         CALL Bootstrap_LoadDiskFile
         BCC  2$
        .inform_and_hang3 "ep1_intro_slides.bin loading error"
-
-2$:    .ppudo_ensure $PPU_SingleProcess
+    2$:
+       .ppudo_ensure $PPU_SingleProcess
         MOV  $SPReset,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
 Bootstrap_Level_1: # ../Aku/BootStrap.asm:838  main menu --------------------
+       .ppudo_ensure $PPU_SetPalette, $BlackPalette
         CALL StartANewGame
         CALL LevelReset0000
 
-       .ppudo_ensure $PPU_SetPalette, $BlackPalette
         MOV  $level_01.bin,R0
         CALL Bootstrap_LoadDiskFile
         BCC  1$
        .inform_and_hang3 "level_01.bin loading error"
-
-1$:    .ppudo_ensure $PPU_SingleProcess
-
+    1$:
+       .ppudo_ensure $PPU_SingleProcess
         MOV  $SPReset,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
@@ -244,7 +241,6 @@ ContinueModeSet: # ../Aku/BootStrap.asm:2165
                                                             #     inc a
                                                             #     jr z,StartANewGame_NoMultiplay
                                                             #     ld hl,&78ED
-
 StartANewGame_NoMultiplay: # ../Aku/BootStrap.asm:2195
         # TODO: implement this
 StartANewGame_NoControlFlip: # ../Aku/BootStrap.asm:2206
@@ -254,16 +250,15 @@ StartANewGame_NoControlFlip: # ../Aku/BootStrap.asm:2206
         CALL StartANewGamePlayer
 
         MOV  $Player_ScoreBytes,R3
-        MOV  $8,R0
-        CLR  (R3)+ # wipe highscores
-        SOB  R0,.-2
+        MOV  $8,R1
+        CALL @$ClearR1Words # wipe highscores
 
         MOV  $Player_Array, R5 # AkuYou_Player_GetPlayerVars
-
         MOV  $0010000,R2 # MOV R0,R0 # slightly faster than NOP
         BITB $0x40,-10(R5) # test bit 6
         BNZ  NoBulletSlowdown
         MOV  $0006200,R2 # ASR R0
+
 NoBulletSlowdown: # ../Aku/BootStrap.asm:2206
         MOV  R2,@$opcStarSlowdown # ../SrcALL/Akuyou_Multiplatform_Stararray.asm:107
 
@@ -274,6 +269,7 @@ NoBulletSlowdown: # ../Aku/BootStrap.asm:2206
         MOV  $2,R0
         BITB $0x80,-10(R5) # test bit 7
         BNZ  useheaven
+
         MOV  $BulletConfigHell,R3
         MOV  $1,R0
 useheaven: # ../Aku/BootStrap.asm:2242
@@ -331,33 +327,38 @@ StartANewGamePlayer: # ../Aku/BootStrap.asm:2256 ;player fire directions ----{{{
         MOVB $0x67,(R5)+  # 15 Fire dir
 RETURN
 #----------------------------------------------------------------------------}}}
-#----------------------------------------------------------------------------}}}
+
+ClearR1Words:
+      # we have to deal with odd number of iterations before entering the
+      # cycle
+        INC  R1
+        ASR  R1
+        BCC  2$ # number of iterations is odd, skipping first command
+        100$:
+            CLR  (R3)+
+        2$:
+            CLR  (R3)+
+        SOB  R1, 100$
+
+        RETURN
 
 LevelReset0000: # ../Aku/BootStrap.asm:2306 ---------------------------------{{{
         # wipe our memory, to clear out any junk from old levels
         MOV  $ObjectArraySizeBytes >> 1,R1
         MOV  $ObjectArrayPointer,R3
-        100$:
-            CLR  (R3)+
-        SOB  R1, 100$
+        CALL @$ClearR1Words
 
         MOV  $StarArraySizeBytes >> 1,R1
         MOV  $StarArrayPointer,R3
-        110$:
-            CLR  (R3)+
-        SOB  R1, 110$
+        CALL @$ClearR1Words
 
         MOV  $PlayerStarArraySizeBytes >> 1,R1
         MOV  $PlayerStarArrayPointer,R3
-        120$:
-            CLR  (R3)+
-        SOB  R1, 120$
+        CALL @$ClearR1Words
 
         MOV  $Event_SavedSettingsSizeBytes >> 1,R1
         MOV  $Event_SavedSettings,R3
-        130$:
-            CLR  (R3)+
-        SOB  R1, 130$
+        CALL @$ClearR1Words
 
         # This resets anything the last level may have messed with during
         # play so we can start a new level with everything back to normal
@@ -381,7 +382,6 @@ ResetCore: # ../Aku/BootStrap.asm:2318
         MOV  $Object_DecreaseLifeShot, @$dstObjectShotOverride
 
         # set stuff that happens every level
-        # TODO: check if 2 lines below still relevant
         MOV  $0x2064,@$Player_Array  # X:0x20 Y:0x64
         MOV  $0x2096,@$Player_Array2 # X:0x20 Y:0x96
 
@@ -396,17 +396,10 @@ ResetCore: # ../Aku/BootStrap.asm:2318
         CLR  R0
         MOV  R0,@$srcSfx_CurrentPriority # clear the to-do
         MOV  R0,@$srcSfx_Sound           # clear the note
-
         CALL DoMovesBackground_SetScroll # TODO: implement the subroutine
 
-        # TODO: Set RST 6 to call IY
-        #CALL DoCustomRsts # ../SrcCPC/Akuyou_CPC_BankSwapper.asm:73
-
-        MOV  $Player_Array,R5 # call AkuYou_Player_GetPlayerVars
-        #read "..\AkuCPC\Bootstrap_ReconfigureCore_CPC.asm"
-        MOV  $Player_Array,R5 # call AkuYou_Player_GetPlayerVars
-RETURN
-#----------------------------------------------------------------------------}}}
+        RETURN
+# LevelReset0000 end --------------------------------------------------------}}}
 
 Bootstrap_LoadDiskFile: # ---------------------------------------------------{{{
         MOV  (R0)+,@$PS.CPU_RAM_Address
@@ -431,14 +424,15 @@ Bootstrap_LoadDiskFile: # ---------------------------------------------------{{{
 
         MOV  $ParamsAddr,R0 # R0 - pointer to channel's init sequence array
         MOV  $8,R1          # R1 - size of the array, 8 bytes
-1$:     MOVB (R0)+,@$CCH2OD # Send a byte to channel 2
-
-2$:     TSTB @$CCH2OS       #
+    1$:
+        MOVB (R0)+,@$CCH2OD # Send a byte to channel 2
+    2$:
+        TSTB @$CCH2OS       #
         BPL  2$             # Wait until channel is ready
 
         SOB  R1,1$          # Next byte
-
-3$:     MOVB @$PS.Status,R0
+    3$:
+        MOVB @$PS.Status,R0
         TSTB R0
         BMI  3$
         BZE  1237$
@@ -500,7 +494,7 @@ loading_screen.bin:
     .word loading_screen_block_num
 core.bin:
     .word GameVarsEnd
-    .equiv core_size, 6676
+    .equiv core_size, 5746
     .word core_size >> 1
     .equiv core_block_num, (loading_screen_size + 511) >> 9 + loading_screen_block_num
     .word core_block_num
@@ -518,13 +512,13 @@ ep1_intro_slides.bin:
     .word ep1_intro_slides_block_num
 level_00.bin:
     .word Akuyou_LevelStart
-    .equiv level_00_size, 10178
+    .equiv level_00_size, 10194
     .word level_00_size >> 1
     .equiv level_00_block_num, ep1_intro_slides_block_num + (ep1_intro_slides_size + 511) >> 9
     .word level_00_block_num
 level_01.bin:
     .word Akuyou_LevelStart
-    .equiv level_01_size, 9774
+    .equiv level_01_size, 9788
     .word level_01_size >> 1
     .equiv level_01_block_num, level_00_block_num + (level_00_size + 511) >> 9
     .word level_01_block_num
@@ -751,8 +745,8 @@ TitleScreenPalette: #--------------------------------------------------------{{{
     .byte 201     #--line number, 201 - end of the main screen params
     .even
 #----------------------------------------------------------------------------}}}
-                   #0         1         2         3         4         5         6         7
-                   #01234567890123456789012345678901234567890123456789012345678901234567890123456789
+#0         1         2         3         4         5         6         7
+#01234567890123456789012345678901234567890123456789012345678901234567890123456789
        .even # PPU reads strings word by word, so align
 TestStr: .byte 0,10
          .byte        '!,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F

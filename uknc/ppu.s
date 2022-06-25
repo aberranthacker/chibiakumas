@@ -287,7 +287,7 @@ JMPTable:      .word EventLoop            # do nothing
                .word Debug_Print          # PPU_Debug_Print
                .word Debug_PrintAt        # PPU_Debug_PrintAt
 #-------------------------------------------------------------------------------
-CommandExecuted: #-----------------------------------------------------------{{{
+CommandExecuted: #--------------------------------------------------------------
                 MOV  $PPU_PPUCommand, @$PBPADR
                 CLR  @$PBP12D        # inform CPU's program that we are done
                .equiv SingleProcessFlag, .+2
@@ -298,7 +298,7 @@ EventLoop:      TST  $0x00
                 MOV  $1, @$07100     # require execution
                 MOV  (SP)+, R0       # restore R0
                 JMP  @$0174170       # jump back to the process manager (63608; 0xF878)
-#----------------------------------------------------------------------------}}}
+#-------------------------------------------------------------------------------
 Teardown: #------------------------------------------------------------------{{{
                 MOV  @$SYS272, @$0272 # restore default SLTAB (186; 0xBA)
                 MOV  @$SYS300, @$0300 # restore keyboard interrupt handler
@@ -596,6 +596,7 @@ SBT_NextChar:   DEC  (PC)+; srcCharsToPrint: .word 0xFF
 
 1237$:          JMP  @$CommandExecuted
 #----------------------------------------------------------------------------}}}
+
 LoadMusic: #-----------------------------------------------------------------{{{
                 MOV  $MusicBuffer,R3
                 MOV  $PBP12D,R4
@@ -637,51 +638,6 @@ MusicStop: #-----------------------------------------------------------------{{{
         CALL PLY_AKG_Stop
 
         JMP  @$CommandExecuted
-#----------------------------------------------------------------------------}}}
-
-VblankIntHandler: #----------------------------------------------------------{{{
-        # we disabling "single process mode" to load data from disk only,
-        # and to avoid random disk loading issues, we disabling our
-        # Vblank handler as well
-        TST  @$SingleProcessFlag
-        BZE  SkipToFirmwareHandler
-
-        MOV  @$PBPADR,-(SP)
-        MOV  R5,-(SP)
-        MOV  R4,-(SP)
-        MOV  R3,-(SP)
-        MOV  R2,-(SP)
-        MOV  R1,-(SP)
-        MOV  R0,-(SP)
-
-    .ifdef DebugMode
-        MTPS $PR7
-        CALL @$PrintDebugInfo
-        MTPS $PR0
-    .endif
-
-MusicPlayerCall:
-        BR   .+4 # or CALL @(PC)+ when music is playing
-       .word PLY_AKG_Play
-
-        MOV  (SP)+,R0
-        MOV  (SP)+,R1
-        MOV  (SP)+,R2
-        MOV  (SP)+,R3
-        MOV  (SP)+,R4
-        MOV  (SP)+,R5
-        MOV  (SP)+,@$PBPADR
-
-SkipToFirmwareHandler:
-        # we do not need firmware interrupt handler except for this small
-        # procedure
-        TST  @$07130 # is floppy drive spindle rotating?
-        BZE  1237$   # no
-        DEC  @$07130 # decrease spindle rotation counter
-        BNZ  1237$   # continue rotation unless the counter reaches zero
-        CALL @07132  # stop floppy drive spindle
-
-1237$:  RTI
 #----------------------------------------------------------------------------}}}
 
 PrintDebugInfo: #------------------------------------------------------------{{{
@@ -742,7 +698,6 @@ LevelTimeStrEnd:
 
 
 #----------------------------------------------------------------------------}}}
-
 Debug_PrintAt: #-------------------------------------------------------------{{{
         MOV  $PBP12D,R4
         MOV  $PBPADR,R5
@@ -868,8 +823,52 @@ Debug_DonePrinting:
         JMP  @$CommandExecuted
 #----------------------------------------------------------------------------}}}
 
+VblankIntHandler: #----------------------------------------------------------{{{
+        # we disabling "single process mode" to load data from disk only,
+        # and to avoid random disk loading issues, we disabling our
+        # Vblank handler as well
+        TST  @$SingleProcessFlag
+        BZE  SkipToFirmwareHandler
+
+        MOV  @$PBPADR,-(SP)
+        MOV  R5,-(SP)
+        MOV  R4,-(SP)
+        MOV  R3,-(SP)
+        MOV  R2,-(SP)
+        MOV  R1,-(SP)
+        MOV  R0,-(SP)
+
+    .ifdef DebugMode
+        MTPS $PR7
+        CALL @$PrintDebugInfo
+        MTPS $PR0
+    .endif
+
+MusicPlayerCall:
+        BR   .+4 # or CALL @(PC)+ when music is playing
+       .word PLY_AKG_Play
+
+        MOV  (SP)+,R0
+        MOV  (SP)+,R1
+        MOV  (SP)+,R2
+        MOV  (SP)+,R3
+        MOV  (SP)+,R4
+        MOV  (SP)+,R5
+        MOV  (SP)+,@$PBPADR
+
+SkipToFirmwareHandler:
+        # we do not need firmware interrupt handler except for this small
+        # procedure
+        TST  @$07130 # is floppy drive spindle rotating?
+        BZE  1237$   # no
+        DEC  @$07130 # decrease spindle rotation counter
+        BNZ  1237$   # continue rotation unless the counter reaches zero
+        CALL @07132  # stop floppy drive spindle
+
+1237$:  RTI
+#----------------------------------------------------------------------------}}}
 KeyboardIntHadler: #---------------------------------------------------------{{{
-# key codes #----------------------------------------------------------------{{{
+# key codes #-----------------------------------------------------{{{
 # | oct | hex|  key    | note     | oct | hex|  key  |  note     |
 # |-----+----+---------+----------+-----+----+-------+-----------|
 # |   5 | 05 | ,       | NumPad   | 106 | 46 | АЛФ   | Alphabet  |
@@ -915,7 +914,7 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
 # |  76 | 3E | Б / B   |          | 175 | 7D | - / = |           |
 # |  77 | 3F | Ю / @   |          | 176 | 7E | О / } |           |
 # | 105 | 45 | HP      | Shift    | 177 | 7F | 9 / ) |           |
-#-----------------------------------------------------------------------------}}}
+#-----------------------------------------------------------------}}}
         MOV  R0,-(SP)
         MOV  @$PBPADR,-(SP)
 
@@ -924,7 +923,7 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         MOVB @$KBDATA,R0
         BMI  key_released$
 
-    key_pressed$: #------------------{{{
+    key_pressed$: #------------------
         CMPB R0,$070  # Y
         BEQ  fire_right_pressed$
 
@@ -950,9 +949,8 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         BEQ  pause_pressed$
 
         BR   1237$
-    #--------------------------------}}}
-
-    key_released$: #-----------------{{{
+    #--------------------------------
+    key_released$: #-----------------
         CMPB R0,$0210  # Y
         BEQ  fire_right_released$
 
@@ -980,9 +978,8 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         BEQ  pause_released$
 
         BR   1237$
-    #--------------------------------}}}
-
-    down_pressed$: #-----------------{{{
+    #--------------------------------
+    down_pressed$: #-----------------
         MOV  $0x01,R0
         BR   set_bit$
     up_pressed$:
@@ -1006,9 +1003,8 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
     pause_pressed$:
         MOV  $0x80,R0
         BR   set_bit$
-    #--------------------------------}}}
-
-    down_released$: #----------------{{{
+    #--------------------------------
+    down_released$: #----------------
         MOV  $0x01,R0
         BR   clear_bit$
     up_released$:
@@ -1032,8 +1028,7 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
     pause_released$:
         MOV  $0x80,R0
         BR   clear_bit$
-    #--------------------------------}}}
-
+    #--------------------------------
     set_bit$:
         BIS  R0,@$PBP12D
         BR   1237$

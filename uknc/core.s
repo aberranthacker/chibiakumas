@@ -132,101 +132,66 @@ TranspColors: .byte 0x00 # 0b00000000
               .byte 0x53 # 0b10010011
 
 # Smartbomb effect shows a flashing background, these are the bytes used
-# Background_SmartBombColors: defb &FF, &0, &FF, &0, &FF
+Background_SmartBombColors:
+       .word 0xFFFF, 0x0000, 0xFFFF, 0x0000, 0xFFFF
 
 Event_VectorArray:
-       .word Event_SingleSprite                # 0x00 0x00  # defw Event_OneObj
-       .word Event_MultiObj_NotImplemented     # 0x01 0x02  # defw Event_MultiObj
-       .word Event_ObjColumn_NotImplemented    # 0x02 0x04  # defw Event_ObjColumn
-       .word Event_ObjStrip_NotImplemented     # 0x03 0x06  # defw Event_ObjStrip
-       .word Event_StarBurst_NotImplemented    # 0x04 0x08  # defw Event_StarBust
-       .word null                              # 0x05 0x0A
-       .word null                              # 0x06 0x0C
-       .word Event_CoreMultipleEventsAtOneTime # 0x07 0x0E
-       .word null                              # 0x08 0x10  Event_MoveSwitch, legacy
-       .word Event_SaveObjSettings             # 0x09 0x12
-       .word Event_LoadObjSettings             # 0x0A 0x14
-       .word Event_CoreSaveLoadSettings2_NotImplemented # 0x0B 0x16  # defw Event_CoreSaveLoadSettings2
-       .word null                              # 0x0C 0x18
-       .word null                              # 0x0D 0x1A
-       .word null                              # 0x0E 0x1C
-       .word null                              # 0x0F 0x1E  Event_CoreReprogram, legacy
+       .word Event_SingleSprite                 # 0x00 0x00  defw Event_OneObj
+       .word not_implemented_check_R0           # 0x01 0x02  defw Event_MultiObj
+       .word not_implemented_check_R0           # 0x02 0x04  defw Event_ObjColumn
+       .word not_implemented_check_R0           # 0x03 0x06  defw Event_ObjStrip
+       .word not_implemented_check_R0           # 0x04 0x08  defw Event_StarBust
+       .word null                               # 0x05 0x0A
+       .word null                               # 0x06 0x0C
+       .word Event_CoreMultipleEventsAtOneTime  # 0x07 0x0E
+       .word null                               # 0x08 0x10  Event_MoveSwitch, legacy
+       .word Event_SaveObjSettings              # 0x09 0x12
+       .word Event_LoadObjSettings              # 0x0A 0x14
+       .word not_implemented_check_R0           # 0x0B 0x16  defw Event_CoreSaveLoadSettings2
+       .word null                               # 0x0C 0x18
+       .word null                               # 0x0D 0x1A
+       .word null                               # 0x0E 0x1C
+       .word null                               # 0x0F 0x1E  Event_CoreReprogram, legacy
 # Event_MoveVector:
-       .word Event_SetMoveLife                 # 0x10 0x20  evtSetMoveLife
-       .word Event_SetProgram                  # 0x11 0x22  # defw Event_ProgramSwitch_0001
-       .word Event_SetLife                     # 0x12 0x24  evtSetLife
-       .word Event_SetMove                     # 0x13 0x26    defw Event_MoveSwitch_0011
-       .word Event_SetProgMoveLife             # 0x14 0x28  evtSetProgMoveLife
-       .word Event_SpriteSwitch                # 0x15 0x2A    defw Event_SpriteSwitch_0101
-       .word Event_AddToBackground             # 0x16 0x2C  evtAddToBackground
-       .word Event_AddToForeground             # 0x17 0x2E  evtAddToForeground
-       .word Event_ChangeStreamTime            # 0x18 0x30  evtChangeStreamTime
-       .word Event_Call                        # 0x19 0x32  evtCallAddress
+       .word Event_SetMoveLife                  # 0x10 0x20  evtSetMoveLife
+       .word Event_SetProgram                   # 0x11 0x22    defw Event_ProgramSwitch_0001
+       .word Event_SetLife                      # 0x12 0x24  evtSetLife
+       .word Event_SetMove                      # 0x13 0x26    defw Event_MoveSwitch_0011
+       .word Event_SetProgMoveLife              # 0x14 0x28  evtSetProgMoveLife
+       .word Event_SetSprite                    # 0x15 0x2A    defw Event_SpriteSwitch_0101
+       .word Event_AddToBackground              # 0x16 0x2C  evtAddToBackground
+       .word Event_AddToForeground              # 0x17 0x2E  evtAddToForeground
+       .word Event_ChangeStreamTime             # 0x18 0x30  evtChangeStreamTime
+       .word Event_CallSubroutine               # 0x19 0x32  evtCallAddress
        .word Event_LoadLastAddedObjectToAddress # 0x1A 0x34  evtSaveLstObjToAdd
-       .word Event_ClearPowerups_NotImplemented # 0x1B 0x36    defw Event_ClearPowerups
-       .word Event_ChangeStreamSpeed_1100_NotImplemented # 0x1C 0x38    defw Event_ChangeStreamSpeed_1100
-       .word Event_SetSpriteSize               # 0x1D 0x3A  evtSetObjectSize
-       .word Event_SetAnimator                 # 0x1E 0x3C  evtSetAnimator
-       .word Event_CoreReprogram_AnimatorPointer_NotImplemented # 0x1F 0x3E    defw Event_CoreReprogram_AnimatorPointer
+       .word not_implemented_check_R0           # 0x1B 0x36    defw Event_ClearPowerups
+       .word not_implemented_check_R0           # 0x1C 0x38    defw Event_ChangeStreamSpeed_1100
+       .word Event_SetSpriteSize                # 0x1D 0x3A  evtSetObjectSize
+       .word Event_SetAnimator                  # 0x1E 0x3C  evtSetAnimator
+       .word not_implemented_check_R0           # 0x1F 0x3E    defw Event_CoreReprogram_AnimatorPointer
 # Event_ReprogramVector:
-       .word Event_CoreReprogram_Palette       # 0x20 0x40
-       .word null                              # 0x21 0x42  Obsolete - Reserver for Plus Palette
-       .word Event_CoreReprogram_ObjectHitHandler_NotImplemented # 0x22 0x44  defw Event_CoreReprogram_ObjectHitHandler
-       .word Event_CoreReprogram_ShotToDeath_NotImplemented # 0x23 0x46  defw Event_CoreReprogram_ShotToDeath
-       .word Event_CoreReprogram_CustomMove1   # 0x24 0x48  mveCustom1
-       .word Event_CoreReprogram_CustomMove2   # 0x25 0x4A  mveCustom2
-       .word Event_CoreReprogram_PowerupSprites_NotImplemented # 0x26 0x4C  defw Event_CoreReprogram_PowerupSprites
-       .word Event_CoreReprogram_CustomMove3   # 0x27 0x4E  mveCustom3
-       .word Event_CoreReprogram_CustomMove4   # 0x28 0x50  mveCustom4
-       .word Event_CustomProgram1_NotImplemented # 0x29 0x52  defw Event_CustomProgram1
-       .word Event_CustomProgram2_NotImplemented # 0x2A 0x54  defw Event_CustomProgram2
-       .word Event_CustomPlayerHitter_NotImplemented # 0x2B 0x56  defw Event_CustomPlayerHitter
-       .word Event_CustomSmartBomb_NotImplemented # 0x2C 0x58  defw Event_CustomSmartBomb
-       .word Event_ReprogramObjectBurstPosition_NotImplemented # 0x2D 0x5A  defw Event_ReprogramObjectBurstPosition
-       .word Event_ObjectFullCustomMoves_NotImplemented # 0x2E 0x5C  defw Event_ObjectFullCustomMoves
-       .word Event_SmartBombSpecial_NotImplemented # 0x2F 0x5E  defw Event_SmartBombSpecial
+       .word Event_CoreReprogram_Palette        # 0x20 0x40
+       .word null                               # 0x21 0x42  Obsolete - Reserver for Plus Palette
+       .word not_implemented_check_R0           # 0x22 0x44  defw Event_CoreReprogram_ObjectHitHandler
+       .word not_implemented_check_R0           # 0x23 0x46  defw Event_CoreReprogram_ShotToDeath
+       .word Event_CoreReprogram_CustomMove1    # 0x24 0x48  mveCustom1
+       .word Event_CoreReprogram_CustomMove2    # 0x25 0x4A  mveCustom2
+       .word not_implemented_check_R0           # 0x26 0x4C  defw Event_CoreReprogram_PowerupSprites
+       .word Event_CoreReprogram_CustomMove3    # 0x27 0x4E  mveCustom3
+       .word Event_CoreReprogram_CustomMove4    # 0x28 0x50  mveCustom4
+       .word not_implemented_check_R0           # 0x29 0x52  defw Event_CustomProgram1
+       .word not_implemented_check_R0           # 0x2A 0x54  defw Event_CustomProgram2
+       .word not_implemented_check_R0           # 0x2B 0x56  defw Event_CustomPlayerHitter
+       .word not_implemented_check_R0           # 0x2C 0x58  defw Event_CustomSmartBomb
+       .word not_implemented_check_R0           # 0x2D 0x5A  defw Event_ReprogramObjectBurstPosition
+       .word not_implemented_check_R0           # 0x2E 0x5C  defw Event_ObjectFullCustomMoves
+       .word not_implemented_check_R0           # 0x2F 0x5E  defw Event_SmartBombSpecial
 
 null:   RETURN
 
-Event_MultiObj_NotImplemented:
-    .inform_and_hang "no Event_MultiObj"
-Event_ObjColumn_NotImplemented:
-    .inform_and_hang "no Event_ObjColumn"
-Event_ObjStrip_NotImplemented:
-    .inform_and_hang "no Event_ObjStrip"
-Event_StarBurst_NotImplemented:
-    .inform_and_hang "no Event_StarBurst"
-Event_CoreSaveLoadSettings2_NotImplemented:
-    .inform_and_hang "no Event_CoreSaveLoadSettings2"
-Event_ClearPowerups_NotImplemented:
-    .inform_and_hang "no Event_ClearPowerups"
-Event_ChangeStreamSpeed_1100_NotImplemented:
-    .inform_and_hang "no Event_ChangeStreamSpeed"
-Event_CoreReprogram_AnimatorPointer_NotImplemented:
-    .inform_and_hang "no Event_CoreReprogram_AnimatorPointer"
-Event_CoreReprogram_ObjectHitHandler_NotImplemented:
-    .inform_and_hang "no Event_CoreReprogram_ObjectHitHandler"
-Event_CoreReprogram_ShotToDeath_NotImplemented:
-    .inform_and_hang "no Event_CoreReprogram_ShotToDeath"
-Event_CoreReprogram_PowerupSprites_NotImplemented:
-    .inform_and_hang "no Event_CoreReprogram_PowerupSprites"
-Event_CustomProgram1_NotImplemented:
-    .inform_and_hang "no Event_CustomProgram1"
-Event_CustomProgram2_NotImplemented:
-    .inform_and_hang "no Event_CustomProgram2"
-Event_CustomPlayerHitter_NotImplemented:
-    .inform_and_hang "no Event_CustomPlayerHitter"
-Event_CustomSmartBomb_NotImplemented:
-    .inform_and_hang "no Event_CustomSmartBomb"
-Event_ReprogramObjectBurstPosition_NotImplemented:
-    .inform_and_hang "no Event_ReprogramObjectBurstPosition"
-Event_ObjectFullCustomMoves_NotImplemented:
-    .inform_and_hang "no Event_ObjectFullCustomMoves"
-Event_SmartBombSpecial_NotImplemented:
-    .inform_and_hang "no Event_SmartBombSpecial"
+not_implemented_check_R0:
+       .inform_and_hang "core: not implemented, check R0 for jump vector"
 
-        # read "../SrcALL/Akuyou_Multiplatform_AkuCommandVectorArray.asm"
-        # read "../SrcCPC/Akuyou_CPC_BankSwapper.asm"
        .include "core/compiled_sprite_viewer.s"
        .global CLS
 
@@ -322,12 +287,6 @@ Event_SmartBombSpecial_NotImplemented:
 
        .include "decoders/lzsa1.s"
        .global unlzsa1
-
-       ## ifdef Debug_Monitor
-       ## ;   read "../SrcALL/Multiplatform_Monitor.asm"
-       ## ;   read "../SrcALL/Multiplatform_MonitorMemdump.asm"
-       ## ;   read "../SrcALL/Multiplatform_MonitorSimple.asm"
-       ## endif
 
        .include "background_solid_fill.s"
        .global Background_SolidFill

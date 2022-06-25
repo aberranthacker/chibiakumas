@@ -1,9 +1,9 @@
 #-------------------------------------------------------------------------------
 # Note that the PRESENCE of those variables is tested, NOT their values. -------
-.equiv DebugMode, 1
+ .equiv DebugMode, 1
 #.equiv DebugSprite, 1
-.equiv SkipPSGSend, 1
-#.equiv ExtMemCore, 1
+ .equiv SkipPSGSend, 1
+#.equiv ExtMemCore, 1 # do `make clean` after commenting/uncommenting this line
 #-------------------------------------------------------------------------------
 .equiv MainMenu, 0x8000
 .equiv Episode1_Intro, 0x0000
@@ -39,7 +39,7 @@
 .equiv PPU_DebugPrintAt,  34
 .equiv PPU_LastJMPTableIndex, 34
 #-------------------------------------------------------------------------------
-.equiv ExtMemSizeBytes, 7616
+.equiv ExtMemSizeBytes, 7168
 
 .equiv ObjectArraySize, 60
 .equiv ObjectArrayElementSize, 8
@@ -88,7 +88,7 @@
     .endif
 
     .ifndef ExtMemCore
-.equiv Akuyou_LevelStart, 0x9F70 # 40816 0117560 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9BCE # 39886 0115716 # auto-generated during a build
     .else
 .equiv Akuyou_LevelStart, GameVarsEnd
     .endif

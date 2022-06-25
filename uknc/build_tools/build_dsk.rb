@@ -73,6 +73,7 @@ module BuildDskImage
     ending_address = binary_info.split(',')[3].chomp.to_i
     str = ending_address.to_s.rjust(6, ' ')
     return str unless ending_address >= 56*1024
+    return "\u001b[31m#{str}\u001b[0m" unless ending_address >= 63*1024
 
     "\u001b[31;1m#{str}\u001b[0m"
   end

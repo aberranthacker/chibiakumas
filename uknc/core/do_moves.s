@@ -71,7 +71,7 @@ DoMoves_Background: # Background sprites move much more slowly, and only in 1 di
     1$: # it's time for a left move
        .equiv opcDoMovesBGShift, . # check Xpos
         DEC  R4 # X
-        CMP  R4, $24+160+24 # we are offscreen
+        CMP  R4, $24+ 160+24 # we are offscreen
         BHIS DoMoves_Kill # over the page
         RETURN
 
@@ -95,26 +95,27 @@ DoMoves_Spec: # Special moves - various kinds
         BNE  2$
        .equiv jmpLevelSpecificMoveD, .+2
         JMP  @$null
-
-    2$: CMPB R0,$0b11010000 # 1101xxxx Custom3
+    2$: 
+        CMPB R0,$0b11010000 # 1101xxxx Custom3
         BNE  3$
        .equiv jmpLevelSpecificMoveC, .+2
         JMP  @$null
-
-    3$: CMPB R0,$0b11100000 # 1110xxxx Custom2
+    3$: 
+        CMPB R0,$0b11100000 # 1110xxxx Custom2
         BNE  4$
        .equiv jmpLevelSpecificMoveB, .+2
         JMP  @$null
-
-    4$: CMPB R0,$0b11110000 # 1111xxxx Custom 1
+    4$: 
+        CMPB R0,$0b11110000 # 1111xxxx Custom 1
         BNE  5$
        .equiv jmpLevelSpecificMoveA, .+2
         JMP  @$null
-
-    5$: MOV  R2,R0          # 1000xxxx
+    5$: 
+        MOV  R2,R0          # 1000xxxx
         BICB $0b00000011,R0 # 101111xx
-        CMPB R0,$0b10010000
-        BEQ  DoMoves_SeekerP2   # Used by 'Chu attack' - and also coins!
+        # TODO: uncomment for player 2
+       #CMPB R0,$0b10010000
+       #BEQ  DoMoves_SeekerP2   # Used by 'Chu attack' - and also coins!
 
         CMPB R0,$0b10000100
         BEQ  DoMoves_SeekerP1   # Used by 'Chu attack' - and also coins!
@@ -170,51 +171,49 @@ DoMoves_Wave_SlowSpeed:             # DoMoves_WaveSlowSpeed
 
 DoMoves_SeekerAuto:
          .inform_and_hang "no DoMoves_SeekerAuto"
-                                                            #         push bc
-                                                            #
-                                                            #             ld c,%10010000  ;p2
-                                                            #
-                                                            #             ld a,(P1_P09)   ;See how many lives are left
-                                                            #             or a
-                                                            #             jr z,SeakChoosePlayerDone
-                                                            #             ;if player 1 is dead, always home on player 2
-                                                            #
-                                                            #             ld a,(P2_P09)   ;See how many lives are left
-                                                            #             or a
-                                                            #             jr z,SeakChoosePlayerP1
-                                                            #             ;if player 2 is dead, always home on player 1
-                                                            #
-                                                            #             ld a,0 :SeakChoosePlayer_Plus1
-                                                            #             or a
-                                                            #             cpl
-                                                            #             ld (SeakChoosePlayer_Plus1-1),a
-                                                            #
-                                                            #             jr nz,SeakChoosePlayerDone
-                                                            #
-                                                            # SeakChoosePlayerP1:
-                                                            #             ld c,%10000100; p1
-                                                            # SeakChoosePlayerDone:
-                                                            #
-                                                            #             ld a,d
-                                                            #             and %00000011
-                                                            #             or c
-                                                            #             ld d,a
-                                                            #         pop bc
-                                                            #
-                                                            #         jp DoMoves_Spec
-                                                            #
-DoMoves_SeekerP2: # Home in on player 2
-         .inform_and_hang "no DoMoves_SeekerP2"
-                                                            #     push iy
-                                                            #         ld iy,Player_Array2
-                                                            #     jr DoMoves_SeekerContinue
+                                        #    push bc
+                                        #
+                                        #        ld c,%10010000  ;p2
+                                        #
+                                        #        ld a,(P1_P09)   ;See how many lives are left
+                                        #        or a
+                                        #        jr z,SeakChoosePlayerDone
+                                        #        ;if player 1 is dead, always home on player 2
+                                        #
+                                        #        ld a,(P2_P09)   ;See how many lives are left
+                                        #        or a
+                                        #        jr z,SeakChoosePlayerP1
+                                        #        ;if player 2 is dead, always home on player 1
+                                        #
+                                        #        ld a,0 :SeakChoosePlayer_Plus1
+                                        #        or a
+                                        #        cpl
+                                        #        ld (SeakChoosePlayer_Plus1-1),a
+                                        #
+                                        #        jr nz,SeakChoosePlayerDone
+                                        #
+                                        # SeakChoosePlayerP1:
+                                        #        ld c,%10000100; p1
+                                        # SeakChoosePlayerDone:
+                                        #        ld a,d
+                                        #        and %00000011
+                                        #        or c
+                                        #        ld d,a
+                                        #    pop bc
+                                        #
+                                        #    jp DoMoves_Spec
+                                        #
+#DoMoves_SeekerP2: # Home in on player 2
+#                                                            #     push iy
+#                                                            #         ld iy,Player_Array2
+#        BR   DoMoves_Seeker                                 #     jr DoMoves_SeekerContinue
 DoMoves_SeekerP1: # Home in on player 1
          .inform_and_hang "no DoMoves_SeekerP1"
                                                             #
                                                             #     push iy
                                                             #         ld iy,Player_Array
                                                             #
-                                                            # DoMoves_SeekerContinue:
+DoMoves_Seeker:                                             # DoMoves_SeekerContinue:
                                                             #     push de
                                                             #     ld a,d
                                                             #     and %00000011 ; Speed
