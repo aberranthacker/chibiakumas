@@ -493,7 +493,7 @@ loading_screen.bin:
     .word loading_screen_block_num
 core.bin:
     .word GameVarsEnd
-    .equiv core_size, 6702
+    .equiv core_size, 6694
     .word core_size >> 1
     .equiv core_block_num, (loading_screen_size + 511) >> 9 + loading_screen_block_num
     .word core_block_num
