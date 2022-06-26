@@ -421,95 +421,48 @@ WaitKey: #-------------------------------------------------------------------{{{
         CLR  @$KeyboardScanner_P1
 #----------------------------------------------------------------------------}}}
 
-# 9 br.     # A br.     # B br.     # C br.     # D br.     # E br.     # F white
-# 1 blue    # 2 green   # 3 cyan    # 4 red     # 5 magenta # 6 yellow  # 7 gray
 TitleScreenPalette: #--------------------------------------------------------{{{
-    .byte 0,   0  #--line number, 0 - set cursor/scale/palette
-    .word 0x10    #  graphical cursor, cursor color is black
-    .word 0b10101 #  320 dots per line, pallete 5
-
-    .byte 1,   1  #--line number, set colors
-    .byte 0x00, 0x99, 0xCC, 0xFF
-    .byte 49,  1  #--line number, set colors
-    .byte 0x00, 0x55, 0x11, 0xFF
-    .byte 63,  1  #--line number, set colors
-    .byte 0x00, 0x55, 0xDD, 0xFF
-    .byte 95,  1  #--line number, set colors
-    .byte 0x00, 0x22, 0xBB, 0xFF
-    .byte 185, 1  #--line number, set colors
-    .byte 0x00, 0x22, 0x00, 0xFF
-    .byte 192, 1  #--line number, set colors
-    .byte 0x00, 0x22, 0xBB, 0xFF
-    .byte 196, 1  #--line number, set colors
-    .byte 0x00, 0x22, 0xCC, 0xFF
-
-    .byte 201     #--line number, 201 - end of the main screen params
-    .even
+    .word   0, cursorGraphic, scale320 | 0b101
+    .byte   1, setColors, Black, brBlue, brRed, White
+    .byte  49, setColors, Black, Magenta, Blue, White
+    .byte  63, setColors, Black, Magenta, brMagenta, White
+    .byte  95, setColors, Black, Green, brCyan, White
+    .byte 185, setColors, Black, Green, Black, White
+    .byte 192, setColors, Black, Green, brCyan, White
+    .byte 196, setColors, Black, Green, brRed, White
+    .word endOfScreen
 #----------------------------------------------------------------------------}}}
 MenuPalette: #---------------------------------------------------------------{{{
-    .byte 0, 0    #--line number, 0 - set cursor/scale/palette
-    .word 0b10000 #  graphical cursor
-    .word 0b10111 #  320 dots per line, pallete 7
-
-    .byte 1, 1    # line number, set colors
-    .byte 0x00, 0xDD, 0xEE, 0xFF
-    .byte 40, 1
-    .byte 0x00, 0xCC, 0xBB, 0xFF
-    .byte 60, 1
-    .byte 0x00, 0x44, 0xBB, 0xFF
-    .byte 67, 1
-    .byte 0x00, 0x55, 0xCC, 0xFF
-    .byte 88, 1
-    .byte 0x00, 0x55, 0xBB, 0xFF
-    .byte 105, 1
-    .byte 0x00, 0x55, 0x33, 0xFF
-    .byte 117, 1
-    .byte 0x00, 0x77, 0x33, 0xFF
-
-    .byte 120, 0  # line number, 0 - set cursor/scale/palette
-    .word 0b10000 #  graphical cursor
-    .word 0b10011 #  320 dots per line, pallete 3
-
-    .byte 121, 1
-    .byte 0x00, 0x77, 0xDD, 0xFF
-    .byte 129, 1
-    .byte 0x00, 0x77, 0x55, 0xFF
-
-    .byte 137, 0  #--line number, 0 - set cursor/scale/palette
-    .word 0b10000 #  graphical cursor
-    .word 0b10111 #  320 dots per line, pallete 7
-
-    .byte 138, 1
-    .byte 0x00, 0x77, 0x44, 0xAA
-    .byte 145, 1
-    .byte 0x00, 0x77, 0xCC, 0xAA
-
-    .byte 190, 0  #--line number, 0 - set cursor/scale/palette
-    .word 0b10000 #  graphical cursor
-    .word 0b10101 #  320 dots per line, pallete 5
-
-    .byte 191, 1
-    .byte 0x00, 0x66, 0xEE, 0xFF
-
-    .byte 201     #--line number, 201 - end of the main screen params
-    .even
+    .word   0, cursorGraphic, scale320 | 0b111
+    .byte   1, setColors, Black, brMagenta, brYellow, White
+    .byte  40, setColors, Black, brRed, brCyan, White
+    .byte  60, setColors, Black, Red, brCyan, White
+    .byte  67, setColors, Black, Magenta, brRed, White
+    .byte  88, setColors, Black, Magenta, brCyan, White
+    .byte 105, setColors, Black, Magenta, Cyan, White
+    .byte 117, setColors, Black, Gray, Cyan, White
+    .word 120, cursorGraphic, scale320 | 0b011
+    .byte 121, setColors, Black, Gray, brMagenta, White
+    .byte 129, setColors, Black, Gray, Magenta, White
+    .word 137, cursorGraphic, scale320 | 0b111
+    .byte 138, setColors, Black, Gray, Red, brGreen
+    .byte 145, setColors, Black, Gray, brRed, brGreen
+    .word 190, cursorGraphic, scale320 | 0b101
+    .byte 191, setColors, Black, Yellow, brYellow, White
+    .word endOfScreen
 #----------------------------------------------------------------------------}}}
 FireKeyBrightPalette: #------------------------------------------------------{{{
-    .byte 185, 1  # line number, setup palette
-    .byte 0x00, 0x22, 0xEE, 0xFF
-    .byte 192, -1 # until the line 192
+    .byte 185, setColors, Black, Green, brYellow, White
+    .word untilLine | 192
 FireKeyNormalPalette:
-    .byte 185, 1
-    .byte 0x00, 0x22, 0xCC, 0xFF
-    .byte 192, -1
+    .byte 185, setColors, Black, Green, brRed, White
+    .word untilLine | 192
 FireKeyDarkPalette:
-    .byte 185, 1
-    .byte 0x00, 0x22, 0x44, 0xFF
-    .byte 192, -1
+    .byte 185, setColors, Black, Green, Red, White
+    .word untilLine | 192
 FireKeyBlackPalette:
-    .byte 185, 1
-    .byte 0x00, 0x22, 0x00, 0xFF
-    .byte 192, -1
+    .byte 185, setColors, Black, Green, Black, White
+    .word untilLine | 192
 #----------------------------------------------------------------------------}}}
 
 PressFireKeyStr: .byte 9,23
