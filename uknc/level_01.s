@@ -587,7 +587,7 @@ EndLevel:
         JMP  @$ExecuteBootstrap
 
 LevelInit:
-        CALL @$AkuYou_Player_GetPlayerVars
+        CALL @$Player_GetPlayerVars
 
         MOV  $EventStreamArray_Ep1,R5 # Event Stream
         MOV  $Event_SavedSettingsB,R3 # Saved Settings
@@ -596,20 +596,27 @@ LevelInit:
         CALL ScreenBuffer_Init
         MTPS $PR0
 
+        MOVB $3,@$Player_Array+9 # set number of lives for the first player
 LevelLoop:
+        CALL ShowKeysBitmap
+
         CALL @$Background_Draw
 
         CALL @$EventStream_Process
 
+        MOV  $LevelSprites,@$srcSprShow_BankAddr  
         CALL @$ObjectArray_Redraw
 
-       #CALL @$Player_Handler
+        MOV  $ChibiSprites,@$srcSprShow_BankAddr
 
+        CALL @$PlayerHandler
+
+        MOV  $ChibiSprites,@$srcSprShow_BankAddr  
         CALL @$Player_StarArray_Redraw
 
         CALL @$StarArray_Redraw
 
-       #CALL @$Player_DrawUI
+        CALL @$Player_DrawUI
 
        #CALL @$PlaySfx
 
@@ -617,6 +624,40 @@ LevelLoop:
 
         BR   LevelLoop
 
+ShowKeysBitmap: # -----------------------------------------------------------{{{
+        MOV  @$KeyboardScanner_P1,R3
+       .equiv LastKeysBitmap, .+2
+        CMP  R3,$0b00000000
+       #BEQ  1237$
+        MOV  R3,@$LastKeysBitmap
+
+        MOV  $ScanCodeStr+2,R1
+        CALL @$NumToStr
+       .ppudo_ensure $PPU_DebugPrintAt, $ScanCodeStr
+1237$:  RETURN
+
+NumToStr: #------------------------------------------------------------------{{{
+        MOV  $8,R0      # R0 - length of the number
+                        # R1 - position of number in str (first argument)
+                        # R3 - number (second argument)
+        ADD  R0,R1
+
+100$:   CLR  R2         # R2 - most, R3 - least significant word
+        DIV  $2,R2
+                        # R2 contains quotient, R3 - remainder
+        ADD  $'0,R3 # add ASCII code for "0" to the remainder
+        MOVB R3,-(R1)
+        MOV  R2,R3
+
+        SOB  R0,100$
+
+        RETURN
+#----------------------------------------------------------------------------}}}
+ScanCodeStr:
+        .byte 0,4
+        .asciz "76543210"
+        .even
+#----------------------------------------------------------------------------}}}
 # Generic Background Begin -----------------------------------------------------
 Background_Draw:
         MOV  $0,R0 # 0=left

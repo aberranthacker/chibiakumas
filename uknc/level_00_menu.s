@@ -135,6 +135,7 @@ ShowMenu:
         WAIT
 
        .ppudo_ensure $PPU_PrintAt,$MenuText
+        MOV  $LevelSprites,@$srcSprShow_BankAddr  
         CALL @$ObjectArray_Redraw
 
         JSR  R5,@$OnscreenCursorDefine
@@ -193,6 +194,7 @@ Introduction: #--------------------------------------------------------------{{{
         CALL ExecuteBootstrap
 #----------------------------------------------------------------------------}}}
 StartGame_1UP: #-------------------------------------------------------------{{{
+        MOVB $3,@$Player_Array+9 # set number of lives for the first player
         MOV  $1,R5
         CALL ExecuteBootstrap
 #----------------------------------------------------------------------------}}}

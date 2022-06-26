@@ -68,7 +68,7 @@ SavedSettings: #-------------------------------------------------------------{{{
         P1_P04: .byte 0          #  4 - drones (0/1/2)
         P1_P05: .byte 60         #  5 - continues
         P1_P06: .byte 0          #  6 - drone pos
-        P1_P07: .byte 1          #  7 - Invincibility
+        P1_P07: .byte 0b00000111 #  7 - Invincible for how many ticks
         P1_P08: .byte 0          #  8 - Player SpriteNum
         P1_P09: .byte 3          #  9 - Lives
         P1_P10: .byte 100        # 10 - Burst Fire (Xfire)
@@ -86,7 +86,7 @@ SavedSettings: #-------------------------------------------------------------{{{
         P2_P04: .byte 0          #  4 - Drones (0/1/2)
         P2_P05: .byte 60         #  5 - continues
         P2_P06: .byte 0          #  6 - Drone Pos
-        P2_P07: .byte 1          #  7 - Invincibility
+        P2_P07: .byte 0b00000111 #  7 - Invincibility
         P2_P08: .byte 0          #  8 - Player SpriteNum
         P2_P09: .byte 0          #  9 - Lives
         P2_P10: .byte 0          # 10 - Burst Fire
@@ -121,6 +121,23 @@ SavedSettings: #-------------------------------------------------------------{{{
     # 25
     HighScoreBytes:     .space 8,0 # Highscore
 SavedSettings_Last: # 0x80 bytes --------------------------------------------}}}
+
+# X,X,Y,Y,S,[0,0,0] - [] not used
+PlusSprites_Config1:
+    # These go at &6030
+    .byte 0x60-0x00, 0x02, 0x08, 0x00 #  0
+    .byte 0x60-0x20, 0x02, 0x08, 0x00 #  4
+    .byte 0x60-0x40, 0x02, 0x08, 0x00 #  8
+    .byte 0x00+0x00, 0x00, 0x08, 0x00 # 12
+    .byte 0x00+0x20, 0x00, 0x08, 0x00 # 16
+    .byte 0x00+0x40, 0x00, 0x08, 0x00 # 20
+PlusSprites_Config2:
+    .byte 0x00+0x00, 0x00, 0xB4, 0x00 #  0
+    .byte 0x00+0x20, 0x00, 0xB4, 0x00 #  4
+    .byte 0x00+0x40, 0x00, 0xB4, 0x00 #  8
+    .byte 0x60-0x00, 0x02, 0xB4, 0x00 # 12
+    .byte 0x60-0x20, 0x02, 0xB4, 0x00 # 16
+    .byte 0x60-0x40, 0x02, 0xB4, 0x00 # 20
 
 # Transparent colors are used by the sprite, if the byte matches it is skipped
 # to effect transparency without an 'alpha map'
@@ -228,6 +245,7 @@ not_implemented_check_R0:
 
        .include "core/player_driver.s"
        .global DroneFlipFire
+       .global Player_DrawUI
        .global PlayerHandler
        .global Player_GetPlayerVars
        .global SetFireDir_DOWN
@@ -266,6 +284,7 @@ not_implemented_check_R0:
        .global srcSfx_Sound
 
        .include "core/show_sprite.s"
+       .global srcSprShow_BankAddr
 
        .include "core/stararray.s"
        .global opcStarSlowdown
