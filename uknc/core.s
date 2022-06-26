@@ -64,13 +64,13 @@ SavedSettings: #-------------------------------------------------------------{{{
         P1_P00: .byte 100        #  0 - Y 0x64
         P1_P01: .byte 32         #  1 - X 0x20
         P1_P02: .byte 0          #  2 - shoot delay
-        P1_P03: .byte 2          #  3 - smartbombs
-        P1_P04: .byte 0          #  4 - drones (0/1/2)
+        P1_P03: .byte 2          #  3 - smartbombs     # <= 127
+        P1_P04: .byte 0          #  4 - drones (0/1/2) # <= 127
         P1_P05: .byte 60         #  5 - continues
         P1_P06: .byte 0          #  6 - drone pos
         P1_P07: .byte 0b00000111 #  7 - Invincible for how many ticks
         P1_P08: .byte 0          #  8 - Player SpriteNum
-        P1_P09: .byte 3          #  9 - Lives
+        P1_P09: .byte 3          #  9 - Lives          # <= 127
         P1_P10: .byte 100        # 10 - Burst Fire (Xfire)
         P1_P11: .byte 0b00000100 # 11 - Fire Speed - PlayerShootSpeed_Plus1
         P1_P12: .byte 0          # 12 - Player num (0=1, 1=2)
