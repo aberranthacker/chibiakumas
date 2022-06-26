@@ -81,7 +81,7 @@ SetLevelTime: # This is used for jumping around the event stream # SetLevelTime:
 
 EventStream_Init:
         # Store the address of our 2nd setting buffer (1st is contained in core)
-       #MOV  R3,@$srcEvent_SavedSettings # uknc/core/event_stream.s:621
+       #MOV  R3,@$srcEvent_SavedSettings # core/event_stream.s:621
         CLR  R0
         MOV  R0,@$srcEvent_MultipleEventCount # uknc/event_stream.s:493
         CALL @$SetLevelTime # uknc/event_stream.s:70 # does MOV (R3)+,@$srcEvent_NextEventTime

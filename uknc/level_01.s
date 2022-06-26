@@ -587,8 +587,6 @@ EndLevel:
         JMP  @$ExecuteBootstrap
 
 LevelInit:
-        CALL @$Player_GetPlayerVars
-
         MOV  $EventStreamArray_Ep1,R5 # Event Stream
         MOV  $Event_SavedSettingsB,R3 # Saved Settings
         CALL @$EventStream_Init
