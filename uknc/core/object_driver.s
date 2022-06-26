@@ -82,7 +82,6 @@ ObjectArray_Redraw:                                         # ObjectArray_Redraw
         TST  @$srcTimer_TicksOccured                        #     ld a,(Timer_TicksOccured)
                                                             #     or a
         BZE  game_paused$                                   #     ret z   ; see if game is paused (TicksOccurred = 0 )
-        MOV  $LevelSprites,@$srcSprShow_BankAddr
         # Define player 1 and 2 hitboxes                    #
         CALL @$ObjectArray_ConfigureForSize                 #     call ObjectArray_ConfigureForSize
                                                             #

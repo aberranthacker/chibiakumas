@@ -160,7 +160,6 @@ Bootstrap_Level_Intro:
 #----------------------------------------------------------------------------
 Bootstrap_Level_1: # ../Aku/BootStrap.asm:838  main menu --------------------
        .ppudo_ensure $PPU_SetPalette, $BlackPalette
-        CALL StartANewGame
         CALL LevelReset0000
 
         MOV  $level_01.bin,R0
@@ -494,7 +493,7 @@ loading_screen.bin:
     .word loading_screen_block_num
 core.bin:
     .word GameVarsEnd
-    .equiv core_size, 5746
+    .equiv core_size, 6480
     .word core_size >> 1
     .equiv core_block_num, (loading_screen_size + 511) >> 9 + loading_screen_block_num
     .word core_block_num
@@ -512,13 +511,13 @@ ep1_intro_slides.bin:
     .word ep1_intro_slides_block_num
 level_00.bin:
     .word Akuyou_LevelStart
-    .equiv level_00_size, 10194
+    .equiv level_00_size, 10206
     .word level_00_size >> 1
     .equiv level_00_block_num, ep1_intro_slides_block_num + (ep1_intro_slides_size + 511) >> 9
     .word level_00_block_num
 level_01.bin:
     .word Akuyou_LevelStart
-    .equiv level_01_size, 9788
+    .equiv level_01_size, 9900
     .word level_01_size >> 1
     .equiv level_01_block_num, level_00_block_num + (level_00_size + 511) >> 9
     .word level_01_block_num
