@@ -765,51 +765,30 @@ GradientBottom:
    .word  2, 0x00FF
    .word 0xFFFF
 #----------------------------------------------------------------------------}}}
-# 9 br.     # A br.     # B br.     # C br.     # D br.     # E br.     # F white
-# 1 blue    # 2 green   # 3 cyan    # 4 red     # 5 magenta # 6 yellow  # 7 gray
 BluePalette: #---------------------------------------------------------------{{{
-    .byte 0, 0    # line number, set cursor/scale/palette
-    .word 0b10000 #  graphical cursor
-    .word 0b10000 #  320 dots per line, pallete 0
-
-    .byte 1, 1    # line number, set colors
-    .byte 0x00, 0x11, 0x11, 0x55
-    .byte 201     #--line number, 201 - end of the main screen params
-    .even
+    .word 0, cursorGraphic, scale320 | 0b000
+    .byte 1, setColors, Black, Blue, Blue, Magenta
+    .word endOfScreen
 #----------------------------------------------------------------------------}}}
 DarkRealPalette: #---- ------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10    #  graphical cursor, YRGB color
-    .word 0b10000 #  320 dots per line, palette 0
-
-    .byte 1, 1    # line number, set colors
-    .byte 0x00, 0x99, 0xEE, 0xFF
-    .byte 49, 1    # line number, set colors
-    .byte 0x00, 0x55, 0x11, 0xFF
-    .byte 129, 1    # line number, set colors
-    .byte 0x00, 0xCC, 0xBB, 0xFF
-
-    .byte 201       # --line number, 201 - end of the main screen params
-    .even
+    .word   0, cursorGraphic, scale320 | 0b000
+    .byte   1, setColors, Black, brBlue, brYellow, White
+    .byte  49, setColors, Black, Magenta, Blue, White
+    .byte 129, setColors, Black, brRed, brCyan, White
+    .word endOfScreen
 #----------------------------------------------------------------------------}}}
 RealPalette: #---------------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10    #  graphical cursor, YRGB color
-    .word 0b10111 #  320 dots per line, palette 7
-
-    .byte 1, 1    # line number, set colors
-    .byte 0x00, 0x99, 0xEE, 0xFF
-    .byte 41, 1    # line number, set colors
-    .byte 0x00, 0x55, 0x11, 0xFF
-    .byte 143, 1    # line number, set colors
-    .byte 0x00, 0xCC, 0xBB, 0xFF
-
-    .byte 201       # --line number, 201 - end of the main screen params
-    .even
+    .word   0, cursorGraphic, scale320 | 0b111
+    .byte   1, setColors, Black, brBlue, brYellow, White
+    .word  32, cursorGraphic, scale320 | 0b110
+    .byte  40, setColors, Black, brBlue, Magenta, White
+    .word  64, cursorGraphic, scale320 | 0b111
+    .byte  65, setColors, Black, Magenta, Blue, White
+    .word 142, cursorGraphic, scale320 | 0b011
+    .byte 143, setColors, Black, brRed, brCyan, White
+    .word 178, cursorGraphic, scale320 | 0b111
+    .word endOfScreen
 #----------------------------------------------------------------------------}}}
-# 9 br.     # A br.     # B br.     # C br.     # D br.     # E br.     # F white
-# 1 blue    # 2 green   # 3 cyan    # 4 red     # 5 magenta # 6 yellow  # 7 gray
-
     .even
 end:
     .nolist

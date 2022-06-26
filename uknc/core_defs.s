@@ -88,7 +88,7 @@
     .endif
 
     .ifndef ExtMemCore
-.equiv Akuyou_LevelStart, 0x9EAC # 40620 0117254 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9EA4 # 40612 0117244 # auto-generated during a build
     .else
 .equiv Akuyou_LevelStart, GameVarsEnd
     .endif
@@ -114,17 +114,7 @@
 
 .equiv SLTAB, 0100000# 32768 0x8000
 .equiv OffscreenAreaAddr, 0140000 # 49152 0xC000
-#-------------------------------------------------------------------------------
-
-.equiv TextScreen_MaxX, 39
-.equiv TextScreen_MinX, 0
-.equiv TextScreen_MaxY, 24
-.equiv TextScreen_MinY, 0
-
-# -Player 2's data starts XX bytes after player so you can use IY+XX+1 to get
-# a var from player 2 without changing IY
-.equiv Akuyou_PlayerSeparator, 16
-
+#-end of PPU memory map---------------------------------------------------------
 .equiv Keymap_Down,  0x01
 .equiv Keymap_Up,    0x02
 .equiv Keymap_Right, 0x04
@@ -134,13 +124,39 @@
 .equiv Keymap_F3,    0x40
 .equiv Keymap_Pause, 0x80
 .equiv Keymap_AnyFire, 0b01110000
-
+#-------------------------------------------------------------------------------
 .equiv chr1Up,   0x7B # 0173
 .equiv chr2Up,   0x7C # 0174
 .equiv chrSlab,  0x7D # 0175
 .equiv chrCross, 0x7E # 0176
 .equiv chrHeart, 0x7F # 0177
+#-------------------------------------------------------------------------------
+.equiv setCursorScalePalette, 0
+.equiv cursorGraphic, 0x10 # dummy parameter
+.equiv scale640, 0x00
+.equiv scale320, 0x10
+.equiv scale160, 0x20
+.equiv scale80,  0x30
+#-------------------------------------------------------------------------------
+.equiv setColors, 1
+.equiv Black,     0x00
+.equiv Blue,      0x11
+.equiv Green,     0x22
+.equiv Cyan,      0x33
+.equiv Red,       0x44
+.equiv Magenta,   0x55
+.equiv Yellow,    0x66
+.equiv Gray,      0x77
+.equiv brBlue,    0x99
+.equiv brGreen,   0xAA
+.equiv brCyan,    0xBB
+.equiv brRed,     0xCC
+.equiv brMagenta, 0xDD
+.equiv brYellow,  0xEE
+.equiv White,     0xFF
 
+.equiv untilLine, -1 << 8
+.equiv endOfScreen, 201
 #-------------------------------------------------------------------------------
 # Platform Specific Core commands
 #-------------------------------------------------------------------------------
