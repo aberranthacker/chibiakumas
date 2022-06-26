@@ -38,7 +38,7 @@ StarArray_Redraw:
         MOV  $null,R5 # player invincible
 
     StarArray_PlayerVulnerable:
-        # load player 1 location - do it in advance to save time during the loop
+      # load player 1 location - do it in advance to save time during the loop
         MOVB @$P1_P01,R0
         DEC  R0 # SUB  $2,R0
         DEC  R0
@@ -94,8 +94,7 @@ Starloop_Start:
 Starloop_Start2:
         MOV  R3,@$opcStarSlowdownB
         MOV  R3,@$opcStarSlowdownA
-
-        # Reset the star array to allow more stars to be added
+      # Reset the star array to allow more stars to be added
         CLR  @$srcStarArrayFullMarker
 
 Starloop:
@@ -122,8 +121,8 @@ StarArray_FoundOne:
         BISB (R5)+,R3 # X
         MOVB (R5),R4  # M
 
-        # DoMovesStars moves for stars
-        # C=R2=Y; B=R3=X; D=R4=Move
+      # DoMovesStars moves for stars
+      # C=R2=Y; B=R3=X; D=R4=Move
         MOV  R4,R0
         BIC  $0177707,R0 # 0b11000111
         ASR  R0
@@ -158,7 +157,7 @@ StarArray_FoundOne:
         CMP  R3,$24
         BLO  DoMovesStars_Kill
 
-        # check for collisions with player 1
+      # check for collisions with player 1
        .equiv cmpPlayer1LocX, .+2
         CMP  R3,$30
         BLO  StarLoopP1Skip
