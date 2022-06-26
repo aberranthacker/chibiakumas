@@ -62,7 +62,7 @@ VirtualPosToScreenByte:
         RORB R2 # halve the result, as we have 80 bytes, but 160 x co-ords
         # using MOVB because MSB contains frame buffer offset
         # show_sprite.s:265
-        MOVB R2,@$srcSprShow_TempX
+        MOVB R2,@$srcSprShow_ScrWord
     #---------------------------------------------------------------------------
         # R1 Y
         CLR  R2 # Y lines to skip
@@ -92,7 +92,7 @@ VirtualPosToScreenByte:
     VirtualPos_4$:
        .equiv srcSpriteSizeConfig24G, .+2
         SUB  $24,R1
-        MOV  R1,@$srcSprShow_TempY
+        MOV  R1,@$srcSprShow_ScrLine
 
         RETURN
 

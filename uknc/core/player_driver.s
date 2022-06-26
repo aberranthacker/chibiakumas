@@ -155,18 +155,15 @@ Player_Handler_PauseCheckDone:          # Player_Handler_PauseCheckDone:
         MOV  @$srcTimer_TicksOccured,R0 #     ld hl,Timer_TicksOccured
                                         #     ld a,(hl)
                                         #     or a
-        BZE  1237$                      #     ret z               ;abort handler if game paused
+        BZE  1237$                      #     ret z ;abort handler if game paused
                                         #     xor a
         CLR  @$srcPlayerSaveShot        #     ld (PlayerSaveShot_Plus1 - 1),a
         CLR  @$srcPlayerDoFire          #     ld (PlayerDoFire_Plus1 - 1),a
-                                        #
                                         #     ld a,(hl)
-                                        #
         BITB 11(R4),R0 # fire speed     #     and (iy+11)
-                                        #
         BZE  Player_Handler_Start       #     jr z,Player_Handler_Start
                                         #
-        CLR  2(R4)                      #     ld (iy+2),0
+        CLRB 2(R4)                      #     ld (iy+2),0
                                         #
         # Move the drones depending if the player is shooting
 Player_Handler_Start:                   # Player_Handler_Start:
@@ -186,47 +183,47 @@ Player_Handler_DronePosOk:              # Player_Handler_DronePosOk:
         CLR  R2                         #     ld b,(iy+1) ;X
         BISB R1,R2                      #     ld e,8  :PlayerMoveSpeedFast_Plus1 ; Fast move speed - will be overriden if we're firing
         CLRB R1
-        SWAB R1
+        SWAB R1 # R2=Y, R1=X
+       .equiv srcPlayerMoveSpeedFast, .+2
+        MOV  $8,R3 # Fast move speed - will be overriden if we're firing
 
-# Player_Handler_KeyreadJoy1Fire2:
-        MOV  @$KeyboardScanner_P1,R0         # ld a,ixl
-# SelfModifyingFire2:
-        BIT  $Keymap_F2,R0                   # bit Keymap_F2,a
-        BZE  Player_Handler_KeyreadJoy1Fire1 # jr nz,Player_Handler_KeyreadJoy1Fire1
-        # fire bullets
+        MOV  @$KeyboardScanner_P1,R0
 # SelfModifyingFire1:
-        BIT  $Keymap_F1,R0                   # bit Keymap_F1,a
-        BZE  Player_Handler_NoFireX          # jr nz,Player_Handler_NoFireX
-                                             #
+        BIT  $Keymap_F1,R0
+        BZE  Player_Handler_KeyreadJoy1Fire2
+        # fire bullets
+# SelfModifyingFire2:
+        BIT  $Keymap_F2,R0
+        BZE  Player_Handler_KeyreadJoy1Fire1
+
       # Xfire is a secret feature planned for the sequel
       # it activates when both fire buttons are pressed
        #CALL Player_Handler_FireX
-        BR   Player_Handler_KeyreadJoy1Up    # jr Player_Handler_KeyreadJoy1Up ;
+        BR   Player_Handler_KeyreadJoy1Up
 
- Player_Handler_NoFireX: # Fire right
-       .equiv dstFire2Handler, .+2
-        CALL @$SetFireDir_RIGHTsave       #     call SetFireDir_RIGHTsave :Fire2Handler_Plus2
-                                          #
-# Player_ShootSkip
-        MOV  $2,R3                        #     ld e,2  :PlayerMoveSpeedSlow1_Plus1 ; slow move speed as we're firing
-                                          #     ld a,ixl
-        BR   Player_Handler_KeyreadJoy1Up #     jr Player_Handler_KeyreadJoy1Up
-                                          #
-Player_Handler_KeyreadJoy1Fire1: # Fire left
-# SelfModifyingFire1B:
-                                        #     bit Keymap_F1,a
-                                        #     jr nz,Player_Handler_KeyreadJoy1Up
-                                        #
-                                        #     ;fire bullets
+Player_Handler_KeyreadJoy1Fire1: # Fire right
        .equiv dstFire1Handler, .+2
-        CALL @$SetFireDir_LEFTsave      #     call SetFireDir_LEFTsave    :Fire1Handler_Plus2
+        CALL @$SetFireDir_RIGHTsave # fire bullets
+# Player_ShootSkip
+       .equiv srcPlayerMoveSpeedSlow1, .+2
+        MOV  $2,R3 # slow move speed as we're firing
+        BR   Player_Handler_KeyreadJoy1Up
+
+Player_Handler_KeyreadJoy1Fire2: # Fire left
+# SelfModifyingFire1B:
+        BIT  $Keymap_F2,R0
+        BZE  Player_Handler_KeyreadJoy1Up
+
+       .equiv dstFire2Handler, .+2
+        CALL @$SetFireDir_LEFTsave # fire bullets
                                                             #
 # Player_ShootSkip2
-        MOV  $2,R3                      # ld e,2  :PlayerMoveSpeedSlow2_Plus1; Slow move speed as we're firing
+       .equiv srcPlayerMoveSpeedSlow2, .+2
+        MOV  $2,R3 # Slow move speed as we're firing
 Player_Handler_KeyreadJoy1Up:
         BIT  $Keymap_Up,@$KeyboardScanner_P1
         BZE  Player_Handler_KeyreadJoy1Down
-        CMP  R2,$24+ 16 # Check we're onscreen
+        CMP  R2,$24+ 24 # Check we're onscreen
         BLO  Player_Handler_KeyreadJoy1Down
 
         SUB  R3,R2
@@ -914,24 +911,25 @@ PlayerKilled:
 #******************************************************************************#
 #*                                  Player UI                                 *#
 #******************************************************************************#
-Player_DrawUI_IconLoop: # Used for Health and Smartbomb icons
+Player_DrawUI_DrawIcons: # Used for Health and Smartbomb icons
         TST  R0 # number of icons to draw
         BZE  1237$
 
-        MOV  R1,@$srcSprShow_TempY
-        MOVB R2,@$srcSprShow_TempX
-        # test using single register for x/y #
-        PUSH R0
-        PUSH R1
-        PUSH R2
-        CALL ShowSpriteDirect
-        POP  R2
-        POP  R1
-        POP  R0
+        100$:
+            MOVB R1,@$srcSprShow_ScrWord
+            MOV  R2,@$srcSprShow_ScrLine
+            PUSH R0
+            PUSH R1
+            PUSH R2
+            CALL ShowSpriteDirect
+            POP  R2
+            POP  R1
+            POP  R0
 
-       .equiv srcPlayer_DrawUI_IconLoop_MoveSize, .+2
-        ADD  $4,R2
-        SOB  R0,Player_DrawUI_IconLoop
+           .equiv srcPlayer_DrawUI_DrawIcons_IconWidth, .+2
+            ADD  $4,R1
+        SOB  R0,100$
+
 1237$:  RETURN
 
 Player1DoContinue:
@@ -1012,46 +1010,28 @@ Player1Continue:
                                         #     txtPressButtonMsg2:
                                         #         db "Continue","?"+&80
                                         #
-Player_DrawUIDual:                  # ld (Player_DrawUI_IconLoop_MoveSize_Plus1 - 1),a
-        MOV  R0,@$srcPlayer_DrawUI_IconLoop_MoveSize
-                                    # ld a,b
-                                    # ld (Player_DrawUI_IconLoop_XPos_Plus1 - 1),a
-        MOV  R1,@$srcPlayer_DrawUI_IconLoop_XPos
-                                    # ld hl,Akuyou_PlayerSpritePos
-                                    # ld (SprShow_BankAddr),hl
-                                    # xor a
-        CLR  @$srcSprShow_SprAttrs  # ld (SprShow_Xoff),a
-        CLRB R0
-        BISB 9(R4),R0               # ld b,(iy+9) ;LIves
-        MOV  $7,@$srcSprShow_SprNum # ld a,7
-                                    # ld (SprShow_SprNum),a
-        MOV  $8,R1                  # ld a,8
-        MOV  R1,@$srcSprShow_Y # do we need this on 511? # ld (SprShow_Y),a
-        # lives
-       .equiv srcPlayer_DrawUI_IconLoop_XPos, .+2
-        MOV  $0,R2                         # ld c,0 :Player_DrawUI_IconLoop_XPos_Plus1
-        PUSH R2                            # push bc
-        PUSH R4                            #     push iy
-        CALL Player_DrawUI_IconLoop        #         call Player_DrawUI_IconLoop
-        POP  R4                            #     pop iy
-        POP  R2                            #
-                                           #     ld a,6
-        MOV  $6,@$srcSprShow_SprNum        #     ld (SprShow_SprNum),a
-                                           #
-                                           #     ld a,180
-        MOV  $180,R1 # Y                   #     ld (SprShow_Y),a
-                                           # pop bc
-        # smart bombs
-        MOVB 3(R4),R0                      # ld b,(iy+3) ;D1
-        JMP  Player_DrawUI_IconLoop        # jp Player_DrawUI_IconLoop
+Player_DrawUIDual:
+        MOV  R0,@$srcPlayer_DrawUI_DrawIcons_IconWidth
+
+        MOV  $8,R2    # Y pos, line
+        MOVB 9(R4),R0 # Lives, number of icons
+        MOV  $7,@$srcSprShow_SprNum
+        PUSH R1
+        PUSH R4
+        CALL Player_DrawUI_DrawIcons
+        POP  R4
+        POP  R1
+
+        MOV  $180,R2  # Y pos, line
+        MOVB 3(R4),R0 # Smart bombs, number of icons
+        MOV  $6,@$srcSprShow_SprNum
+        JMP  Player_DrawUI_DrawIcons
 
 Player1DrawUI:
-        MOV  $4,R0                            # ld a,4
-        CLR  R1                               # ld b,0
-       #MOV  $PlusSprites_Config1+ 3*4+ 3, R3 # ld de,3 * 4 + PlusSprites_Config1 + 3
-       #MOV  $PlusSprites_Config2+ 3,R5       # ld hl,PlusSprites_Config2 + 3
+        MOV  $4,R0 # icon width, bytes        # ld a,4
+        CLR  R1    # Xpos, word               # ld b,0
         CALL Player_DrawUIDual                # call Player_DrawUIDual
-        RETURN
+
                                               # ld a,7
                                               # ld hl,&0003
                                               # ld iy,Player_Array
@@ -1103,14 +1083,14 @@ Player_DrawUI_PlusAsWell:
                                         #     pop hl
                                         #     ; check if we need to show the continue screen
                                         #
-                                        # ScoreAddRepeat:             ;This does our rolling up effect on the score!
+                                        # ScoreAddRepeat: ;This does our rolling up effect on the score!
                                         #     push hl
                                         #         call Player_UpdateScore
                                         #     pop hl
                                         #     ld a,(iy+13)
-                                        #     cp 30               ; if waiting score goes over 30, add faster
-                                        #     jr nc,ScoreAddRepeat        ; this is for the 'coffee time' effect at the
-                                        #                     ; end of level 9
+                                        #     cp 30  ; if waiting score goes over 30, add faster
+                                        #     jr nc,ScoreAddRepeat ; this is for the 'coffee time' effect at the
+                                        #                          ; end of level 9
                                         #
                                         #     ;Show the remaining 'burst fire' power
                                         #     ld hl,&0003 : BurstDrawPos_Plus2
@@ -1118,9 +1098,9 @@ Player_DrawUI_PlusAsWell:
                                         #     ld a,(iy+10)
                                         #     or a
                                         #     call nz,DrawText_Decimal
-                                        #
-                                        #     ret: CheatMode_Plus1
-                                        #
+       .equiv CheadMode, .
+        RETURN                          #     ret: CheatMode_Plus1
+
       # CHEAT MODE!
       # Sssh, we set cheats here - as some levels steal our powerups,
       # done During the level not before

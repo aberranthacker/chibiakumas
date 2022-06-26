@@ -104,7 +104,7 @@ ShowSpriteDirect: #----------------------------------------------------------{{{
                                                             #     ld c,a
                                                             #     ld a,(SprShow_TempY)
                                                             #     add c
-        ADD  @$srcSprShow_Yoffset, @$srcSprShow_TempY       #     ld (SprShow_TempY),A
+        ADD  @$srcSprShow_Yoffset, @$srcSprShow_ScrLine       #     ld (SprShow_TempY),A
                                                             # ;Quick shortcuts for fonts
         MOV  @$srcSprShow_DrawWidth,R0                      # ld a,(SprShow_TempW)
         MOV  R0,@$srcSprShow_SpriteWidth                    # ld (SprShow_W),a
@@ -259,15 +259,15 @@ ShowSprite: # ShowSprite is the main routine of our program!
 #----------------------------------------------------------------------------}}}
 
     ShowSprite_SkipChanges:
-        # srcSprShow_TempY = Y - lines to skip
-       .equiv srcSprShow_TempY, .+2
+        # srcSprShow_ScrLine = Y - lines to skip
+       .equiv srcSprShow_ScrLine, .+2
         MOV  $0x00,R5
         ASL  R5 # calculate the table entry offset
         MOV  scr_addr_table(R5),R5
         ADD  (PC)+,R5 # add X position and the frame buffer MSB
-        srcSprShow_TempX: .byte 0x00
-        srcFB_MSB:        .byte 0x40 # FB1
-                         #.byte 0x00 # FB0
+        srcSprShow_ScrWord: .byte 0x00
+        srcFB_MSB:          .byte 0x40 # FB1
+                           #.byte 0x00 # FB0
 
         # srcSprShow_TempH = (H - lines to remove) or (H - lines to skip)
        .equiv srcSprShow_TempH, .+2
