@@ -182,11 +182,13 @@ Stars_AddBurst_Loop:
         BR   Stars_AddBurst_Loop
 1237$:  RETURN
 
-        # input Y    = R1
-        #       X    = R2
-        #       Move = R0 LSB
+        # input C = R1 = Y
+        #       D = R2 = X
+        #       A = R0 LSB = Move
         # corrupts R3, R4
 Stars_AddObjectFromR0:
+        MOV  R0,@$StarObjectMoveToAdd
+Stars_AddObject:
        .equiv srcStarArrayFullMarker, .+2
         TST  $0x00
         BNZ  1237$ # if > 0 we cannot add any stars as the loop is full!
@@ -204,7 +206,8 @@ Stars_SeekLoop:
         MOV  R3,@$srcStarArrayStartPoint  # found a free slot!
         MOVB R1,(R4)+ # Y
         MOVB R2,(R4)+ # X
-        MOVB R0,(R4)  # Move
+       .equiv StarObjectMoveToAdd, .+2
+        MOVB $0x00,(R4)  # Move, can be set from player_driver
 1237$:  RETURN
 
 Stars_SeekLoopNext:

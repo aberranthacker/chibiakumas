@@ -7,7 +7,7 @@
                                         #     ld hl,HighScoreBytes
                                         #     ret
 Player_GetPlayerVars:                   # Player_GetPlayerVars:
-        MOV  $Player_Array,R5           #     ld iy,Player_Array
+        MOV  $Player_Array,R4           #     ld iy,Player_Array
         RETURN                          # ret
                                         #     ; iy = Pointer to player vars
 NoSpend:                                # NoSpend:
@@ -26,14 +26,14 @@ SpendCheck:                             # SpendCheck:
         BNE  SpendCredit                #     ret z
         RETURN                          #
 SpendCredit:                            # SpendCredit:
-         PUSH R5                        #     push iy
+         PUSH R4                        #     push iy
          SpendCreditSelfMod:
-             MOV  $Player_Array,R5      # SpendCreditSelfMod: ld iy,Player_Array ; All credits are (currently) stored in player 1's var!
-         MOVB 5(R5),R0                  #         ld a,(iy+5)
+             MOV  $Player_Array,R4      # SpendCreditSelfMod: ld iy,Player_Array ; All credits are (currently) stored in player 1's var!
+         MOVB 5(R4),R0                  #         ld a,(iy+5)
          DECB R0                        #         sub 1
          POP  R4                        #     pop ix
          BMI  1$                        #     ret c ;no credits left!
-         MOVB R0,5(R5)                  #     ld (iy+5),a
+         MOVB R0,5(R4)                  #     ld (iy+5),a
                                         #
                                         #     ld a,3
          MOVB $3,9(R4) # lives          #     ld (ix+9),a
@@ -177,13 +177,13 @@ Player_Handler_Start:                   # Player_Handler_Start:
 Player_Handler_DronePosOk:              # Player_Handler_DronePosOk:
         MOVB R0,6(R4)                   #     ld (iy+6),a ;D1 - shots and drones
         ADD  R0,R0                      #     add a
-        MOV  R0,@$srcPlayer_DroneOffset1#     ld (Player_DroneOffset1_Plus1 - 1),a
+        MOV  R0,@$Player_DroneOffset1#     ld (Player_DroneOffset1_Plus1 - 1),a
 
-        MOV  (R4),R1                    #     ld c,(iy)   ;Y
-        CLR  R2                         #     ld b,(iy+1) ;X
-        BISB R1,R2                      #     ld e,8  :PlayerMoveSpeedFast_Plus1 ; Fast move speed - will be overriden if we're firing
-        CLRB R1
-        SWAB R1 # R2=Y, R1=X
+        MOV  (R4),R2                    #     ld c,(iy)   ;Y
+        CLR  R1                         #     ld b,(iy+1) ;X
+        BISB R2,R1                      #     ld e,8  :PlayerMoveSpeedFast_Plus1 ; Fast move speed - will be overriden if we're firing
+        CLRB R2
+        SWAB R2 # R1=Y, R2=X
        .equiv srcPlayerMoveSpeedFast, .+2
         MOV  $8,R3 # Fast move speed - will be overriden if we're firing
 
@@ -216,17 +216,17 @@ Player_Handler_KeyreadJoy1Fire2: # Fire left
 
        .equiv dstFire2Handler, .+2
         CALL @$SetFireDir_LEFTsave # fire bullets
-                                                            #
+
 # Player_ShootSkip2
        .equiv srcPlayerMoveSpeedSlow2, .+2
         MOV  $2,R3 # Slow move speed as we're firing
 Player_Handler_KeyreadJoy1Up:
         BIT  $Keymap_Up,@$KeyboardScanner_P1
         BZE  Player_Handler_KeyreadJoy1Down
-        CMP  R2,$24+ 24 # Check we're onscreen
+        CMP  R1,$24+ 24 # Check we're onscreen
         BLO  Player_Handler_KeyreadJoy1Down
 
-        SUB  R3,R2
+        SUB  R3,R1
        .equiv dstFireUpHandler, .+2
         CALL @$null
 
@@ -234,10 +234,10 @@ Player_Handler_KeyreadJoy1Down:
         BIT  $Keymap_Down,@$KeyboardScanner_P1
         BZE  Player_Handler_KeyreadJoy1Left
 
-        CMP  R2,$24+ 200-16 # Check we're onscreen
+        CMP  R1,$24+ 200-16 # Check we're onscreen
         BHIS Player_Handler_KeyreadJoy1Left
 
-        ADD  R3,R2
+        ADD  R3,R1
        .equiv dstFireDownHandler, .+2
         CALL @$null
 
@@ -245,10 +245,10 @@ Player_Handler_KeyreadJoy1Left:
         BIT  $Keymap_Left,@$KeyboardScanner_P1
         BZE  Player_Handler_KeyreadJoy1Right
 
-        CMP  R1,$24+ 12 # Check we're onscreen
+        CMP  R2,$24+ 12 # Check we're onscreen
         BLO  Player_Handler_KeyreadJoy1Right
 
-        SUB  R3,R1
+        SUB  R3,R2
        .equiv dstFireLeftHandler, .+2
         CALL @$null
 
@@ -256,10 +256,10 @@ Player_Handler_KeyreadJoy1Right:
         BIT  $Keymap_Right,@$KeyboardScanner_P1
         BZE  Player_Handler_SmartBomb
 
-        CMP  R1,$24+ 160-12 # Check we're onscreen
+        CMP  R2,$24+ 160-12 # Check we're onscreen
         BHIS Player_Handler_SmartBomb
 
-        ADD  R3,R1
+        ADD  R3,R2
        .equiv dstFireRightHandler, .+2
         CALL @$null
 
@@ -293,29 +293,25 @@ Player_Handler_KeyreadDone:
         MOVB $0,15(R4)                 # ld (iy+15),a
                                        #
 Player_Handler_NoSaveFire:
-        MOVB 8(R4),R0                  # ld a,(iy+8)
+        MOVB 8(R4),R0 # player sprite num # ld a,(iy+8)
         BIC  $0xFF7F,R0                # and %10000000
        .equiv cmpDroneFlipCurrent, .+2
         CMP  R0,$1                     # cp 1 :DroneFlipCurrent_Plus1
-      #.CALL NE, DroneFlip             # call nz,DroneFlip
-                                       #
+        BZE  1$                        # call nz,DroneFlip
+        CALL DroneFlip                 #
+    1$:
        .equiv srcPlayerDoFire, .+2
         TST  $0                        # ld a,0 :PlayerDoFire_Plus1
                                        # or a
-      #.CALL NZ, Player_Fire4D         # call nz,Player_Fire4D
-                                       #
+        BZE  2$                        # call nz,Player_Fire4D
+        CALL Player_Fire4D
                                        # push bc
                                        #     ld a,PlusSprite_ExtBank :PlayerSpriteBank_Plus1
                                        #     call BankSwitch_C0_SetCurrent
                                        # pop bc
-                                       #
-       #SWAB R1
-       #CLRB R1
-       #BISB R2,R1
-       #MOV  R1,(R4)
-
-        MOVB R2,(R4)  # Y              # ld (iy),c   ;Y
-        MOVB R1,1(R4) # X              # ld (iy+1),b ;X
+   2$:
+        MOVB R1,(R4)  # Y              # ld (iy),c   ;Y
+        MOVB R2,1(R4) # X              # ld (iy+1),b ;X
                                        #
         CLR  R3                        # ld e,0
                                        # ld a,(Timer_CurrentTick_Plus1-1)
@@ -327,7 +323,7 @@ Player_Handler_NoSaveFire:
 Player_Handler_Frame1:
         PUSH R3                         # push de ;save the frame no
        .equiv opcDroneDirPos8, .
-        MOV  R1,R0 # or MOV  R2,R0      # ld a,B  :DroneDirPos8_Plus1
+        MOV  R2,R0 # or MOV  R1,R0      # ld a,B  :DroneDirPos8_Plus1
         SUB  $4,R0                      # sub 4
        .equiv dstDroneDirPos1, .+2
         MOV  R0,@$srcSprShow_X          # ld (SprShow_X),a :DroneDirPos1_Plus2
@@ -346,7 +342,7 @@ Player_Handler_Frame1:
         BZE  Player_Handler_OneDrone    # jr z,Player_Handler_OneDrone
                                         #
         MOV  $-12,R0                    # ld a,-12
-       .equiv srcPlayer_DroneOffset1, .+2
+       .equiv Player_DroneOffset1, .+2
         SUB  $16,R0                     # sub 16:Player_DroneOffset1_Plus1
         CALL @$SetDronePos              # call SetDronePos
                                         #
@@ -362,7 +358,7 @@ Player_Handler_Frame1:
                                         #
 Player_Handler_OneDrone:
 Player_Handler_OneDroneSkip:
-        MOV  @$srcPlayer_DroneOffset1,R0# ld a,(Player_DroneOffset1_Plus1 - 1) ; 16Player_DroneOffset2_Plus1
+        MOV  @$Player_DroneOffset1,R0   # ld a,(Player_DroneOffset1_Plus1 - 1) ; 16Player_DroneOffset2_Plus1
         CALL SetDronePos                # call SetDronePos
                                         #
 # Drone1NoPlus:
@@ -372,7 +368,7 @@ Player_Handler_OneDroneSkip:
         POP  R2                         # pop bc
         POP  R1                         # pop iy
 Player_Handler_NoDrones:
-        MOV  R1,R0                      # ld a,B
+        MOV  R2,R0 # X                  # ld a,B
         SUB  $7,R0                      # sub 7
         MOV  R0,@$srcSprShow_X          # ld (SprShow_X),a
         POP  R3                         # pop de  ;get back the frame num
@@ -402,18 +398,20 @@ Player_NotInvincible:
                                         #
                                         # ShowPlayer_NoPlus:
                                         #     ld a,c
-        SUB  $18,R2                     #     sub 18
-        MOV  R2,@$srcSprShow_Y          #     ld (SprShow_Y),a
+        SUB  $18,R1                     #     sub 18
+        MOV  R1,@$srcSprShow_Y          #     ld (SprShow_Y),a
                                         #
         CALL @$ShowSprite               #     call ShowSprite
                                         # pop bc
         RETURN                          # ret
                                         #
 SetDronePos:
+        # C = R1 = Y
+        # B = R2 = X
        .equiv DroneDirPos5, .
-        NOP                             # nop              :DroneDirPos5_Plus2 ; sra a
+        NOP # or ASR R0                 # nop              :DroneDirPos5_Plus2 ; sra a
        .equiv DroneDirPos2, .
-        ADD  R2,R0                      # add c            :DroneDirPos2_Plus1 ; add b
+        ADD  R1,R0                      # add c            :DroneDirPos2_Plus1 ; add b
        .equiv DroneDirPos6, .+2
         MOV  R0,@$srcSprShow_Y          # ld (SprShow_Y),a :DroneDirPos6_Plus2 ; ld (SprShow_X),a;ld (SprShow_Y),a
         RETURN                          # ret
@@ -458,152 +456,141 @@ SetDronePos:
                                         #
                                         #     ld e,2
                                         #     jr FireSfx
-                                                            #
-                                                            # Xfire:
-                                                            #     defb &7C,&4C,&67,&61
-                                                            # XfireSml:
-                                                            #     defb &49,&4F,&79,&7F,0
-                                                            #
-Player_Fire4D:                                              # Player_Fire4D:  ; Fire bullets!
-        MOVB 8(R5),R0                                       #     ld a,(iy+8)
-        BIC  $!0x80,R0                                      #     and %10000000
+
+        # Xfire:
+        #     defb &7C,&4C,&67,&61
+        # XfireSml:
+        #     defb &49,&4F,&79,&7F,0
+
+        # input  C = R1 = Y
+        #        B = R2 = X
+        #        IY = R4 = Player_Array pointer
+        #        R0, R3, R5 free
+Player_Fire4D: # Fire bullets!
+        MOVB 8(R4),R0                      # ld a,(iy+8)
+        BIC  $0xFF7F,R0                    # and %10000000
        .equiv cmpDroneFlipFireCurrent, .+2
-        CMP  R0,$0                                          #     cp 0 :DroneFlipFireCurrent_Plus1
-       .CALL NE, DroneFlipFire                              #     call nz,DroneFlipFire
-                                                            #
-                                                            #     ld a,(iy+15)
-                                                            # Player_Fire:    ; Fire bullets!
-                                                            #     push bc
-                                                            #     push de
-                                                            #
-                                                            #         ld d,(iy+12)
-                                                            #         or d
-                                                            #         ld (StarObjectMoveToAdd_Plus1-1),a
-                                                            #
-                                                            #         ld a,(iy+6) ;D1 Move the drones in when fire is held
-                                                            #         dec a
-                                                            #         dec a
-                                                            #         jr nz,Player_Handler_KeyreadJoy1Fire2_DroneLimit
-                                                            #         inc a   ; Drone at Max 'innness'!
-                                                            #
-                                                            #     Player_Handler_KeyreadJoy1Fire2_DroneLimit:
-                                                            #         ld (iy+6),a ;D1
-                                                            #
-                                                            #     pop de
-                                                            #     pop bc
-                                                            #     ld a,(iy+2) ;D1
-                                                            #     bit 7,a ; check if player is allowed to fire
-                                                            #     ret nz
-                                                            #     or %10000000
-                                                            #     ld (iy+2),a ;D1
-                                                            #
-                                                            #     push bc
-                                                            #
-                                                            #         call Stars_AddToPlayer
-                                                            #         ld d,b
-                                                            #         push bc
-                                                            #
-                                                            #             call Stars_AddObject
-                                                            #
-                                                            #     ;drone1
-                                                            #         pop bc
-                                                            #
-                                                            #         ld a,(Player_DroneOffset1_Plus1-1)
-                                                            #         add 4
-                                                            #         rrca    :DroneFlipFirePos5_Plus1    ;disable these for X
-                                                            #         ld ixh,a
-                                                            #
-                                                            #         ; Add extra stars depending on how many drones we have
-                                                            #         ld a,(iy+4)
-                                                            #         or a
-                                                            #         jr z,Player_NoDrones
-                                                            #         dec a
-                                                            #         jr z,Player_OneDrone
-                                                            #         xor a
-                                                            #         sub ixh
-                                                            #         call dodrone
-                                                            #     ;drone2
-                                                            #
-                                                            # Player_OneDrone:
-                                                            #     ld a,ixh
-                                                            #     call dodrone
-                                                            #
-                                                            # Player_NoDrones:
-                                                            #     pop bc
-                                                            # FireSfx:
-                                                            #     ld a,1
-                                                            #     jp SFX_QueueSFX_Generic
-                                                            #
-                                                            # dodrone:
-                                                            #     push bc
-                                                            #         ld d,b
-                                                            #
-                                                            #         ; ResetCore sets to add a,c
-                                                            #         add a,d :DroneFlipFirePos3_Plus1
-                                                            #
-                                                            #         ld d,a  :DroneFlipFirePos2_Plus1;ld c,a ;Flip for X
-                                                            #         call Stars_AddObject
-                                                            #     pop bc
-                                                            # ret
-                                                            #
-DroneFlipFire:                                              # DroneFlipFire:
-        MOV  R0,@$cmpDroneFlipFireCurrent                   #     ld (DroneFlipFireCurrent_Plus1 - 1),a
-        PUSH R2                                             #     push de
-                                                            #     or a
-                                                            #     ld a,&82
-                                                            #     jr z,DroneFlipFire_HorizontalMove
-                                                            #
-                                                            #         ld de,&570F
-                                                            #         jr DroneFlipFireApply
-                                                            # DroneFlipFire_HorizontalMove:
-                                                            #         dec a
-                                                            #         ld de,&4F00  ; ld c,a nop
-                                                            # DroneFlipFireApply:
-                                                            #     ld (DroneFlipFirePos3_Plus1 - 1),a
-                                                            #     ld a,d
-                                                            #     ld (DroneFlipFirePos2_Plus1 - 1),a
-                                                            #     ld a,e
-                                                            #     ld (DroneFlipFirePos5_Plus1 - 1),a
-        POP  R2                                             # jr DroneFlipFinish
-        RETURN                                              #
-DroneFlip:                                                  # DroneFlip:
-                                                            #     ld (DroneFlipCurrent_Plus1-1),a
-        PUSH R3                                             #     push de
-                                                            #     push hl
-                                                            #     push bc
-                                                            #     push ix
-                                                            #
-                                                            #     LD DE,SprShow_X
-                                                            #     LD HL,SprShow_Y
-                                                            #     or a
-                                                            #     LD A,&80
-                                                            #     ld ixl,&79
-                                                            #
-                                                            #     jr z,DroneFlip_HorizontalMove
-                                                            #
-                                                            #     ld bc,&2FCB
-                                                            #     jp DroneFlip_Apply
-                                                            #     DroneFlip_HorizontalMove:
-                                                            #         ex hl,de
-                                                            #         dec ixl
-                                                            #         inc a
-                                                            #         ld bc,&0000
-                                                            #     DroneFlip_Apply:
-                                                            #     ld (DroneDirPos1_Plus2-2),hl
-                                                            #     ld (DroneDirPos2_Plus1-1),a
-                                                            #     ld (DroneDirPos5_Plus2-2),bc
-                                                            #     ld (DroneDirPos6_Plus2-2),de
-                                                            #     ld a,ixl
-                                                            #     ld (DroneDirPos8_Plus1-1),a
-                                                            #
-                                                            #     pop ix
-                                                            #     pop bc
-                                                            #
-                                                            #     pop hl
-    DroneFlipFinish:                                        # DroneFlipFinish:
-        POP  R3                                             #     pop de
-        RETURN                                              # ret
-                                                            #
+        CMP  R0,$0                         # cp 0 :DroneFlipFireCurrent_Plus1
+        BZE  1$
+        CALL DroneFlipFire                 # call nz,DroneFlipFire
+   1$:                                     #
+        MOVB 15(R4),R0 # fire dir          # ld a,(iy+15)
+# Player_Fire: Fire bullets!
+                                           # push bc
+                                           # push de
+                                           #
+        BISB 12(R4),R0 # player num        # ld d,(iy+12)
+                                           # or d
+        MOV  R0,@$StarObjectMoveToAdd      # ld (StarObjectMoveToAdd_Plus1 - 1),a
+
+        MOVB 6(R4),R0                      # ld a,(iy+6) ;D1 Move the drones in when fire is held
+        DECB R0                            # dec a
+        DECB R0                            # dec a
+        BNZ  Player_Handler_KeyreadJoy1Fire2_DroneLimit # jr nz,Player_Handler_KeyreadJoy1Fire2_DroneLimit
+        INCB R0                            # inc a   ; Drone at Max 'innness'!
+                                           #
+Player_Handler_KeyreadJoy1Fire2_DroneLimit:
+        MOVB R0,6(R4) # D1                 # ld (iy+6),a ;D1
+                                           #
+                                           # pop de
+                                           # pop bc
+        MOVB 2(R4),R0                      # ld a,(iy+2) ;D1
+        BIT  $0x80,R0                      # bit 7,a ; check if player is allowed to fire
+        BZE  1$                            # ret nz
+        RETURN
+    1$:
+        BIS  $0x80,R0                      # or %10000000
+        MOV  R0,2(R4)                      # ld (iy+2),a ;D1
+                                           # push bc
+        CALL Stars_AddToPlayer             #     call Stars_AddToPlayer
+        #  input C = R1 = Y
+        #        D = R2 = X                #     ld d,b
+        # TODO: if use R5 for Player_Array pointer instead of R4
+        # PUSH and POP will become unnecessary
+        PUSH R4                            #     push bc
+        CALL Stars_AddObject               #         call Stars_AddObject
+        POP  R4                            #     pop bc
+      # drone1
+        MOV  @$Player_DroneOffset1,R3      #     ld a,(Player_DroneOffset1_Plus1 - 1)
+        ADD  $4,R3                         #     add 4
+       .equiv DroneFlipFirePos5, .
+        ROR  R3                            #     rrca    :DroneFlipFirePos5_Plus1 ;disable these for X
+                                           #     ld ixh,a
+      # Add extra stars depending on how many drones we have
+        MOVB 4(R4),R0 # number of drones   #     ld a,(iy+4)
+                                           #     or a
+        BZE  Player_NoDrones               #     jr z,Player_NoDrones
+
+        DEC  R0                            #     dec a
+        BZE  Player_OneDrone               #     jr z,Player_OneDrone
+
+        MOV  R3,R0                         #     xor a
+        NEG  R0                            #     sub ixh
+        CALL dodrone                       #     call dodrone
+      # drone2
+Player_OneDrone:
+        MOV  R3,R0                         #     ld a,ixh
+        CALL dodrone                       #     call dodrone
+Player_NoDrones:
+                                           #     pop bc
+                                           # FireSfx:
+        # TODO: implement sound effect     #     ld a,1
+        RETURN                             #     jp SFX_QueueSFX_Generic
+                                           #
+dodrone:
+        # C = R1 = Y                       #  push bc
+        # B = R2 = X                       #  ld d,b
+                                           #
+        # ResetCore sets to add a,c
+       .equiv DroneFlipFirePos3, .         #  add a,d :DroneFlipFirePos3_Plus1
+        ADD  R0,R2                         #
+                                           #  ld d,a  :DroneFlipFirePos2_Plus1;ld c,a ;Flip for X
+        #  input C = R1 = Y
+        #        D = R2 = X
+        # TODO: if use R5 for Player_Array pointer instead of R4
+        # PUSH and POP will become unnecessary
+        PUSH R4
+        CALL Stars_AddObject               #         call Stars_AddObject
+        POP  R4
+       .equiv DroneFlipFirePos2, .
+        SUB  R0,R2
+                                           #     pop bc
+        RETURN                             # ret
+
+DroneFlipFire:
+        MOV  R0,@$cmpDroneFlipFireCurrent
+        BZE  1$
+      # vertical move
+        MOV  $0060002,@$DroneFlipFirePos3 # ADD R0,R2
+        MOV  $0160002,@$DroneFlipFirePos2 # SUB R0,R2
+        MOV  $0006003,@$DroneFlipFirePos5 # R0R R3
+        RETURN
+   1$:# horizontal move
+        MOV  $0060001,@$DroneFlipFirePos3 # ADD R0,R1
+        MOV  $0160001,@$DroneFlipFirePos2 # SUB R0,R1
+        MOV  $0000240,@$DroneFlipFirePos5 # NOP
+        RETURN
+
+DroneFlip:
+        # C = R1 = Y
+        # B = R2 = X
+        MOV  R0,@$cmpDroneFlipFireCurrent
+        BZE  1$
+      # vertical move
+        MOV  $srcSprShow_Y,@$dstDroneDirPos1
+        MOV  $0060200,@$DroneDirPos2    # ADD R2,R0
+        MOV  $0006200,@$DroneDirPos5    # ASR R0
+        MOV  $srcSprShow_X, @$DroneDirPos6
+        MOV  $0010100,@$opcDroneDirPos8 # MOV R1,R0
+        RETURN
+   1$:# horizontal move
+        MOV  $srcSprShow_X,@$dstDroneDirPos1
+        MOV  $0060100,@$DroneDirPos2    # ADD R1,R0
+        MOV  $0000240,@$DroneDirPos5    # NOP
+        MOV  $srcSprShow_Y,@$DroneDirPos6
+        MOV  $0010200,@$opcDroneDirPos8 # MOV R2,R0
+        RETURN
+
 SetFireDir_UP:                                              # SetFireDir_UP:
        #MOV  $0x82,@$srcPlayerThisSprite                    #     push bc
        #MOV  $0x4C,@$srcPlayerThisShot                      #     ld bc,&4C82
@@ -638,9 +625,9 @@ SetFireDir_RIGHT:                                           # SetFireDir_RIGHT:
                                                             #
 SetFireDir_FireAndSaveRestore:                              # SetFireDir_FireAndSaveRestore:
                                                             #     ld a,(iy+8)
-        MOVB 8(R5), @$srcPlayerThisSprite                   #     ld (PlayerThisSprite_Plus1 - 1),a
+        MOVB 8(R4), @$srcPlayerThisSprite                   #     ld (PlayerThisSprite_Plus1 - 1),a
                                                             #
-        MOVB 15(R5),@$srcPlayerThisShot                     #     ld a,(iy+15)
+        MOVB 15(R4),@$srcPlayerThisShot                     #     ld a,(iy+15)
                                                             #     ld (PlayerThisShot_Plus1 - 1),a
                                                             #
 SetFireDir_FireAndSave:                                     # SetFireDir_FireAndSave:
@@ -672,10 +659,10 @@ SetFireDir_Fire:                                            # SetFireDir_Fire:
                                                             #     ldir
                                                             #     ret
                                                             #
-                                                            # ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-                                                            # ;;                               Smart Bomb                                   ;;
-                                                            # ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-                                                            #
+# ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+# ;;                               Smart Bomb                                   ;;
+# ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
                                                             # DoSmartBomb:
                                                             #     push de
                                                             #     push bc
@@ -916,8 +903,8 @@ Player_DrawUI_DrawIcons: # Used for Health and Smartbomb icons
         BZE  1237$
 
         100$:
-            MOVB R1,@$srcSprShow_ScrWord
-            MOV  R2,@$srcSprShow_ScrLine
+            MOVB R2,@$srcSprShow_ScrWord
+            MOV  R1,@$srcSprShow_ScrLine
             PUSH R0
             PUSH R1
             PUSH R2
@@ -927,7 +914,7 @@ Player_DrawUI_DrawIcons: # Used for Health and Smartbomb icons
             POP  R0
 
            .equiv srcPlayer_DrawUI_DrawIcons_IconWidth, .+2
-            ADD  $4,R1
+            ADD  $4,R2
         SOB  R0,100$
 
 1237$:  RETURN
@@ -946,7 +933,6 @@ Player2DoContinue:
 # We put PLus sprite anims here, as they have to be run
 # after the playerhandler and mess up practically ALL registers
 Player_DrawUI:
-#:bpt
 # TwoDronesOnscreen:
         MOV  $Player_Array,R4           # ld iy,Player_Array
         TSTB @$P1_P09                   # ld a,(P1_P09)   ;See how many lives are left
@@ -1013,30 +999,30 @@ Player1Continue:
 Player_DrawUIDual:
         MOV  R0,@$srcPlayer_DrawUI_DrawIcons_IconWidth
 
-        MOV  $8,R2    # Y pos, line
+        MOV  $8,R1    # Y pos, line
         MOVB 9(R4),R0 # Lives, number of icons
         MOV  $7,@$srcSprShow_SprNum
-        PUSH R1
+        PUSH R2
         PUSH R4
         CALL Player_DrawUI_DrawIcons
         POP  R4
-        POP  R1
+        POP  R2
 
-        MOV  $180,R2  # Y pos, line
+        MOV  $180,R1  # Y pos, line
         MOVB 3(R4),R0 # Smart bombs, number of icons
         MOV  $6,@$srcSprShow_SprNum
         JMP  Player_DrawUI_DrawIcons
 
 Player1DrawUI:
         MOV  $4,R0 # icon width, bytes        # ld a,4
-        CLR  R1    # Xpos, word               # ld b,0
+        CLR  R2    # Xpos, word               # ld b,0
         CALL Player_DrawUIDual                # call Player_DrawUIDual
 
                                               # ld a,7
                                               # ld hl,&0003
                                               # ld iy,Player_Array
                                               # ld de,Player_ScoreBytes
-                                              # jr Player_DrawUI_PlusAsWell
+        BR   Player_DrawUI_PlusAsWell         # jr Player_DrawUI_PlusAsWell
 Player2DrawUI:
                                         # ld a,-4
                                         # ld b,80-4
