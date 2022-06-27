@@ -299,7 +299,7 @@ not_implemented_check_R0:
        .global Timer_GetTimer
        .global Timer_UpdateTimer
        .global srcTimer_CurrentTick
-       .global srcTimer_TicksOccured
+       .global Timer_TicksOccured
 
        .include "core/virtual_screen_pos_320.s"
        .global ShowSpriteReconfigureEnableDisable

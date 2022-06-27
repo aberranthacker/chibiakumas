@@ -97,7 +97,7 @@ EventStream_Init:
 
 EventStream_Process:
        .equiv srcEvent_LevelSpeed, .+2 # how often ticks occur
-        BIT  $0x04,@$srcTimer_TicksOccured
+        BIT  $0x04,@$Timer_TicksOccured
         BNZ  EventStream_ForceNow
         RETURN # no ticks occured
 

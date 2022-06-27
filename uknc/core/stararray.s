@@ -3,10 +3,11 @@
 #;*******************************************************************************
 
 Player_StarArray_Redraw:
-        MOV  $0x0003,@$srcStarColor0
-        MOV  $0x000C,@$srcStarColor1
-        MOV  $0x0030,@$srcStarColor2
-        MOV  $0x00C0,@$srcStarColor3
+       .equiv PlayerBulletColor, 0x0003
+        MOV  $PlayerBulletColor,   @$srcStarColor0
+        MOV  $PlayerBulletColor<<2,@$srcStarColor1
+        MOV  $PlayerBulletColor<<4,@$srcStarColor2
+        MOV  $PlayerBulletColor<<6,@$srcStarColor3
         # configure the loop for the player star array
         MOV  $null,R5
         MOV  R5,@$dstCurrentStarArrayCollisionsB2
@@ -17,16 +18,17 @@ Player_StarArray_Redraw:
         BR   Starloop_Start
 
 StarArray_Redraw:
-        TST  @$srcTimer_TicksOccured
+        TST  @$Timer_TicksOccured
         BNZ  1$ # see if game is not paused (TicksOccurred != 0 )
         RETURN
     1$:
         # Redraw the enemy star array
         MOV  $StarArraySize,R1
-        MOV  $0x0303,@$srcStarColor0
-        MOV  $0x0C0C,@$srcStarColor1
-        MOV  $0x3030,@$srcStarColor2
-        MOV  $0xC0C0,@$srcStarColor3
+       .equiv EnemyBulletColor, 0x0303
+        MOV  $EnemyBulletColor,   @$srcStarColor0
+        MOV  $EnemyBulletColor<<2,@$srcStarColor1
+        MOV  $EnemyBulletColor<<4,@$srcStarColor2
+        MOV  $EnemyBulletColor<<6,@$srcStarColor3
 
         #;;;;;;;;;;;;;;;;;;;;; Player 1 handler
         # configure the loop for the enemy star array
@@ -84,7 +86,7 @@ StarArray_Redraw:
        .equiv opcStarSlowdown, .+2
         MOV  $0006200,R3 # ASR  R0
        .equiv srcSlowdownFreq, .+2
-        BIT  $0b10,@$srcTimer_TicksOccured
+        BIT  $0b10,@$Timer_TicksOccured
         BZE  Starloop_Start2
 
 Starloop_Start:
