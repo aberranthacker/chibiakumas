@@ -60,13 +60,13 @@ PlayerHandler:
 
 PlayerCounter:
         INC  R0 # or NOP if player 1 is dead # inc a
-        INC  R0 # or NOP if player 2 is dead # inc a
+       #INC  R0 # or NOP if player 2 is dead # inc a
         MOVB R0,@$LivePlayers           #     ld (LivePlayers),a
                                         #     or a
         BZE  PlayersDead                #     jr z, Players_Dead
 
         MOV  $000240,@$PlayerCounter    #     ld hl,&0000     ;nop,nop
-        MOV  $000240,@$PlayerCounter+2  #     ld (PlayerCounter),hl
+       #MOV  $000240,@$PlayerCounter+2  #     ld (PlayerCounter),hl
                                         #     call KeyboardScanner_Read
                                         #     ; returns
                                         #     ; ixl = Keypress bitmap Player
@@ -146,7 +146,7 @@ Player_HandlerOne:                      # Player_HandlerOne:
 1237$:  RETURN                          # ret
 
 Player_Handler_PauseCheckDone:          # Player_Handler_PauseCheckDone:
-        MOV  @$srcTimer_TicksOccured,R0 #     ld hl,Timer_TicksOccured
+        MOV  @$Timer_TicksOccured,R0 #     ld hl,Timer_TicksOccured
                                         #     ld a,(hl)
                                         #     or a
         BZE  1237$                      #     ret z ;abort handler if game paused
@@ -342,7 +342,7 @@ Player_Handler_NoDrones:
         TSTB 7(R5) # invincibility
         BZE  Player_NotInvincible
 
-        MOV  @$srcTimer_TicksOccured,R0
+        MOV  @$Timer_TicksOccured,R0
         BIT  $0b0010,R0
         BZE  Player_NotInvincible # invincible flash
 

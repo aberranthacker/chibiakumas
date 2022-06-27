@@ -65,7 +65,7 @@ Background_NewLine:                             #     di
                                                 #     ld a,(Timer_TicksOccured_Plus1-1)
         # Scroll rate for 'ground'              #     ld e,a
        .equiv srcScrollPosRate1, .+2            #     ld a,%11111111  :ScrollPosRate1_Plus1
-        BIT  $0xFF,@$srcTimer_TicksOccured      #     and e
+        BIT  $0xFF,@$Timer_TicksOccured      #     and e
         BZE  Background_NoShift                 #     jp nz,Background_ShiftNow :Background_ShiftJumpA_Plus2 #
 
        .equiv jmpBackground_ShiftJumpA, .+2     #

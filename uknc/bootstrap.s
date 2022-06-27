@@ -374,7 +374,7 @@ ResetCore: # ../Aku/BootStrap.asm:2318
         MOV  R0,@$srcEventObjectAnimatorToAdd
         MOV  R0,@$srcEventObjectSpriteSizeToAdd
         MOV  R0,@$srcEventObjectProgramToAdd
-        MOV  R0,@$srcTimer_TicksOccured
+        MOV  R0,@$Timer_TicksOccured
         # R0 has to contain zero to tell the subroutine to init
         CALL DroneFlipFire # TODO: implement this; does nothing for now
 
@@ -493,7 +493,7 @@ loading_screen.bin:
     .word loading_screen_block_num
 core.bin:
     .word GameVarsEnd
-    .equiv core_size, 6716
+    .equiv core_size, 6788
     .word core_size >> 1
     .equiv core_block_num, (loading_screen_size + 511) >> 9 + loading_screen_block_num
     .word core_block_num
