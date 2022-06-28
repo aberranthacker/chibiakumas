@@ -88,7 +88,7 @@
     .endif
 
     .ifndef ExtMemCore
-.equiv Akuyou_LevelStart, 0x9FE0 # 40928 0117740 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9F3E # 40766 0117476 # auto-generated during a build
     .else
 .equiv Akuyou_LevelStart, GameVarsEnd
     .endif
@@ -156,6 +156,7 @@
 .equiv White,     0xFF
 
 .equiv untilLine, -1 << 8
+.equiv untilEndOfScreen, 201
 .equiv endOfScreen, 201
 #-------------------------------------------------------------------------------
 # Platform Specific Core commands

@@ -88,6 +88,7 @@ Stars_AddBurst_BottomWide:
     .word 0x3533
     .word 0x3D3B
     .word 0
+# patterns above take 146 bytes of RAM
 
 Stars_AddToPlayer: # used by player_driver.s
         CLR  @$srcStarArrayFullMarker
