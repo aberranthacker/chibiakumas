@@ -12,7 +12,11 @@
 # evtMultipleCommands equ %01110000 ;+V  ;Multiple commands, V commands will follow
 .equiv evtMultipleCommands, 0x0E << 8 # (0b01110000 >> 4) * 2 = 14
 #-------------------------------------------------------------------------------
-#.equiv evtMove, 0x10 << 8 # 128 >> 4 * 2 = 16
+# 10011111 B = Save to bank B
+# 1001XXXX Load object settings (Prog, Move, Life, Spritesize, Animator,
+# BG/FG layer) from XXXX bank (0-14 - see above 15 is save command)
+.equiv evtSaveObjSettings,  (0x09 * 2) << 8 # 18
+.equiv evtLoadObjSettings,  (0x0A * 2) << 8 # 20
 
 # evtSetMoveLife     equ 128+0 ; Set Move to b1, Set Life to b2
 .equiv evtSetMoveLife,      (0x10 * 2) << 8 # 30
@@ -136,12 +140,6 @@
 #      10001000 L H T = (136) Load HL as next event pointer, change time to T
 #      10001001 L H   = (137) Call HL
 #      10001010 L H   = (138) Load last added object address to address HL
-
-# 10011111 B = Save to bank B
-# 1001XXXX Load object settings (Prog, Move, Life, Spritesize, Animator,
-# BG/FG layer) from XXXX bank (0-14 - see above 15 is save command)
-.equiv evtSaveObjSettings, (0x09 * 2) << 8 # 18
-.equiv evtLoadObjSettings, (0x0A * 2) << 8 # 20
 
 # Use this function to create template enemy moves and background object types
 # 1010       Unused

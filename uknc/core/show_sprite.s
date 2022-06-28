@@ -304,7 +304,7 @@ SprDrawLn_LineLoop:
         MOV  $0x00,R1
         ASR  R1
 
-   .if DebugMode
+   .ifdef DebugMode
         BNZ  1$
        .inform_and_hang "SprDrawLn line to draw is 0"
     1$:
@@ -367,26 +367,22 @@ SprDraw_TurboRenderer: # Pick the render based on width
     .endif
 
     SprDraw_TurboRenderer_Jump:
-        JMP  @SprDraw_TurboRenderer_JumpTable(R1)
+        JMP  @SprDraw_TurboRenderer_JumpTable-2(R1)
 
     SprDraw_TurboRenderer_JumpTable:
-       .word SprDraw_TurboRenderer_0px      #  0
        .word SprDraw_TurboRenderer_8pxInit  #  2
        .word SprDraw_TurboRenderer_16pxInit #  4
        .word SprDraw_TurboRenderer_24pxInit #  6
        .word SprDraw_TurboRenderer_32pxInit #  8
        .word SprDraw_TurboRenderer_40pxInit # 10
        .word SprDraw_TurboRenderer_48pxInit # 12
-       .word SprDraw_BasicRenderer   # 14 56
-       .word SprDraw_BasicRenderer   # 16 64
+       .word SprDraw_BasicRenderer          # 14 56
+       .word SprDraw_BasicRenderer          # 16 64
        .word SprDraw_TurboRenderer_72pxInit # 18
-       .word SprDraw_BasicRenderer   # 20 80
-       .word SprDraw_BasicRenderer   # 22 88
+       .word SprDraw_BasicRenderer          # 20 80
+       .word SprDraw_BasicRenderer          # 22 88
        .word SprDraw_TurboRenderer_96pxInit # 24
 
-    SprDraw_TurboRenderer_0px:
-        RETURN
-       .inform_and_hang "no SprDraw0px"
     SprDraw_TurboRenderer_8pxInit:
         MOV  $80-2,R1
         MOV  $SprDraw_TurboRenderer_8px,R3
@@ -482,9 +478,8 @@ SprDraw_PsetRenderer:
     .endif
 
     SprDraw_PsetRendererJump:
-        JMP  @SprDraw_PsetRendererJumpTable(R1)
+        JMP  @SprDraw_PsetRendererJumpTable-2(R1)
     SprDraw_PsetRendererJumpTable: #--------------------------------------------------{{{
-       .word SprDraw_PsetRenderer0Px        #  0
        .word SprDraw_PsetRenderer8pxInit   #  2
        .word SprDraw_PsetRenderer16pxInit  #  4
        .word SprDraw_PsetRenderer24pxInit  #  6
@@ -502,9 +497,6 @@ SprDraw_PsetRenderer:
        .word SprDraw_BasicRenderer         # 30 120
        .word SprDraw_PsetRenderer128pxInit # 32
     #------------------------------------------------------------------------}}}
-
-    SprDraw_PsetRenderer0Px:
-       .inform_and_hang "no SprDraw_PsetRenderer0Px"
 
     SprDraw_PsetRenderer8pxInit: #---------------------------------------------------{{{
         MOV  $80-2,R1

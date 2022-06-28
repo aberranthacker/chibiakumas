@@ -147,7 +147,6 @@ Objectloop_TwoFrameSprite:
         BIC  $0177775,R0                                  #         and %00000010
 
 Objectloop_SpriteBankSet:
-      #
       # Life BPxxxxx
       # B=hurt by bullets,
       # P=hurts player,
@@ -217,9 +216,9 @@ ObjectLoopP1Skip:
        #                                                    #
        #                                                    # ObjectLoopP2Skip:
 ObjectLoopBothPlayerSkip:                                   # ObjectLoopBothPlayerSkip:
-# when the object is dead, there is no point checking if its shot
-# Life BPxxxxx B=hurt by bullets, P=hurts player,
-#        xxxxx = hit points (if not B then ages over time)
+      # when the object is dead, there is no point checking if its shot
+      # Life BPxxxxx B=hurt by bullets, P=hurts player,
+      #        xxxxx = hit points (if not B then ages over time)
         TSTB R3                                  # ld a,ixl
                                                  # or a
         BZE  ObjectLoop_NotShot                  # jr z,ObjectLoopP1StarSkip ; immortal object (background)
@@ -236,7 +235,6 @@ ObjectLoopBothPlayerSkip:                                   # ObjectLoopBothPlay
         BZE  ObjectLoop_SaveChanges              # jr z,ObjectLoop_SaveChanges
 ObjectLoop_Ageless:
                                                  # ld a,ixl
-# ObjectLoop_AgelessB:
         BIT  $0x80,R3                            # bit 7,a
         BZE  ObjectLoop_NotShot                  # jr z,ObjectLoop_NotShot ; cant be shot
 ObjectLoop_AgelessIXLCheck:
@@ -276,24 +274,24 @@ ObjectLoop_AgelessIXLCheck:
        .equiv ObjectHitYB, .+2
         CMPB R0,$0x00                               # cp 00 :ObjectHitYB_Plus1
         BHIS ObjectLoop_PlayerStarSkip              # jr nc,ObjectLoop_PlayerStarSkip
-                                                    #
                                                     # inc h
         MOVB (R5),R0                                # ld a,(hl)
        .equiv ObjectHitXA, .+2                      # dec h
         CMPB R0,$0x00                               # cp 00 :ObjectHitXA_Plus1
         BLO  ObjectLoop_PlayerStarSkip              # jr c,ObjectLoop_PlayerStarSkip
+
        .equiv ObjectHitXB, .+2
         CMPB R0,$0x00                               # cp 00 :ObjectHitXB_Plus1
         BHIS ObjectLoop_PlayerStarSkip              # jr nc,ObjectLoop_PlayerStarSkip
-                                                    #
                                                     # inc h
         INC  R5                                     # inc h
         MOVB (R5),R0                                # ld a,(hl)
-        BIC  $0xFF7F,R0                             # and %10000000   ; CHeck if this is player 1's bullet or not
-                                                    # dec h
-                                                    # dec h
-        INC  R0                                     # inc a
-        MOV  R0,@$ObjectShotShooter                 # ld (ObjectShotShooter_Plus1 - 1),a
+        # TODO: uncomment for two players
+       #BIC  $0xFF7F,R0                             # and %10000000   ; CHeck if this is player 1's bullet or not
+       #                                            # dec h
+       #                                            # dec h
+       #INC  R0                                     # inc a
+       #MOV  R0,@$ObjectShotShooter                 # ld (ObjectShotShooter_Plus1 - 1),a
                                                     # xor a
         CLRB @$ObjectLoop_IFShot # BR .+2           # ld (ObjectLoop_IFShot_Plus1 - 1),a
         DEC  R5
@@ -325,10 +323,11 @@ ObjectLoop_SaveChanges:
         MOV  R2,-(R5) # R2 LSB ixh = Move, R2 MSB iyh = Sprite
         MOVB R4,-(R5) # R4 b = X
         MOVB R1,-(R5) # R1 c = Y
-                                      # ld a,iyl
-        # заменить на CLRB R3, SWAB R3
-        BIC  $0x00FF,R3               # or a
+
+        CLRB R3                       # ld a,iyl
+        SWAB R3                       # or a
         BZE  ObjectLoop_ShowSprite    # call nz, ObjectProgram
+
         CALL ObjectProgram            #
 ObjectLoop_ShowSprite:
                                       # ld b,Akuyou_LevelStart_Bank;&C0
@@ -557,7 +556,8 @@ ObjectAnimator:                         # ObjectAnimator:
                                         # ret
 # ObjectAnimator end --------------------------------------------------------}}}
 ObjectProgram:
-        SWAB R3 # MSB=Program, LSB=0        # ret z       ; return if zero
+                                            # ret z       ; return if zero
+      # R3 R3 LSB iyl = Program code, MSB ixl = 0
         MOV  R3,R0
         CMP  R0,$0b00000001                 # cp %00000001
         BNE  1$                             # ; Used by background, sprite bank based on X co-ord
@@ -718,52 +718,52 @@ ObjectProgram_HyperFire:
                                            #     jr Object_DecreaseShot_Start
 Object_DecreaseLifeShot: #------------------------------------------------------
       # R3 LSB ixl = Life, R3 MSB iyl = Program Code
-        MOV  R3,R0                         #     ld a,ixl
-        BIC  $0xFFC0,R0                    #     and %00111111
-        BZE  1237$                         #     ret z   ; if life is zero drop out (For custom hit code callback)
-        PUSH R5                            #     push bc
-                                           #     push IY
-                                           #         ;see if player has POWERSHOT!
-                                           #         ;Uhh, this was soo much easier before 2 player support!
-                                           #         ld b,a
-       .equiv ObjectShotShooter, .+2
-                                           #         ld a,0:ObjectShotShooter_Plus1  ;1=Player 1, 129 = player 2
-                                           #         dec a
-                                           #         jr nz,Object_DecreaseShot_Player2
-        MOV  $Player_Array,R5              #         ld iy,Player_Array
+        MOV  R3,R0                         # ld a,ixl
+        BIC  $0xFFC0,R0 # MM = life mode, LLLLLL = life qty # and %00111111
+        BZE  1237$                         # ret z ; if life is zero drop out (For custom hit code callback)
+        PUSH R5                            # push bc
+                                           # push IY
+      # see if player has POWERSHOT!
+      # Uhh, this was soo much easier before 2 player support!
+                                           # ld b,a
+      #.equiv ObjectShotShooter, .+2
+                                           # ld a,0:ObjectShotShooter_Plus1  ;1=Player 1, 129 = player 2
+                                           # dec a
+                                           # jr nz,Object_DecreaseShot_Player2
+        MOV  $Player_Array,R5              # ld iy,Player_Array
 Object_DecreaseShot_Start:
-                                           #         ld a,(IY+14)
-                                           #         or a
-        TSTB 14(R5)                        #         ld a,b
-        BZE  Object_DecreaseShot_OnlyOne   #         jp z,Object_DecreaseShot_OnlyOne
-        DEC  R0                            #         dec a
-        BZE  Object_DecreaseShotToDeath    #         jr z, Object_DecreaseShotToDeath
+                                           # ld a,(IY+14)
+                                           # or a
+        TSTB 14(R5)                        # ld a,b
+        BZE  Object_DecreaseShot_OnlyOne   # jp z,Object_DecreaseShot_OnlyOne
+        DEC  R0                            # dec a
+        BZE  Object_DecreaseShotToDeath    # jr z, Object_DecreaseShotToDeath
 Object_DecreaseShot_OnlyOne:
-        POP  R5                            #     pop IY
-                                           #     pop bc
-        DEC  R0                            #     dec a
-        BNZ  Object_DecreaseLife_AgeUpdate #     jr nz,Object_DecreaseLife_AgeUpdate
+        POP  R5                            # pop IY
+                                           # pop bc
+        DEC  R0                            # dec a
+        BNZ  Object_DecreaseLife_AgeUpdate # jr nz,Object_DecreaseLife_AgeUpdate
                                            #
-        BR   Object_DecreaseShotToDeathB   #     jr Object_DecreaseShotToDeathB
+        BR   Object_DecreaseShotToDeathB   # jr Object_DecreaseShotToDeathB
 Object_DecreaseShotToDeath:
-        POP  R5                            #     pop IY
-                                           #     pop bc
+        POP  R5                            # pop IY
+                                           # pop bc
 Object_DecreaseShotToDeathB:
-                                           #     ;object has been shot to death
-       .equiv  dstCustomShotToDeathCall, .+2
-        CALL @$null                        #     call null :CustomShotToDeathCall_Plus2
+      # object has been shot to death
+       .equiv dstCustomShotToDeathCall, .+2
+        CALL @$null                        # call null :CustomShotToDeathCall_Plus2
                                            #
-                                           #     xor a
-        BIC  $0xFF00,(R5)                  #     ld (hl),a ;Clear object animator
+                                           # xor a
+        BIC  $0xFF00,(R5)                  # ld (hl),a ;Clear object animator
                                            #
-        # TODO: implement sfx              #     ld a,3
-                                           #     call SFX_QueueSFX_Generic
+        # TODO: implement sfx              # ld a,3
+                                           # call SFX_QueueSFX_Generic
                                            #
       # create a coin
         CLRB R2
        .equiv srcPointsSpriteC, .+2
       # R2 LSB ixh = Sprite, R2 MSB iyh = Move
-        BISB (PC)+,R2                      
+        BISB (PC)+,R2
        .byte 128+16     # ld iyh,128+16 :PointsSpriteC_Plus1  ; Sprite
        .byte 0b10000111 # ld ixh,%10000111 ; Seaker Fast 1000001XX XX=Speed
 
@@ -779,29 +779,19 @@ Object_DecreaseShotToDeath_Player1:
 1237$:  RETURN
 #-------------------------------------------------------------------------------
 Object_DecreaseLife:
-      # B   = R1 LSB = X
-      # C   = R1 MSB = Y
-      # IXL = R3 LSB = Life
-      # IXH = R3 MSB = Move
-        MOVB R3,R0                         # ld a,ixl
-        BIC  $0xFFC0,R0                    # and %00111111
-        DEC  R0                            # dec a
-        BNZ  Object_DecreaseLife_AgeUpdate # jr nz,Object_DecreaseLife_AgeUpdate
+      # R1 LSB b = X, R1 MSB c = Y
+      # R3 LSB ixl = Life, R3 MSB iyl = Program Code
+        MOVB R3,R0
+        BIC  $0xFFC0,R0 # 0b00111111
+        DEC  R0
+        BNZ  Object_DecreaseLife_AgeUpdate
       # object has died of old age
-        CLR  R1                            # ld b,0
-                                           # ld C,b
-        CLRB R3                            # ld ixl,b
-                                           #
-        RETURN                             # ret
+        CLR  R1
+        CLRB R3
+        RETURN
 
 Object_DecreaseLife_AgeUpdate:
-                      # di
-                      # exx
-                      # ld d,a
-                      # ld a,ixl
-        BICB $0x3F,R3 # and %11000000 ; Keep the 1st 2 bytes, format is ;MMLLLLLL
-        BISB R0,R3    # or d          ; MM = life mode, LLLLLL = life qty
-                      # exx
-                      # ei
-                      # ld ixl,a
-        RETURN        # ret
+      # R3 LSB ixl = Life, R3 MSB iyl = Program Code
+        BICB $0x3F,R3 # Keep the 1st 2 bytes, format is ;MMLLLLLL
+        BISB R0,R3    # MM = life mode, LLLLLL = life qty
+        RETURN
