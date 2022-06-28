@@ -752,18 +752,15 @@ Object_DecreaseShotToDeathB:
       # object has been shot to death
        .equiv dstCustomShotToDeathCall, .+2
         CALL @$null                        # call null :CustomShotToDeathCall_Plus2
-                                           #
                                            # xor a
         BIC  $0xFF00,(R5)                  # ld (hl),a ;Clear object animator
                                            #
         # TODO: implement sfx              # ld a,3
                                            # call SFX_QueueSFX_Generic
-                                           #
       # create a coin
-        CLRB R2
        .equiv srcPointsSpriteC, .+2
       # R2 LSB ixh = Sprite, R2 MSB iyh = Move
-        BISB (PC)+,R2
+        MOV (PC)+,R2
        .byte 128+16     # ld iyh,128+16 :PointsSpriteC_Plus1  ; Sprite
        .byte 0b10000111 # ld ixh,%10000111 ; Seaker Fast 1000001XX XX=Speed
 
