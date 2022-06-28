@@ -147,6 +147,11 @@ Objectloop_TwoFrameSprite:
         BIC  $0177775,R0                                  #         and %00000010
 
 Objectloop_SpriteBankSet:
+      # R1 LSB b = X, R1 MSB c = Y
+      # R2 LSB ixh = Sprite, R2 MSB iyh = Move
+      # R3 LSB ixl = Life, R3 MSB iyl = Program Code
+      # R4 LSB = Animator, R4 MSB = Sprite size
+
       # Life BPxxxxx
       # B=hurt by bullets,
       # P=hurts player,
@@ -242,7 +247,7 @@ ObjectLoop_AgelessIXLCheck:
       # R1 LSB b = X, R1 MSB c = Y
                                                             # push bc
         PUSH R1                                             # push de
-        PUSH R5                                             # push hl
+                                                            # push hl
         MOVB R1,R0                                          # ld a,b
         MOVB R0,@$ObjectHitXA                               # ld (ObjectHitXA_Plus1 - 1),a
        .equiv srcSpriteSizeShiftHalfH, .+2
@@ -257,16 +262,16 @@ ObjectLoop_AgelessIXLCheck:
                                                             #
 # ObjectLoop_HeightNZ:
         MOV  $PlayerStarArraySize,R1    # ld b ,PlayerStarArraySize    ;36 StarArraySize_PlayerB_Plus1
-        MOV  $PlayerStarArrayPointer,R5 # ld hl,PlayerStarArrayPointer ;&0000 StarArrayMemloc_Player_Plus2
+        MOV  $PlayerStarArrayPointer,R4 # ld hl,PlayerStarArrayPointer ;&0000 StarArrayMemloc_Player_Plus2
 
         ObjectLoop_PlayerStarNext:
-            MOVB (R5)+,R0
+            MOVB (R4)+,R0
            .equiv ObjectHitYA, .+2                  # ld a,(hl)   ;check Y of star
             CMPB R0,$0x00                           # cp 00 :ObjectHitYA_Plus1
             BHIS ObjectLoop_PlayerStarScanContinue  # jr nc,ObjectLoop_PlayerStarScanContinue
         ObjectLoop_PlayerStarSkip:
-            INC  R5                                 # inc l
-            INC  R5
+            INC  R4                                 # inc l
+            INC  R4
         SOB  R1,ObjectLoop_PlayerStarNext           # djnz ObjectLoop_PlayerStarNext
         BR   ObjectLoop_PlayerStarEnd               # jr ObjectLoop_PlayerStarEnd
                                                     #
@@ -275,7 +280,7 @@ ObjectLoop_AgelessIXLCheck:
         CMPB R0,$0x00                               # cp 00 :ObjectHitYB_Plus1
         BHIS ObjectLoop_PlayerStarSkip              # jr nc,ObjectLoop_PlayerStarSkip
                                                     # inc h
-        MOVB (R5),R0                                # ld a,(hl)
+        MOVB (R4),R0                                # ld a,(hl)
        .equiv ObjectHitXA, .+2                      # dec h
         CMPB R0,$0x00                               # cp 00 :ObjectHitXA_Plus1
         BLO  ObjectLoop_PlayerStarSkip              # jr c,ObjectLoop_PlayerStarSkip
@@ -284,8 +289,8 @@ ObjectLoop_AgelessIXLCheck:
         CMPB R0,$0x00                               # cp 00 :ObjectHitXB_Plus1
         BHIS ObjectLoop_PlayerStarSkip              # jr nc,ObjectLoop_PlayerStarSkip
                                                     # inc h
-        INC  R5                                     # inc h
-        MOVB (R5),R0                                # ld a,(hl)
+        INC  R4                                     # inc h
+        MOVB (R4),R0                                # ld a,(hl)
         # TODO: uncomment for two players
        #BIC  $0xFF7F,R0                             # and %10000000   ; CHeck if this is player 1's bullet or not
        #                                            # dec h
@@ -294,11 +299,11 @@ ObjectLoop_AgelessIXLCheck:
        #MOV  R0,@$ObjectShotShooter                 # ld (ObjectShotShooter_Plus1 - 1),a
                                                     # xor a
         CLRB @$ObjectLoop_IFShot # BR .+2           # ld (ObjectLoop_IFShot_Plus1 - 1),a
-        DEC  R5
-        CLRB -(R5)                                  # ld (hl),0 ; star hit so lets remove it
+        DEC  R4
+        CLRB -(R4)                                  # ld (hl),0 ; star hit so lets remove it
 
     ObjectLoop_PlayerStarEnd:
-        POP  R5                                     # pop hl
+                                                    # pop hl
         POP  R1                                     # pop de
                                                     # pop bc
 
@@ -557,20 +562,34 @@ ObjectAnimator:                         # ObjectAnimator:
 # ObjectAnimator end --------------------------------------------------------}}}
 ObjectProgram:
                                             # ret z       ; return if zero
-      # R3 R3 LSB iyl = Program code, MSB ixl = 0
+      # R3 R3 LSB iyl = Program code, MSB = 0, ixl = Life
         MOV  R3,R0
         CMP  R0,$0b00000001                 # cp %00000001
         BNE  1$                             # ; Used by background, sprite bank based on X co-ord
         JMP  @$ObjectProgram_BitShiftSprite # jp z,ObjectProgram_BitShiftSprite
     1$:
-        BIC  $0b00000111,R0                 # and %11111000           ;00000XXX = Powerup
+        BIC  $0b00000111,R0                 # and %11111000 ;00000XXX = Powerup
         BZE  ObjectProgram_PowerUps         # jr z,ObjectProgram_PowerUps
                                             # 01101011
-                                            # cp %11110000            ;11110XXX = Animate every X frames
-                                            # jp z,ObjectProgram_FrameAnimate
+        CMP  $0b11110000,R0                 # cp %11110000  ;11110XXX = Animate every X frames
+       #BZE  ObjectProgram_FrameAnimate     # jp z,ObjectProgram_FrameAnimate
         BIC  $0b00011111,R0                 # and %11100000
         BZE  ObjectProgram_PowerUps         # jr z,ObjectProgram_PowerUps ;0001XXXX = Smartbombable Powerup
-                                            #
+
+      # # 12 words
+      # ASR  R0
+      # ASR  R0
+      # ASR  R0
+      # ASR  R0
+      # JMP  @ProgramFireJumpTable-2(R0)
+      #.word ObjectProgram_FastFire
+      #.word ObjectProgram_MidFire
+      #.word ObjectProgram_SlowFire
+      #.word ObjectProgram_SnailFire
+      #.word ObjectProgram_HyperFire
+      #.word ObjectProgram_AboveMidFire
+
+        # 18 words
         CMP  R0,$0b001 << 5                 # cp %00100000            ;001XXXXX = fast fire
         BEQ  ObjectProgram_FastFire         # jp z,ObjectProgram_FastFire
         CMP  R0,$0b010 << 5                 # cp %01000000            ;010XXXXX = medium fire
@@ -579,11 +598,11 @@ ObjectProgram:
         BEQ  ObjectProgram_SlowFire         # jp z,ObjectProgram_SlowFire
         CMP  R0,$0b100 << 5                 # cp %10000000            ;100XXXXX = Fastfire
         BEQ  ObjectProgram_SnailFire        # jp z,ObjectProgram_SnailFire
-                                            # cp %11000000            ;110XXXXX = Fastfire
-       .inform_and_hang "ObjectProgram not implemented"
-                                            # jp z,ObjectProgram_Mid2Fire
-                                            # cp %10100000            ;110XXXXX = Fastfire
-                                            # jp z,ObjectProgram_HyperFire
+        CMP  R0,$0b110 << 5                 # cp %11000000            ;110XXXXX = Mid2Fire
+        BEQ  ObjectProgram_AboveMidFire     # jp z,ObjectProgram_AboveMidFire
+        CMP  R0,$0b101 << 5                 # cp %10100000            ;101XXXXX = Fastfire
+        BEQ  ObjectProgram_HyperFire        # jp z,ObjectProgram_HyperFire
+       .inform_and_hang "no ObjProg"
                                             # ld a,iyl
                                             # cp %11111100            ;Custom 1
                                             # jr z,ObjectProgram_Custom1
@@ -678,7 +697,7 @@ ObjectProgram_MidFire:
        .equiv  srcFireFrequencyC, .+2
         MOV  $0b00001000,R0     # ld a,%00001000  :FireFrequencyC_Plus1
         BR   ObjectProgram_Fire # jr ObjectProgram_Fire
-ObjectProgram_Mid2Fire:
+ObjectProgram_AboveMidFire:
        .equiv  srcFireFrequencyD, .+2
         MOV  $0b00000100,R0     # ld a,%00000100; :FireFrequencyD_Plus1
         BR   ObjectProgram_Fire # jr ObjectProgram_Fire
@@ -721,7 +740,7 @@ Object_DecreaseLifeShot: #------------------------------------------------------
         MOV  R3,R0                         # ld a,ixl
         BIC  $0xFFC0,R0 # MM = life mode, LLLLLL = life qty # and %00111111
         BZE  1237$                         # ret z ; if life is zero drop out (For custom hit code callback)
-        PUSH R5                            # push bc
+                                           # push bc
                                            # push IY
       # see if player has POWERSHOT!
       # Uhh, this was soo much easier before 2 player support!
@@ -730,23 +749,23 @@ Object_DecreaseLifeShot: #------------------------------------------------------
                                            # ld a,0:ObjectShotShooter_Plus1  ;1=Player 1, 129 = player 2
                                            # dec a
                                            # jr nz,Object_DecreaseShot_Player2
-        MOV  $Player_Array,R5              # ld iy,Player_Array
+        MOV  $Player_Array,R4              # ld iy,Player_Array
 Object_DecreaseShot_Start:
                                            # ld a,(IY+14)
                                            # or a
-        TSTB 14(R5)                        # ld a,b
+        TSTB 14(R4)                        # ld a,b
         BZE  Object_DecreaseShot_OnlyOne   # jp z,Object_DecreaseShot_OnlyOne
         DEC  R0                            # dec a
         BZE  Object_DecreaseShotToDeath    # jr z, Object_DecreaseShotToDeath
 Object_DecreaseShot_OnlyOne:
-        POP  R5                            # pop IY
+                                           # pop IY
                                            # pop bc
         DEC  R0                            # dec a
         BNZ  Object_DecreaseLife_AgeUpdate # jr nz,Object_DecreaseLife_AgeUpdate
                                            #
         BR   Object_DecreaseShotToDeathB   # jr Object_DecreaseShotToDeathB
 Object_DecreaseShotToDeath:
-        POP  R5                            # pop IY
+                                           # pop IY
                                            # pop bc
 Object_DecreaseShotToDeathB:
       # object has been shot to death
