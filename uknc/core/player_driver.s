@@ -159,19 +159,18 @@ Player_Handler_PauseCheckDone:          # Player_Handler_PauseCheckDone:
                                         #
         CLRB 2(R5)                      #     ld (iy+2),0
 
-        # Move the drones depending if the player is shooting
+      # Move the drones depending if the player is shooting
 Player_Handler_Start:                   # Player_Handler_Start:
-        CLR  R0
-        BISB 6(R5),R0                   #     ld a,(iy+6) ;D1
+        MOVB 6(R5),R0                   #     ld a,(iy+6) ;D1
        #INC  R0                         #     inc a
-        CMP  R0,$15                     #     cp 16
+        CMPB R0,$15                     #     cp 16
         BHIS Player_Handler_DronePosOk  #     jr c,Player_Handler_DronePosOk
        #DEC  R0                         #     dec a
-        INC  R0
+        INCB R0
 Player_Handler_DronePosOk:              # Player_Handler_DronePosOk:
         MOVB R0,6(R5) # D1 - shots and drones
-        ADD  R0,R0
-        MOV  R0,@$Player_DroneOffset1
+        ASLB R0
+        MOVB R0,@$Player_DroneOffset1
 
         MOV  (R5),R2
         CLR  R1
@@ -317,6 +316,7 @@ Player_Handler_Frame1:
 
         PUSH R1
         PUSH R2
+        PUSH R3
         PUSH R5
         BITB $0b10,4(R5)
         BZE  Player_Handler_OneDrone
@@ -329,9 +329,10 @@ Player_Handler_Frame1:
 
 Player_Handler_OneDrone:
         MOV  @$Player_DroneOffset1,R0
-        CALL SetDronePos
+        CALL @$SetDronePos
         CALL @$ShowSprite
         POP  R5
+        POP  R3
         POP  R2
         POP  R1
 
@@ -687,91 +688,92 @@ SetFireDir_Fire:
 
 #-------------------------------------------------------------------------------
 Player_Hit: #-------------------------------------------------------------------
-                                        # ld (PlayerHitMempointer_Plus2-2),hl
-                                        #
-                                        # ld a,iyl
-                                        # cp 16+2
+      # R0 use at will
+      # R1 LSB b = X, R1 MSB c = Y
+      # R2 LSB ixh = Sprite, R2 MSB iyh = Move
+      # R3 LSB ixl = Life, R3 MSB iyl = Program Code
+      # R4 use at will
+      # R5 points to Player_Array
+                                        # ld (PlayerHitMempointer_Plus2 - 2),hl
+        MOV  R3,R0                      # ld a,iyl
+        SWAB R0
+        CMPB R0,$16+2                   # cp 16+2
         BNZ  1$
        .equiv  dstCustomPlayerHitter, .+2
         CALL @$null                     # call z,null :customPlayerHitter_Plus2
     1$:
-                                        # cp 3
-                                        # jp nz,Player_Hit_Injure
+        CMPB R0,$3                      # cp 3
+        BNZ  Player_Hit_Injure          # jp nz,Player_Hit_Injure
                                         #
-                                        # ; if we got here we hit a powerup
-                                        # ld b,0  ; remove the powerup
+      # we hit a powerup if we got here
+        CLR  R1                         # ld b,0  ; remove the powerup
                                         # ld c,b
                                         # ld d,b
                                         # ld a,iyh
-      .equiv cmpDroneSprite, .+2
-       CMP  R0, $128+38                 # cp 128+38   :DroneSprite_Plus1
-                                        # jr z,Player_Hit_PowerupDrone
-      .equiv cmpShootSpeedSprite, .+2
-       CMP  R0, $128+39                 # cp 128+39   :ShootSpeedSprite_Plus1
-                                        # jr z,Player_Hit_PowerupShootSpeed
-      .equiv cmpShootPowerSprite, .+2
-       CMP  R0, $128+40                 # cp 128+40   :ShootPowerSprite_Plus1
-                                        # jr z,Player_Hit_PowerupShootPower
-      .equiv cmpPointsSprite, .+2
-       CMP  R0, $128+16                 # cp 128+16   :PointsSprite_Plus1
-                                        # jr z,Player_Hit_Points
-       RETURN                           # ret
-                                        #
-                                        # Player_Hit_Points:
-                                        #         ld a,6
-                                        #         call SFX_QueueSFX_GenericHighPri
-                                        #
-                                        #         ; Object is Points for player
-                                        #         push bc
-                                        #             ld bc,13
-                                        #             add hl,bc
-                                        #             ld a,(hl)
-                                        #             add 5
-                                        #             ld (hl),a
-                                        #         pop bc
-                                        #
-                                        #         ret
-                                        #
-                                        # Player_Hit_PowerupShootSpeed:
-                                        #         push iy
-                                        #             ld iy,(PlayerHitMempointer_Plus2-2)
-                                        #             ld a,(iy+11)
-                                        #
-                                        #             srl a
-                                        #             or a
-                                        #             jr nz,Player_Hit_PowerupShootSpeedNZ
-                                        #                 inc a ;dont let a=0
-                                        # Player_Hit_PowerupShootSpeedNZ:
-                                        #             ld (iy+11),a
-                                        #
-                                        #         pop iy
-                                        #         jr PowerupPlaySfx
-                                        #
-                                        # Player_Hit_PowerupDrone:
-                                        #         push iy
-                                        #             ld iy,(PlayerHitMempointer_Plus2-2)
-                                        #             ld a,(iy+4)
-                                        #             cp 2
-                                        #             jr nc,Player_Hit_PowerupDroneFull
-                                        #             inc a
-                                        #             ld (iy+4),a
-                                        # Player_Hit_PowerupDroneFull:
-                                        #             pop iy
-                                        #         jr PowerupPlaySfx
-                                        # Player_Hit_PowerupShootPower:
+       .equiv DroneSprite, .+2
+        CMPB R2, $128+38                 # cp 128+38   :DroneSprite_Plus1
+        BEQ  Player_Hit_PowerupDrone     # jr z,Player_Hit_PowerupDrone
+       .equiv ShootSpeedSprite, .+2
+        CMPB R2, $128+39                 # cp 128+39   :ShootSpeedSprite_Plus1
+        BEQ  Player_Hit_PowerupShootSpeed# jr z,Player_Hit_PowerupShootSpeed
+       .equiv ShootPowerSprite, .+2
+        CMPB R2, $128+40                 # cp 128+40   :ShootPowerSprite_Plus1
+        BEQ  Player_Hit_PowerupShootPower# jr z,Player_Hit_PowerupShootPower
+       .equiv PointsSprite, .+2
+        CMPB R2, $128+16                 # cp 128+16   :PointsSprite_Plus1
+        BEQ  Player_Hit_Points           # jr z,Player_Hit_Points
+        RETURN                           # ret
+
+Player_Hit_Points:
+        # TODO: add sfx
+                                        # ld a,6
+                                        # call SFX_QueueSFX_GenericHighPri
+      # Object is Points for player
+                                        # push bc
+       #MOVB 13(R4),R0                  #     ld bc,13
+       #ADD  $5,R0                      #     add hl,bc
+       #MOVB R0,13(R4)                  #     ld a,(hl)
+        MOVB @$P1_P13,R0                #     add 5
+        ADD  $5,R0                      #     ld (hl),a
+        MOVB R0,@$P1_P13                # pop bc
+        RETURN                          # ret
+
+Player_Hit_PowerupShootSpeed:
+                                            # push iy
+                                            # ld iy,(PlayerHitMempointer_Plus2-2)
+        MOVB @$P1_P11,R0                    # ld a,(iy+11)
+        ASLB R0                             # srl a
+                                            # or a
+        BNZ  Player_Hit_PowerupShootSpeedNZ # jr nz,Player_Hit_PowerupShootSpeedNZ
+        INCB R0                             # inc a ; dont let a=0
+Player_Hit_PowerupShootSpeedNZ:
+        MOVB R0,@$P1_P11                    # ld (iy+11),a
+                                            # pop iy
+        BR   PowerupPlaySfx                 # jr PowerupPlaySfx
+                                            #
+Player_Hit_PowerupDrone:
+                                        # push iy
+                                        # ld iy,(PlayerHitMempointer_Plus2-2)
+                                        # ld a,(iy+4)
+        CMPB @$P1_P04,$2                # cp 2
+        BHIS Player_Hit_PowerupDroneFull# jr nc,Player_Hit_PowerupDroneFull
+        INC  @$P1_P04                   # inc a
+                                        # ld (iy+4),a
+Player_Hit_PowerupDroneFull:
+                                        # pop iy
+        BR   PowerupPlaySfx             # jr PowerupPlaySfx
+Player_Hit_PowerupShootPower:
+        MOV  $0x0303,@$PlayerStarColor0
+        MOV  $0x3030,@$PlayerStarColor1
                                         #         ld a,&96
-                                        #         ld (PlayerStarColor_Plus1-1),a
+                                        #         ld (PlayerStarColor_Plus1 - 1),a
                                         #
                                         #         ld a, 1
                                         # ;       power up both players
                                         #         ld (P2_P14),a
-                                        #         ld (P1_P14),a
-                                        # ;       power up only one player
-                                        # ;       push iy
-                                        # ;           ld iy,(PlayerHitMempointer_Plus2-2)
-                                        # ;           ld (iy+14),a
-                                        # ;       pop iy
-                                        # PowerupPlaySfx:
+        MOVB $1,@$P1_P14                #         ld (P1_P14),a
+PowerupPlaySfx:
+        RETURN
                                         #         ld a,7
                                         #         jp SFX_QueueSFX_GenericHighPri
                                         # Player_Hit_Injure_2
@@ -784,7 +786,9 @@ Player_Hit: #-------------------------------------------------------------------
                                         # Player_Hit_Injure_X
                                         #             ld (PlayerHitMempointer_Plus2-2),hl
                                         #         pop hl
-                                        # Player_Hit_Injure:
+Player_Hit_Injure:
+        # TODO: implement Player_Hit_Injure
+        RETURN
                                         #     push iy
                                         #     ld iy,Player_Array :PlayerHitMempointer_Plus2
                                         #
@@ -851,7 +855,7 @@ Player2DoContinue:
         BZE  Player2_DeadUI               # call nz,Player2Continue
         CALL Player2Continue              # jr Player2_DeadUI
 #-------------------------------------------------------------------------------
-# We put PLus sprite anims here, as they have to be run
+# We put Plus sprite anims here, as they have to be run
 # after the playerhandler and mess up practically ALL registers
 Player_DrawUI:
 # TwoDronesOnscreen:

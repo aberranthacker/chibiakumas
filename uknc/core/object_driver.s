@@ -39,22 +39,24 @@ ObjectArray_ConfigureForSize:
         # Define player 1's hitbox
         CLR  R0
         BISB @$P1_P00,R0 # PlayerY
-        MOV  R0,@$srcPlayerY2
+        MOV  R0,@$PlayerY2
        .equiv srcSpriteSizeShiftFull, .+2
         SUB  $24,R0
         BHIS 1$
 
         CLR  R0
-    1$: MOV  R0,@$srcPlayerY1
+    1$:
+        MOV  R0,@$PlayerY1
         CLR  R0
         BISB @$P1_P01,R0 # PlayerX
-        MOV  R0,@$srcPlayerX2
+        MOV  R0,@$PlayerX2
        .equiv srcSpriteSizeShiftHalfB, .+2
         SUB  $12,R0
         BHIS 2$
 
         CLR  R0
-    2$: MOV  R0,@$srcPlayerX1
+    2$:
+        MOV  R0,@$PlayerX1
       # Define player 2's hitbox # TODO uncomment for player 2
    #    CLR  R0
    #    BISB @$P2_P00,R0 # PlayerY
@@ -165,30 +167,39 @@ Objectloop_SpriteBankSet:
 # ;Jp Objectloop_PlayerVunrable ;Objectloop_DoPlayerCollisions_Plus2
 # Objectloop_PlayerVunrable:
 #  Player collisions --------------------------------------------------------{{{
-                                                            # ld a,b
-        CMPB (PC)+,R0; srcPlayerX1: .word 0                 # cp 0 :PlayerX1_Plus1
-                                                            # jr c,ObjectLoopP1Skip
-        CMPB (PC)+,R0; srcPlayerX2: .word 0                 # cp 0 :PlayerX2_Plus1
-                                                            # jr nc,ObjectLoopP1Skip
-                                                            #
-                                                            # ld a,c
-        CMPB (PC)+,R0; srcPlayerY1: .word 0                 # cp 0 :PlayerY1_Plus1
-                                                            # jr c,ObjectLoopP1Skip
-        CMPB (PC)+,R0; srcPlayerY2: .word 0                 # cp 0 :PlayerY2_Plus1
-                                                            # jr nc,ObjectLoopP1Skip
-                                                            #
-                                                            # ld a,(P1_P09)
-                                                            # or a
-                                                            # jr z,ObjectLoopP1Skip
-                                                            #
-                                                            # push hl
-                                                            #     ld hl,Player_Array
-                                                            #     call Player_Hit
-                                                            # pop hl
-                                                            #
-                                                            # ld a,b
-                                                            # or a
-                                                            # jp z,ObjectLoop_SaveChanges
+      # R0 use at will
+      # R1 LSB b = X, R1 MSB c = Y
+      # R2 LSB ixh = Sprite, R2 MSB iyh = Move
+      # R3 LSB ixl = Life, R3 MSB iyl = Program Code
+      # R4 use at will
+      # R5 ObjectArray current object last element pointer
+        MOV  R1,R0                  # ld a,b
+       .equiv PlayerX1, .+2
+        CMPB R0,$20                 # cp 0 :PlayerX1_Plus1
+        BLO  ObjectLoopP1Skip       # jr c,ObjectLoopP1Skip
+       .equiv PlayerX2, .+2
+        CMPB R0,$32                 # cp 0 :PlayerX2_Plus1
+        BHIS ObjectLoopP1Skip       # jr nc,ObjectLoopP1Skip
+        SWAB R0                     # ld a,c
+       .equiv PlayerY1, .+2
+        CMPB R0,$76                 # cp 0 :PlayerY1_Plus1
+        BLO  ObjectLoopP1Skip       # jr c,ObjectLoopP1Skip
+       .equiv PlayerY2, .+2
+        CMPB R0,$100                # cp 0 :PlayerY2_Plus1
+        BHIS ObjectLoopP1Skip       # jr nc,ObjectLoopP1Skip
+                                    #
+        TSTB @$P1_P09               # ld a,(P1_P09)
+                                    # or a
+        BZE  ObjectLoopP1Skip       # jr z,ObjectLoopP1Skip
+                                    #
+                                    # push hl
+                                    #     ld hl,Player_Array
+        CALL Player_Hit             #     call Player_Hit
+                                    # pop hl
+                                    #
+                                    # ld a,b
+        TST  R1                     # or a
+        BZE  ObjectLoop_SaveChanges # jp z,ObjectLoop_SaveChanges
 
 ObjectLoopP1Skip:
        # uncomment for player 2                             # ;assume we're playing 1 player!

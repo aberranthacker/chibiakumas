@@ -210,13 +210,13 @@ Event_SetLife:                                              # Event_LifeSwitch_0
 # OK so I didn't think this through very well!
 Event_CoreReprogram_PowerupSprites:                         # Event_CoreReprogram_PowerupSprites:
                                                             #     rst 6
-        MOVB (R5)+,@$cmpDroneSprite                         #     ld (DroneSprite_Plus1-1),a
+        MOVB (R5)+,@$DroneSprite                         #     ld (DroneSprite_Plus1-1),a
                                                             #     rst 6
-        MOVB (R5)+,@$cmpShootSpeedSprite                    #     ld (ShootSpeedSprite_Plus1-1),a
+        MOVB (R5)+,@$ShootSpeedSprite                    #     ld (ShootSpeedSprite_Plus1-1),a
         MOV  (R5)+,R0                                       #     rst 6
-        MOVB R0,@$cmpShootPowerSprite                       #     ld (ShootPowerSprite_Plus1-1),a
+        MOVB R0,@$ShootPowerSprite                       #     ld (ShootPowerSprite_Plus1-1),a
         SWAB R0                                             #     rst 6
-        MOVB R0,@$cmpPointsSprite                           #     ld (PointsSprite_Plus1-1),a
+        MOVB R0,@$PointsSprite                           #     ld (PointsSprite_Plus1-1),a
         MOVB R0,@$srcPointsSpriteB                          #     ld (PointsSpriteB_Plus1-1),a
         MOVB R0,@$srcPointsSpriteC                          #     ld (PointsSpriteC_Plus1-1),a
 

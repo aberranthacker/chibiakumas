@@ -4,7 +4,9 @@
 
 Player_StarArray_Redraw:
        .equiv PlayerBulletColor, 0x0003
+       .equiv PlayerStarColor0, .+2
         MOV  $PlayerBulletColor,   @$srcStarColor0
+       .equiv PlayerStarColor1, .+2
         MOV  $PlayerBulletColor<<2,@$srcStarColor1
         MOV  $PlayerBulletColor<<4,@$srcStarColor2
         MOV  $PlayerBulletColor<<6,@$srcStarColor3

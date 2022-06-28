@@ -154,17 +154,18 @@ ShowSpriteDirectOneByteSpecial: # shortcut for our minifont!
 #-------------------------------------------------------------------------------
 ShowSprite: # ShowSprite is the main routine of our program!
         CALL @$ShowSprite_ReadInfo # Get Sprite Details
-        # R0 Xoff
+        # R0 sprite attributes
         # R1 width
         # R3 sprite store address
         # R5 sprite offset
 
        .equiv cmpSpriteSizeConfig6, .+2
-        CMP  R1,$3 # 3 words, default sprite width
+        CMP  R1,$6 # 6 bytes, default sprite width
+        BEQ  1$
 
-       .equiv dstShowSpriteReconfigureCommand, .+4
-       .call NE, @$ShowSpriteReconfigure # calls ShowSpriteReconfigure or null
-
+       .equiv dstShowSpriteReconfigureCommand, .+2
+        CALL @$ShowSpriteReconfigure
+    1$:
         ADD  (R5),R3 # calculate sprite address
         MOV  R3,@$srcSprShow_TempAddr
 
