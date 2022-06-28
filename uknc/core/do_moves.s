@@ -9,8 +9,8 @@ DoMoves:
         # XXX - X movement bits
         # B=X, C=Y, D=Move
         #
-        # in:  R1 LSB=X MSB=Y
-        #      R2 LSB=Move, MSB=anything
+        # in:  R1 LSB b = X, R1 MSB c = Y
+        #      R2 LSB d = Move, R2 MSB=anything
         #
         # out: R1 new Y
         #      R2 unmodified
@@ -170,88 +170,83 @@ DoMoves_Wave_SlowSpeed:             # DoMoves_WaveSlowSpeed
         RETURN                      #     ret
 
 DoMoves_SeekerAuto:
-         .inform_and_hang "no DoMoves_SeekerAuto"
-                                        #    push bc
+                                        # push bc
                                         #
-                                        #        ld c,%10010000  ;p2
+                                        # ld c,%10010000  ;p2
                                         #
-                                        #        ld a,(P1_P09)   ;See how many lives are left
-                                        #        or a
-                                        #        jr z,SeakChoosePlayerDone
-                                        #        ;if player 1 is dead, always home on player 2
+                                        # ld a,(P1_P09)   ;See how many lives are left
+                                        # or a
+                                        # jr z,SeakChoosePlayerDone
+                                        # ;if player 1 is dead, always home on player 2
                                         #
-                                        #        ld a,(P2_P09)   ;See how many lives are left
-                                        #        or a
-                                        #        jr z,SeakChoosePlayerP1
-                                        #        ;if player 2 is dead, always home on player 1
+                                        # ld a,(P2_P09)   ;See how many lives are left
+                                        # or a
+                                        # jr z,SeakChoosePlayerP1
+                                        # ;if player 2 is dead, always home on player 1
                                         #
-                                        #        ld a,0 :SeakChoosePlayer_Plus1
-                                        #        or a
-                                        #        cpl
-                                        #        ld (SeakChoosePlayer_Plus1-1),a
+                                        # ld a,0 :SeakChoosePlayer_Plus1
+                                        # or a
+                                        # cpl
+                                        # ld (SeakChoosePlayer_Plus1-1),a
                                         #
-                                        #        jr nz,SeakChoosePlayerDone
+                                        # jr nz,SeakChoosePlayerDone
                                         #
-                                        # SeakChoosePlayerP1:
-                                        #        ld c,%10000100; p1
-                                        # SeakChoosePlayerDone:
-                                        #        ld a,d
-                                        #        and %00000011
-                                        #        or c
-                                        #        ld d,a
-                                        #    pop bc
+# SeakChoosePlayerP1:
+                                        # ld c,%10000100; p1
+# SeakChoosePlayerDone:
+                                        # ld a,d
+                                        # and %00000011
+                                        # or c
+                                        # ld d,a
+                                        # pop bc
                                         #
-                                        #    jp DoMoves_Spec
-                                        #
+                                        # jp DoMoves_Spec
+
 #DoMoves_SeekerP2: # Home in on player 2
-#                                                            #     push iy
-#                                                            #         ld iy,Player_Array2
-#        BR   DoMoves_Seeker                                 #     jr DoMoves_SeekerContinue
+#                                       # push iy
+#                                       #     ld iy,Player_Array2
+#        BR   DoMoves_Seeker            # jr DoMoves_Seeker
 DoMoves_SeekerP1: # Home in on player 1
-         .inform_and_hang "no DoMoves_SeekerP1"
-                                                            #
-                                                            #     push iy
-                                                            #         ld iy,Player_Array
-                                                            #
-DoMoves_Seeker:                                             # DoMoves_SeekerContinue:
-                                                            #     push de
-                                                            #     ld a,d
-                                                            #     and %00000011 ; Speed
-                                                            #     sll a
-                                                            #     inc a
-                                                            #     ld d,a
-                                                            #     ld a,r        ; Crude randomizer, as we move so fast the object may never hit the player otherwise
-                                                            #     bit 0,a
-                                                            #     jr z,DoMoves_SeekerS
-                                                            #     inc d
-                                                            # DoMoves_SeekerS:
-                                                            #         ; B=X C=Y D=Move speed
-                                                            #         ld a,(iy) ; Y
-                                                            #         sub 8
-                                                            #         cp C
-                                                            #         jr NC,DoMoves_Seeker_Ylower
-                                                            #         ld a,C
-                                                            #         sub d
-                                                            #         jr DoMoves_Seeker_CheckX
-                                                            #     DoMoves_Seeker_Ylower:
-                                                            #         ld a,C
-                                                            #         add d
-                                                            #     DoMoves_Seeker_CheckX:
-                                                            #         ld C,a
-                                                            #         ld a,(iy+1) ;X
-                                                            #         sub 3
-                                                            #         cp B
-                                                            #         jr NC,DoMoves_Seeker_Xlower
-                                                            #         ld a,B
-                                                            #         sub d
-                                                            #         jr DoMoves_Seeker_Done
-                                                            #     DoMoves_Seeker_Xlower:
-                                                            #         ld a,B
-                                                            #         add d
-                                                            #     DoMoves_Seeker_Done:
-                                                            #         ld B,a
-                                                            #
-                                                            #     pop de
-                                                            #     pop iy
-                                                            #
-                                                            #     ret
+                                        # push iy
+                                        #     ld iy,Player_Array
+DoMoves_Seeker:
+        # R1 c = Y, R4 b = X
+        # R2 LSB d = Move, R2 MSB=anything
+        PUSH R3                     # push de
+        MOV  R2,R3                  # ld a,d
+        BIC  $0xFFFC,R3             # and %00000011 ; Speed
+        ASL  R3                     # sll a
+        INC  R3                     # inc a
+                                    # ld d,a
+                                    # ld a,r ; Crude randomizer, as we move so fast the object may never hit the player otherwise
+                                    # bit 0,a
+                                    # jr z,DoMoves_SeekerS
+        INC  R3                     # inc d
+DoMoves_SeekerS:
+        MOVB @$P1_P00,R0            # ld a,(iy) ; Y
+        SUB  $8,R0                  # sub 8
+        CMPB R0,R1                  # cp C
+        BHIS DoMoves_Seeker_Ylower  # jr NC,DoMoves_Seeker_Ylower
+                                    # ld a,C
+        SUB  R3,R1                  # sub d
+        BR   DoMoves_Seeker_CheckX  # jr DoMoves_Seeker_CheckX
+DoMoves_Seeker_Ylower:
+                                    # ld a,C
+        ADD  R3,R1                  # add d
+DoMoves_Seeker_CheckX:
+                                    # ld C,a
+        MOVB  @$P1_P01,R0           # ld a,(iy+1) ;X
+        SUB   $3,R0                 # sub 3
+        CMPB  R0,R4                 # cp B
+        BHIS  DoMoves_Seeker_Xlower # jr NC,DoMoves_Seeker_Xlower
+                                    # ld a,B
+        SUB  R3,R4                  # sub d
+        BR   DoMoves_Seeker_Done    # jr DoMoves_Seeker_Done
+DoMoves_Seeker_Xlower:
+                                    # ld a,B
+        ADD  R3,R4                  # add d
+DoMoves_Seeker_Done:
+                                    # ld B,a
+        POP  R3                     # pop de
+                                    # pop iy
+        RETURN                      # ret
