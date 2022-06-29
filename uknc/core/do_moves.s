@@ -76,7 +76,7 @@ DoMoves_Background: # Background sprites move much more slowly, and only in 1 di
         RETURN
 
 DoMoves_Spec: # Special moves - various kinds
-       .equiv srcSpecialMoveSlowdown, .+2
+       .equiv SpecialMoveSlowdown, .+2
         BITB $0xFF,@$Timer_TicksOccured
         BNZ  1$
         RETURN

@@ -5,11 +5,11 @@
 Player_StarArray_Redraw:
        .equiv PlayerBulletColor, 0x0003
        .equiv PlayerStarColor0, .+2
-        MOV  $PlayerBulletColor,   @$srcStarColor0
+        MOV  $PlayerBulletColor,   @$StarColor0
        .equiv PlayerStarColor1, .+2
-        MOV  $PlayerBulletColor<<2,@$srcStarColor1
-        MOV  $PlayerBulletColor<<4,@$srcStarColor2
-        MOV  $PlayerBulletColor<<6,@$srcStarColor3
+        MOV  $PlayerBulletColor<<2,@$StarColor1
+        MOV  $PlayerBulletColor<<4,@$StarColor2
+        MOV  $PlayerBulletColor<<6,@$StarColor3
         # configure the loop for the player star array
         MOV  $null,R5
         MOV  R5,@$dstCurrentStarArrayCollisionsB2
@@ -27,10 +27,10 @@ StarArray_Redraw:
         # Redraw the enemy star array
         MOV  $StarArraySize,R1
        .equiv EnemyBulletColor, 0x0303
-        MOV  $EnemyBulletColor,   @$srcStarColor0
-        MOV  $EnemyBulletColor<<2,@$srcStarColor1
-        MOV  $EnemyBulletColor<<4,@$srcStarColor2
-        MOV  $EnemyBulletColor<<6,@$srcStarColor3
+        MOV  $EnemyBulletColor,   @$StarColor0
+        MOV  $EnemyBulletColor<<2,@$StarColor1
+        MOV  $EnemyBulletColor<<4,@$StarColor2
+        MOV  $EnemyBulletColor<<6,@$StarColor3
 
         #;;;;;;;;;;;;;;;;;;;;; Player 1 handler
         # configure the loop for the enemy star array
@@ -46,15 +46,15 @@ StarArray_Redraw:
         MOVB @$P1_P01,R0
         DEC  R0 # SUB  $2,R0
         DEC  R0
-        MOV  R0,@$cmpPlayer1LocX
+        MOV  R0,@$Player1LocX
         ADD  $4,R0
-        MOV  R0,@$cmpPlayer1LocXB
+        MOV  R0,@$Player1LocXB
         MOVB @$P1_P00,R0
         DEC  R0 # SUB  $2,R0
         DEC  R0
-        MOV  R0,@$cmpPlayer1LocY
+        MOV  R0,@$Player1LocY
         ADD  $4,R0
-        MOV  R0,@$cmpPlayer1LocYB
+        MOV  R0,@$Player1LocYB
         MOV  R5,@$dstCurrentStarArrayCollisionsB2
 
         # Player 2 handler (commented out)-----------------------------------{{{
@@ -71,15 +71,15 @@ StarArray_Redraw:
 #       MOVB @$P2_P01,R0
 #       DEC  R0 # SUB  $2,R0
 #       DEC  R0
-#       MOV  R0,@$cmpPlayer2LocX
+#       MOV  R0,@$Player2LocX
 #       ADD  $4,R0
-#       MOV  R0,@$cmpPlayer2LocXB
+#       MOV  R0,@$Player2LocXB
 #       MOVB @$P1_P00,R0
 #       DEC  R0 # SUB  $2,R0
 #       DEC  R0
-#       MOV  R0,@$cmpPlayer2LocY
+#       MOV  R0,@$Player2LocY
 #       ADD  $4,R0
-#       MOV  R0,@$cmpPlayer2LocYB
+#       MOV  R0,@$Player2LocYB
 #       MOV  R5,@$dstCurrentStarArrayCollisions2B2
         #--------------------------------------------------------------------}}}
 
@@ -87,19 +87,19 @@ StarArray_Redraw:
 
        .equiv opcStarSlowdown, .+2
         MOV  $0006200,R3 # ASR  R0
-       .equiv srcSlowdownFreq, .+2
+       .equiv SlowdownFreq, .+2
         BIT  $0b10,@$Timer_TicksOccured
         BZE  Starloop_Start2
 
 Starloop_Start:
-       .equiv srcPlayerFireSpeed, .+2
+       .equiv PlayerFireSpeed, .+2
         MOV  $0000240,R3
 
 Starloop_Start2:
         MOV  R3,@$opcStarSlowdownB
         MOV  R3,@$opcStarSlowdownA
       # Reset the star array to allow more stars to be added
-        CLR  @$srcStarArrayFullMarker
+        CLR  @$StarArrayFullMarker
 
 Starloop:
         CLR  R2
@@ -162,16 +162,16 @@ StarArray_FoundOne:
         BLO  DoMovesStars_Kill
 
       # check for collisions with player 1
-       .equiv cmpPlayer1LocX, .+2
+       .equiv Player1LocX, .+2
         CMP  R3,$30
         BLO  StarLoopP1Skip
-       .equiv cmpPlayer1LocXB, .+2
+       .equiv Player1LocXB, .+2
         CMP  R3,$34
         BHIS StarLoopP1Skip
-       .equiv cmpPlayer1LocY, .+2
+       .equiv Player1LocY, .+2
         CMP  R2,$98
         BLO  StarLoopP1Skip
-       .equiv cmpPlayer1LocYB, .+2
+       .equiv Player1LocYB, .+2
         CMP  R2,$102
         BHIS StarLoopP1Skip
 
@@ -180,16 +180,16 @@ StarArray_FoundOne:
 
 StarLoopP1Skip:
         # check for collisions with player 2 (commented out) ----------------{{{
-      #.equiv cmpPlayer2LocX, .+2
+      #.equiv Player2LocX, .+2
       # CMP  R3,$30
       # BLO  StarCollisionsDone
-      #.equiv cmpPlayer2LocXB, .+2
+      #.equiv Player2LocXB, .+2
       # CMP  R3,$34
       # BHIS StarCollisionsDone
-      #.equiv cmpPlayer2LocY, .+2
+      #.equiv Player2LocY, .+2
       # CMP  R2,$148
       # BLO  StarCollisionsDone
-      #.equiv cmpPlayer2LocYB, .+2
+      #.equiv Player2LocYB, .+2
       # CMP  R2,$152
       # BHIS StarCollisionsDone
 
@@ -223,7 +223,7 @@ DotOffsetTable:
        .word DotOffset3
 
 DotOffset0:
-       .equiv srcStarColor0, .+2
+       .equiv StarColor0, .+2
         MOV  $0x0303,R3
         BIC  $0x0303,(R4)
         BIS  R3,(R4)
@@ -232,7 +232,7 @@ DotOffset0:
         BIS  R3,(R4)
         BR   StarArray_Loop_AfterDraw
 DotOffset1:
-       .equiv srcStarColor1, .+2
+       .equiv StarColor1, .+2
         MOV  $0x0C0C,R3
         BIC  $0x0C0C,(R4)
         BIS  R3,(R4)
@@ -241,7 +241,7 @@ DotOffset1:
         BIS  R3,(R4)
         BR   StarArray_Loop_AfterDraw
 DotOffset2:
-       .equiv srcStarColor2, .+2
+       .equiv StarColor2, .+2
         MOV  $0x3030,R3
         BIC  $0x3030,(R4)
         BIS  R3,(R4)
@@ -250,7 +250,7 @@ DotOffset2:
         BIS  R3,(R4)
         BR   StarArray_Loop_AfterDraw
 DotOffset3:
-       .equiv srcStarColor3, .+2
+       .equiv StarColor3, .+2
         MOV  $0xC0C0,R3
         BIC  $0xC0C0,(R4)
         BIS  R3,(R4)

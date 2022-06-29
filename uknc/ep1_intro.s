@@ -217,18 +217,18 @@ LevelLoop:
         WAIT
 
         MOV  $0, R0
-       .equiv srcShowTextUpdate, .-2
+       .equiv ShowTextUpdate, .-2
         CMP  R0,$22
         BHI  LevelLoop
 
-        MOV  $0xFF,@$srcShowTextUpdate
+        MOV  $0xFF,@$ShowTextUpdate
         ASL  R0
 
        .wait_ppu
         MOV  SubtitlesTable(R0), @$PPUCommandArg
         MOV  $PPU_LoadText, @$PPUCommand
 
-        MOV  $1, @$srcCharsToPrint
+        MOV  $1, @$CharsToPrint
         MOV  $ShowBossText, @$dstShowBossTextCommand
 
         CALL @$Clear4000
@@ -404,14 +404,14 @@ ShowText22Init:
 
 UpdateShowText:
         MOV  $null, @$dstShowBossTextCommand
-        MOV  R0, @$srcShowTextUpdate
+        MOV  R0, @$ShowTextUpdate
 
         RETURN
 #----------------------------------------------------------------------------}}}
 
 ShowBossText: # ../Aku/Level252-Intro.asm:1950
-        INC  @$srcCharsToPrint
-       .equiv srcCharsToPrint, .+2
+        INC  @$CharsToPrint
+       .equiv CharsToPrint, .+2
         MOV  $1, @$PPUCommandArg
         MOV  $PPU_ShowBossText, @$PPUCommand
 RETURN

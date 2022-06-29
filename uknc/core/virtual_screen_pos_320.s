@@ -28,28 +28,28 @@ VirtualPosToScreenByte:
         CLR  R4 # X bytes to skip, left
         CLR  R5 # X bytes to remove, right
         # only works with 24 pixel sprites
-       .equiv cmpSpriteSizeConfig24, .+2
+       .equiv SpriteSizeConfig24, .+2
         CMP  R2,$24     # check X
         BHIS VirtualPos_1$
         # X < 24
-       .equiv srcSpriteSizeConfig25, .+2
+       .equiv SpriteSizeConfig25, .+2
         MOV  $24+3,R4
         SUB  R2,R4
         ASR  R4
         ASR  R4
         ASL  R4
         MOV  R4,R5  # need to skip R4 bytes
-       .equiv srcSpriteSizeConfig24B, .+2
+       .equiv SpriteSizeConfig24B, .+2
         MOV  $24,R2 # R2 was offscreen, so move it back on
         BR   VirtualPos_2$
 
     VirtualPos_1$:
-       .equiv cmpSpriteSizeConfig184less12, .+2
+       .equiv SpriteSizeConfig184less12, .+2
         CMP  R2,$184-12    # check X
         BLO  VirtualPos_2$ # X < 172
         # X >= 172
-       .equiv srcSpriteSizeConfig184less12, .+2
-        MOV  $-160-12,R0
+       .equiv SpriteSizeConfigMinus184Plus12, .+2
+        MOV  $-184+12,R0
         ADD  R2,R0
         ASR  R0
         ASR  R0
@@ -57,42 +57,42 @@ VirtualPosToScreenByte:
         ADD  R0,R5 # X pos is ok, but plot R5 less bytes
 
     VirtualPos_2$:
-       .equiv srcSpriteSizeConfig24C, .+2
+       .equiv SpriteSizeConfig24C, .+2
         SUB  $24,R2
         RORB R2 # halve the result, as we have 80 bytes, but 160 x co-ords
         # using MOVB because MSB contains frame buffer offset
         # show_sprite.s:265
-        MOVB R2,@$srcSprShow_ScrWord
+        MOVB R2,@$SprShow_ScrWord
       #-------------------------------------------------------------------------
         # R1 Y
         CLR  R2 # Y lines to skip
         CLR  R3 # Y lines to remove
 
-       .equiv cmpSpriteSizeConfig24D, .+2
+       .equiv SpriteSizeConfig24D, .+2
         CMP  R1,$24 # check Y
         BHIS VirtualPos_3$
         # Y < 24
-       .equiv srcSpriteSizeConfig24E, .+2
+       .equiv SpriteSizeConfig24E, .+2
         MOV  $24,R2
         SUB  R1,R2 # move the sprite R2  up
         MOV  R2,R3 # need to plot A less lines
-       .equiv srcSpriteSizeConfig24F, .+2
+       .equiv SpriteSizeConfig24F, .+2
         MOV  $24,R1
         BR   VirtualPos_4$
 
     VirtualPos_3$:
-       .equiv cmpSpriteSizeConfig224less24, .+2
+       .equiv SpriteSizeConfig224less24A, .+2
         CMP  R1,$224-24 # check Y
         BLO  VirtualPos_4$
         # Y > 224
         MOV  R1,R3
-       .equiv srcSpriteSizeConfig224less24, .+2
+       .equiv SpriteSizeConfig224less24B, .+2
         SUB  $224-24,R3
 
     VirtualPos_4$:
-       .equiv srcSpriteSizeConfig24G, .+2
+       .equiv SpriteSizeConfig24G, .+2
         SUB  $24,R1
-        MOV  R1,@$srcSprShow_ScrLine
+        MOV  R1,@$SprShow_ScrLine
 
         RETURN
 #-------------------------------------------------------------------------------
@@ -106,7 +106,8 @@ ShowSpriteReconfigureEnableDisableB:
         BR   ShowSpriteReconfigure_24px
 
 ShowSpriteReconfigure:
-        MOV  R1,@$cmpSpriteSizeConfig6
+#:bpt
+        MOV  R1,@$SpriteSizeConfig6
         # Akuyou was designed for 24x24 sprites, but this module can
         # 'reconfigure' it for other sizes
         CMP  R1,$6
@@ -132,51 +133,61 @@ ShowSpriteReconfigure:
 
 ShowSpriteReconfigure_128px: # Not actually used!
        #MOV  $184-64,R1
-       #MOV  $224-24,R2
+       #MOV  $-184+64,R2
+       #MOV  $224-128,R4
        #BR   ShowSpriteReconfigure_all
 ShowSpriteReconfigure_104px: # Not actually used!
        #MOV  $184-52,R1
-       #MOV  $224-96,R2
+       #MOV  $-184+52,R2
+       #MOV  $224-104,R4
        #BR   ShowSpriteReconfigure_all
 ShowSpriteReconfigure_96px:  # Used by Boss 1
         MOV  $184-48,R1
-        MOV  $224-24,R2
+        MOV  $-184+48,R2
+        MOV  $224-96,R4
         BR   ShowSpriteReconfigure_all
 ShowSpriteReconfigure_80px:  # Not actually used!
        #MOV  $184-40,R1
-       #MOV  $224-80,R2
+       #MOV  $-184+40,R2
+       #MOV  $224-80,R4
+       #BR   ShowSpriteReconfigure_all
+ShowSpriteReconfigure_64px:  # not actually used
+       #MOV  $184-32,R1
+       #MOV  $-184+32,R2
+       #MOV  $224-64,R4
        #BR   ShowSpriteReconfigure_all
 ShowSpriteReconfigure_48px:
         MOV  $184-24,R1
-        MOV  $224-48,R2
+        MOV  $-184+24,R2
+        MOV  $224-48,R4
         BR   ShowSpriteReconfigure_all
 ShowSpriteReconfigure_32px:
         MOV  $184-16,R1
-        MOV  $224-32,R2
+        MOV  $-184+16,R2
+        MOV  $224-32,R4
         BR   ShowSpriteReconfigure_all
-ShowSpriteReconfigure_64px:  # not actually used
-       #MOV  $184-32,R1
-       #MOV  $224-64,R2
-       #BR   ShowSpriteReconfigure_all
 ShowSpriteReconfigure_16px:
         MOV  $184- 8,R1
-        MOV  $224-16,R2
+        MOV  $-184+8,R2
+        MOV  $224-16,R4
         BR   ShowSpriteReconfigure_all
 ShowSpriteReconfigure_8px:
-        MOV  $184- 4,R1
-        MOV  $224- 8,R2
+        MOV  $184-4,R1
+        MOV  $-184+4,R2
+        MOV  $224-8,R4
         BR   ShowSpriteReconfigure_all
 ShowSpriteReconfigure_24px:
         MOV  $184-12,R1
-        MOV  $224-24,R2
+        MOV  $-184+12,R2
+        MOV  $224-24,R4
 
 ShowSpriteReconfigure_all:
         # Right X
-        MOV  R1,$cmpSpriteSizeConfig184less12
-        MOV  R1,$srcSpriteSizeConfig184less12
+        MOV  R1,@$SpriteSizeConfig184less12
+        MOV  R2,@$SpriteSizeConfigMinus184Plus12
 
         # Bottom Y
-        MOV  R2,$cmpSpriteSizeConfig224less24
-        MOV  R2,$srcSpriteSizeConfig224less24
+        MOV  R4,@$SpriteSizeConfig224less24A
+        MOV  R4,@$SpriteSizeConfig224less24B
 
         RETURN

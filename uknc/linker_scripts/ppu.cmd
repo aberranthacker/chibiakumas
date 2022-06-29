@@ -6,7 +6,7 @@ OUTPUT(build/ppu.out)
 
 PPU_KeyboardScanner_P1 = KeyboardScanner_P1 / 2;
 PPU_KeyboardScanner_P2 = KeyboardScanner_P2 / 2;
-PPU_Event_LevelTime = srcEvent_LevelTime / 2;
+PPU_Event_LevelTime = Event_LevelTime / 2;
 
 SECTIONS
 {

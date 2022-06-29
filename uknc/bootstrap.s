@@ -179,31 +179,31 @@ Player_Dead_ResumeB: # ../Aku/BootStrap.asm:1411
 # StartANewGame -------------------------------------------------------------{{{
 FireMode_Normal: # ../Aku/BootStrap.asm:2116
         MOV  $null,R3
-        MOV  R3,@$dstFireUpHandler
-        MOV  R3,@$dstFireDownHandler
-        MOV  R3,@$dstFireLeftHandler
-        MOV  R3,@$dstFireRightHandler
+        MOV  R3,@$FireUpHandler
+        MOV  R3,@$FireDownHandler
+        MOV  R3,@$FireLeftHandler
+        MOV  R3,@$FireRightHandler
 
-        MOV  $SetFireDir_LEFTsave, @$dstFire1Handler
-        MOV  $SetFireDir_RIGHTsave,@$dstFire2Handler
+        MOV  $SetFireDir_LEFTsave, @$Fire1Handler
+        MOV  $SetFireDir_RIGHTsave,@$Fire2Handler
         BR   FireMode_Both
 
 FireMode_4D: # ../Aku/BootStrap.asm:2128
-        MOV  $SetFireDir_UP,   @$dstFireUpHandler
-        MOV  $SetFireDir_DOWN, @$dstFireDownHandler
-        MOV  $SetFireDir_LEFT, @$dstFireLeftHandler
-        MOV  $SetFireDir_RIGHT,@$dstFireRightHandler
+        MOV  $SetFireDir_UP,   @$FireUpHandler
+        MOV  $SetFireDir_DOWN, @$FireDownHandler
+        MOV  $SetFireDir_LEFT, @$FireLeftHandler
+        MOV  $SetFireDir_RIGHT,@$FireRightHandler
 
-        MOV  $SetFireDir_Fire, @$dstFire1Handler
-        MOV  $SetFireDir_FireAndSaveRestore,@$dstFire2Handler
+        MOV  $SetFireDir_Fire, @$Fire1Handler
+        MOV  $SetFireDir_FireAndSaveRestore,@$Fire2Handler
 
 FireMode_Both: # ../Aku/BootStrap.asm:2143
-        MOV $255,@$cmpDroneFlipFireCurrent
+        MOV $255,@$DroneFlipFireCurrent
         RETURN
 
 StartANewGame: # ../Aku/BootStrap.asm:2151
         # reset the core                 # xor a
-        CLR  @$srcShowContinueCounter    # ld (ShowContinueCounter_Plus1-1),a
+        CLR  @$ShowContinueCounter    # ld (ShowContinueCounter_Plus1-1),a
 
         MOV  $0012700,R0 # MOV (PC)+,R0  # ld bc,&3E0D ;Split Continues ; 3E n == LD A,n
         MOV  $0x0D,R1
@@ -218,7 +218,7 @@ StartANewGame: # ../Aku/BootStrap.asm:2151
 
 ContinueModeSet: # ../Aku/BootStrap.asm:2165
         MOV  R0,@$ShowContinuesSelfMod
-        MOV  R1,@$srcContinuesScreenPos
+        MOV  R1,@$ContinuesScreenPos
         MOV  R2,@$SpendCreditSelfMod
         MOV  R2,@$SpendCreditSelfMod2
 
@@ -272,7 +272,7 @@ NoBulletSlowdown: # ../Aku/BootStrap.asm:2206
         MOV  $BulletConfigHell,R3
         MOV  $1,R0
 useheaven: # ../Aku/BootStrap.asm:2242
-        MOV  R0,@$srcBurstSpacing
+        MOV  R0,@$BurstSpacing
         100$:
             MOV  (R3)+,(R2)+
         SOB  R1,100$
@@ -297,14 +297,14 @@ Difficulty_Hard:
         BR   Difficulty_Generic
 Difficulty_Generic:
         CLC
-        MOV  R0,srcFireFrequencyA
+        MOV  R0,FireFrequencyA
         ROR  R0
-        MOV  R0,srcFireFrequencyB
-        MOV  R0,srcFireFrequencyC
+        MOV  R0,FireFrequencyB
+        MOV  R0,FireFrequencyC
         ROR  R0
-        MOV  R0,srcFireFrequencyD
+        MOV  R0,FireFrequencyD
         ROR  R0
-        MOV  R0,srcFireFrequencyE
+        MOV  R0,FireFrequencyE
 RETURN
 
 StartANewGamePlayer: # ../Aku/BootStrap.asm:2256 ;player fire directions ----{{{
@@ -366,17 +366,16 @@ ResetCore: # ../Aku/BootStrap.asm:2318
         CALL ShowSpriteReconfigureEnableDisable # ./SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm:82
 
         MOV  $0x69,R0
-        MOV  R0,@$srcTimer_CurrentTick
-        MOV  R0,@$cmpDroneFlipCurrent
-        MOV  R0,@$cmpDroneFlipFireCurrent
+        MOV  R0,@$Timer_CurrentTick
+        MOV  R0,@$DroneFlipCurrent
 
         CLR  R0
-        MOV  R0,@$srcEventObjectAnimatorToAdd
-        MOV  R0,@$srcEventObjectSpriteSizeToAdd
-        MOV  R0,@$srcEventObjectProgramToAdd
+        MOV  R0,@$EventObjectAnimatorToAdd
+        MOV  R0,@$EventObjectSpriteSizeToAdd
+        MOV  R0,@$EventObjectProgramToAdd
         MOV  R0,@$Timer_TicksOccured
-        # R0 has to contain zero to tell the subroutine to init
-        CALL DroneFlipFire # TODO: implement this; does nothing for now
+
+        CALL DroneFlipFire
 
         MOV  $Object_DecreaseLifeShot, @$dstObjectShotOverride
 
@@ -393,8 +392,8 @@ ResetCore: # ../Aku/BootStrap.asm:2318
         MOV  R3,@$dstCustomShotToDeathCall
 
         CLR  R0
-        MOV  R0,@$srcSfx_CurrentPriority # clear the to-do
-        MOV  R0,@$srcSfx_Sound           # clear the note
+        MOV  R0,@$Sfx_CurrentPriority # clear the to-do
+        MOV  R0,@$Sfx_Sound           # clear the note
         CALL DoMovesBackground_SetScroll # TODO: implement the subroutine
 
         RETURN
@@ -493,7 +492,7 @@ loading_screen.bin:
     .word loading_screen_block_num
 core.bin:
     .word GameVarsEnd
-    .equiv core_size, 6698
+    .equiv core_size, 6622
     .word core_size >> 1
     .equiv core_block_num, (loading_screen_size + 511) >> 9 + loading_screen_block_num
     .word core_block_num

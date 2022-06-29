@@ -35,7 +35,7 @@ EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
 
         # Title
     .word 0 # time
-    .word evtMultipleCommands | 7 # Event_CoreMultipleEventsAtOneTime; 7 -> srcEvent_MultipleEventCount
+    .word evtMultipleCommands | 7 # Event_CoreMultipleEventsAtOneTime; 7 -> Event_MultipleEventCount
     .word evtLoadObjSettings | 0  # Load Object settings from the Slot 2
     .word evtSingleSprite, 12     # sprite
     .byte 24+16, 12*0 + 24+44     # Y, X : 16,  88
@@ -52,7 +52,7 @@ EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
 
         # Chibiko
     .word 0 # time
-    .word evtMultipleCommands | 3 # Event_CoreMultipleEventsAtOneTime; 7 -> srcEvent_MultipleEventCount
+    .word evtMultipleCommands | 3 # Event_CoreMultipleEventsAtOneTime; 7 -> Event_MultipleEventCount
     .word evtLoadObjSettings | 0  # Load Object settings from the Slot 2
     .word evtSingleSprite, 0      # sprite
     .byte 24+64, 12*0 + 24        # Y, X : 64,  0
@@ -61,7 +61,7 @@ EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
 
         # Bochan!
     .word 0 # time
-    .word evtMultipleCommands | 3     # Event_CoreMultipleEventsAtOneTime; 7 -> srcEvent_MultipleEventCount
+    .word evtMultipleCommands | 3     # Event_CoreMultipleEventsAtOneTime; 7 -> Event_MultipleEventCount
     .word evtLoadObjSettings | 0      # Load Object settings from the Slot 2
     .word evtSingleSprite, 2          # sprite
     .byte 24+200-64, 12*0 + 24+160-24 # Y, X 136, 272
@@ -135,7 +135,7 @@ ShowMenu:
         WAIT
 
        .ppudo_ensure $PPU_PrintAt,$MenuText
-        MOV  $LevelSprites,@$srcSprShow_BankAddr  
+        MOV  $LevelSprites,@$SprShow_BankAddr  
         CALL @$ObjectArray_Redraw
 
         JSR  R5,@$OnscreenCursorDefine
