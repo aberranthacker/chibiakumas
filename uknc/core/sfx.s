@@ -8,7 +8,7 @@
 */
                                                             # SFX_PlaySfx:
         MOV  $0x0000,R0; Sfx_Sound_Plus2:                   #     ld a,&00 :Sfx_Sound_Plus1
-       .equiv  srcSfx_Sound, Sfx_Sound_Plus2 - 2
+       .equiv  Sfx_Sound, Sfx_Sound_Plus2 - 2
                                                             #     or a
                                                             #     ret z
                                                             #     ld l,a
@@ -65,7 +65,7 @@
                                                             #     ;      The higher the pitch, the lower the sound.
                                                             #
          MOV  $0x0000,R0; Sfx_CurrentPriority_Plus2:        #     ld a,&00 :Sfx_CurrentPriority_Plus1
-        .equiv  srcSfx_CurrentPriority, Sfx_CurrentPriority_Plus2 - 2
+        .equiv  Sfx_CurrentPriority, Sfx_CurrentPriority_Plus2 - 2
                                                             #     ;jp z,SFX_PlaySFX_NothingPlaying
                                                             #     cp d
                                                             #     ret nc ; we're have queued something already, and this sound is low priority

@@ -11,11 +11,11 @@
 #         RETURN                          # ret
                                         #     ; iy = Pointer to player vars
 NoSpend:                                # NoSpend:
-        MOV  R0,@$srcSpendTimeout       #     ld (SpendTimeout_Plus1-1),a
+        MOV  R0,@$SpendTimeout       #     ld (SpendTimeout_Plus1-1),a
         RETURN                          # ret
                                         #
 SpendCheck:                             # SpendCheck:
-       .equiv srcSpendTimeout, .+2
+       .equiv SpendTimeout, .+2
         MOV  $1,R0                      # ld a,1:SpendTimeout_Plus1 ;Dont let player continue right away!
         DEC  R0                         # dec a
         BNZ  NoSpend                    # jr nz,NoSpend
@@ -121,53 +121,43 @@ Player1NotDead:                         # Player1NotDead:
                                         #
                                         #     jp BankSwitch_C0_SetCurrentToC0
 Player_HandlerOne:                      # Player_HandlerOne:
-       #MOV  R5,@$srcSprShow_BankAddr   #     ld (SprShow_BankAddr),hl
-                                        #
+       #MOV  R5,@$SprShow_BankAddr   #     ld (SprShow_BankAddr),hl
                                         #     ld a,e
-                                        #     ld (PlayerSpriteBank_Plus1-1),a;    call Akuyou_BankSwitch_C0_SetCurrent
-                                        #
+                                        #     ld (PlayerSpriteBank_Plus1-1),a; call Akuyou_BankSwitch_C0_SetCurrent
                                         #     ld a,ixl
-                                        #
-                                        #     ;Check if the game is paused
-                                        #     Player_Handler_Pause:
-        BIT  $Keymap_Pause, @$KeyboardScanner_P1 #     bit Keymap_Pause,a
-        BZE  Player_Handler_PauseCheckDone      #     jr nz,Player_Handler_PauseCheckDone
-        # Z=normal; NZ=paused
-        COM  @$srcTimer_Pause           #     ld hl,Timer_Pause_Plus1-1
-                                        #     ld a,(hl)
-                                        #     cpl
-                                        #     ld (hl),a
+      # Check if the game is paused
+        BIT  $Keymap_Pause, @$KeyboardScanner_P1
+        BZE  Player_Handler_PauseCheckDone
 
-        MOV  $12,R1                     #     ld b,12
-        WaitLoop:                       # WaitLoop:halt ; KeyboardScanner_ScanForOne
-            WAIT
-        SOB  R1,WaitLoop                #     djnz WaitLoop
-                                        #     pop af ; wtf???
-1237$:  RETURN                          # ret
+   1$:  BIT  $Keymap_Pause, @$KeyboardScanner_P1
+        BNZ  1$
+        COM  @$Timer_Pause # Z=normal, NZ=paused
 
-Player_Handler_PauseCheckDone:          # Player_Handler_PauseCheckDone:
-        MOV  @$Timer_TicksOccured,R0 #     ld hl,Timer_TicksOccured
-                                        #     ld a,(hl)
-                                        #     or a
-        BZE  1237$                      #     ret z ;abort handler if game paused
-                                        #     xor a
-        CLR  @$srcPlayerSaveShot        #     ld (PlayerSaveShot_Plus1 - 1),a
-        CLR  @$srcPlayerDoFire          #     ld (PlayerDoFire_Plus1 - 1),a
-                                        #     ld a,(hl)
-        BITB 11(R5),R0 # fire speed     #     and (iy+11)
-        BZE  Player_Handler_Start       #     jr z,Player_Handler_Start
-                                        #
-        CLRB 2(R5)                      #     ld (iy+2),0
+1237$:  RETURN
+
+Player_Handler_PauseCheckDone:
+        MOV  @$Timer_TicksOccured,R0   # ld hl,Timer_TicksOccured
+                                       # ld a,(hl)
+                                       # or a
+        BZE  1237$                     # ret z ;abort handler if game paused
+                                       # xor a
+        CLR  @$PlayerSaveShot       # ld (PlayerSaveShot_Plus1 - 1),a
+        CLR  @$PlayerDoFire         # ld (PlayerDoFire_Plus1 - 1),a
+                                       # ld a,(hl)
+        BITB 11(R5),R0 # fire speed    # and (iy+11)
+        BZE  Player_Handler_Start      # jr z,Player_Handler_Start
+                                       #
+        CLRB 2(R5)                     # ld (iy+2),0
 
       # Move the drones depending if the player is shooting
-Player_Handler_Start:                   # Player_Handler_Start:
-        MOVB 6(R5),R0                   #     ld a,(iy+6) ;D1
-       #INC  R0                         #     inc a
-        CMPB R0,$15                     #     cp 16
-        BHIS Player_Handler_DronePosOk  #     jr c,Player_Handler_DronePosOk
-       #DEC  R0                         #     dec a
+Player_Handler_Start:
+        MOVB 6(R5),R0 # drone pos      # ld a,(iy+6) ;D1
+       #INC  R0                        # inc a
+        CMPB R0,$15                    # cp 16
+        BHIS Player_Handler_DronePosOk # jr c,Player_Handler_DronePosOk
+       #DEC  R0                        # dec a
         INCB R0
-Player_Handler_DronePosOk:              # Player_Handler_DronePosOk:
+Player_Handler_DronePosOk:             # Player_Handler_DronePosOk:
         MOVB R0,6(R5) # D1 - shots and drones
         ASLB R0
         MOVB R0,@$Player_DroneOffset1
@@ -177,7 +167,7 @@ Player_Handler_DronePosOk:              # Player_Handler_DronePosOk:
         BISB R2,R1
         CLRB R2
         SWAB R2 # R1=Y, R2=X
-       .equiv srcPlayerMoveSpeedFast, .+2
+       .equiv PlayerMoveSpeedFast, .+2
         MOV  $8,R3 # Fast move speed - will be overriden if we're firing
 
         MOV  @$KeyboardScanner_P1,R0
@@ -195,10 +185,10 @@ Player_Handler_DronePosOk:              # Player_Handler_DronePosOk:
         BR   Player_Handler_KeyreadJoy1Up
 
 Player_Handler_KeyreadJoy1Fire1: # Fire right
-       .equiv dstFire1Handler, .+2
+       .equiv Fire1Handler, .+2
         CALL @$SetFireDir_RIGHTsave # fire bullets
 
-       .equiv srcPlayerMoveSpeedSlow1, .+2
+       .equiv PlayerMoveSpeedSlow1, .+2
         MOV  $2,R3 # slow move speed as we're firing
         BR   Player_Handler_KeyreadJoy1Up
 
@@ -207,11 +197,10 @@ Player_Handler_KeyreadJoy1Fire2: # Fire left
         BIT  $Keymap_F2,R0
         BZE  Player_Handler_KeyreadJoy1Up
 
-       .equiv dstFire2Handler, .+2
+       .equiv Fire2Handler, .+2
         CALL @$SetFireDir_LEFTsave # fire bullets
 
-# Player_ShootSkip2
-       .equiv srcPlayerMoveSpeedSlow2, .+2
+       .equiv PlayerMoveSpeedSlow2, .+2
         MOV  $2,R3 # Slow move speed as we're firing
 Player_Handler_KeyreadJoy1Up:
         BIT  $Keymap_Up,@$KeyboardScanner_P1
@@ -220,7 +209,7 @@ Player_Handler_KeyreadJoy1Up:
         BLO  Player_Handler_KeyreadJoy1Down
 
         SUB  R3,R1
-       .equiv dstFireUpHandler, .+2
+       .equiv FireUpHandler, .+2
         CALL @$null
 
 Player_Handler_KeyreadJoy1Down:
@@ -231,7 +220,7 @@ Player_Handler_KeyreadJoy1Down:
         BHIS Player_Handler_KeyreadJoy1Left
 
         ADD  R3,R1
-       .equiv dstFireDownHandler, .+2
+       .equiv FireDownHandler, .+2
         CALL @$null
 
 Player_Handler_KeyreadJoy1Left:
@@ -242,7 +231,7 @@ Player_Handler_KeyreadJoy1Left:
         BLO  Player_Handler_KeyreadJoy1Right
 
         SUB  R3,R2
-       .equiv dstFireLeftHandler, .+2
+       .equiv FireLeftHandler, .+2
         CALL @$null
 
 Player_Handler_KeyreadJoy1Right:
@@ -253,14 +242,14 @@ Player_Handler_KeyreadJoy1Right:
         BHIS Player_Handler_SmartBomb
 
         ADD  R3,R2
-       .equiv dstFireRightHandler, .+2
+       .equiv FireRightHandler, .+2
         CALL @$null
 
 Player_Handler_SmartBomb: # Check if we should fire the smarbomb
         BIT  $Keymap_F3,@$KeyboardScanner_P1
         BZE  Player_Handler_KeyreadDone
 
-        TST  @$srcSmartBomb # smartbomb active?
+        TST  @$SmartBomb # smartbomb active?
         BNZ  Player_Handler_KeyreadDone
 
         TSTB 3(R5) # see if we've got any smartbombs left
@@ -273,31 +262,32 @@ Player_Handler_SmartBomb: # Check if we should fire the smarbomb
         # call DoSmartBombFX
 
 Player_Handler_KeyreadDone:
-       .equiv srcPlayerSaveShot, .+2
+       .equiv PlayerSaveShot, .+2
         TST  $0
         BZE  Player_Handler_NoSaveFire
-       .equiv srcPlayerThisSprite, .+2
+       .equiv PlayerThisSprite, .+2
         MOVB $0,8(R5) # player sprite num
-       .equiv srcPlayerThisShot, .+2
+       .equiv PlayerThisShot, .+2
         MOVB $0,15(R5) # fire direction
 Player_Handler_NoSaveFire:
         MOVB 8(R5),R0 # player sprite num
         BIC  $0xFF7F,R0
-       .equiv cmpDroneFlipCurrent, .+2
-        CMP  R0,$1
+       .equiv DroneFlipCurrent, .+2
+        CMP  R0,$1 # ResetCore sets it to 0x69 ../bootstrap.s:370
         BZE  1$
         CALL DroneFlip
    1$:
-       .equiv srcPlayerDoFire, .+2
+       .equiv PlayerDoFire, .+2
         TST  $0
         BZE  2$
         CALL Player_Fire4D
    2$:
-        MOVB R1,(R5)  # Y
-        MOVB R2,1(R5) # X
+        MOVB R1,(R5)+ # Y
+        MOVB R2,(R5)  # X
+        DEC  R5
         CLR  R3
-       .equiv srcPlayerSpriteAnim, .+2
-        BIT  $0b00000010,@$srcTimer_CurrentTick
+       .equiv PlayerSpriteAnim, .+2
+        BIT  $0b00000010,@$Timer_CurrentTick
         BZE  Player_Handler_Frame1
 
         INC  R3
@@ -306,13 +296,13 @@ Player_Handler_Frame1:
         MOV  R2,R0 # or MOV  R1,R0
         SUB  $4,R0
        .equiv dstDroneDirPos1, .+2
-        MOV  R0,@$srcSprShow_X # or srcSprShow_Y
+        MOV  R0,@$SprShow_X # or SprShow_Y
         TSTB 4(R5)
         BZE  Player_Handler_NoDrones
 
         MOV  $4,R0
         ADD  R3,R0
-        MOV  R0,@$srcSprShow_SprNum
+        MOV  R0,@$SprShow_SprNum
 
         PUSH R1
         PUSH R2
@@ -339,7 +329,7 @@ Player_Handler_OneDrone:
 Player_Handler_NoDrones:
         MOV  R2,R0 # X
         SUB  $7,R0
-        MOV  R0,@$srcSprShow_X
+        MOV  R0,@$SprShow_X
         TSTB 7(R5) # invincibility
         BZE  Player_NotInvincible
 
@@ -360,9 +350,9 @@ Player_NotInvincible:
         MOV  8(R5),R0 # player sprite num
         BIC  $0xFFF0,R0
         ADD  R3,R0 # add frame number
-        MOV  R0,@$srcSprShow_SprNum
+        MOV  R0,@$SprShow_SprNum
         SUB  $18,R1
-        MOV  R1,@$srcSprShow_Y
+        MOV  R1,@$SprShow_Y
         CALL @$ShowSprite
 
         RETURN
@@ -375,7 +365,7 @@ SetDronePos:
        .equiv DroneDirPos2, .
         ADD  R1,R0 # or ADD R2,R0
        .equiv DroneDirPos6, .+2
-        MOV  R0,@$srcSprShow_Y # or srcSprShow_X
+        MOV  R0,@$SprShow_Y # or SprShow_X
         RETURN
 
                                         # Player_Fire_OneBurst:
@@ -431,9 +421,9 @@ SetDronePos:
 Player_Fire4D: # Fire bullets!
         MOVB 8(R5),R0 # player sprite num
         BIC  $0xFF7F,R0
-       .equiv cmpDroneFlipFireCurrent, .+2
-        CMP  R0,$0
-        BZE  1$
+       .equiv DroneFlipFireCurrent, .+2
+        CMP  R0,$0 # drones placement Z=horizontal, NZ=vertical
+        BEQ  1$
         CALL DroneFlipFire
    1$:
         MOVB 15(R5),R0 # fire dir
@@ -441,15 +431,15 @@ Player_Fire4D: # Fire bullets!
         BISB 12(R5),R0 # player num
         MOV  R0,@$StarObjectMoveToAdd
 
-        MOVB 6(R5),R0 # D1 Move the drones in when fire is held
+        MOVB 6(R5),R0 # Move the drones in when fire is held
         DECB R0
         DECB R0
         BNZ  Player_Handler_KeyreadJoy1Fire2_DroneLimit
         INCB R0 # Drone at Max 'innness'!
 
 Player_Handler_KeyreadJoy1Fire2_DroneLimit:
-        MOVB R0,6(R5) # D1
-        MOVB 2(R5),R0 # D1
+        MOVB R0,6(R5) # drone pos
+        MOVB 2(R5),R0 # shoot delay
         BIT  $0x80,R0 # check if player is allowed to fire
         BZE  1$
         RETURN
@@ -466,7 +456,7 @@ Player_Handler_KeyreadJoy1Fire2_DroneLimit:
         MOV  @$Player_DroneOffset1,R3
         ADD  $4,R3
        .equiv DroneFlipFirePos5, .
-        ROR  R3 # disable these for X
+        ROR  R3 # or NOP for horizontal drones placement
 
       # Add extra stars depending on how many drones we have
         MOVB 4(R5),R0 # number of drones
@@ -500,7 +490,7 @@ dodrone:
         RETURN
 
 DroneFlipFire:
-        MOV  R0,@$cmpDroneFlipFireCurrent
+        MOV  R0,@$DroneFlipFireCurrent
         BZE  1$
       # vertical move
         MOV  $0060002,@$DroneFlipFirePos3 # ADD R0,R2
@@ -516,55 +506,55 @@ DroneFlipFire:
 DroneFlip:
         # C = R1 = Y
         # B = R2 = X
-        MOV  R0,@$cmpDroneFlipFireCurrent
+        MOV  R0,@$DroneFlipFireCurrent
         BZE  1$
       # vertical move
-        MOV  $srcSprShow_Y,@$dstDroneDirPos1
+        MOV  $SprShow_Y,@$dstDroneDirPos1
         MOV  $0060200,@$DroneDirPos2    # ADD R2,R0
         MOV  $0006200,@$DroneDirPos5    # ASR R0
-        MOV  $srcSprShow_X, @$DroneDirPos6
+        MOV  $SprShow_X, @$DroneDirPos6
         MOV  $0010100,@$opcDroneDirPos8 # MOV R1,R0
         RETURN
    1$:# horizontal move
-        MOV  $srcSprShow_X,@$dstDroneDirPos1
+        MOV  $SprShow_X,@$dstDroneDirPos1
         MOV  $0060100,@$DroneDirPos2    # ADD R1,R0
         MOV  $0000240,@$DroneDirPos5    # NOP
-        MOV  $srcSprShow_Y,@$DroneDirPos6
+        MOV  $SprShow_Y,@$DroneDirPos6
         MOV  $0010200,@$opcDroneDirPos8 # MOV R2,R0
         RETURN
 
 SetFireDir_UP:
-        MOV  $0x82,@$srcPlayerThisSprite
-        MOV  $0x4C,@$srcPlayerThisShot
+        MOV  $0x82,@$PlayerThisSprite
+        MOV  $0x4C,@$PlayerThisShot
         RETURN
 
  SetFireDir_DOWN:
-        MOV  $0x80,@$srcPlayerThisSprite
-        MOV  $0x7C,@$srcPlayerThisShot
+        MOV  $0x80,@$PlayerThisSprite
+        MOV  $0x7C,@$PlayerThisShot
         RETURN
 
 SetFireDir_LEFTsave:
         CALL SetFireDir_FireAndSave
 SetFireDir_LEFT:
-        MOV  $0x02,@$srcPlayerThisSprite
-        MOV  $0x61,@$srcPlayerThisShot
+        MOV  $0x02,@$PlayerThisSprite
+        MOV  $0x61,@$PlayerThisShot
         RETURN
 
 SetFireDir_RIGHTsave:
         CALL SetFireDir_FireAndSave
 SetFireDir_RIGHT:
-        MOV  $0x00,@$srcPlayerThisSprite
-        MOV  $0x67,@$srcPlayerThisShot
+        MOV  $0x00,@$PlayerThisSprite
+        MOV  $0x67,@$PlayerThisShot
         RETURN
 
 SetFireDir_FireAndSaveRestore:
-        MOVB 8(R5), @$srcPlayerThisSprite
-        MOVB 15(R5),@$srcPlayerThisShot
+        MOVB 8(R5), @$PlayerThisSprite
+        MOVB 15(R5),@$PlayerThisShot
 SetFireDir_FireAndSave:
         MOV  $0x67,R0
-        MOV  R0,@$srcPlayerSaveShot
+        MOV  R0,@$PlayerSaveShot
 SetFireDir_Fire:
-        MOV  R0,@$srcPlayerDoFire
+        MOV  R0,@$PlayerDoFire
 
         RETURN
 
@@ -649,7 +639,7 @@ SetFireDir_Fire:
                                         #         ld (hl),%10001011
                                         #
                                         #         inc h
-       .equiv srcPointsSpriteB, .+2
+       .equiv PointsSpriteB, .+2
         MOVB $128+16, (R5)              #         ld (hl),128+16  :PointsSpriteB_Plus1; Sprite
                                         #
                                         #         set 6,l
@@ -815,9 +805,9 @@ PlayerKilled:
         CLRB 3(R5)                         # ld (iy+3),a
         POP  R5                            # pop iy
                                            # ld a,20
-        MOV  $20,@$srcSpendTimeout         # ld (SpendTimeout_Plus1-1),a
+        MOV  $20,@$SpendTimeout         # ld (SpendTimeout_Plus1-1),a
                                            # ld a,100
-        MOV  $100,@$srcShowContinueCounter # ld (ShowContinueCounter_Plus1-1),a
+        MOV  $100,@$ShowContinueCounter # ld (ShowContinueCounter_Plus1-1),a
         RETURN                             # ret
 
 #******************************************************************************#
@@ -828,8 +818,8 @@ Player_DrawUI_DrawIcons: # Used for Health and Smartbomb icons
         BZE  1237$
 
         100$:
-            MOVB R2,@$srcSprShow_ScrWord
-            MOV  R1,@$srcSprShow_ScrLine
+            MOVB R2,@$SprShow_ScrWord
+            MOV  R1,@$SprShow_ScrLine
             PUSH R0
             PUSH R1
             PUSH R2
@@ -838,19 +828,19 @@ Player_DrawUI_DrawIcons: # Used for Health and Smartbomb icons
             POP  R1
             POP  R0
 
-           .equiv srcPlayer_DrawUI_DrawIcons_IconWidth, .+2
+           .equiv Player_DrawUI_DrawIcons_IconWidth, .+2
             ADD  $4,R2
         SOB  R0,100$
 
 1237$:  RETURN
 
 Player1DoContinue:
-        TST  @$srcShowContinueCounter     # ld a,(ShowContinueCounter_Plus1 - 1)
+        TST  @$ShowContinueCounter     # ld a,(ShowContinueCounter_Plus1 - 1)
                                           # or a
         BZE  Player1_DeadUI               # call nz, Player1Continue
         CALL Player1Continue              # jr Player1_DeadUI
 Player2DoContinue:
-       .equiv srcShowContinueCounter, .+2 # ld a,100    :ShowContinueCounter_Plus1
+       .equiv ShowContinueCounter, .+2 # ld a,100    :ShowContinueCounter_Plus1
         TST  $100                         # or a
         BZE  Player2_DeadUI               # call nz,Player2Continue
         CALL Player2Continue              # jr Player2_DeadUI
@@ -886,7 +876,7 @@ Player2_DeadUI:
                                         # ld l,&00;14  ; show how many credits are left
 ShowContinues:
        .inform_and_hang "no ShowContinues"
-       .equiv  srcContinuesScreenPos, .+2
+       .equiv ContinuesScreenPos, .+2
         MOV  $0x0E,R3                   # ld h,&0E    :ContinuesScreenpos_Plus1
                                         # ld bc,txtCreditsMsg2
                                         # call DrawText_LocateAndPrintStringUnlimited
@@ -922,11 +912,11 @@ Player1Continue:
                                         #         db "Continue","?"+&80
                                         #
 Player_DrawUIDual:
-        MOV  R0,@$srcPlayer_DrawUI_DrawIcons_IconWidth
+        MOV  R0,@$Player_DrawUI_DrawIcons_IconWidth
 
         MOV  $8,R1    # Y pos, line
         MOVB 9(R5),R0 # Lives, number of icons
-        MOV  $7,@$srcSprShow_SprNum
+        MOV  $7,@$SprShow_SprNum
         PUSH R2
         PUSH R5
         CALL Player_DrawUI_DrawIcons
@@ -935,7 +925,7 @@ Player_DrawUIDual:
 
         MOV  $180,R1  # Y pos, line
         MOVB 3(R5),R0 # Smart bombs, number of icons
-        MOV  $6,@$srcSprShow_SprNum
+        MOV  $6,@$SprShow_SprNum
         JMP  Player_DrawUI_DrawIcons
 
 Player1DrawUI:
@@ -962,8 +952,8 @@ Player2DrawUI:
                                         # ld iy,Player_Array2
                                         # ld de, Player_ScoreBytes2
 Player_DrawUI_PlusAsWell:
-                                        #     ld (PlayerScorePos_Plus2-1),a
-                                        #     ld (BurstDrawPos_Plus2-2),hl
+                                        #     ld (PlayerScorePos_Plus2 - 1),a
+                                        #     ld (BurstDrawPos_Plus2 - 2),hl
                                         #     push de
                                         #     push iy
                                         #

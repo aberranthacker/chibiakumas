@@ -91,10 +91,10 @@ Stars_AddBurst_BottomWide:
 # patterns above take 146 bytes of RAM
 
 Stars_AddToPlayer: # used by player_driver.s
-        CLR  @$srcStarArrayFullMarker
-        MOV  $PlayerStarArraySizeBytes,@$cmpStars_AddObject_StarArraySize
-        MOV  $PlayerStarArrayPointer,@$srcStars_AddObject_StarArrayPointer
-        CLR  @$srcStarArrayStartPoint
+        CLR  @$StarArrayFullMarker
+        MOV  $PlayerStarArraySizeBytes,@$Stars_AddObject_StarArraySize
+        MOV  $PlayerStarArrayPointer,@$Stars_AddObject_StarArrayPointer
+        CLR  @$StarArrayStartPoint
         RETURN
 
 # OuterBurstPatternLoop:
@@ -109,9 +109,9 @@ Stars_AddToPlayer: # used by player_driver.s
 #     jr OuterBurstPatternLoop
 
 Stars_AddObjectBatchDefault:
-        MOV  $StarArraySizeBytes,@$cmpStars_AddObject_StarArraySize
-        MOV  $StarArrayPointer,@$srcStars_AddObject_StarArrayPointer
-        CLR  @$srcStarArrayStartPoint
+        MOV  $StarArraySizeBytes,@$Stars_AddObject_StarArraySize
+        MOV  $StarArrayPointer,@$Stars_AddObject_StarArrayPointer
+        CLR  @$StarArrayStartPoint
 
         # input  B = R3 = pattern (0-15)
         #        C = R1 = Y pos
@@ -166,7 +166,7 @@ Stars_AddBurst_Loop:
 
         CLR  R4
         BISB R0,R4
-       .equiv srcBurstSpacing, .+2
+       .equiv BurstSpacing, .+2
         SUB  $2,R4 # alter to reduce fire
         BLO  1237$
         SWAB R0
@@ -190,13 +190,13 @@ Stars_AddBurst_Loop:
 Stars_AddObjectFromR0:
         MOV  R0,@$StarObjectMoveToAdd
 Stars_AddObject:
-       .equiv srcStarArrayFullMarker, .+2
+       .equiv StarArrayFullMarker, .+2
         TST  $0x00
         BNZ  1237$ # if > 0 we cannot add any stars as the loop is full!
 
-       .equiv srcStarArrayStartPoint, .+2  #
+       .equiv StarArrayStartPoint, .+2  #
         MOV  $0x00,R3
-       .equiv srcStars_AddObject_StarArrayPointer, .+2
+       .equiv Stars_AddObject_StarArrayPointer, .+2
         MOV  $0x0000,R4
         ADD  R3,R4
 
@@ -204,7 +204,7 @@ Stars_SeekLoop:
         TSTB (R4) # Y check
         BNZ  Stars_SeekLoopNext # if Y <> 0 then this slot is in use
 
-        MOV  R3,@$srcStarArrayStartPoint  # found a free slot!
+        MOV  R3,@$StarArrayStartPoint  # found a free slot!
         MOVB R1,(R4)+ # Y
         MOVB R2,(R4)+ # X
        .equiv StarObjectMoveToAdd, .+2
@@ -214,11 +214,11 @@ Stars_SeekLoop:
 Stars_SeekLoopNext:
         ADD  $3,R4
         ADD  $3,R3
-       .equiv cmpStars_AddObject_StarArraySize, .+2
+       .equiv Stars_AddObject_StarArraySize, .+2
         CMP  R3,$0x00
 
         BLO  Stars_SeekLoop
-        MOV  R3,@$srcStarArrayFullMarker
+        MOV  R3,@$StarArrayFullMarker
         RETURN
 
 Stars_AddObjectBatch2:

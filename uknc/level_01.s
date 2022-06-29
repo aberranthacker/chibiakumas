@@ -80,7 +80,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word        prgFireSlow | fireLeftWide
     .word        mvRegular | spdNormal | 0x22 # move - direction left, slow
     .word        lifeEnemy | 1
-    .word    evtSetSprite | sprTwoFrame | 1                 # 2
+    .word    evtSetSprite | sprTwoFrame | 1   # 2
     .word    evtSetAnimator | anmNone         # 3
     .word    evtAddToForeground               # 4
     .word    evtSaveObjSettings | 2           # 5
@@ -602,14 +602,14 @@ LevelLoop:
 
         CALL @$EventStream_Process
 
-        MOV  $LevelSprites,@$srcSprShow_BankAddr  
+        MOV  $LevelSprites,@$SprShow_BankAddr  
         CALL @$ObjectArray_Redraw
 
-        MOV  $ChibiSprites,@$srcSprShow_BankAddr
+        MOV  $ChibiSprites,@$SprShow_BankAddr
 
         CALL @$PlayerHandler
 
-        MOV  $ChibiSprites,@$srcSprShow_BankAddr  
+        MOV  $ChibiSprites,@$SprShow_BankAddr  
         CALL @$Player_StarArray_Redraw
 
         CALL @$StarArray_Redraw
@@ -665,7 +665,7 @@ Background_Draw:
         PUSH R0 # need to keep the smartbomb color
 
         CALL @$Timer_GetTimer
-        MOV  R0,@$srcBitShifter_TicksOccured
+        MOV  R0,@$BitShifter_TicksOccured
 
         MOV  @$ScreenBuffer_ActiveScreen, R5
 

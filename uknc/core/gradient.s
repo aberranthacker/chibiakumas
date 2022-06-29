@@ -29,22 +29,22 @@ Background_Gradient:
         # R5 HL = ScreenMem pointer # ActiveScreen
         # R3 DE = Gradient pointer  # GradientTop
         # R1 B  = Lines             # GradientTopStart
-        # R2 C  = srcScrollPosRate1 # Shift on Timer Ticks
+        # R2 C  = ScrollPosRate1 # Shift on Timer Ticks
                                                 #     ld a,c
-        MOV  R2,@$srcScrollPosRate1             #     ld (ScrollPosRate1_Plus1 - 1),a
+        MOV  R2,@$ScrollPosRate1             #     ld (ScrollPosRate1_Plus1 - 1),a
                                                 #     ex hl,de
                                                 #     ld a,(hl) ; Load up the first two bytes
                                                 #     ld ixl,a
                                                 #     inc hl
         MOV  (R3)+,R4                           #     ld a,(hl)
         MOV  (R3)+,R2                           #     ld ixh,a
-       #MOV  R2,@$srcBackground_LastLinePattern #     ld (Background_LastLine),a
+       #MOV  R2,@$Background_LastLinePattern #     ld (Background_LastLine),a
                                                 #     inc hl
                                                 #     push hl
                                                 #     pop iy
                                                 #
                                                 #     ld a,(hl)
-        MOV  (R3)+,@$cmpSrollNextLineChange     #     ld (ScrollNextLineChange),a
+        MOV  (R3)+,@$SrollNextLineChange     #     ld (ScrollNextLineChange),a
                                                 #
                                                 #     ex hl,de
                                                 #
@@ -52,19 +52,19 @@ Background_Gradient:
 
 Background_NewLine:                             #     di
                                                 #     ld a,128        :ScrollNextLineChange_Plus1
-       .equiv cmpSrollNextLineChange, .+2       #
+       .equiv SrollNextLineChange, .+2       #
         CMP  R1,$0x80                           #     cp b            ; b is lineno
         BNE  Background_NotNextLine             #     jp nz, Background_NotNextLine   ;jp is faster when true
                                                 #
                                                 #     dec IY
                                                 #
-      #.equiv srcBackground_LastLinePattern, .+2#     ld a,&FF    :Background_LastLine_Plus1
+      #.equiv Background_LastLinePattern, .+2#     ld a,&FF    :Background_LastLine_Plus1
        #MOV  $0xFFFF,R2                         #     ld c,a
         TST  R2                                 #     or a
         BZE  Background_NoShift                 #     jp z,Background_NoShift
                                                 #     ld a,(Timer_TicksOccured_Plus1-1)
         # Scroll rate for 'ground'              #     ld e,a
-       .equiv srcScrollPosRate1, .+2            #     ld a,%11111111  :ScrollPosRate1_Plus1
+       .equiv ScrollPosRate1, .+2            #     ld a,%11111111  :ScrollPosRate1_Plus1
         BIT  $0xFF,@$Timer_TicksOccured      #     and e
         BZE  Background_NoShift                 #     jp nz,Background_ShiftNow :Background_ShiftJumpA_Plus2 #
 
@@ -83,11 +83,11 @@ Background_NoShift: # No shift
                                                 # inc de
                                                 # ld a,(de)
         MOV  (R3)+,R2                           # ld ixh,a    ; byte 2
-       #MOV  R2,@$srcBackground_LastLinePattern # ld (Background_LastLine),a  ; last
+       #MOV  R2,@$Background_LastLinePattern # ld (Background_LastLine),a  ; last
                                                 # inc de
                                                 #
                                                 # ld a,(de)
-        MOV  (R3)+,@$cmpSrollNextLineChange     # ld (ScrollNextLineChange),a ;remember when we need to do it again
+        MOV  (R3)+,@$SrollNextLineChange     # ld (ScrollNextLineChange),a ;remember when we need to do it again
                                                 #
                                                 # ld iyh,d
                                                 # ld iyl,e

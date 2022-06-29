@@ -7,7 +7,7 @@
         # R2 lines
         # R5 pointer to next line of sprite
 BitShifter:
-       .equiv srcBitShifter_TicksOccured, .+2
+       .equiv BitShifter_TicksOccured, .+2
         BIT  $0x00,R0
         BZE  BitShifter_Skip
 

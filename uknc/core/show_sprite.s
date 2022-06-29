@@ -45,11 +45,11 @@
 # The object loop now assumes the sprite is 24x24, this was done to save time
 # as 97% of the time - it is
 ShowSprite_ReadInfo: # ------------------------------------------------------{{{
-       .equiv srcSprShow_SprNum, .+2
+       .equiv SprShow_SprNum, .+2
         MOV  $0,R0
         ASL  R0
 
-       .equiv srcSprShow_BankAddr, .+2
+       .equiv SprShow_BankAddr, .+2
         MOV  $LevelSprites,R5
         MOV  R5,R3
         # 6 bytes per sprite
@@ -60,18 +60,18 @@ ShowSprite_ReadInfo: # ------------------------------------------------------{{{
         MOVB (R5)+,R0 # height of the sprite in lines
         BZE  SpriteGiveUp$
 
-        MOVB R0,@$srcSprShow_TempH
+        MOVB R0,@$SprShow_TempH
 
         MOVB (R5)+,R1 # width in bytes
         # don't care about sign extension, 80 is a maximum value
-        MOV  R1,@$srcSprShow_DrawWidth
-        MOV  R1,@$srcSprShow_SpriteWidth
+        MOV  R1,@$SprShow_DrawWidth
+        MOV  R1,@$SprShow_SpriteWidth
 
-        MOVB (R5)+,@$srcSprShow_Yoffset
+        MOVB (R5)+,@$SprShow_Yoffset
 
         # Sprite attributes such as PSet, Doubleheight and transp color
         MOVB (R5)+,R0 # sign extension is irrelevant
-        MOV  R0,@$srcSprShow_SprAttrs
+        MOV  R0,@$SprShow_SprAttrs
 
         # A  R0 sprite attributes
         # B  R1 width
@@ -98,16 +98,16 @@ ShowSpriteDirect: #----------------------------------------------------------{{{
                                                             #
         ADD  (R5),R3                                        # ex de,hl
                                                             # add hl,bc
-        MOV  R3,@$srcSprShow_TempAddr                       # ld (SprShow_TempAddr),hl
+        MOV  R3,@$SprShow_TempAddr                       # ld (SprShow_TempAddr),hl
                                                             # ex de,hl
                                                             #     ld a,(SprShow_Yoff)
                                                             #     ld c,a
                                                             #     ld a,(SprShow_TempY)
                                                             #     add c
-        ADD  @$srcSprShow_Yoffset, @$srcSprShow_ScrLine       #     ld (SprShow_TempY),A
+        ADD  @$SprShow_Yoffset, @$SprShow_ScrLine       #     ld (SprShow_TempY),A
                                                             # ;Quick shortcuts for fonts
-        MOV  @$srcSprShow_DrawWidth,R0                      # ld a,(SprShow_TempW)
-        MOV  R0,@$srcSprShow_SpriteWidth                    # ld (SprShow_W),a
+        MOV  @$SprShow_DrawWidth,R0                      # ld a,(SprShow_TempW)
+        MOV  R0,@$SprShow_SpriteWidth                    # ld (SprShow_W),a
         DEC  R0                                             # dec a
         BZE  ShowSpriteDirectOneByteSpecial                 # jr z,ShowSpriteDirectOneByteSpecial
         DEC  R0                                             # dec a
@@ -117,10 +117,10 @@ ShowSpriteDirect: #----------------------------------------------------------{{{
         BZE  ShowSpriteDirectFourByteSpecial                # jr z,ShowSpriteDirectFourByteSpecial
                                                             #
                                                             # xor a
-        CLR  @$srcTranspBitA                                # ld (TranspBitA_Plus1-1),a
+        CLR  @$TranspBitA                                # ld (TranspBitA_Plus1-1),a
                                                             #
         MOV  $SprDraw_TurboRenderer,R5                      # ld hl,SprDrawChooseRender
-        BIT  $0x80,@$srcSprShow_SprAttrs                    # ld a,(SprShow_Xoff_Plus1-1)
+        BIT  $0x80,@$SprShow_SprAttrs                    # ld a,(SprShow_Xoff_Plus1-1)
                                                             # bit 7,a
         BZE  ShowSprite_OK_Xoff2                            # jp z,ShowSprite_OK_Xoff2
 
@@ -130,7 +130,7 @@ ShowSprite_OK_Xoff2:
         JMP  ShowSprite_SkipCrop                         # jp ShowSprite_Ready
 
 ShowSpriteDirectFourByteSpecial:
-        CLR  @$srcTranspBitA                                # ld (TranspBitA_Plus1-1),a
+        CLR  @$TranspBitA                                # ld (TranspBitA_Plus1-1),a
                                                             # ld hl,SprDraw16pxInit
         MOV  $SprDraw_TurboRenderer_16pxInit, @$jmpShowSprite_DrawAndReturn # ld (ShowSprite_Ready_Return_Plus2-2),hl
         JMP  ShowSprite_SkipCrop                         # jp ShowSprite_Ready
@@ -159,7 +159,7 @@ ShowSprite: # ShowSprite is the main routine of our program!
       # R3 sprites pointer
       # R5 sprite offset
 
-       .equiv cmpSpriteSizeConfig6, .+2
+       .equiv SpriteSizeConfig6, .+2
         CMP  R1,$6 # 6 bytes, default sprite width
         BEQ  1$
 
@@ -167,23 +167,23 @@ ShowSprite: # ShowSprite is the main routine of our program!
         CALL @$ShowSpriteReconfigure
     1$:
         ADD  (R5),R3 # calculate sprite address
-        MOV  R3,@$srcSprShow_TempAddr
+        MOV  R3,@$SprShow_TempAddr
 
       # we are relying on sprite attributes still being in R0
         BIC  $0xFFF8,R0 # Bits 2,1,0 - transparency
-        MOVB TranspColors(R0),@$srcTranspBitA
+        MOVB TranspColors(R0),@$TranspBitA
 
 # *********  show a new sprite *********
 
 # ShowSprite_OK:
-       .equiv srcSprShow_Yoffset, .+2
+       .equiv SprShow_Yoffset, .+2
         MOV  $48,R1 # set from ShowSprite_ReadInfo
-       .equiv srcSprShow_Y, .+2
+       .equiv SprShow_Y, .+2
         ADD  $48,R1 # set from object array # object_driver.s
 
-       .equiv srcSprShow_SprAttrs, .+2
+       .equiv SprShow_SprAttrs, .+2
         MOV  $48,R0 # set from ShowSprite_ReadInfo
-       .equiv srcSprShow_X, .+2
+       .equiv SprShow_X, .+2
         MOV  $48,R2 # set from object array # object_driver.s
 
       # Set renderer according to the sprite attributes
@@ -230,36 +230,36 @@ ShowSprite: # ShowSprite is the main routine of our program!
 # truncate the sprite ----------------------------------------------------------
         MOV  $SprDraw_BasicRenderer,@$jmpShowSprite_DrawAndReturn
       # R3 = Y lines less to draw
-        SUB  R3,@$srcSprShow_TempH
+        SUB  R3,@$SprShow_TempH
         BLOS 1237$ # return if new height is <= 0
       # R5 = X bytes to remove from the right side
-        SUB  R5,@$srcSprShow_DrawWidth # check if new width is =< 0
+        SUB  R5,@$SprShow_DrawWidth # check if new width is =< 0
         BLOS 1237$ # return if new width is <= 0
       # R2 = Y lines of the sprite to skip
         TST  R2
         BZE  ShowSprite_SkipTopCrop
-        MUL  @$srcSprShow_SpriteWidth,R2 # MUL beats ADD+SOB when factor is more than 2
+        MUL  @$SprShow_SpriteWidth,R2 # MUL beats ADD+SOB when factor is more than 2
         ADD  R3,R4
       # R4 = X bytes to skip on the left side
     ShowSprite_SkipTopCrop:
-        ADD  R4,@$srcSprShow_TempAddr
+        ADD  R4,@$SprShow_TempAddr
 #-------------------------------------------------------------------------------
     ShowSprite_SkipCrop:
-        # srcSprShow_ScrLine = Y - lines to skip
-       .equiv srcSprShow_ScrLine, .+2
+        # SprShow_ScrLine = Y - lines to skip
+       .equiv SprShow_ScrLine, .+2
         MOV  $0x00,R5
         ASL  R5 # calculate the table entry offset
         MOV  scr_addr_table(R5),R5
         ADD  (PC)+,R5 # add X position and the frame buffer MSB
-        srcSprShow_ScrWord: .byte 0x00
-        srcFB_MSB:          .byte 0x40 # FB1
+        SprShow_ScrWord: .byte 0x00
+        FB_MSB:          .byte 0x40 # FB1
                            #.byte 0x00 # FB0
 
-        # srcSprShow_TempH = (H - lines to remove) or (H - lines to skip)
-       .equiv srcSprShow_TempH, .+2
+        # SprShow_TempH = (H - lines to remove) or (H - lines to skip)
+       .equiv SprShow_TempH, .+2
         MOV  $0x00,R2
         # address of the visible part of the sprite
-       .equiv srcSprShow_TempAddr, .+2
+       .equiv SprShow_TempAddr, .+2
         MOV  $0x0000,R4
 
        .equiv jmpShowSprite_DrawAndReturn, .+2
@@ -268,14 +268,14 @@ ShowSprite: # ShowSprite is the main routine of our program!
 # This is our most basic render, its slow, but can do any size and clipping
 SprDraw_BasicRenderer: # (SprDrawChooseRender)-------------------------------{{{
         # R2 number of lines
-        # R4 sprite src address
+        # R4 sprite  address
         # R5 screen memory dst address
-        MOV  @$srcTranspBitA,@$srcTranspBitB
+        MOV  @$TranspBitA,@$TranspBitB
 
        .equiv LineLoopBR, 000400 + (SprDrawLn_LineLoop - SprDrawLn_LineLoopBR - 2) >> 1 & 0xFF
         MOV  $LineLoopBR,R0
 
-        BIT  $0x40,@$srcSprShow_SprAttrs
+        BIT  $0x40,@$SprShow_SprAttrs
         BZE  SprDrawLn_SetLineLoopBR
 
         MOV  $000240,R0 # NOP to remove BR to execute double line related code
@@ -286,7 +286,7 @@ SprDrawLn_SetLineLoopBR:
 SprDrawLn_LineLoop:
         MOV  R5,-(SP)
         MOV  R4,R3
-       .equiv srcSprShow_DrawWidth, .+2
+       .equiv SprShow_DrawWidth, .+2
         MOV  $0x00,R1
         ASR  R1
 
@@ -302,7 +302,7 @@ SprDrawLn_LineLoop:
 SprDrawLn_PixelLoop:
         # TODO: implement transparency
         MOV  (R3)+, R0
-       .equiv srcTranspBitB, .+2
+       .equiv TranspBitB, .+2
         CMP  R0,$0x0000
        #BEQ  SprDrawLn_NextWord
    .ifdef DebugSprite
@@ -317,7 +317,7 @@ SprDrawLn_NextWord:
 
         SOB  R1,SprDrawLn_PixelLoop
 
-       .equiv srcSprShow_SpriteWidth, .+2
+       .equiv SprShow_SpriteWidth, .+2
         ADD  $0x00,R4
         MOV  (SP)+,R5
         ADD  $80,R5
@@ -342,9 +342,9 @@ SprDraw_TurboRenderer_LineDoubler:
         MOV  $SprDraw_TurboRenderer_24px_Double,R3
         JMP  (R3)
 SprDraw_TurboRenderer: # Pick the render based on width
-       .equiv srcTranspBitA, .+2
+       .equiv TranspBitA, .+2
         MOV  $0x00,R0 # Set R0 to ZERO / Transp byte
-        MOV  @$srcSprShow_DrawWidth,R1
+        MOV  @$SprShow_DrawWidth,R1
 
     .ifdef DebugMode
         CMP  R1,$24
@@ -455,7 +455,7 @@ SprDraw_PsetRenderer_LineDoubler:
         BR   SprDraw_PsetRenderer_Double
 
 SprDraw_PsetRenderer:
-        MOV  @$srcSprShow_DrawWidth,R1
+        MOV  @$SprShow_DrawWidth,R1
 
     .ifdef DebugMode
         CMP  R1,$32

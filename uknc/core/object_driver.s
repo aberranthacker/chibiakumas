@@ -23,15 +23,15 @@ ObjectArray_reConfigureForSize:
 ObjectArray_ConfigureForSizeB:
         CLR  R0
         BISB R4,R0
-        MOV  R0,@$srcObjectSpriteSizeCurrent
-        MOV  R0,@$srcSpriteSizeShiftFull
-       #MOV  R0,@$srcSpriteSizeShiftFullB # TODO: uncomment for player 2
-        MOV  R0,@$srcSpriteSizeShiftFullC
+        MOV  R0,@$ObjectSpriteSizeCurrent
+        MOV  R0,@$SpriteSizeShiftFull
+       #MOV  R0,@$SpriteSizeShiftFullB # TODO: uncomment for player 2
+        MOV  R0,@$SpriteSizeShiftFullC
         ASR  R0
-        MOV  R0,@$srcSpriteSizeShiftHalfB
-       #MOV  R0,@$srcSpriteSizeShiftHalfD # TODO: uncomment for player 2
+        MOV  R0,@$SpriteSizeShiftHalfB
+       #MOV  R0,@$SpriteSizeShiftHalfD # TODO: uncomment for player 2
         BIS  $0b00000011,R0
-        MOV  R0,@$srcSpriteSizeShiftHalfH
+        MOV  R0,@$SpriteSizeShiftHalfH
 
         # Define player 1 and 2 hitboxes
 ObjectArray_ConfigureForSize:
@@ -40,7 +40,7 @@ ObjectArray_ConfigureForSize:
         CLR  R0
         BISB @$P1_P00,R0 # PlayerY
         MOV  R0,@$PlayerY2
-       .equiv srcSpriteSizeShiftFull, .+2
+       .equiv SpriteSizeShiftFull, .+2
         SUB  $24,R0
         BHIS 1$
 
@@ -50,7 +50,7 @@ ObjectArray_ConfigureForSize:
         CLR  R0
         BISB @$P1_P01,R0 # PlayerX
         MOV  R0,@$PlayerX2
-       .equiv srcSpriteSizeShiftHalfB, .+2
+       .equiv SpriteSizeShiftHalfB, .+2
         SUB  $12,R0
         BHIS 2$
 
@@ -60,22 +60,22 @@ ObjectArray_ConfigureForSize:
       # Define player 2's hitbox # TODO uncomment for player 2
    #    CLR  R0
    #    BISB @$P2_P00,R0 # PlayerY
-   #    MOV  R0,@$srcPlayer2Y2
-   #   .equiv srcSpriteSizeShiftFullB, .+2
+   #    MOV  R0,@$Player2Y2
+   #   .equiv SpriteSizeShiftFullB, .+2
    #    SUB  $24,R0
    #    BHIS 3$
 
    #    CLR  R0
-   #3$: MOV  R0,@$srcPlayer2Y1
+   #3$: MOV  R0,@$Player2Y1
    #    CLR  R0
    #    BISB @$P1_P01,R0 # PlayerX
-   #    MOV  R0,@$srcPlayer2X2
-   #   .equiv srcSpriteSizeShiftHalfD, .+2
+   #    MOV  R0,@$Player2X2
+   #   .equiv SpriteSizeShiftHalfD, .+2
    #    SUB  $12,R0
    #    BHIS 4$
 
    #    CLR  R0
-   #4$: MOV  R0,@$srcPlayer2X1
+   #4$: MOV  R0,@$Player2X1
 
         RETURN
 # ObjectArray_ConfigureForSize ----------------------------------------------}}}
@@ -105,9 +105,9 @@ ObjectArray_NextObject:                                     # ObjectArray_Turbo:
         PUSH R4
         PUSH R5
 
-        MOVB R1,@$srcSprShow_Y
+        MOVB R1,@$SprShow_Y
         SWAB R1
-        MOVB R1,@$srcSprShow_X
+        MOVB R1,@$SprShow_X
       # R1 LSB b = X, R1 MSB c = Y
         MOV  (R5)+,R2
       # R2 LSB ixh = Move, R2 MSB iyh = Sprite
@@ -116,7 +116,7 @@ ObjectArray_NextObject:                                     # ObjectArray_Turbo:
         MOV  (R5),R4
       # R4 LSB = Sprite Size, R4 MSB = Animator
 
-       .equiv srcObjectSpriteSizeCurrent, .+2
+       .equiv ObjectSpriteSizeCurrent, .+2
         CMPB $0x00,R4
         BEQ  1$
         CALL ObjectArray_reConfigureForSize # Code to change sprite size!
@@ -131,12 +131,12 @@ ObjectArray_NextObject:                                     # ObjectArray_Turbo:
       # R2 LSB ixh = Sprite, R2 MSB iyh = Move
         MOV  R2,R0
         BIC  $0xFFC0,R0                                   # and %00111111
-        MOV  R0,@$srcSprShow_SprNum                       # ld (SprShow_SprNum),a
+        MOV  R0,@$SprShow_SprNum                       # ld (SprShow_SprNum),a
                                                           # ld a,iyh
         BIT  $0xC0,R2                                     # and %11000000
         BZE  Objectloop_SpriteBankSet  # one frame sprite # jr z,Objectloop_SpriteBankSet
 
-        MOV  @$srcTimer_CurrentTick,R0                    # bit 6,a
+        MOV  @$Timer_CurrentTick,R0                    # bit 6,a
         BIT  $0x40,R2                                     # ld a,(Timer_CurrentTick)
         BZE  Objectloop_TwoFrameSprite                    # jr z,Objectloop_TwoFrameSprite
 
@@ -209,15 +209,15 @@ ObjectLoopP1Skip:
        #                                                    # jr z,ObjectLoopP2Skip
        #                                                    #
        #                                                    # ld a,b
-       #CMPB (PC)+,R0; srcPlayer2X1: .word 0                # cp 0 :Player2X1_Plus1
+       #CMPB (PC)+,R0; Player2X1: .word 0                # cp 0 :Player2X1_Plus1
        #                                                    # jr c,ObjectLoopP2Skip
-       #CMPB (PC)+,R0; srcPlayer2X2: .word 0                # cp 0 :Player2X2_Plus1
+       #CMPB (PC)+,R0; Player2X2: .word 0                # cp 0 :Player2X2_Plus1
        #                                                    # jr nc,ObjectLoopP2Skip
        #                                                    #
        #                                                    # ld a,c
-       #CMPB (PC)+,R0; srcPlayer2Y1: .word 0                # cp 0 :Player2Y1_Plus1
+       #CMPB (PC)+,R0; Player2Y1: .word 0                # cp 0 :Player2Y1_Plus1
        #                                                    # jr c,ObjectLoopP2Skip
-       #CMPB (PC)+,R0; srcPlayer2Y2: .word 0                # cp 0 :Player2Y2_Plus1
+       #CMPB (PC)+,R0; Player2Y2: .word 0                # cp 0 :Player2Y2_Plus1
        #                                                    # jr nc,ObjectLoopP2Skip
        #                                                    #
        #                                                    # push hl
@@ -261,13 +261,13 @@ ObjectLoop_AgelessIXLCheck:
                                                             # push hl
         MOVB R1,R0                                          # ld a,b
         MOVB R0,@$ObjectHitXA                               # ld (ObjectHitXA_Plus1 - 1),a
-       .equiv srcSpriteSizeShiftHalfH, .+2
+       .equiv SpriteSizeShiftHalfH, .+2
         ADD  $12,R0                                         # add 12  :SpriteSizeShiftHalfH_Plus1
         MOVB R0,@$ObjectHitXB                               # ld (ObjectHitXB_Plus1 - 1),a
         SWAB R1
         MOVB R1,R0                                          # ld a,c
         MOVB R0,@$ObjectHitYA                               # ld (ObjectHitYA_Plus1 - 1),a
-       .equiv srcSpriteSizeShiftFullC, .+2
+       .equiv SpriteSizeShiftFullC, .+2
         ADD  $24,R0                                         # add 24  :SpriteSizeShiftFullC_Plus1
         MOVB R0,@$ObjectHitYB                               # ld (ObjectHitYB_Plus1 - 1),a
                                                             #
@@ -692,28 +692,28 @@ ObjectProgram_PowerUps:
 # Every other X column uses an alternate sprite - for background anim ----------
 ObjectProgram_BitShiftSprite:
                                 # ld a,b
-       #MOV  R4,@$srcSprShow_X  # ld (SprShow_X),a ; Makesure sprite pos is updated for Domoves
+       #MOV  R4,@$SprShow_X  # ld (SprShow_X),a ; Makesure sprite pos is updated for Domoves
                                 # bit 0,b ;2 pixel
 1237$:  RETURN                  # ret
 
 ObjectProgram_SnailFire:
-       .equiv  srcFireFrequencyA, .+2
+       .equiv  FireFrequencyA, .+2
         MOV  $0b00010000,R0     # ld a,%00010000  :FireFrequencyA_Plus1
         BR   ObjectProgram_Fire # jr ObjectProgram_Fire
 ObjectProgram_SlowFire:
-       .equiv  srcFireFrequencyB, .+2
+       .equiv  FireFrequencyB, .+2
         MOV  $0b00001000,R0     # ld a,%00001000  :FireFrequencyB_Plus1
         BR   ObjectProgram_Fire # jr ObjectProgram_Fire
 ObjectProgram_MidFire:
-       .equiv  srcFireFrequencyC, .+2
+       .equiv  FireFrequencyC, .+2
         MOV  $0b00001000,R0     # ld a,%00001000  :FireFrequencyC_Plus1
         BR   ObjectProgram_Fire # jr ObjectProgram_Fire
 ObjectProgram_AboveMidFire:
-       .equiv  srcFireFrequencyD, .+2
+       .equiv  FireFrequencyD, .+2
         MOV  $0b00000100,R0     # ld a,%00000100; :FireFrequencyD_Plus1
         BR   ObjectProgram_Fire # jr ObjectProgram_Fire
 ObjectProgram_FastFire:
-       .equiv  srcFireFrequencyE, .+2
+       .equiv  FireFrequencyE, .+2
         MOV  $0b00000010,R0     # ld a,%00000010; :FireFrequencyE_Plus1
 
 ObjectProgram_Fire:
@@ -727,7 +727,7 @@ ObjectProgram_HyperFire:
         # TODO: implement QueueSFX
        #CALL @$SFX_QueueSFX_Generic        # call SFX_QueueSFX_Generic
         # B=R4=X, C=R1=Y, IYL=R3=Prg       #
-        MOV  @$srcSpriteSizeShiftHalfB,R2  # ld a,(SpriteSizeShiftHalfB_Plus1 - 1)
+        MOV  @$SpriteSizeShiftHalfB,R2  # ld a,(SpriteSizeShiftHalfB_Plus1 - 1)
         ADD  R2,R1                         # ld d,a
                                            # add c
                                            # ld c,a
@@ -788,7 +788,7 @@ Object_DecreaseShotToDeathB:
         # TODO: implement sfx              # ld a,3
                                            # call SFX_QueueSFX_Generic
       # create a coin
-       .equiv srcPointsSpriteC, .+2
+       .equiv PointsSpriteC, .+2
       # R2 LSB ixh = Sprite, R2 MSB iyh = Move
         MOV (PC)+,R2
        .byte 128+16     # ld iyh,128+16 :PointsSpriteC_Plus1  ; Sprite

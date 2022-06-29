@@ -387,9 +387,9 @@ PrintAt: #-------------------------------------------------------------------{{{
                 ROR  R0
                 MOV  R0,(R5)
                 MOV  (R4),R0
-                MOVB R0,@$srcCurrentChar
+                MOVB R0,@$CurrentChar
                 SWAB R0
-                MOVB R0,@$srcCurrentLine
+                MOVB R0,@$CurrentLine
                 BR   Print
 #----------------------------------------------------------------------------}}}
 Print: #---------------------------------------------------------------------{{{
@@ -426,11 +426,11 @@ LoadNext2Bytes: MOV  (R4),R0  # load 2 bytes from CPU RAM
                 BR   LoadNext2Bytes
 
 2$:             INC  (R5)
-                MOV  (R5),@$srcNextStringAddr
+                MOV  (R5),@$NextStringAddr
 
-3$:             MOV  @$srcCurrentLine,R1 # prepare to calculate relative char address
+3$:             MOV  @$CurrentLine,R1 # prepare to calculate relative char address
                 MUL  $CharLineSize,R1    # calculate relative address of the line
-                ADD  @$srcCurrentChar,R1 # calculate relative address of the char
+                ADD  @$CurrentChar,R1 # calculate relative address of the char
                 ADD  $FbStart,R1         # calculate absolute address of the next char
 
                 MOV  $StrBuffer,R3
@@ -453,29 +453,29 @@ NextChar:       MOV  R1,(R5)      # load address of the next char into address r
                .endr
 
                 INC  R1
-                INC  (PC)+; srcCurrentChar: .word 0
-                CMP  @$srcCurrentChar,R2 # end of screen line? (R2 == 40)
+                INC  (PC)+; CurrentChar: .word 0
+                CMP  @$CurrentChar,R2 # end of screen line? (R2 == 40)
                 BNE  NextChar            # no, print another character
-NewLine:        CLR  @$srcCurrentChar
-                INC  (PC)+; srcCurrentLine: .word 0
-                CMP  @$srcCurrentLine,$TextLinesCount # next line out of screen?
+NewLine:        CLR  @$CurrentChar
+                INC  (PC)+; CurrentLine: .word 0
+                CMP  @$CurrentLine,$TextLinesCount # next line out of screen?
                 BNE  Recalculate      # no, recalculate screen address
-                CLR  @$srcCurrentLine # yes, print from the beginning
+                CLR  @$CurrentLine # yes, print from the beginning
 
-Recalculate:    MOV  @$srcCurrentLine,R1 #
+Recalculate:    MOV  @$CurrentLine,R1 #
                 MUL  $CharLineSize,R1    # calculate relative line address
-                ADD  @$srcCurrentChar,R1 # calculate relative char dst address
+                ADD  @$CurrentChar,R1 # calculate relative char dst address
                 ADD  $FbStart,R1         # calculate screen address of the next char
                 MOV  R1,(R5)             # load screen address of the next char to address register
                 BR   NextChar
 
 NextString:     MOV  $StrBuffer,R3
-                MOV  (PC)+,(R5); srcNextStringAddr: .word 0
+                MOV  (PC)+,(R5); NextStringAddr: .word 0
                 MOV  $PBP12D,R4
                 MOV  (R4),R0
-                MOVB R0,@$srcCurrentChar
+                MOVB R0,@$CurrentChar
                 SWAB R0
-                MOVB R0,@$srcCurrentLine
+                MOVB R0,@$CurrentLine
                 INC  (R5)
                 BR   LoadNext2Bytes
 
@@ -562,7 +562,7 @@ ShowBossText: #--------------------------------------------------------------{{{
 
                 MOV  $PPU_PPUCommandArg, (R5) # setup address register
 
-                MOV  (R4),@$srcCharsToPrint
+                MOV  (R4),@$CharsToPrint
 
                 MOV  $DTSOCT,R4
 
@@ -574,7 +574,7 @@ SBT_NextTextLine:
                 MUL  $CharLineSize,R1
                 ADD  R0,R1
 
-SBT_NextChar:   DEC  (PC)+; srcCharsToPrint: .word 0xFF
+SBT_NextChar:   DEC  (PC)+; CharsToPrint: .word 0xFF
                 BZE  1237$
 
                 MOV  R1,(R5)      # load address of the next char into address register
@@ -709,9 +709,9 @@ Debug_PrintAt: #-------------------------------------------------------------{{{
         ROR  R0
         MOV  R0,(R5)
         MOV  (R4),R0
-        MOVB R0,@$Debug_srcCurrentChar
+        MOVB R0,@$Debug_CurrentChar
         SWAB R0
-        MOVB R0,@$Debug_srcCurrentLine
+        MOVB R0,@$Debug_CurrentLine
         BR   Debug_Print
 #----------------------------------------------------------------------------}}}
 Debug_Print: #---------------------------------------------------------------{{{
@@ -760,11 +760,11 @@ Debug_LoadNext2Bytes:
         BR   Debug_LoadNext2Bytes
 
 2$:     INC  (R5)
-        MOV  (R5),@$Debug_srcNextStringAddr
+        MOV  (R5),@$Debug_NextStringAddr
 
-3$:     MOV  @$Debug_srcCurrentLine,R1 # prepare to calculate relative char address
+3$:     MOV  @$Debug_CurrentLine,R1 # prepare to calculate relative char address
         MUL  $Debug_CharLineSize,R1    # calculate relative address of the line
-        ADD  @$Debug_srcCurrentChar,R1 # calculate relative address of the char
+        ADD  @$Debug_CurrentChar,R1 # calculate relative address of the char
         ADD  $Debug_FbStart,R1         # calculate absolute address of the next char
 
         MOV  $StrBuffer,R3
@@ -786,21 +786,21 @@ Debug_NextChar:
        .endr
 
         INC  R1
-       .equiv Debug_srcCurrentChar, .+2
+       .equiv Debug_CurrentChar, .+2
         INC  $0x00
-        CMP  @$Debug_srcCurrentChar,R2 # end of screen line? (R2 == 40)
+        CMP  @$Debug_CurrentChar,R2 # end of screen line? (R2 == 40)
         BNE  Debug_NextChar            # no, print another character
 Debug_NewLine:
-        CLR  @$Debug_srcCurrentChar
-       .equiv Debug_srcCurrentLine, .+2
+        CLR  @$Debug_CurrentChar
+       .equiv Debug_CurrentLine, .+2
         INC  $0x00
-        CMP  @$Debug_srcCurrentLine,$Debug_TextLinesCount # next line out of screen?
+        CMP  @$Debug_CurrentLine,$Debug_TextLinesCount # next line out of screen?
         BNE  Debug_Recalculate      # no, recalculate screen address
-        CLR  @$Debug_srcCurrentLine # yes, print from the beginning
+        CLR  @$Debug_CurrentLine # yes, print from the beginning
 Debug_Recalculate:
-        MOV  @$Debug_srcCurrentLine,R1 #
+        MOV  @$Debug_CurrentLine,R1 #
         MUL  $Debug_CharLineSize,R1    # calculate relative line address
-        ADD  @$Debug_srcCurrentChar,R1 # calculate relative char dst address
+        ADD  @$Debug_CurrentChar,R1 # calculate relative char dst address
         ADD  $Debug_FbStart,R1         # calculate screen address of the next char
         BR   Debug_NextChar
 
@@ -808,12 +808,12 @@ Debug_NextString:
         MOV  $StrBuffer,R3
         MOV  $PBP12D,R4
         MOV  $PBPADR,R5
-       .equiv Debug_srcNextStringAddr, .+2
+       .equiv Debug_NextStringAddr, .+2
         MOV  $0x0000,(R5);
         MOV  (R4),R0
-        MOVB R0,@$Debug_srcCurrentChar
+        MOVB R0,@$Debug_CurrentChar
         SWAB R0
-        MOVB R0,@$Debug_srcCurrentLine
+        MOVB R0,@$Debug_CurrentLine
         INC  (R5)
         BR   Debug_LoadNext2Bytes
 

@@ -96,50 +96,11 @@ SavedSettings: #-------------------------------------------------------------{{{
         P2_P14: .byte 0          # 14 - PlayerShootPower_Plus1
         P2_P15: .byte 0x67       # 15 - FireDir
 
-    KeyMap2:
-       .byte 0xFF,       0x00 # Pause
-       .byte 0b01111111, 0x05 # Fire3
-       .byte 0b10111111, 0x06 # Fire2R
-       .byte 0b01111111, 0x06 # Fire1L
-       .byte 0b11011111, 0x07 # Right
-       .byte 0b11011111, 0x08 # Left
-       .byte 0b11101111, 0x07 # Down
-       .byte 0b11110111, 0x07 # Up
-
-    KeyMap:
-       .byte 0xF7,       0x03 # Pause bit 20
-       .byte 0b11111011, 0x02 # Fire3     19
-       .byte 0b11111011, 0x04 # Fire2R    18
-       .byte 0b11110111, 0x04 # Fire1L    17
-       .byte 0xFD,       0x00 # Right     16
-       .byte 0xFE,       0x01 # Left      15
-       .byte 0xFB,       0x00 # Down      14
-       .byte 0xFE,       0x00 # Up        13
-
     Player_ScoreBytes:  .space 8,0 # Player 1 current score
     Player_ScoreBytes2: .space 8,0 # Player 2 current score
-    # 25
     HighScoreBytes:     .space 8,0 # Highscore
 SavedSettings_Last: # 0x80 bytes --------------------------------------------}}}
 
-# X,X,Y,Y,S,[0,0,0] - [] not used
-PlusSprites_Config1:
-    # These go at &6030
-    .byte 0x60-0x00, 0x02, 0x08, 0x00 #  0
-    .byte 0x60-0x20, 0x02, 0x08, 0x00 #  4
-    .byte 0x60-0x40, 0x02, 0x08, 0x00 #  8
-    .byte 0x00+0x00, 0x00, 0x08, 0x00 # 12
-    .byte 0x00+0x20, 0x00, 0x08, 0x00 # 16
-    .byte 0x00+0x40, 0x00, 0x08, 0x00 # 20
-PlusSprites_Config2:
-    .byte 0x00+0x00, 0x00, 0xB4, 0x00 #  0
-    .byte 0x00+0x20, 0x00, 0xB4, 0x00 #  4
-    .byte 0x00+0x40, 0x00, 0xB4, 0x00 #  8
-    .byte 0x60-0x00, 0x02, 0xB4, 0x00 # 12
-    .byte 0x60-0x20, 0x02, 0xB4, 0x00 # 16
-    .byte 0x60-0x40, 0x02, 0xB4, 0x00 # 20
-
-# Transparent colors are used by the sprite, if the byte matches it is skipped
 # to effect transparency without an 'alpha map'
 TranspColors: .byte 0x00 # 0b00000000
               .byte 0xF0 # 0b11110000
@@ -207,7 +168,11 @@ Event_VectorArray:
 null:   RETURN
 
 not_implemented_check_R0:
+    .ifdef DebugMode
        .inform_and_hang "core: not implemented, check R0 for jump vector"
+    .else
+        BR   null
+    .endif
 
        .include "core/compiled_sprite_viewer.s"
        .global CLS
@@ -218,20 +183,20 @@ not_implemented_check_R0:
        .global dstCustomShotToDeathCall
        .global dstObjectDoMovesOverride
        .global dstObjectShotOverride
-       .global srcFireFrequencyA
-       .global srcFireFrequencyB
-       .global srcFireFrequencyC
-       .global srcFireFrequencyD
-       .global srcFireFrequencyE
+       .global FireFrequencyA
+       .global FireFrequencyB
+       .global FireFrequencyC
+       .global FireFrequencyD
+       .global FireFrequencyE
 
        .include "core/event_stream.s"
        .global DoMovesBackground_SetScroll
        .global EventStream_Process
        .global EventStream_Init
-       .global srcEventObjectAnimatorToAdd
-       .global srcEventObjectProgramToAdd
-       .global srcEventObjectSpriteSizeToAdd
-       .global srcEvent_LevelTime
+       .global EventObjectAnimatorToAdd
+       .global EventObjectProgramToAdd
+       .global EventObjectSpriteSizeToAdd
+       .global Event_LevelTime
 
        .include "core/execute_bootstrap.s"
        .global ExecuteBootstrap
@@ -258,19 +223,19 @@ not_implemented_check_R0:
        .global SetFireDir_UP
        .global ShowContinuesSelfMod
        .global SpendCreditSelfMod
-       .global cmpDroneFlipCurrent
-       .global cmpDroneFlipFireCurrent
+       .global DroneFlipCurrent
+       .global DroneFlipFireCurrent
        .global dstCustomPlayerHitter
        .global dstCustomSmartBombEnemy
-       .global dstFire1Handler
-       .global dstFire2Handler
-       .global dstFireDownHandler
-       .global dstFireLeftHandler
-       .global dstFireRightHandler
-       .global dstFireUpHandler
+       .global Fire1Handler
+       .global Fire2Handler
+       .global FireDownHandler
+       .global FireLeftHandler
+       .global FireRightHandler
+       .global FireUpHandler
        .global dstSmartBombSpecial
-       .global srcContinuesScreenPos
-       .global srcShowContinueCounter
+       .global ContinuesScreenPos
+       .global ShowContinueCounter
 
        .include "core/screen_memory.s"
        .global GetMemPos
@@ -280,11 +245,11 @@ not_implemented_check_R0:
        .global ScreenBuffer_Reset
 
        .include "core/sfx.s"
-       .global srcSfx_CurrentPriority
-       .global srcSfx_Sound
+       .global Sfx_CurrentPriority
+       .global Sfx_Sound
 
        .include "core/show_sprite.s"
-       .global srcSprShow_BankAddr
+       .global SprShow_BankAddr
 
        .include "core/stararray.s"
        .global opcStarSlowdown
@@ -293,12 +258,12 @@ not_implemented_check_R0:
 
        .include "core/stararray_add.s"
        .global Stars_AddBurst_Top
-       .global srcBurstSpacing
+       .global BurstSpacing
 
        .include "core/timer.s"
        .global Timer_GetTimer
        .global Timer_UpdateTimer
-       .global srcTimer_CurrentTick
+       .global Timer_CurrentTick
        .global Timer_TicksOccured
 
        .include "core/virtual_screen_pos_320.s"
@@ -315,7 +280,7 @@ not_implemented_check_R0:
 
        .include "background_bit_shifter.s"
        .global BitShifter
-       .global srcBitShifter_TicksOccured
+       .global BitShifter_TicksOccured
 
        .include "background_get_sprite_mem_pos.s"
        .global GetSpriteMempos
