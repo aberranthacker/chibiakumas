@@ -172,11 +172,11 @@ Player_Handler_DronePosOk:             # Player_Handler_DronePosOk:
 
         MOV  @$KeyboardScanner_P1,R0
 # SelfModifyingFire1:
-        BIT  $Keymap_F1,R0
+        BIT  $Keymap_F2,R0
         BZE  Player_Handler_KeyreadJoy1Fire2
         # fire bullets
 # SelfModifyingFire2:
-        BIT  $Keymap_F2,R0
+        BIT  $Keymap_F1,R0
         BZE  Player_Handler_KeyreadJoy1Fire1
 
       # Xfire is a secret feature planned for the sequel
@@ -186,7 +186,7 @@ Player_Handler_DronePosOk:             # Player_Handler_DronePosOk:
 
 Player_Handler_KeyreadJoy1Fire1: # Fire right
        .equiv Fire1Handler, .+2
-        CALL @$SetFireDir_RIGHTsave # fire bullets
+        CALL @$SetFireDir_LEFTsave # fire bullets
 
        .equiv PlayerMoveSpeedSlow1, .+2
         MOV  $2,R3 # slow move speed as we're firing
@@ -194,11 +194,11 @@ Player_Handler_KeyreadJoy1Fire1: # Fire right
 
 Player_Handler_KeyreadJoy1Fire2: # Fire left
 # SelfModifyingFire1B: # supposed to be reset from bootstrap
-        BIT  $Keymap_F2,R0
+        BIT  $Keymap_F1,R0
         BZE  Player_Handler_KeyreadJoy1Up
 
        .equiv Fire2Handler, .+2
-        CALL @$SetFireDir_LEFTsave # fire bullets
+        CALL @$SetFireDir_RIGHTsave # fire bullets
 
        .equiv PlayerMoveSpeedSlow2, .+2
         MOV  $2,R3 # Slow move speed as we're firing
@@ -249,17 +249,14 @@ Player_Handler_SmartBomb: # Check if we should fire the smarbomb
         BIT  $Keymap_F3,@$KeyboardScanner_P1
         BZE  Player_Handler_KeyreadDone
 
-        TST  @$SmartBomb # smartbomb active?
+        TST  @$SmartBombTimer # smartbomb active?
         BNZ  Player_Handler_KeyreadDone
 
         TSTB 3(R5) # see if we've got any smartbombs left
         BZE  Player_Handler_KeyreadDone
 
-        DEC  3(R5)
-        # TODO: implement smartbomb
-        # call DoSmartBomb
-        # ld a,3
-        # call DoSmartBombFX
+        DECB 3(R5)
+        CALL Player_Handler_DoSmartBomb
 
 Player_Handler_KeyreadDone:
        .equiv PlayerSaveShot, .+2
@@ -445,11 +442,11 @@ Player_Handler_KeyreadJoy1Fire2_DroneLimit:
         RETURN
     1$:
         BIS  $0x80,R0
-        MOV  R0,2(R5)
+        MOVB R0,2(R5)
 
         CALL Stars_AddToPlayer
-        #  input C = R1 = Y
-        #        D = R2 = X
+      #  input C = R1 = Y
+      #        D = R2 = X
         CALL Stars_AddObject
 
       # drone1
@@ -479,9 +476,9 @@ Player_NoDrones:
         RETURN                         #     jp SFX_QueueSFX_Generic
 
 dodrone:
-        # C = R1 = Y
-        # B = R2 = X
-        # ResetCore sets to add a,c
+      # C = R1 = Y
+      # B = R2 = X
+      # ResetCore sets to add a,c
        .equiv DroneFlipFirePos3, .
         ADD  R0,R2
         CALL Stars_AddObject
@@ -504,8 +501,8 @@ DroneFlipFire:
         RETURN
 
 DroneFlip:
-        # C = R1 = Y
-        # B = R2 = X
+      # C = R1 = Y
+      # B = R2 = X
         MOV  R0,@$DroneFlipFireCurrent
         BZE  1$
       # vertical move
@@ -567,115 +564,71 @@ SetFireDir_Fire:
                                                             #     pop af
                                                             #     jr DoSmartBombFX
 
-                                                            # MemoryFlushLDIR:
-                                                            #     ld b,0
-                                                            #     ld c,a
-                                                            #
-                                                            #     ld d,h
-                                                            #     ld e,l
-                                                            #     inc de
-                                                            #     ld (hl),b
-                                                            #     ldir
-                                                            #     ret
-
 # ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 # ;;                               Smart Bomb                                   ;;
 # ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-                                        # DoSmartBomb:
-                                        #     push de
-                                        #     push bc
-                                        #
-                                        #     ld a,StarArraySize-1;(StarArraySize_Enemy)
-                                        #     ld hl,StarArrayPointer;(StarArrayMemloc_Enemy)
-                                        #
-                                        #     call MemoryFlushLDIR
-                                        #
-       .equiv  dstSmartBombSpecial, .+2
-        CALL @$null                     #     call null :SmartBombSpecial_Plus2 ; We can hack in our own smartbomb handler
-                                        #                                       ; this is needed to wipe omega array for
-                                        #                                       ; final boss as it's not handled by
-                                        #                                       ; normal core code
-                                        #     ld b,ObjectArraySize
-                                        #     ld hl,ObjectArrayPointer
-                                        #
-                                        # Player_Handler_SmartBombObjLoop: ; we need special code because we don't want to wipe
-                                        #                                  ; bg objects and boss sprites
-                                        #     push hl
-                                        #         ;y
-                                        #         inc h
-                                        #         ;x
-                                        #         inc h
-                                        #         ;m
-                                        #         inc h
-                                        #         ;s
-                                        #         set 6,l
-                                        #         ld a,(hl)   ;life (0 is background)
-                                        #         or a
-                                        #
-                                        #         jr z,Player_Handler_SmartBombObjMoveNext
-                                        #         inc a
-                                        #         jr z,Player_Handler_SmartBombObjMoveNext
-                                        #
-                                        #         dec h
-                                        #
-       .equiv  dstCustomSmartBombEnemy, .+2
-        CALL @$null                     #         call null : CustomSmartBombEnemy_Plus2
-                                        #
-                                        #         ld a,(hl)
-                                        #         or a
-                                        #         jr z,SmartBombKill
-                                        #
-                                        #         cp 16           ;Program 1-31 are protected from smartbomb
-                                        #         jr C,Player_Handler_SmartBombObjMoveNext
-                                        #
-                                        # SmartBombKill
-                                        #         ;if we got here we need to kill this object
-                                        #         pop hl
-                                        #         push hl
-                                        #
-                                        #         inc h ;y
-                                        #         inc h ;X
-                                        #
-                                        #         ld (hl),%10001011
-                                        #
-                                        #         inc h
-       .equiv PointsSpriteB, .+2
-        MOVB $128+16, (R5)              #         ld (hl),128+16  :PointsSpriteB_Plus1; Sprite
-                                        #
-                                        #         set 6,l
-                                        #         ld (hl),64+63   ; Life ; must "hurt" player for hit to be detected
-                                        #         dec h
-                                        #         ld (hl),3   ; Program
-                                        #         dec h
-                                        #         dec h
-                                        #         ld (hl),0
-                                        #
-                                        # Player_Handler_SmartBombObjMoveNext:
-                                        #     pop hl
-                                        #     inc l
-                                        #     djnz Player_Handler_SmartBombObjLoop
-                                        #
-                                        #     pop bc
-                                        #     pop de
-                                        #
-                                        # ret
-                                        #
-                                        # DoSmartBombFX:
-                                        #     push af;
-                                        #
-                                        #     or a
-                                        #     ret z
-                                        #
-                                        #     ld a,5
-                                        #     ld(SmartBomb_Plus1-1),a
-                                        #
-                                        #     pop af
-                                        #     dec a
-                                        #     ret z
-                                        #
-                                        #     ld a,5
+      # R0, R3, R4 are free to use
+      # R1 player Y
+      # R2 player X
+      # R5 player array pointer
+Player_Handler_DoSmartBomb:
+        MOV  $5,@$SmartBombTimer
+    # TODO: implement smartbomb SFX     #     ld a,5
                                         #     jp SFX_QueueSFX_GenericHighPri
 
+
+        MOV  $StarArraySizeBytes >> 2,R3
+        MOV  $StarArrayPointer,R4
+        100$:
+            CLR  (R4)+
+            CLR  (R4)+
+        SOB  R3,100$
+
+      # We can hack in our own smartbomb handler this is needed to wipe omega
+      # array for final boss as it's not handled by normal core code
+       .equiv dstSmartBombSpecial, .+2
+        CALL @$null
+
+        MOV  $ObjectArraySize,R3
+        MOV  $ObjectArrayPointer,R4
+      # we need special code because we don't want to wipe
+      # bg objects and boss sprites
+Player_Handler_SmartBomb_ObjLoop:
+        MOVB 4(R4),R0    # Life
+        BZE  Player_Handler_SmartBomb_NextObj # life (0 is background)
+        INCB R0
+        BZE  Player_Handler_SmartBomb_NextObj # ???
+
+       .equiv  dstCustomSmartBombEnemy, .+2
+        CALL @$null
+
+        MOVB 5(R4),R0    # Program
+        BZE  Player_Handler_SmartBomb_Kill
+
+        CMPB R0,$16      # Program 1-31 are protected from smartbomb
+        BLO  Player_Handler_SmartBomb_NextObj
+
+Player_Handler_SmartBomb_Kill:
+      # we need to kill this object if we got here
+        INC  R4
+        INC  R4
+       .equiv PointsSpriteB, .+3
+        MOV  (PC)+,(R4)+
+       .byte 0b10000111  # Seaker Fast 1000001XX XX=Speed
+       .byte 128+16      # Sprite
+        MOV  (PC)+,(R4)+
+       .byte 64+63       # Life, must "hurt" player for hit to be detected
+       .byte 3           # Program
+        INC  R4
+        CLRB (R4)+       # Animator
+
+        SOB  R3,Player_Handler_SmartBomb_ObjLoop
+        RETURN
+
+Player_Handler_SmartBomb_NextObj:
+        ADD  $8,R4
+        SOB  R3,Player_Handler_SmartBomb_ObjLoop
+        RETURN
 #-------------------------------------------------------------------------------
 Player_Hit: #-------------------------------------------------------------------
       # R0 use at will
