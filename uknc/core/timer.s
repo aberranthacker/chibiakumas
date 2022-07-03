@@ -28,7 +28,7 @@ Timer_UpdateTimer:                                     #
         MOV  R0,@$Timer_CurrentTick                         #     ld (Timer_CurrentTick),a
         XOR  R1,R0                                          #     xor b
         MOV  R0,(R3) # R3 points to Timer_TicksOccured      #     ld (hl),a
-       .equiv SmartBomb, .+2 # Make the background flash with the smartbomb
+       .equiv SmartBombTimer, .+2 # Make the background flash with the smartbomb
         MOV  $0x00,R0                                       #     ld a,0 :SmartBomb_Plus1
         BNZ  SmartBombCountdown$                            #     or a
 
@@ -36,9 +36,9 @@ Timer_UpdateTimer:                                     #
 
 SmartBombCountdown$:
         DEC  R0                                             #     dec a ; Smartbomb timer down one
-        MOV  R0,@$SmartBomb                              #     ld (SmartBomb_Plus1-1),a
+        MOV  R0,@$SmartBombTimer                            #     ld (SmartBomb_Plus1-1),a
         ASL  R0                                             #
-        MOV  @Background_SmartBombColors(R0),R0             #     push af
+        MOV  Background_SmartBombColors(R0),R0              #     push af
         RETURN                                              #     push hl
                                                             #     ld hl,Background_SmartBombColors    ; must be aligned
                                                             #         add l

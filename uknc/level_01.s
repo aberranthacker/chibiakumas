@@ -283,8 +283,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word 45, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 3
     .word     evtSingleSprite | 3  # Row 5, last Column, Last Sprite
-
-    # Ant
+   # Ant
     .word 45, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 4
     .word     evtSingleSprite | 12  # Row 23, last Column, Last Sprite
@@ -566,7 +565,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word      evtSingleSprite, sprSingleFrame | 43
     .byte          24+ 14, 24+ 160
 
-   #.word, 256+ 5, evtCallAddress, DoSmartBombCall
+    .word 256+ 5, evtCallAddress, Player_Handler_DoSmartBomb
 
 # LevelEndAnim:
 # defb 5,evtMultipleCommands+2            ; 3 commands at the same timepoint
@@ -606,10 +605,7 @@ LevelLoop:
         CALL @$ObjectArray_Redraw
 
         MOV  $ChibiSprites,@$SprShow_BankAddr
-
         CALL @$PlayerHandler
-
-        MOV  $ChibiSprites,@$SprShow_BankAddr  
         CALL @$Player_StarArray_Redraw
 
         CALL @$StarArray_Redraw
