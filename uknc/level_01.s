@@ -221,6 +221,10 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word    evtLoadObjSettings | 2
     .word    evtSingleSprite | 8 # Row 15, last Column, Last Sprite
 
+    #----------
+   #.word 5, evtChangeStreamTime, 256+ 5, LevelEndAnim
+    #----------
+
     # Rock Pt 1
     .word 10, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 0
@@ -567,10 +571,14 @@ EventStreamArray_Ep1: #---------------------------------------------------------
 
     .word 256+ 5, evtCallAddress, Player_Handler_DoSmartBomb
 
-# LevelEndAnim:
+LevelEndAnim:
 # defb 5,evtMultipleCommands+2            ; 3 commands at the same timepoint
 # defb evtSetProgMoveLife,prgMovePlayer,&24,10
 # defb    0,128+  47,140+24,100+24    ;   ; Single Object sprite 11 (animated)
+    .word 256+ 5, evtMultipleCommands | 2
+    .word         evtSetProgMoveLife, prgMovePlayer, mvStatic, 10
+    .word         evtSingleSprite, sprTwoFrame | 5
+    .byte             24+ 100, 24+ 140
 
 # Start of fade out block ------------------------------------------------------
     .equiv FadeOutStartPoint, 256+ 5

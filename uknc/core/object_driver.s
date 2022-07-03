@@ -140,7 +140,7 @@ ObjectArray_NextObject:                                     # ObjectArray_Turbo:
         BIT  $0x40,R2                                     # ld a,(Timer_CurrentTick)
         BZE  Objectloop_TwoFrameSprite                    # jr z,Objectloop_TwoFrameSprite
 
-      ##if we got here it's a FourFrameSprite
+      # it's a FourFrameSprite if we got here
         BIC  $0177774,R0                                  # and %00000011
         BR   Objectloop_SpriteBankSet                     # jr Objectloop_SpriteBankSet
 
@@ -209,15 +209,15 @@ ObjectLoopP1Skip:
        #                                                    # jr z,ObjectLoopP2Skip
        #                                                    #
        #                                                    # ld a,b
-       #CMPB (PC)+,R0; Player2X1: .word 0                # cp 0 :Player2X1_Plus1
+       #CMPB (PC)+,R0; Player2X1: .word 0                   # cp 0 :Player2X1_Plus1
        #                                                    # jr c,ObjectLoopP2Skip
-       #CMPB (PC)+,R0; Player2X2: .word 0                # cp 0 :Player2X2_Plus1
+       #CMPB (PC)+,R0; Player2X2: .word 0                   # cp 0 :Player2X2_Plus1
        #                                                    # jr nc,ObjectLoopP2Skip
        #                                                    #
        #                                                    # ld a,c
-       #CMPB (PC)+,R0; Player2Y1: .word 0                # cp 0 :Player2Y1_Plus1
+       #CMPB (PC)+,R0; Player2Y1: .word 0                   # cp 0 :Player2Y1_Plus1
        #                                                    # jr c,ObjectLoopP2Skip
-       #CMPB (PC)+,R0; Player2Y2: .word 0                # cp 0 :Player2Y2_Plus1
+       #CMPB (PC)+,R0; Player2Y2: .word 0                   # cp 0 :Player2Y2_Plus1
        #                                                    # jr nc,ObjectLoopP2Skip
        #                                                    #
        #                                                    # push hl
@@ -571,109 +571,87 @@ ObjectAnimator:                         # ObjectAnimator:
                                         # ld hl,(Objects_LastAdded_Plus2-2)
                                         # ret
 # ObjectAnimator end --------------------------------------------------------}}}
-ObjectProgram:
-                                            # ret z       ; return if zero
-      # R3 R3 LSB iyl = Program code, MSB = 0, ixl = Life
+ObjectProgram:                            # ret z       ; return if zero
+      # R3 LSB iyl = Program code, MSB = 0, ixl = Life
         MOV  R3,R0
-        CMP  R0,$0b00000001                 # cp %00000001
-        BNE  1$                             # ; Used by background, sprite bank based on X co-ord
-        JMP  @$ObjectProgram_BitShiftSprite # jp z,ObjectProgram_BitShiftSprite
-    1$:
-        BIC  $0b00000111,R0                 # and %11111000 ;00000XXX = Powerup
-        BZE  ObjectProgram_PowerUps         # jr z,ObjectProgram_PowerUps
-                                            # 01101011
-        CMP  $0b11110000,R0                 # cp %11110000  ;11110XXX = Animate every X frames
-       #BZE  ObjectProgram_FrameAnimate     # jp z,ObjectProgram_FrameAnimate
-        BIC  $0b00011111,R0                 # and %11100000
-        BZE  ObjectProgram_PowerUps         # jr z,ObjectProgram_PowerUps ;0001XXXX = Smartbombable Powerup
+        CMP  R0,$0b00000001         # Used by background, sprite bank based on X co-ord
+        BEQ  ObjectProgram_BitShiftSprite
+        BIC  $0b00000111,R0         # 00000xxx = Powerup
+        BZE  ObjectProgram_Misc
+        CMP  $0b11110000,R0         # 11110xxx = Animate every X frames
+        BZE  ObjectProgram_FrameAnimate
+        BIC  $0b00011111,R0         # 0001xxxx = Smartbombable Powerup
+        BZE  ObjectProgram_Misc
 
-      # # 12 words
-      # ASR  R0
-      # ASR  R0
-      # ASR  R0
-      # ASR  R0
-      # JMP  @ProgramFireJumpTable-2(R0)
-      #.word ObjectProgram_FastFire
-      #.word ObjectProgram_MidFire
-      #.word ObjectProgram_SlowFire
-      #.word ObjectProgram_SnailFire
-      #.word ObjectProgram_HyperFire
-      #.word ObjectProgram_AboveMidFire
+        ASR  R0
+        ASR  R0
+        ASR  R0
+        ASR  R0
+        JMP  @ObjectProgram_Fire_JumpTable-2(R0)
+ObjectProgram_Fire_JumpTable:
+       .word ObjectProgram_FastFire       # 001xxxxx
+       .word ObjectProgram_MidFire        # 010xxxxx
+       .word ObjectProgram_SlowFire       # 011xxxxx
+       .word ObjectProgram_SnailFire      # 100xxxxx
+       .word ObjectProgram_HyperFire      # 101xxxxx
+       .word ObjectProgram_AboveMidFire   # 110xxxxx
+       .word ObjectProgram_CustomPrograms
 
-        # 18 words
-        CMP  R0,$0b001 << 5                 # cp %00100000            ;001XXXXX = fast fire
-        BEQ  ObjectProgram_FastFire         # jp z,ObjectProgram_FastFire
-        CMP  R0,$0b010 << 5                 # cp %01000000            ;010XXXXX = medium fire
-        BEQ  ObjectProgram_MidFire          # jp z,ObjectProgram_MidFire
-        CMP  R0,$0b011 << 5                 # cp %01100000            ;011XXXXX = slow fire
-        BEQ  ObjectProgram_SlowFire         # jp z,ObjectProgram_SlowFire
-        CMP  R0,$0b100 << 5                 # cp %10000000            ;100XXXXX = Fastfire
-        BEQ  ObjectProgram_SnailFire        # jp z,ObjectProgram_SnailFire
-        CMP  R0,$0b110 << 5                 # cp %11000000            ;110XXXXX = Mid2Fire
-        BEQ  ObjectProgram_AboveMidFire     # jp z,ObjectProgram_AboveMidFire
-        CMP  R0,$0b101 << 5                 # cp %10100000            ;101XXXXX = Fastfire
-        BEQ  ObjectProgram_HyperFire        # jp z,ObjectProgram_HyperFire
-       .inform_and_hang "no ObjProg"
-                                            # ld a,iyl
-                                            # cp %11111100            ;Custom 1
-                                            # jr z,ObjectProgram_Custom1
-                                            # cp %11111101            ;Custom 2
-                                            # jp z,null :CustomProgram2_Plus2
-                                            # cp %11111110            ;Custom 3
-                                            # jp z,null :CustomProgram3_Plus2
-                                            #
-                                            # cp 255
-                                            # ret nz  ;Only used by ep2 for a crap joke!
+ObjectProgram_CustomPrograms:
+        BIC  $0xFFFC0,R3 # 0b11111100
+        ASL  R3
+        JMP  @ObjectProgram_CustomPrograms_JumpTable(R3)
+ObjectProgram_CustomPrograms_JumpTable:
+        ObjectProgram_Custom1: .word null   # jp null   :CustomProgram1_Plus2
+        ObjectProgram_Custom2: .word null   # jp z,null :CustomProgram2_Plus2
+        ObjectProgram_Custom3: .word null   # jp z,null :CustomProgram3_Plus2
+                               .word SpecialMoveChibiko # Only used by ep2 for a crap joke!
+
+ObjectProgram_Misc:
+                                        # ld a,iyl
+        BIC  $0xFFF0,R3                 # and %00001111
+        CMP  R3,$4                      # cp 4
+        BEQ  ObjectProgram_MovePlayer   # jr z,ObjectProgram_MovePlayer
+       #CMP  R3,$8                      # cp 8                ;Custom 1
+       #BEQ  ObjectProgram_Custom1      # jr z,ObjectProgram_Custom1
+1237$:  RETURN                          # ret
+
+ObjectProgram_MovePlayer: # Used by end of level code to make player fly to a point
+      # R4 b = X, R1 c = Y, R3 iyl = Program
+      # TODO: uncomment for 2 players game
+       #MOV  $Player_Array2,R5
+       #CALL ObjectProgram_DoMovePlayer
+SpecialMoveChibiko:
+        MOV  $Player_Array,R5
+
+# ObjectProgram_DoMovePlayer:
+        MOVB (R5),R0
+        CMPB R0,R1
+        BEQ  ObjectProgram_MovePlayerX
+        BHIS ObjectProgram_MovePlayerYUp
+        ADD  $8,R0
+        BR   ObjectProgram_MovePlayerX
+ObjectProgram_MovePlayerYUp:
+        SUB  $8,R0
+ObjectProgram_MovePlayerX:
+        MOVB R0,(R5)+
+
+        MOVB (R5),R0
+        CMPB R0,R4
+        BEQ  ObjectProgram_MovePlayerDone
+        BHIS ObjectProgram_MovePlayerXUp
+
+        ADD  $6,R0
+        BR   ObjectProgram_MovePlayerDone
+ObjectProgram_MovePlayerXUp:
+        SUB  $6,R0
+ObjectProgram_MovePlayerDone:
+        MOVB R0,(R5)
+
         RETURN
-                                        # SpecialMoveChibiko:
-                                        #     push iy
-                                        #     jr ObjectProgram_MovePlayerB
-                                        # ObjectProgram_Custom1:
-                                        #     jp null :CustomProgram1_Plus2
-ObjectProgram_PowerUps:
-                                        #     ld a,iyl
-        BIC  $0xFFF0,R3                 #     and %00001111
-                                        #     cp 4
-                                        #     jr z,ObjectProgram_MovePlayer
-                                        #     cp 8                ;Custom 1
-                                        #     jr z,ObjectProgram_Custom1
-1237$:  RETURN                          #     ret
-                                        # ObjectProgram_MovePlayer: ; Used by end of level code to make player fly to a point
-                                        #     ;b=x ;c=y
-                                        #     push iy
-                                        #
-                                        #         ld iy,Player_Array2
-                                        #         call ObjectProgram_DoMovePlayer
-                                        # ObjectProgram_MovePlayerB:
-                                        #         ld iy,Player_Array
-                                        #         call ObjectProgram_DoMovePlayer
-                                        #     pop iy
-                                        #     ret
-                                        #
-                                        # ObjectProgram_DoMovePlayer:
-                                        #     ld a,(iy)   ;Y
-                                        #     cp c
-                                        #     jr z,  ObjectProgram_MovePlayerX
-                                        #     jr nc, ObjectProgram_MovePlayerYUp
-                                        #     add 8
-                                        #     jr ObjectProgram_MovePlayerX
-                                        # ObjectProgram_MovePlayerYUp:
-                                        #     sub 8
-                                        # ObjectProgram_MovePlayerX:
-                                        #     ld (iy),a
-                                        #     ld a,(iy+1) ;X
-                                        #     cp b
-                                        #     jr z,  ObjectProgram_MovePlayerDone
-                                        #     jr nc, ObjectProgram_MovePlayerXUp
-                                        #     add 6
-                                        #     jr ObjectProgram_MovePlayerDone
-                                        # ObjectProgram_MovePlayerXUp:
-                                        #     sub 6
-                                        # ObjectProgram_MovePlayerDone:
-                                        #     ld (iy+1),a
-                                        #
-                                        #     ret
-                                        # ObjectProgram_FrameAnimate: ; Used To animate spider legs in 1st boss
+
+ObjectProgram_FrameAnimate: # Used To animate spider legs in 1st boss
+       .inform_and_hang "no FrameAnimate"
                                         #     push bc
                                         #         ld a,iyl
                                         #         and %00000111
@@ -787,9 +765,9 @@ Object_DecreaseShotToDeathB:
                                            #
         # TODO: implement sfx              # ld a,3
                                            # call SFX_QueueSFX_Generic
+      # R2 LSB ixh = Sprite, R2 MSB iyh = Move
       # create a coin
        .equiv PointsSpriteC, .+2
-      # R2 LSB ixh = Sprite, R2 MSB iyh = Move
         MOV (PC)+,R2
        .byte 128+16     # ld iyh,128+16 :PointsSpriteC_Plus1  ; Sprite
        .byte 0b10000111 # ld ixh,%10000111 ; Seaker Fast 1000001XX XX=Speed
