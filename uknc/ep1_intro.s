@@ -78,7 +78,7 @@ EventStreamArray:
     .word     evtLoadObjSettings | 2           # 2
     .word     evtSingleSprite, 3               # 3
     .byte         24+80+6, 24+80-16 # Y, X 110, 88
-    .word     evtSaveLstObjToAdd, charnikohime # 4
+    .word     evtSaveObjPointer, charnikohime  # 4
     .word     evtAddToBackground               # 5
 
     # Start of fade in block
@@ -137,7 +137,7 @@ StartPoint:
     .word     evtAddToForeground                   # 5
     .word     evtSingleSprite, sprTwoFrame | 5     # 6
     .byte         24+80+10, 24+80-16   # Y, X :  9, 128
-    .word     evtSaveLstObjToAdd, charnikohimehead # 7
+    .word     evtSaveObjPointer, charnikohimehead  # 7
 
     .word 52, evtCallAddress, Decapitate
     .word 54, evtCallAddress, Decapitateend
@@ -179,7 +179,6 @@ charnikohime: .word 0
 charnikohimehead: .word 0
 
 EndLevel:
-        TST  (SP)+ # remove return address from the stack
         MOV  $0x8000,R5
         JMP  @$ExecuteBootstrap
 

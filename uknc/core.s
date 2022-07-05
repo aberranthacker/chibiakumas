@@ -6,7 +6,6 @@
 # Global symbols ------------------------------------------------------------{{{
        .global ContinueMode
        .global ContinuesReset
-       .global Event_SavedSettings
        .global FileBeginCore
        .global FileEndCore
        .global KeyboardScanner_P1
@@ -20,7 +19,6 @@
        .global SavedSettings
        .global SavedSettings_Last
        .global SmartBombsReset
-       .global StarArrayPointer
        .global null
 #----------------------------------------------------------------------------}}}
 
@@ -33,8 +31,7 @@
 #******************************************************************************#
        .=CoreStart
 
-start:
-FileBeginCore:
+start: FileBeginCore:
 SavedSettings: #-------------------------------------------------------------{{{
                      .byte 255          # pos -20 spare
                      .byte   0          # pos -19 spare
@@ -64,14 +61,14 @@ SavedSettings: #-------------------------------------------------------------{{{
         P1_P00: .byte 100        #  0 - Y 0x64
         P1_P01: .byte 32         #  1 - X 0x20
         P1_P02: .byte 0          #  2 - shoot delay
-        P1_P03: .byte 2          #  3 - smartbombs     # <= 127
-        P1_P04: .byte 0          #  4 - drones (0/1/2) # <= 127
+        P1_P03: .byte 3          #  3 - smartbombs     # <= 127
+        P1_P04: .byte 2          #  4 - drones (0/1/2) # <= 127
         P1_P05: .byte 60         #  5 - continues
         P1_P06: .byte 0          #  6 - drone pos
         P1_P07: .byte 0b00000111 #  7 - Invincible for how many ticks
         P1_P08: .byte 0          #  8 - Player SpriteNum
         P1_P09: .byte 3          #  9 - Lives          # <= 127
-        P1_P10: .byte 100        # 10 - Burst Fire (Xfire)
+        P1_P10: .byte 0          # 10 - Burst Fire (Xfire)
         P1_P11: .byte 0b00000100 # 11 - Fire Speed - PlayerShootSpeed_Plus1
         P1_P12: .byte 0          # 12 - Player num (0=1, 1=2)
         P1_P13: .byte 0          # 13 - Points to add to player 1 - used to make score 'roll up'
@@ -82,7 +79,7 @@ SavedSettings: #-------------------------------------------------------------{{{
         P2_P00: .byte 150        #  0 - Y 0x96
         P2_P01: .byte 32         #  1 - X 0x20
         P2_P02: .byte 0          #  2 - Shoot delay
-        P2_P03: .byte 2          #  3 - smartbombs
+        P2_P03: .byte 3          #  3 - smartbombs
         P2_P04: .byte 0          #  4 - Drones (0/1/2)
         P2_P05: .byte 60         #  5 - continues
         P2_P06: .byte 0          #  6 - Drone Pos
@@ -212,6 +209,7 @@ not_implemented_check_R0:
        .global DroneFlipFire
        .global Player_DrawUI
        .global PlayerHandler
+       .global Player_Handler_DoSmartBomb
        .global Player_GetPlayerVars
        .global SetFireDir_DOWN
        .global SetFireDir_Fire
@@ -265,6 +263,7 @@ not_implemented_check_R0:
        .global Timer_UpdateTimer
        .global Timer_CurrentTick
        .global Timer_TicksOccured
+       .global SmartBombTimer
 
        .include "core/virtual_screen_pos_320.s"
        .global ShowSpriteReconfigureEnableDisable
