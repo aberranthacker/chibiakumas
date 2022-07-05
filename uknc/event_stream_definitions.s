@@ -52,7 +52,7 @@
 # evtSaveLstObjToAdd equ 138 ; Save the memory position of last added object in
 #                            ; the object array to memory location w1
 #                            ; used for boss sprites
-.equiv evtSaveLstObjToAdd,  (0x1A * 2) << 8 # 52
+.equiv evtSaveObjPointer,   (0x1A * 2) << 8 # 52
 # evtResetPowerup    equ 139 ; Take away the player powerups... how mean!
 # evtSetLevelSpeed   equ 140 ; Change the speed of the object array to b1...
 #                            ; %00000100 is default.. .%00000010 is faster
@@ -177,7 +177,7 @@
 .equiv prgBitShift, 1           # prgBitShift    equ 1 ; Change sprite bank according to X
                                 # prgSpecial     equ 2 ; not used
 .equiv prgBonus, 3              # prgBonus       equ 3 ; not used
-                                # prgMovePlayer  equ 4
+.equiv prgMovePlayer, 4         # prgMovePlayer  equ 4
                                 #
                                 # prgSpriteBank0 equ 0 ; not used
                                 # prgSpriteBank1 equ 5 ; removed
@@ -208,6 +208,9 @@
                                 # prgFireMid2  equ %11000000
 .equiv prgFireFast,  0b00100000 # prgFireFast  equ %00100000
                                 # prgFireHyper equ %10100000
+
+ # Used To animate spider legs in 1st boss
+.equiv prgFrameAnimate, 0b11110000 # 11110xxx = Animate every X frames
 
                             # ; Fire Patterns
                             #
@@ -289,16 +292,16 @@
 # 7 - 4 =  3| 70  71  72  73  74  75  76  77
 
 # Moves hexadecimal
-#         0   1   2   3   4   5   6   7
-#        -4  -3  -2  -1  0    1   2   3
-# -4  0  00  01  02  03  04  05  06  07
-# -3  1  08  09  0A  0B  0C  0D  0E  0F
-# -2  2  10  11  12  13  14  15  16  17
-# -1  3  18  19  1A  1B  1C  1D  1E  1F
-#  0  4  20  21  22  23 [24] 25  26  27
-#  1  5  28  29  2A  2B  2C  2D  2E  2F
-#  2  6  30  31  32  33  34  35  36  37
-#  3  7  38  39  3A  3B  3C  3D  3E  3F
+#              0   1   2   3   4   5   6   7
+#             -4  -3  -2  -1   0   1   2   3
+# -4  0       00  01  02  03  04  05  06  07
+# -3  1       08  09  0A  0B  0C  0D  0E  0F
+# -2  2       10  11  12  13  14  15  16  17
+# -1  3       18  19  1A  1B  1C  1D  1E  1F
+#  0  4       20  21  22  23 [24] 25  26  27
+#  1  5       28  29  2A  2B  2C  2D  2E  2F
+#  2  6       30  31  32  33  34  35  36  37
+#  3  7       38  39  3A  3B  3C  3D  3E  3F
 
                                  # mveMisc       equ 0 ;used for visual clarity!
 .equiv mveBackground, 0b11000000 # 1100xxxx, ----xxxx tick point
