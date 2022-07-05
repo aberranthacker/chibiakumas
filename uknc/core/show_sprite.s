@@ -60,23 +60,27 @@ ShowSprite_ReadInfo: # ------------------------------------------------------{{{
         MOVB (R5)+,R0 # height of the sprite in lines
         BZE  SpriteGiveUp$
 
-        MOVB R0,@$SprShow_TempH
+      # we are not expecting sprites to be more than 127 lines in height
+      # and it is important to clear MSB of the SprShow_TempH
+      # becase SprShow_TempH can have negative value from previous sprite
+      # truncation, check show_sprite.s:238
+        MOV  R0,@$SprShow_TempH
 
         MOVB (R5)+,R1 # width in bytes
-        # don't care about sign extension, 80 is a maximum value
+      # don't care about sign extension, 80 is a maximum value
         MOV  R1,@$SprShow_DrawWidth
         MOV  R1,@$SprShow_SpriteWidth
 
         MOVB (R5)+,@$SprShow_Yoffset
 
-        # Sprite attributes such as PSet, Doubleheight and transp color
+      # Sprite attributes such as PSet, Doubleheight and transp color
         MOVB (R5)+,R0 # sign extension is irrelevant
         MOV  R0,@$SprShow_SprAttrs
 
-        # A  R0 sprite attributes
-        # B  R1 width
-        # DE R3 sprite store address
-        # HL R5 points to sprite offset
+      # A  R0 sprite attributes
+      # B  R1 width
+      # DE R3 sprite store address
+      # HL R5 points to sprite offset
     SpriteGiveUp$:
         RETURN
 
@@ -157,7 +161,7 @@ ShowSprite: # ShowSprite is the main routine of our program!
       # R0 sprite attributes
       # R1 width
       # R3 sprites pointer
-      # R5 sprite offset
+      # R5 points to sprite offset
 
        .equiv SpriteSizeConfig6, .+2
         CMP  R1,$6 # 6 bytes, default sprite width
@@ -229,19 +233,21 @@ ShowSprite: # ShowSprite is the main routine of our program!
 
 # truncate the sprite ----------------------------------------------------------
         MOV  $SprDraw_BasicRenderer,@$jmpShowSprite_DrawAndReturn
+
       # R3 = Y lines less to draw
         SUB  R3,@$SprShow_TempH
         BLOS 1237$ # return if new height is <= 0
+
       # R5 = X bytes to remove from the right side
-        SUB  R5,@$SprShow_DrawWidth # check if new width is =< 0
+        SUB  R5,@$SprShow_DrawWidth
         BLOS 1237$ # return if new width is <= 0
+
       # R2 = Y lines of the sprite to skip
-        TST  R2
-        BZE  ShowSprite_SkipTopCrop
-        MUL  @$SprShow_SpriteWidth,R2 # MUL beats ADD+SOB when factor is more than 2
+      # MUL beats ADD+SOB when factor is more than 2 in this case
+        MUL  @$SprShow_SpriteWidth,R2
         ADD  R3,R4
+
       # R4 = X bytes to skip on the left side
-    ShowSprite_SkipTopCrop:
         ADD  R4,@$SprShow_TempAddr
 #-------------------------------------------------------------------------------
     ShowSprite_SkipCrop:
