@@ -17,5 +17,3 @@ ExecuteBootstrap:
         SOB  R0,100$
 
         JMP  @$Bootstrap_FromR5
-
-
