@@ -121,7 +121,7 @@ Player1NotDead:                         # Player1NotDead:
                                         #
                                         #     jp BankSwitch_C0_SetCurrentToC0
 Player_HandlerOne:                      # Player_HandlerOne:
-       #MOV  R5,@$SprShow_BankAddr   #     ld (SprShow_BankAddr),hl
+       #MOV  R5,@$SprShow_BankAddr      #     ld (SprShow_BankAddr),hl
                                         #     ld a,e
                                         #     ld (PlayerSpriteBank_Plus1-1),a; call Akuyou_BankSwitch_C0_SetCurrent
                                         #     ld a,ixl
@@ -141,8 +141,8 @@ Player_Handler_PauseCheckDone:
                                        # or a
         BZE  1237$                     # ret z ;abort handler if game paused
                                        # xor a
-        CLR  @$PlayerSaveShot       # ld (PlayerSaveShot_Plus1 - 1),a
-        CLR  @$PlayerDoFire         # ld (PlayerDoFire_Plus1 - 1),a
+        CLR  @$PlayerSaveShot          # ld (PlayerSaveShot_Plus1 - 1),a
+        CLR  @$PlayerDoFire            # ld (PlayerDoFire_Plus1 - 1),a
                                        # ld a,(hl)
         BITB 11(R5),R0 # fire speed    # and (iy+11)
         BZE  Player_Handler_Start      # jr z,Player_Handler_Start
@@ -152,12 +152,13 @@ Player_Handler_PauseCheckDone:
       # Move the drones depending if the player is shooting
 Player_Handler_Start:
         MOVB 6(R5),R0 # drone pos      # ld a,(iy+6) ;D1
-       #INC  R0                        # inc a
-        CMPB R0,$15                    # cp 16
+       #INCB R0                        # inc a
+        CMPB R0,$16                    # cp 16
         BHIS Player_Handler_DronePosOk # jr c,Player_Handler_DronePosOk
-       #DEC  R0                        # dec a
+       #DECB R0                        # dec a
         INCB R0
 Player_Handler_DronePosOk:             # Player_Handler_DronePosOk:
+#:bpt
         MOVB R0,6(R5) # D1 - shots and drones
         ASLB R0
         MOVB R0,@$Player_DroneOffset1
@@ -289,7 +290,7 @@ Player_Handler_NoSaveFire:
 
         INC  R3
 Player_Handler_Frame1:
-       .equiv opcDroneDirPos8, .
+       .equiv DroneDirPos8, .
         MOV  R2,R0 # or MOV  R1,R0
         SUB  $4,R0
        .equiv dstDroneDirPos1, .+2
@@ -301,10 +302,10 @@ Player_Handler_Frame1:
         ADD  R3,R0
         MOV  R0,@$SprShow_SprNum
 
-        PUSH R1
-        PUSH R2
-        PUSH R3
-        PUSH R5
+        PUSH R5 # player array pointer
+        PUSH R3 # frame number
+        PUSH R2 # X
+        PUSH R1 # Y
         BITB $0b10,4(R5)
         BZE  Player_Handler_OneDrone
 
@@ -316,12 +317,15 @@ Player_Handler_Frame1:
 
 Player_Handler_OneDrone:
         MOV  @$Player_DroneOffset1,R0
+       .equiv DroneDirPos7, .
+        MOV  (SP),R1 # or MOV  2(SP),R2
+        NOP
         CALL @$SetDronePos
         CALL @$ShowSprite
-        POP  R5
-        POP  R3
-        POP  R2
         POP  R1
+        POP  R2
+        POP  R3
+        POP  R5
 
 Player_Handler_NoDrones:
         MOV  R2,R0 # X
@@ -419,7 +423,7 @@ Player_Fire4D: # Fire bullets!
         MOVB 8(R5),R0 # player sprite num
         BIC  $0xFF7F,R0
        .equiv DroneFlipFireCurrent, .+2
-        CMP  R0,$0 # drones placement Z=horizontal, NZ=vertical
+        CMP  R0,$0 # drones placement Z=vertical, NZ=horizontal
         BEQ  1$
         CALL DroneFlipFire
    1$:
@@ -435,14 +439,11 @@ Player_Fire4D: # Fire bullets!
         INCB R0 # Drone at Max 'innness'!
 
 Player_Handler_KeyreadJoy1Fire2_DroneLimit:
-        MOVB R0,6(R5) # drone pos
-        MOVB 2(R5),R0 # shoot delay
-        BIT  $0x80,R0 # check if player is allowed to fire
-        BZE  1$
-        RETURN
-    1$:
-        BIS  $0x80,R0
-        MOVB R0,2(R5)
+        MOVB R0,6(R5)    # drone pos
+        BITB $0x80,2(R5) # check if player is allowed to fire
+        BNZ  1237$
+
+        BISB $0x80,2(R5)
 
         CALL Stars_AddToPlayer
       #  input C = R1 = Y
@@ -453,27 +454,28 @@ Player_Handler_KeyreadJoy1Fire2_DroneLimit:
         MOV  @$Player_DroneOffset1,R3
         ADD  $4,R3
        .equiv DroneFlipFirePos5, .
-        ROR  R3 # or NOP for horizontal drones placement
+        NOP # or ROR R3 for horizontal drones placement
 
       # Add extra stars depending on how many drones we have
         MOVB 4(R5),R0 # number of drones
-
         BZE  Player_NoDrones
 
         DEC  R0
         BZE  Player_OneDrone
 
+        PUSH R3
         MOV  R3,R0
         NEG  R0
         CALL dodrone
+        POP  R3
       # drone2
 Player_OneDrone:
         MOV  R3,R0
         CALL dodrone
 Player_NoDrones:
-                                       # FireSfx:
-        # TODO: implement sound effect #     ld a,1
-        RETURN                         #     jp SFX_QueueSFX_Generic
+                                     # FireSfx:
+      # TODO: implement sound effect #     ld a,1
+1237$:  RETURN                       #     jp SFX_QueueSFX_Generic
 
 dodrone:
       # C = R1 = Y
@@ -488,36 +490,40 @@ dodrone:
 
 DroneFlipFire:
         MOV  R0,@$DroneFlipFireCurrent
-        BZE  1$
-      # vertical move
-        MOV  $0060002,@$DroneFlipFirePos3 # ADD R0,R2
-        MOV  $0160002,@$DroneFlipFirePos2 # SUB R0,R2
-        MOV  $0006003,@$DroneFlipFirePos5 # R0R R3
-        RETURN
-   1$:# horizontal move
+        BNZ  1$
+      # vertical drones placement
         MOV  $0060001,@$DroneFlipFirePos3 # ADD R0,R1
         MOV  $0160001,@$DroneFlipFirePos2 # SUB R0,R1
         MOV  $0000240,@$DroneFlipFirePos5 # NOP
+        RETURN
+   1$:# horizontal drones placement
+        MOV  $0060002,@$DroneFlipFirePos3 # ADD R0,R2
+        MOV  $0160002,@$DroneFlipFirePos2 # SUB R0,R2
+        MOV  $0006003,@$DroneFlipFirePos5 # R0R R3
         RETURN
 
 DroneFlip:
       # C = R1 = Y
       # B = R2 = X
         MOV  R0,@$DroneFlipFireCurrent
-        BZE  1$
-      # vertical move
+        BNZ  1$
+      # vertical drones placement
+        MOV  $SprShow_X,@$dstDroneDirPos1
+        MOV  $0060100,@$DroneDirPos2     # ADD R1,R0
+        MOV  $0000240,@$DroneDirPos5     # NOP
+        MOV  $SprShow_Y,@$DroneDirPos6
+        MOV  $0011601,@$DroneDirPos7     # MOV (SP),R1
+        MOV  $0000240,@$DroneDirPos7+2   # NOP
+        MOV  $0010200,@$DroneDirPos8     # MOV R2,R0
+        RETURN
+   1$:# horizontal drones placement
         MOV  $SprShow_Y,@$dstDroneDirPos1
         MOV  $0060200,@$DroneDirPos2    # ADD R2,R0
         MOV  $0006200,@$DroneDirPos5    # ASR R0
         MOV  $SprShow_X, @$DroneDirPos6
-        MOV  $0010100,@$opcDroneDirPos8 # MOV R1,R0
-        RETURN
-   1$:# horizontal move
-        MOV  $SprShow_X,@$dstDroneDirPos1
-        MOV  $0060100,@$DroneDirPos2    # ADD R1,R0
-        MOV  $0000240,@$DroneDirPos5    # NOP
-        MOV  $SprShow_Y,@$DroneDirPos6
-        MOV  $0010200,@$opcDroneDirPos8 # MOV R2,R0
+        MOV  $0016602,@$DroneDirPos7    # MOV 2(SP),R2
+        MOV  $2,@$DroneDirPos7+2
+        MOV  $0010100,@$DroneDirPos8    # MOV R1,R0
         RETURN
 
 SetFireDir_UP:
@@ -685,7 +691,7 @@ Player_Hit_PowerupShootSpeed:
                                             # push iy
                                             # ld iy,(PlayerHitMempointer_Plus2-2)
         MOVB @$P1_P11,R0                    # ld a,(iy+11)
-        ASLB R0                             # srl a
+        RORB R0                             # srl a
                                             # or a
         BNZ  Player_Hit_PowerupShootSpeedNZ # jr nz,Player_Hit_PowerupShootSpeedNZ
         INCB R0                             # inc a ; dont let a=0
