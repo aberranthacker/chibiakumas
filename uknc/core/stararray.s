@@ -11,9 +11,10 @@ Player_StarArray_Redraw:
         MOV  $PlayerBulletColor<<4,@$StarColor2
         MOV  $PlayerBulletColor<<6,@$StarColor3
         # configure the loop for the player star array
-        MOV  $null,R5
-        MOV  R5,@$dstCurrentStarArrayCollisionsB2
-       #MOV  R5,@$dstCurrentStarArrayCollisions2B2
+        MOV  $null,@$dstCurrentStarArrayCollisionsB2
+   .ifdef TwoPlayerGame
+        MOV  $null,@$dstCurrentStarArrayCollisions2B2
+   .endif
 
         MOV  $PlayerStarArraySize,R1
         MOV  $PlayerStarArrayPointer,R5
@@ -35,52 +36,57 @@ StarArray_Redraw:
         #;;;;;;;;;;;;;;;;;;;;; Player 1 handler
         # configure the loop for the enemy star array
         # TODO: implement Player_Hit_Injure_1
-       #MOV  $Player_Hit_Injure_1,R5
+        MOV  $Player_Hit_Injure_1,R5
         TSTB @$P1_P07
-       #BZE  StarArray_PlayerVulnerable
+        BZE  StarArray_PlayerVulnerable
 
         MOV  $null,R5 # player invincible
 
     StarArray_PlayerVulnerable:
       # load player 1 location - do it in advance to save time during the loop
         MOVB @$P1_P01,R0
-        DEC  R0 # SUB  $2,R0
-        DEC  R0
-        MOV  R0,@$Player1LocX
+        DECB R0 # SUB  $2,R0
+        DECB R0
+        MOVB R0,@$Player1LocX
         ADD  $4,R0
-        MOV  R0,@$Player1LocXB
+        MOVB R0,@$Player1LocXB
+
         MOVB @$P1_P00,R0
-        DEC  R0 # SUB  $2,R0
-        DEC  R0
-        MOV  R0,@$Player1LocY
+        DECB R0 # SUB  $2,R0
+        DECB R0
+        MOVB R0,@$Player1LocY
         ADD  $4,R0
-        MOV  R0,@$Player1LocYB
+        MOVB R0,@$Player1LocYB
+
         MOV  R5,@$dstCurrentStarArrayCollisionsB2
 
-        # Player 2 handler (commented out)-----------------------------------{{{
-        # configure the loop for the enemy star array
-        # TODO: implement Player_Hit_Injure_2
-#      #MOV  $Player_Hit_Injure_2,R5
-#       TSTB @$P2_P07
-#       BZE  StarArray_Player2Vulnerable
+        # Player 2 handler --------------------------------------------------{{{
+   .ifdef TwoPlayerGame
+      # configure the loop for the enemy star array
+        MOV  $Player_Hit_Injure_2,R5
+        TSTB @$P2_P07
+        BZE  StarArray_Player2Vulnerable
 
-#       MOV  $null,R5 # player invincible
+        MOV  $null,R5 # player invincible
 
-#   StarArray_Player2Vulnerable:
-#       # load player 2 location - do it in advance to save time during the loop
-#       MOVB @$P2_P01,R0
-#       DEC  R0 # SUB  $2,R0
-#       DEC  R0
-#       MOV  R0,@$Player2LocX
-#       ADD  $4,R0
-#       MOV  R0,@$Player2LocXB
-#       MOVB @$P1_P00,R0
-#       DEC  R0 # SUB  $2,R0
-#       DEC  R0
-#       MOV  R0,@$Player2LocY
-#       ADD  $4,R0
-#       MOV  R0,@$Player2LocYB
-#       MOV  R5,@$dstCurrentStarArrayCollisions2B2
+    StarArray_Player2Vulnerable:
+        # load player 2 location - do it in advance to save time during the loop
+        MOVB @$P2_P01,R0
+        DECB R0 # SUB  $2,R0
+        DECB R0
+        MOV  R0,@$Player2LocX
+        ADD  $4,R0
+        MOV  R0,@$Player2LocXB
+
+        MOVB @$P1_P00,R0
+        DECB R0 # SUB  $2,R0
+        DECB R0
+        MOV  R0,@$Player2LocY
+        ADD  $4,R0
+        MOVB R0,@$Player2LocYB
+
+        MOV  R5,@$dstCurrentStarArrayCollisions2B2
+   .endif
         #--------------------------------------------------------------------}}}
 
         MOV  $StarArrayPointer,R5

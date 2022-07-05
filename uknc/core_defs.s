@@ -4,6 +4,7 @@
 #.equiv DebugSprite, 1
  .equiv SkipPSGSend, 1
 #.equiv ExtMemCore, 1 # do `make clean` after commenting/uncommenting this line
+#.equiv TwoPlayersGame, 1
 #-------------------------------------------------------------------------------
 .equiv MainMenu, 0x8000
 .equiv Episode1_Intro, 0x0000
