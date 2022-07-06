@@ -96,15 +96,15 @@ sprites_metadata.each do |md|
   end
 end
 
-diff = data_offset - (sprites_metadata.size * 6)
+diff = data_offset - (sprites_metadata.size * 8)
 
 new_file = ''
 
 sprites_metadata.each do |rec|
-  values = rec.values_at(:height, :width, :y_offset, :settings, :offset)
-  values[-1] = values[-1] - diff
+  values = rec.values_at(:offset, :height, :y_offset, :width, :settings)
+  values[0] = values[0] - diff
 
-  new_file << values.pack('CCCCv')
+  new_file << values.pack('vvvCC')
 end
 
 new_file = '' if options.font
