@@ -3,10 +3,9 @@
 # sprite pos is returned in DE R4
 GetSpriteMempos:
         ASL  R0
-        MOV  R4,R3
-        ADD  R0,R3
-        ADD  R0,R3
-        ADD  R0,R3
-        ADD  4(R3),R4
+        ASL  R0
+        ASL  R0
+        ADD  R4,R0
+        ADD  (R0),R4
 
         RETURN
