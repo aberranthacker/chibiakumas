@@ -7,41 +7,34 @@
         # R2 lines
         # R5 pointer to next line of sprite
 BitShifter:
-       .equiv BitShifter_TicksOccured, .+2
-        BIT  $0x00,R0
+        BIT  @$Timer_TicksOccured,R0
         BZE  BitShifter_Skip
 
-        PUSH R1
-BitShifter_LinesLoop:   # <----------------------------------------------------+
-        ASR  R1         #                                                      |
-        CLR  R4         # remembers the overflow from the last word            |
-        PUSH R5         #                                                      |
-                        #                                                      |
-BitShifter_WordsLoop:   # <-------------------------------------------------+  |
-        MOV  -(R5),R0   # load next word of sprite line                     |  |
-        MOV  R0,R3      # store it for later                                |  |
-        BIC  $0x0101,R0 # keep        XXXXXXX-                              |  |
-        ROR  R0         # shift right -XXXXXXX                              |  |
-        BIS  R4,R0      # add leftmost pixel from previous word             |  |
-        MOV  R0,(R5)    # store shifted word                                |  |
-        BIC  $0xFEFE,R3 # keep rightmost pixel -------X                     |  |
-        ASH  $7,R3      # shift left x7        X-------                     |  |
-        MOV  R3,R4      # store leftmost pixel for next word                |  |
-        SOB  R1,BitShifter_WordsLoop #--------------------------------------+  |
-                        #                                                      |
-        POP  R5         #                                                      |
-        BIS  R4,-(R5)   #                                                      |
-        INC  R5         #                                                      |
-        INC  R5         #                                                      |
-        MOV  (SP),R1    # restore sprite width in bytes                        |
-        ADD  R1,R5      # next line of the sprite                              |
-        SOB  R2,BitShifter_LinesLoop #-----------------------------------------+
-
-        POP  R1         # remove value from stack
+        PUSH R1 # we will restore R1 inside cycle without advancing SP
+        BitShifter_LinesLoop: # <--------------------------------------------------+
+            ASR  R1         #                                                      |
+            CLR  R4         # remembers the overflow from the last word            |
+            BitShifter_WordsLoop: # <-------------------------------------------+  |
+                MOV  -(R5),R0   # load next word of sprite line                 |  |
+                MOV  R0,R3
+                BIC  $0x0101,R0 # keep        XXXXXXX-                          |  |
+                ROR  R0         # shift right -XXXXXXX                          |  |
+                BIS  R4,R0      # add leftmost pixel from previous word         |  |
+                MOV  R0,(R5)    # store shifted word                            |  |
+                MOV  R3,R4      # store it for later                            |  |
+                BIC  $0xFEFE,R4 # keep rightmost pixel -------X                 |  |
+                ASH  $7,R4      # shift left x7        X-------                 |  |
+            SOB  R1,BitShifter_WordsLoop #--------------------------------------+  |
+            MOV  (SP),R1    # restore sprite width in bytes                        |
+            ADD  R1,R5
+            BIS  R4,-2(R5)  #                                                      |
+            ADD  R1,R5      # next line of the sprite                              |
+        SOB  R2,BitShifter_LinesLoop #---------------------------------------------+
+        POP  R1 # we don't need the value anymore, remove it from stack
         RETURN
 
 BitShifter_Skip:
+        MUL  R2,R1
         ADD  R1,R5
-        SOB  R2, BitShifter_Skip
 
         RETURN
