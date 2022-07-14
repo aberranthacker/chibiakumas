@@ -35,6 +35,8 @@
 
 # evtSetSprite       equ 128+5 ; set sprite to b1
 .equiv evtSetSprite,        (0x15 *2) << 8  # 42
+.equiv X, 8 # X coord is a most significant byte
+.equiv Y, 0 # Y coord is a least significant byte
 
 # evtAddToBackground equ 128+6 ; Add oject to background (back of object array)
 .equiv evtAddToBackground,  (0x16 * 2) << 8 # 44
@@ -64,34 +66,35 @@
 .equiv evtSetAnimator,      (0x1E * 2) << 8 # 60
 
 # evtSetAnimatorPointers  equ 143 ; set address of array of animators to w1
-#
+.equiv evtSetAnimatorPointers, (0x1F * 2) << 8 # 62
+
 # evtStarburt             equ %01000000 ; 0100xxxx X Y   = (64) add stars to X,Y
 #                                       ; (pattern xxxx) - is this ever used???
 #-------------------------------------------------------------------------------
 # evtReprogramPalette     equ %11110000 ; Reprogram the CPC palette - no effect on
 #                                       ; other systems
 .equiv evtSetPalette, (0x20 * 2) << 8 # 64
-                                                            # evtReprogramPlusPalette equ %11110001 ; Reprogram the CPC PLUS palette
-                                                            #
-                                                            # evtReprogramHitHandler  equ %11110010 ; Define Custom hit handler as call to w1,
-                                                            #                                       ; used for boss battles
-                                                            # evtReprogramShotToDeath equ %11110011 ; Define Custom destroy object event as call
-                                                            #                                       ; to w1, used for nuke satellite, and lasers
-                                                            #                                       ; in Ep2 Tech Noir level
-                                                            # evtReprogramSmartBombed equ %11111100
-                                                            #
-                                                            # evtReprogramCustomPlayerHitter equ %11111011 ; Define Custom hit handler for players as call to w1 - used for steaks in Alchemy level of ep2
-                                                            #
-                                                            # evtReprogramCustomMove1 equ %11110100 ; Define Custom Move handler1 to call w1 each object move
-                                                            # evtReprogramCustomMove2 equ %11110101 ; Define Custom Move handler1 to call w2 each object move
-                                                            # evtReprogramCustomMove3 equ %11110111 ; Define Custom Move handler1 to call w3 each object move
-                                                            # evtReprogramCustomMove4 equ %11111000 ; Define Custom Move handler1 to call w4 each object move
-                                                            #
-                                                            # evtReprogramCustomProg1 equ %11111001 ; Define Custom Programmer handler1 to call
-                                                            #                                       ; w1 each program tick (custom fire patterns)
-                                                            # evtReprogramCustomProg2 equ %11111010 ; Define Custom Programmer handler1 to call
-                                                            #                                       ; w2 each program tick (custom fire patterns)
-                                                            #
+                                        # evtReprogramPlusPalette equ %11110001 ; Reprogram the CPC PLUS palette
+                                        #
+                                        # evtReprogramHitHandler  equ %11110010 ; Define Custom hit handler as call to w1,
+                                        #                                       ; used for boss battles
+                                        # evtReprogramShotToDeath equ %11110011 ; Define Custom destroy object event as call
+                                        #                                       ; to w1, used for nuke satellite, and lasers
+                                        #                                       ; in Ep2 Tech Noir level
+                                        # evtReprogramSmartBombed equ %11111100
+                                        #
+                                        # evtReprogramCustomPlayerHitter equ %11111011 ; Define Custom hit handler for players as call to w1 - used for steaks in Alchemy level of ep2
+                                        #
+                                        # evtReprogramCustomMove1 equ %11110100 ; Define Custom Move handler1 to call w1 each object move
+                                        # evtReprogramCustomMove2 equ %11110101 ; Define Custom Move handler1 to call w2 each object move
+                                        # evtReprogramCustomMove3 equ %11110111 ; Define Custom Move handler1 to call w3 each object move
+                                        # evtReprogramCustomMove4 equ %11111000 ; Define Custom Move handler1 to call w4 each object move
+                                        #
+                                        # evtReprogramCustomProg1 equ %11111001 ; Define Custom Programmer handler1 to call
+                                        #                                       ; w1 each program tick (custom fire patterns)
+                                        # evtReprogramCustomProg2 equ %11111010 ; Define Custom Programmer handler1 to call
+                                        #                                       ; w2 each program tick (custom fire patterns)
+                                        #
 # evtReprogram_PowerupSprites equ %11110110 ; Define the sprite numbers of the
 #                                           ; power up objects and coin to b1,b2,b3,b4
 .equiv evtReprogram_PowerupSprites, (0x26 * 2) << 8 # 76
@@ -175,7 +178,7 @@
 
 .equiv prgNone, 0               # prgNothing     equ 0 ; PrgSpare
 .equiv prgBitShift, 1           # prgBitShift    equ 1 ; Change sprite bank according to X
-                                # prgSpecial     equ 2 ; not used
+.equiv prgSpecial, 2            # prgSpecial     equ 2
 .equiv prgBonus, 3              # prgBonus       equ 3 ; not used
 .equiv prgMovePlayer, 4         # prgMovePlayer  equ 4
                                 #
@@ -199,15 +202,14 @@
                                 # ;prgCustom2Protected equ 9  ;Custom 2 - protected from smart bomb
                                 # ;prgCustom3Protected equ 10 ;Custom 3 - protected from smart bomb
                                 # ;prgCustom4Protected equ 11 ;Custom 4 - protected from smart bomb
-                                #
-                                #
-                                # ;All under 31 Do not get killed by smartbomb except 0
-.equiv prgFireSnail, 0b10000000 # prgFireSnail equ %10000000
-.equiv prgFireSlow,  0b01100000 # prgFireSlow  equ %01100000
-                                # prgFireMid   equ %01000000
-                                # prgFireMid2  equ %11000000
-.equiv prgFireFast,  0b00100000 # prgFireFast  equ %00100000
-                                # prgFireHyper equ %10100000
+
+                                   # ;All under 31 Do not get killed by smartbomb except 0
+.equiv prgFireFast,  0b00100000    # prgFireFast  equ %001xxxxx xxxxx is pattern number
+                                   # prgFireMid   equ %010xxxxx
+.equiv prgFireSlow,  0b01100000    # prgFireSlow  equ %011xxxxx
+.equiv prgFireSnail, 0b10000000    # prgFireSnail equ %100xxxxx
+                                   # prgFireHyper equ %101xxxxx
+.equiv prgFireAboveAvg, 0b11000000 # prgFireMid2  equ %110xxxxx
 
  # Used To animate spider legs in 1st boss
 .equiv prgFrameAnimate, 0b11110000 # 11110xxx = Animate every X frames
@@ -216,26 +218,26 @@
                             #
                             # ;defw   Stars_AddObject         ;0 = just one - Special use only
                             #
-                            # ; Quarter bursts
+# Quarter bursts
 .equiv fireTopLeft, 1       # fireTopLeft     equ 1
 .equiv fireBottomLeft, 2    # fireBottomLeft  equ 2
                             # fireTopRight    equ 3
                             # fireBottomRight equ 4
-                            # ; half bursts
+# half bursts
                             # fireTop    equ 5
                             # fireBottom equ 6
-                            # fireLeft   equ 7
+.equiv fireLeft, 7          # fireLeft   equ 7
                             # fireRight  equ 8
-                            # ; triangle bursts
+# triangle bursts
                             # fireTopWide    equ  9
                             # fireBottomWide equ 10
 .equiv fireLeftWide, 11     # fireLeftWide   equ 11
                             # fireRightWide  equ 12
-                            # ; Omni burst
+# Omni burst
 .equiv fireBurst, 13        # fireBurst      equ 13
                             # fireSmallBurst equ 14
                             # fireOuterBurst equ 15  ;Necromancer attack
-                            # ; single dot
+# single dot
 .equiv fireSingleWest, 16   # fireSingleWest      equ 16
                             # fireSingleNorthWest equ 17
                             # fireSingleNorth     equ 18
@@ -339,5 +341,5 @@
                   # anmKill           equ 10 ; Kill the object
                   # anmCall           equ 11 ; Call memory location YX
                   # anmHalt           equ 12 ; End animation without loop
-                  #
+
                   # anmFrameNum       equ 16
