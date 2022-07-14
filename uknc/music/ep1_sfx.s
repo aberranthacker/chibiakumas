@@ -20,7 +20,7 @@ Ep1_SoundEffects_Sound1:
 	.byte 0	#Speed
 
 Ep1_SoundEffects_Sound1_Loop:	.byte 61	#Soft only. Volume: 15.
-	.word 239	#Software period.
+	.word 127	#Software period.
 
 	.byte 4	#End of the sound effect.
 
@@ -30,18 +30,18 @@ Ep1_SoundEffects_Sound2:
 
 Ep1_SoundEffects_Sound2_Loop:	.byte 189	#Soft only. Volume: 15.
 	.byte 6	#Noise: 6.
-	.word 119	#Software period.
+	.word 64	#Software period.
 
 	.byte 185	#Soft only. Volume: 14.
 	.byte 5	#Noise: 5.
-	.word 113	#Software period.
+	.word 60	#Software period.
 
 	.byte 169	#Soft only. Volume: 10.
 	.byte 1	#Noise: 1.
-	.word 95	#Software period.
+	.word 50	#Software period.
 
 	.byte 17	#Soft only. Volume: 4.
-	.word 142	#Software period.
+	.word 76	#Software period.
 
 	.byte 4	#End of the sound effect.
 
@@ -72,69 +72,69 @@ Ep1_SoundEffects_Sound4:
 
 Ep1_SoundEffects_Sound4_Loop:	.byte 189	#Soft only. Volume: 15.
 	.byte 10	#Noise: 10.
-	.word 179	#Software period.
+	.word 95	#Software period.
 
 	.byte 189	#Soft only. Volume: 15.
 	.byte 18	#Noise: 18.
-	.word 150	#Software period.
+	.word 80	#Software period.
 
 	.byte 189	#Soft only. Volume: 15.
 	.byte 12	#Noise: 12.
-	.word 142	#Software period.
+	.word 76	#Software period.
 
 	.byte 189	#Soft only. Volume: 15.
 	.byte 8	#Noise: 8.
-	.word 150	#Software period.
+	.word 80	#Software period.
 
 	.byte 189	#Soft only. Volume: 15.
 	.byte 5	#Noise: 5.
-	.word 159	#Software period.
+	.word 85	#Software period.
 
 	.byte 189	#Soft only. Volume: 15.
 	.byte 3	#Noise: 3.
-	.word 169	#Software period.
+	.word 90	#Software period.
 
 	.byte 189	#Soft only. Volume: 15.
 	.byte 5	#Noise: 5.
-	.word 179	#Software period.
+	.word 95	#Software period.
 
 	.byte 189	#Soft only. Volume: 15.
 	.byte 7	#Noise: 7.
-	.word 190	#Software period.
+	.word 101	#Software period.
 
 	.byte 189	#Soft only. Volume: 15.
 	.byte 5	#Noise: 5.
-	.word 201	#Software period.
+	.word 107	#Software period.
 
 	.byte 189	#Soft only. Volume: 15.
 	.byte 3	#Noise: 3.
-	.word 213	#Software period.
+	.word 113	#Software period.
 
 	.byte 189	#Soft only. Volume: 15.
 	.byte 1	#Noise: 1.
-	.word 225	#Software period.
+	.word 120	#Software period.
 
 	.byte 185	#Soft only. Volume: 14.
 	.byte 1	#Noise: 1.
-	.word 239	#Software period.
+	.word 127	#Software period.
 
 	.byte 173	#Soft only. Volume: 11.
 	.byte 1	#Noise: 1.
-	.word 253	#Software period.
+	.word 135	#Software period.
 
 	.byte 161	#Soft only. Volume: 8.
 	.byte 1	#Noise: 1.
-	.word 268	#Software period.
+	.word 143	#Software period.
 
 	.byte 153	#Soft only. Volume: 6.
 	.byte 1	#Noise: 1.
-	.word 284	#Software period.
+	.word 151	#Software period.
 
 	.byte 17	#Soft only. Volume: 4.
-	.word 301	#Software period.
+	.word 160	#Software period.
 
 	.byte 9	#Soft only. Volume: 2.
-	.word 319	#Software period.
+	.word 170	#Software period.
 
 	.byte 4	#End of the sound effect.
 
@@ -144,19 +144,19 @@ Ep1_SoundEffects_Sound5:
 
 Ep1_SoundEffects_Sound5_Loop:	.byte 189	#Soft only. Volume: 15.
 	.byte 17	#Noise: 17.
-	.word 38	#Software period.
+	.word 20	#Software period.
 
 	.byte 189	#Soft only. Volume: 15.
 	.byte 25	#Noise: 25.
-	.word 71	#Software period.
+	.word 38	#Software period.
 
 	.byte 189	#Soft only. Volume: 15.
 	.byte 31	#Noise: 31.
-	.word 95	#Software period.
+	.word 50	#Software period.
 
 	.byte 189	#Soft only. Volume: 15.
 	.byte 24	#Noise: 24.
-	.word 179	#Software period.
+	.word 95	#Software period.
 
 	.byte 248	#No soft, no hard. Volume: 15.
 	.byte 16	#Noise: 16.
@@ -220,10 +220,10 @@ Ep1_SoundEffects_Sound6:
 	.byte 0	#Speed
 
 Ep1_SoundEffects_Sound6_Loop:	.byte 61	#Soft only. Volume: 15.
-	.word 239	#Software period.
+	.word 127	#Software period.
 
 	.byte 61	#Soft only. Volume: 15.
-	.word 95	#Software period.
+	.word 50	#Software period.
 
 	.byte 4	#End of the sound effect.
 
@@ -233,26 +233,26 @@ Ep1_SoundEffects_Sound7:
 
 Ep1_SoundEffects_Sound7_Loop:	.byte 179	#Soft and Hard. Env: 14.
 	.byte 21	#Noise: 21.
-	.word 239	#Hardware period.
-	.word 602	#Software period.
+	.word 127	#Hardware period.
+	.word 320	#Software period.
 
 	.byte 179	#Soft and Hard. Env: 14.
 	.byte 11	#Noise: 11.
-	.word 239	#Hardware period.
-	.word 319	#Software period.
+	.word 127	#Hardware period.
+	.word 170	#Software period.
 
 	.byte 179	#Soft and Hard. Env: 14.
 	.byte 3	#Noise: 3.
-	.word 239	#Hardware period.
-	.word 239	#Software period.
+	.word 127	#Hardware period.
+	.word 127	#Software period.
 
 	.byte 51	#Soft and Hard. Env: 14.
-	.word 239	#Hardware period.
-	.word 225	#Software period.
+	.word 127	#Hardware period.
+	.word 120	#Software period.
 
 	.byte 51	#Soft and Hard. Env: 14.
-	.word 239	#Hardware period.
-	.word 213	#Software period.
+	.word 127	#Hardware period.
+	.word 113	#Software period.
 
 	.byte 4	#End of the sound effect.
 
