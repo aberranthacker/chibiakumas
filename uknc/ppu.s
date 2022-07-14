@@ -651,24 +651,28 @@ MusicStop: #-----------------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 PlaySoundEffect1: # player fire
         MOV  $1,R0 # R0 contains sound effect number (>0!)
-        CLR  $0,R1 # The channel where to play the sound effect (0, 1, 2)
+        CLR  R1    # The channel where to play the sound effect (0, 1, 2)
         CLR  R2    # Inverted volume (0 = full volume, 16 = no sound)
         JMP  PLY_SE_PlaySoundEffect
+
 PlaySoundEffect2: # enemy fire
         MOV  $2,R0 # R0 contains sound effect number (>0!)
         MOV  $1,R1 # The channel where to play the sound effect (0, 1, 2)
         CLR  R2    # Inverted volume (0 = full volume, 16 = no sound)
         JMP  PLY_SE_PlaySoundEffect
+
 PlaySoundEffect3: # enemy dead
         MOV  $3,R0 # R0 contains sound effect number (>0!)
         MOV  $1,R1 # The channel where to play the sound effect (0, 1, 2)
         CLR  R2    # Inverted volume (0 = full volume, 16 = no sound)
         JMP  PLY_SE_PlaySoundEffect
+
 PlaySoundEffect4: # player dead
         MOV  $4,R0 # R0 contains sound effect number (>0!)
-        CLR  $R1   # The channel where to play the sound effect (0, 1, 2)
+        CLR  R1    # The channel where to play the sound effect (0, 1, 2)
         CLR  R2    # Inverted volume (0 = full volume, 16 = no sound)
         JMP  PLY_SE_PlaySoundEffect
+
 PlaySoundEffect5: # smartbomb
         MOV  $5,R0 # R0 contains sound effect number (>0!)
         MOV  $2,R1 # The channel where to play the sound effect (0, 1, 2)
@@ -679,6 +683,7 @@ PlaySoundEffect6: # coin
         MOV  $2,R1 # The channel where to play the sound effect (0, 1, 2)
         CLR  R2    # Inverted volume (0 = full volume, 16 = no sound)
         JMP  PLY_SE_PlaySoundEffect
+
 PlaySoundEffect7: # powerup
         MOV  $7,R0 # R0 contains sound effect number (>0!)
         MOV  $2,R1 # The channel where to play the sound effect (0, 1, 2)

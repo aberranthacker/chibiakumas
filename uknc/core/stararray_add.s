@@ -113,10 +113,10 @@ Stars_AddObjectBatchDefault:
         MOV  $StarArrayPointer,@$Stars_AddObject_StarArrayPointer
         CLR  @$StarArrayStartPoint
 
-        # input  B = R3 = pattern (0-15)
-        #        C = R1 = Y pos
-        #        D = R2 = X pos
-        # corrupts R0, R3, R4, R5
+      # input  B = R3 = pattern (0-15)
+      #        C = R1 = Y pos
+      #        D = R2 = X pos
+      # corrupts R0, R3, R4, R5
 Stars_AddObjectBatch:
         CMP  R3,$16 # radial blast!
         BHIS Stars_AddObjectBatch2
@@ -154,10 +154,10 @@ Stars_VectorArray:
        .word Stars_AddBurst_Small       # 14
        .word Stars_AddBurst_Outer       # 15
 
-        # C  = R1 = Y pos
-        # D  = R2 = X pos
-        # HL = R0 = first word of burst data
-        # R5 = pointer to next burst data word
+      # C  = R1 = Y pos
+      # D  = R2 = X pos
+      # HL = R0 = first word of burst data
+      # R5 = pointer to next burst data word
 Stars_AddBurst_Start:
         SWAB R0
 
@@ -183,10 +183,10 @@ Stars_AddBurst_Loop:
         BR   Stars_AddBurst_Loop
 1237$:  RETURN
 
-        # input C = R1 = Y
-        #       D = R2 = X
-        #       A = R0 LSB = Move
-        # corrupts R3, R4
+      # input C = R1 = Y
+      #       D = R2 = X
+      #       A = R0 LSB = Move
+      # corrupts R3, R4
 Stars_AddObjectFromR0:
         MOV  R0,@$StarObjectMoveToAdd
 Stars_AddObject:

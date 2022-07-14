@@ -2,31 +2,31 @@
   See EventStreamDirections for details of how DoMoves works
 */
 DoMoves:
-        # SDYYYXXX
-        # S - 'special move'
-        # D - Doubler (speed up move)
-        # YYY - Y movement bits
-        # XXX - X movement bits
-        # B=X, C=Y, D=Move
-        #
-        # in:  R1 LSB b = X, R1 MSB c = Y
-        #      R2 LSB d = Move, R2 MSB=anything
-        #
-        # out: R1 new Y
-        #      R2 unmodified
-        #      R3 unmodified
-        #      R4 new X
-        #      R5 unmodified
+      # SDYYYXXX
+      # S - 'special move'
+      # D - Doubler (speed up move)
+      # YYY - Y movement bits
+      # XXX - X movement bits
+      # B=X, C=Y, D=Move
+      #
+      # in:  R1 LSB b = X, R1 MSB c = Y
+      #      R2 LSB d = Move, R2 MSB=anything
+      #
+      # out: R1 new Y
+      #      R2 unmodified
+      #      R3 unmodified
+      #      R4 new X
+      #      R5 unmodified
         CLR  R4
         BISB R1,R4 # R4 = X
         CLRB R1
         SWAB R1    # R1 = Y
 
-        # Check if we are using a SPECIAL move pattern
+      # Check if we are using a SPECIAL move pattern
         BIT  $0x80,R2
         BNZ  DoMoves_Spec
 
-        # Y move ---------------------------------------------------------------
+      # Y move -----------------------------------------------------------------
         MOV  R2,R0
         BIC  $0177707,R0
         ASR  R0
@@ -41,7 +41,7 @@ DoMoves:
         CMP  R1,$199+24    # we are at the bottom of the screen
         BHIS DoMoves_Kill  # over the page
 
-        # X move ---------------------------------------------------------------
+      # X move -----------------------------------------------------------------
         MOV  R2,R0
         BIC  $0177770,R0
         SUB  $4,R0
@@ -113,10 +113,11 @@ DoMoves_Spec: # Special moves - various kinds
     5$: 
         MOV  R2,R0          # 1000xxxx
         BICB $0b00000011,R0 # 101111xx
-        # TODO: uncomment for player 2
-       #CMPB R0,$0b10010000
-       #BEQ  DoMoves_SeekerP2   # Used by 'Chu attack' - and also coins!
 
+   .ifdef TwoPlayersGame
+        CMPB R0,$0b10010000
+        BEQ  DoMoves_SeekerP2   # Used by 'Chu attack' - and also coins!
+   .endif
         CMPB R0,$0b10000100
         BEQ  DoMoves_SeekerP1   # Used by 'Chu attack' - and also coins!
 
@@ -125,9 +126,9 @@ DoMoves_Spec: # Special moves - various kinds
 
         RETURN
 
-        # R4=X, R1=Y, R2: LSB=move, MSB=anything
+      # R4=X, R1=Y, R2: LSB=move, MSB=anything
 DoMoves_Wave:
-        # wave pattern  1010DSPP D Depth bit, S Speed, PP Position
+      # wave pattern  1010DSPP D Depth bit, S Speed, PP Position
         MOV  R4,R1                  #     ld a,b
         BIT  $0b1000,R2             #     bit 3,d
         BNZ  DoMoves_Wave_TwoShifts #     jr nz,DoMoves_TwoShifts
@@ -210,8 +211,8 @@ DoMoves_SeekerP1: # Home in on player 1
                                         # push iy
                                         #     ld iy,Player_Array
 DoMoves_Seeker:
-        # R1 c = Y, R4 b = X
-        # R2 LSB d = Move, R2 MSB=anything
+      # R1 c = Y, R4 b = X
+      # R2 LSB d = Move, R2 MSB=anything
         PUSH R3                     # push de
         MOV  R2,R3                  # ld a,d
         BIC  $0xFFFC,R3             # and %00000011 ; Speed

@@ -11,7 +11,7 @@
 #         RETURN                          # ret
                                         #     ; iy = Pointer to player vars
 NoSpend:                                # NoSpend:
-        MOV  R0,@$SpendTimeout       #     ld (SpendTimeout_Plus1-1),a
+        MOV  R0,@$SpendTimeout          #     ld (SpendTimeout_Plus1-1),a
         RETURN                          # ret
                                         #
 SpendCheck:                             # SpendCheck:
@@ -77,7 +77,7 @@ PlayerCounter:
         TSTB 9(R5)                      #     ld a,(P1_P09)   ;See how many lives are left
                                         #     or a
         BNZ  Player1NotDead             #     jr nz,Player1NotDead
-        #* if, for some reason we got here, player 1 is dead
+      # player 1 is dead if for some reason we got here
         RETURN                          #     ;if we got here, player 1 is dead
                                         #
                                         #     call SpendCheck
@@ -820,7 +820,11 @@ Player2_DeadUI:
                                         # call SpriteBank_Font2
                                         # ld l,&00;14  ; show how many credits are left
 ShowContinues:
+    .ifdef DebugMode
        .inform_and_hang "no ShowContinues"
+    .else
+        return
+    .endif
        .equiv ContinuesScreenPos, .+2
         MOV  $0x0E,R3                   # ld h,&0E    :ContinuesScreenpos_Plus1
                                         # ld bc,txtCreditsMsg2
@@ -886,7 +890,10 @@ Player1DrawUI:
                                               # ld iy,Player_Array
                                               # ld de,Player_ScoreBytes
         BR   Player_DrawUI_PlusAsWell         # jr Player_DrawUI_PlusAsWell
+
+   .ifdef TwoPlayersGame
 Player2DrawUI:
+   .error "Player2DrawUI not implemented"
                                         # ld a,-4
                                         # ld b,80-4
                                         #
@@ -899,6 +906,8 @@ Player2DrawUI:
                                         # ld a,40-1
                                         # ld iy,Player_Array2
                                         # ld de, Player_ScoreBytes2
+   .endif
+
 Player_DrawUI_PlusAsWell:
                                         #     ld (PlayerScorePos_Plus2 - 1),a
                                         #     ld (BurstDrawPos_Plus2 - 2),hl

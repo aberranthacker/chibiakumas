@@ -74,7 +74,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtAddToBackground               # 4
     .word     evtSaveObjSettings | 1           # 5
 
-    # Rock Chick
+   # Rock Chick
     .word 0, evtMultipleCommands | 5
     .word    evtSetProgMoveLife               # 1
     .word        prgFireSlow | fireLeftWide
@@ -85,7 +85,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word    evtAddToForeground               # 4
     .word    evtSaveObjSettings | 2           # 5
 
-    # Skull bomber
+   # Skull bomber
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
     .word         prgFireFast | fireSingleSouth
@@ -96,7 +96,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtAddToForeground               # 4
     .word     evtSaveObjSettings | 3           # 5
 
-    # Ant Attacker
+   # Ant Attacker
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
     .word         prgFireSlow | fireTopLeft
@@ -107,7 +107,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtAddToForeground               # 4
     .word     evtSaveObjSettings | 4           # 5
 
-    # Skeleton Crawler
+   # Skeleton Crawler
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
     .word         prgFireSnail | fireLeftWide
@@ -118,7 +118,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtAddToForeground               # 4
     .word     evtSaveObjSettings | 5           # 5
 
-    # SpliceFace
+   # SpliceFace
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
     .word         prgFireSnail | fireBurst
@@ -129,7 +129,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtAddToForeground               # 4
     .word     evtSaveObjSettings | 6           # 5
 
-    # BoniBurd
+   # BoniBurd
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
     .word         prgFireSnail | fireBottomLeft
@@ -140,7 +140,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtAddToForeground               # 4
     .word     evtSaveObjSettings | 7           # 5
 
-    # Skull Gang
+   # Skull Gang
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
     .word         prgFireFast | fireSingleWest
@@ -151,7 +151,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtAddToForeground               # 4
     .word     evtSaveObjSettings | 8           # 5
 
-    # Eyeclopse
+  # Eyeclopse
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
     .word         prgFireSlow | fireLeftWide
@@ -165,18 +165,18 @@ EventStreamArray_Ep1: #---------------------------------------------------------
    #.word 0, evtAddToBackground
    #.word 0, evtSetProgMoveLife, prgBitShift, mveBackground | 0b0001, lifeImmortal
 
-    # Moon
+   # Moon
     .word 0, evtMultipleCommands | 3
     .word    evtLoadObjSettings | 0
     .word    evtSetMove, mveBackground | 0b1000
     .word    evtSingleSprite, sprSingleFrame | 3
     .byte        24+ 8, 24+ 160 -16 # Y, X :  32, 172 : 8, 288
 
-    # Castle
+   # Castle
     .word 0, evtSetMove, mveBackground | 0b0010
     .word 0, evtSingleSprite, sprSingleFrame | 4
     .byte        24+ 50,    24+ 120  # Y, X :  74, 144 :  50, 240
-    # some boulders
+   # some boulders
     .word 0, evtSingleSprite, sprSingleFrame | 14
     .byte        24+ 40+90, 24+ 100  # Y, X : 154, 124 : 130, 200
     .word 0, evtSingleSprite, sprSingleFrame | 13
@@ -184,13 +184,13 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word 0, evtSingleSprite, sprSingleFrame | 13
     .byte        24+ 40+100, 24+ 162 # Y, X : 164, 184 : 140, 324
 
-    # Burning bloke
+   # Burning bloke
     .word 0, evtMultipleCommands | 2
     .word    evtSetProgMoveLife, prgNone, mveBackground | 0b0010, lifeImmortal
     .word    evtSingleSprite, sprTwoFrame | 11
     .byte        24+ 90, 24+ 50 # Y, X : 114, 74 : 90, 100
 
-    # Clouds (3 wide)
+   # Clouds (3 wide)
     .word 0, evtMultipleCommands | 4
     .word    evtSetMove, mveBackground | 0b0100
     .word    evtSingleSprite, sprSingleFrame | 41
@@ -200,7 +200,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word    evtSingleSprite, sprSingleFrame | 43
     .byte        24+ 14, 24+ 159+24
 
-    # Spikeyrock
+   # Spikeyrock
     .word 0, evtMultipleCommands | 3
     .word    evtSetMove, mveBackground | 0b0001
 # defb    48+2, 24+100, 24+24+128, 24, 8, 9 ; Two sprites,
@@ -216,7 +216,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word FadeStartPoint + 3, evtSetPalette, RealPalette
 # End of fade in block ---------------------------------------------------------
 
-    # rock chick enemy
+   # rock chick enemy
     .word 5, evtMultipleCommands | 2
     .word    evtLoadObjSettings | 2
     .word    evtSingleSprite | 8 # Row 15, last Column, Last Sprite
@@ -225,65 +225,65 @@ EventStreamArray_Ep1: #---------------------------------------------------------
    #.word 5, evtChangeStreamTime, 256+ 5, LevelEndAnim
     #----------
 
-    # Rock Pt 1
+   # Rock Pt 1
     .word 10, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 0
     .word     evtSingleSprite, sprSingleFrame | 22
     .byte         24+ 176, 24+ 160
 
-    # Cross
+   # Cross
     .word 13, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 1
     .word     evtSingleSprite, sprSingleFrame | 17
     .byte         24+ 110, 24+ 160
 
-    # rock chick enemy
+   # rock chick enemy
     .word 15, evtMultipleCommands | 3
     .word     evtLoadObjSettings | 2
     .word     evtSingleSprite | 6  # Row 11, last Column, Last Sprite
     .word     evtSingleSprite | 10 # Row 19, last Column, Last Sprite
 
-    # Rock Pt 2
+   # Rock Pt 2
     .word 16, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 0
     .word     evtSingleSprite, sprSingleFrame | 23
     .byte         24+ 176, 24+ 160
 
-    # Powerup Rate
+   # Powerup Rate
     .word 17, evtMultipleCommands | 2
     .word     evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 0x22), 64+63
     .word     evtSingleSprite, sprTwoFrame | 39
     .byte         24+ 50, 24+ 160
 
-    # Rock Pt 3
+   # Rock Pt 3
     .word 22, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 0
     .word     evtSingleSprite, sprSingleFrame | 24
     .byte         24+ 176, 24+ 160
 
-    # rock chick enemy
+   # rock chick enemy
     .word 25, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 2
     .word     evtSingleSprite | 8  # Row 15, last Column, Last Sprite
 
-    # rock chick enemy
+   # rock chick enemy
     .word 30, evtMultipleCommands | 3
     .word     evtLoadObjSettings | 2
     .word     evtSingleSprite | 6  # Row 11, last Column, Last Sprite
     .word     evtSingleSprite | 10 # Row 19, last Column, Last Sprite
 
-    # rock chick enemy
+   # rock chick enemy
     .word 35, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 2
     .word     evtSingleSprite | 8  # Row 15, last Column, Last Sprite
 
-    # Cross
+   # Cross
     .word 40, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 1
     .word     evtSingleSprite, sprSingleFrame | 18
     .byte         24+ 85, 24+ 160
 
-    # Skull Bomber
+   # Skull Bomber
     .word 45, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 3
     .word     evtSingleSprite | 3  # Row 5, last Column, Last Sprite
@@ -292,20 +292,20 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtLoadObjSettings | 4
     .word     evtSingleSprite | 12  # Row 23, last Column, Last Sprite
 
-    # Burning bloke
+   # Burning bloke
     .word 55, evtMultipleCommands | 3
     .word     evtLoadObjSettings | 1
     .word     evtSetProg, prgNone
     .word     evtSingleSprite, sprTwoFrame | 11
     .byte         24+ 85, 24+ 160
 
-    # Boniburd
+   # Boniburd
     .word 65, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 7
     .word     evtSingleSprite, sprTwoFrame | 2
     .byte         24+ 16, 24+ 160-24
 
-    # Spikeyrock
+   # Spikeyrock
     .word 67, evtMultipleCommands | 4
     .word     evtLoadObjSettings | 0
 # defb    48+   3   ,160+24,24+ 128,24,       8,9,10 ; Three sprites,
@@ -316,64 +316,64 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtSingleSprite, sprSingleFrame | 10
     .byte         24+ 48+128, 24+ 160
 
-    # rock chick enemy
+   # rock chick enemy
     .word 75, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 2
     .word     evtSingleSprite | 8  # Row 15, last Column, Last Sprite
 
-    # rock chick enemy
+   # rock chick enemy
     .word 80, evtMultipleCommands | 3
     .word     evtLoadObjSettings | 2
     .word     evtSingleSprite | 6  # Row 11, last Column, Last Sprite
     .word     evtSingleSprite | 10 # Row 19, last Column, Last Sprite
 
-    # boniburd
+   # boniburd
     .word 84, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 7
     .word     evtSingleSprite, sprTwoFrame | 2
     .byte         24+ 16, 24+ 160-24
 
-    # Skeleton walker
+   # Skeleton walker
     .word 85, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 5
     .word     evtSingleSprite | 13  # Row 25, last Column, Last Sprite
 
-    # Cross
+   # Cross
     .word 88, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 1
     .word     evtSingleSprite, sprSingleFrame | 18
     .byte         24+ 85, 24+ 160
 
-    # Powerup Drone
+   # Powerup Drone
     .word 90, evtMultipleCommands | 2
     .word     evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 0x22), 64+63
     .word     evtSingleSprite, sprTwoFrame | 38
     .byte         24+ 150, 24+ 160
 
-    # Grave
+   # Grave
     .word 95, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 0
     .word     evtSingleSprite, sprSingleFrame | 21
     .byte         24+ 170, 24+ 160
 
-    # SpliceFace
+   # SpliceFace
     .word 100, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 6
     .word      evtSingleSprite, sprTwoFrame | 34
     .byte          24+ 100, 24
 
-    # rock chick enemy
+   # rock chick enemy
     .word 110, evtMultipleCommands | 3
     .word      evtLoadObjSettings | 2
     .word      evtSingleSprite | 6  # Row 11, last Column, Last Sprite
     .word      evtSingleSprite | 10 # Row 19, last Column, Last Sprite
 
-    # rock chick enemy
+   # rock chick enemy
     .word 115, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 2
     .word     evtSingleSprite | 8  # Row 15, last Column, Last Sprite
 
-    # Clouds (3 wide)
+   # Clouds (3 wide)
     .word 120, evtMultipleCommands | 4
     .word      evtSetProgMoveLife, prgNone, mveBackground | 0b0100, lifeImmortal
     .word      evtSingleSprite, sprSingleFrame | 41
@@ -383,107 +383,107 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word      evtSingleSprite, sprSingleFrame | 43
     .byte          24+ 14, 24+ 159+24
 
-    # rock chick enemy
+   # rock chick enemy
     .word 120, evtMultipleCommands | 3
     .word      evtLoadObjSettings | 2
     .word      evtSingleSprite | 6  # Row 11, last Column, Last Sprite
     .word      evtSingleSprite | 10 # Row 19, last Column, Last Sprite
 
-    # Grave
+   # Grave
     .word 122, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 0
     .word      evtSingleSprite, sprSingleFrame | 21
     .byte         24+ 170, 24+ 160
 
-    # rock chick enemy
+   # rock chick enemy
     .word 125, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 2
     .word      evtSingleSprite | 8  # Row 15, last Column, Last Sprite
 
-    # rock chick enemy
+   # rock chick enemy
     .word 127, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 2
     .word      evtSingleSprite | 8  # Row 15, last Column, Last Sprite
 
-    # Burning bloke
+   # Burning bloke
     .word 129, evtMultipleCommands | 3
     .word      evtLoadObjSettings | 1
     .word      evtSetProg, prgNone
     .word      evtSingleSprite, sprTwoFrame | 11
     .byte          24+ 90, 24+ 160
 
-    # rock chick enemy
+   # rock chick enemy
     .word 130, evtMultipleCommands | 3
     .word      evtLoadObjSettings | 2
     .word      evtSingleSprite | 6  # Row 11, last Column, Last Sprite
     .word      evtSingleSprite | 10 # Row 19, last Column, Last Sprite
 
-    # rock chick enemy
+   # rock chick enemy
     .word 135, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 2
     .word      evtSingleSprite | 8  # Row 15, last Column, Last Sprite
 
-    # Cross
+   # Cross
     .word 140, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 1
     .word      evtSingleSprite, sprSingleFrame | 19
     .byte          24+ 103, 24+ 160
 
-    # SpliceFace
+   # SpliceFace
     .word 150, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 6
     .word      evtSingleSprite, sprSingleFrame | 34
     .byte          24+ 100, 24
 
-    # Powerup Drone
+   # Powerup Drone
     .word 150, evtMultipleCommands | 2
     .word      evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 0x22), 64+63
     .word      evtSingleSprite, sprTwoFrame | 38
     .byte          24+ 150, 24+ 160
 
-    # Eyeclopse s
+   # Eyeclopse s
     .word 160, evtMultipleCommands | 4
     .word      evtLoadObjSettings | 9
     .word      evtSingleSprite | 7  # Row 13, last Column, Last Sprite
     .word      evtSetMove, mveWave | 0b1111
     .word      evtSingleSprite | 12  # Row 23, last Column, Last Sprite
 
-    # rock chick enemy
+   # rock chick enemy
     .word 165, evtMultipleCommands | 3
     .word      evtLoadObjSettings | 2
     .word      evtSingleSprite | 6  # Row 11, last Column, Last Sprite
     .word      evtSingleSprite | 10 # Row 19, last Column, Last Sprite
 
-    # Grave
+   # Grave
     .word 167, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 0
     .word      evtSingleSprite, sprSingleFrame | 20
     .byte          24+ 173, 24+ 160
 
-    # rock chick enemy
+   # rock chick enemy
     .word 170, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 2
     .word      evtSingleSprite | 8  # Row 15, last Column, Last Sprite
 
-    # Eyeclopse s
+   # Eyeclopse s
     .word 180, evtMultipleCommands | 4
     .word      evtLoadObjSettings | 9
     .word      evtSingleSprite | 7  # Row 13, last Column, Last Sprite
     .word      evtSetMove, mveWave | 0b1111
     .word      evtSingleSprite | 12  # Row 23, last Column, Last Sprite
 
-    # Cross
+   # Cross
     .word 185, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 1
     .word      evtSingleSprite, sprSingleFrame | 19
     .byte          24+ 107, 24+ 160
 
-    # Skull Gang
+   # Skull Gang
     .word 190, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 8
     .word      evtSingleSprite | 7  # Row 13, last Column, Last Sprite
 
-    # Clouds (3 wide)
+   # Clouds (3 wide)
     .word 200, evtMultipleCommands | 4
     .word      evtSetProgMoveLife, prgNone, mveBackground | 0b0100, lifeImmortal
     .word      evtSingleSprite, sprSingleFrame | 41
@@ -493,40 +493,40 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word      evtSingleSprite, sprSingleFrame | 43
     .byte          24+ 14, 24+ 159+24
 
-    # rock chick enemy
+   # rock chick enemy
     .word 200, evtMultipleCommands | 3
     .word      evtLoadObjSettings | 2
     .word      evtSingleSprite | 6  # Row 11, last Column, Last Sprite
     .word      evtSingleSprite | 10 # Row 19, last Column, Last Sprite
 
-    # Boniburd
+   # Boniburd
     .word 220, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 7
     .word      evtSingleSprite, sprTwoFrame | 2
     .byte          24+ 16, 24+ 160-24
 
-    # Skeleton walker
+   # Skeleton walker
     .word 220, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 5
     .word      evtSingleSprite | 13  # Row 25, last Column, Last Sprite
 
-    # Grave
+   # Grave
     .word 221, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 0
     .word      evtSingleSprite, sprSingleFrame | 20
     .byte         24+ 176, 24+ 160
 
-    # Skull Bomber
+   # Skull Bomber
     .word 225, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 3
     .word      evtSingleSprite | 3  # Row 5, last Column, Last Sprite
 
-    # Ant
+   # Ant
     .word 225, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 4
     .word      evtSingleSprite | 12  # Row 23, last Column, Last Sprite
 
-    # SpliceFace
+   # SpliceFace
     .word 230, evtMultipleCommands | 4
     .word      evtLoadObjSettings | 6
     .word      evtSetMove, mvRegular | spdNormal | 0x23
@@ -535,7 +535,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word      evtSingleSprite, sprTwoFrame | 34
     .byte          24+ 150, 24+ 138
 
-    # SpliceFace
+   # SpliceFace
     .word 232, evtMultipleCommands | 3
     .word      evtLoadObjSettings | 6
     .word      evtSingleSprite, sprTwoFrame | 34
@@ -543,27 +543,27 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word      evtSingleSprite, sprTwoFrame | 34
     .byte          24+ 150, 24+ 138
 
-    # Skull Bomber
+   # Skull Bomber
     .word 235, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 3
     .word      evtSingleSprite | 3  # Row 5, last Column, Last Sprite
 
-    # Ant
+   # Ant
     .word 235, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 4
     .word      evtSingleSprite | 12  # Row 23, last Column, Last Sprite
 
-    # Skull Bomber
+   # Skull Bomber
     .word 245, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 3
     .word      evtSingleSprite | 3  # Row 5, last Column, Last Sprite
 
-    # Ant
+   # Ant
     .word 245, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 4
     .word      evtSingleSprite | 12  # Row 23, last Column, Last Sprite
 
-    # cloud
+   # cloud
     .word 250, evtMultipleCommands | 2
     .word      evtSetProgMoveLife, prgNone, mveBackground | 0b0100, lifeImmortal
     .word      evtSingleSprite, sprSingleFrame | 43
@@ -701,15 +701,15 @@ Background_DrawB:
 # Background Data -------------------------------------------------------{{{
    .equiv GradientTopStart, 48 # lines count
 GradientTop:
-   .word 0x00FF, 0x00FF                # 1st line
-   .word GradientTopStart - 10, 0x00DD # 2nd line num, new word
-   .word GradientTopStart - 16, 0x0077
-   .word GradientTopStart - 20, 0x00AA
-   .word GradientTopStart - 26, 0x0055
-   .word GradientTopStart - 30, 0x0088
-   .word GradientTopStart - 36, 0x0022
-   .word GradientTopStart - 40, 0x0000
-   .word GradientTopStart - 46, 0x0000
+   .word 0x00FF, 0x00FF                # 11111111 # 1st line
+   .word GradientTopStart - 10, 0x00DD # 11011101 # 2nd line num, new word
+   .word GradientTopStart - 16, 0x0077 # 01110111
+   .word GradientTopStart - 20, 0x00AA # 10101010
+   .word GradientTopStart - 26, 0x0055 # 01010101
+   .word GradientTopStart - 30, 0x0088 # 10001000
+   .word GradientTopStart - 36, 0x0022 # 00100010
+   .word GradientTopStart - 40, 0x0000 # 00000000
+   .word GradientTopStart - 46, 0x0000 # 00000000
    .word 0xFFFF
 
    .equiv GradientBottomStart, 32 # lines count
