@@ -589,92 +589,50 @@ LevelEndAnim:
 #----------------------------------------------------------------------------}}}
 
 EndLevel:
-        TST  (SP)+ # remove return address from the stack
         MOV  $0x8000,R5
         JMP  @$ExecuteBootstrap
 
 LevelInit:
+        MOV  $Player_Array,R5
+        MOVB $3,9(R5) # set number of lives for the first player
+
+       .ppudo_ensure $PPU_LevelMusicRestart
         MOV  $EventStreamArray_Ep1,R5 # Event Stream
-        MOV  $Event_SavedSettingsB,R3 # Saved Settings
         CALL @$EventStream_Init
 
         CALL ScreenBuffer_Init
         MTPS $PR0
-
-        MOVB $3,@$Player_Array+9 # set number of lives for the first player
+#-------------------------------------------------------------------------------
 LevelLoop:
-        CALL ShowKeysBitmap
-
         CALL @$Background_Draw
 
         CALL @$EventStream_Process
 
-        MOV  $LevelSprites,@$SprShow_BankAddr  
+        MOV  $LevelSprites,@$SprShow_BankAddr
         CALL @$ObjectArray_Redraw
 
         MOV  $ChibiSprites,@$SprShow_BankAddr
         CALL @$PlayerHandler
-        CALL @$Player_StarArray_Redraw
 
+        CALL @$Player_StarArray_Redraw
         CALL @$StarArray_Redraw
 
         CALL @$Player_DrawUI
 
-       #CALL @$PlaySfx
-
         CALL @$ScreenBuffer_Flip
 
         BR   LevelLoop
-
-ShowKeysBitmap: # -----------------------------------------------------------{{{
-        MOV  @$KeyboardScanner_P1,R3
-       .equiv LastKeysBitmap, .+2
-        CMP  R3,$0b00000000
-       #BEQ  1237$
-        MOV  R3,@$LastKeysBitmap
-
-        MOV  $ScanCodeStr+2,R1
-        CALL @$NumToStr
-       .ppudo_ensure $PPU_DebugPrintAt, $ScanCodeStr
-1237$:  RETURN
-
-NumToStr: #------------------------------------------------------------------{{{
-        MOV  $8,R0      # R0 - length of the number
-                        # R1 - position of number in str (first argument)
-                        # R3 - number (second argument)
-        ADD  R0,R1
-
-100$:   CLR  R2         # R2 - most, R3 - least significant word
-        DIV  $2,R2
-                        # R2 contains quotient, R3 - remainder
-        ADD  $'0,R3 # add ASCII code for "0" to the remainder
-        MOVB R3,-(R1)
-        MOV  R2,R3
-
-        SOB  R0,100$
-
-        RETURN
-#----------------------------------------------------------------------------}}}
-ScanCodeStr:
-        .byte 0,4
-        .asciz "76543210"
-        .even
-#----------------------------------------------------------------------------}}}
+#-------------------------------------------------------------------------------
 # Generic Background Begin -----------------------------------------------------
 Background_Draw:
         MOV  $0,R0 # 0=left
         CALL @$Background_GradientScroll
 
-        CALL @$Timer_UpdateTimer
-        PUSH R0 # need to keep the smartbomb color
-
-        CALL @$Timer_GetTimer
-        MOV  R0,@$BitShifter_TicksOccured
-
         MOV  @$ScreenBuffer_ActiveScreen, R5
 
-        POP  R0
+        CALL @$Timer_UpdateTimer # R0 = SmartBomb color or 0
         BNZ  Background_SmartBomb
+
        .equiv jmpBackgroundRender, .+2
         JMP  @$Background_DrawB
 

@@ -701,11 +701,9 @@ ObjectProgram_Fire:
         BZE  1237$                     # and d
                                        # ret z
 ObjectProgram_HyperFire:
-        MOV  $2,R0                         # ld a,2
-        # TODO: implement QueueSFX
-       #CALL @$SFX_QueueSFX_Generic        # call SFX_QueueSFX_Generic
-        # B=R4=X, C=R1=Y, IYL=R3=Prg       #
-        MOV  @$SpriteSizeShiftHalfB,R2  # ld a,(SpriteSizeShiftHalfB_Plus1 - 1)
+       .ppudo_ensure $PPU_PlaySoundEffect2
+      # B=R4=X, C=R1=Y, IYL=R3=Prg         #
+        MOV  @$SpriteSizeShiftHalfB,R2     # ld a,(SpriteSizeShiftHalfB_Plus1 - 1)
         ADD  R2,R1                         # ld d,a
                                            # add c
                                            # ld c,a
@@ -759,12 +757,9 @@ Object_DecreaseShotToDeath:
 Object_DecreaseShotToDeathB:
       # object has been shot to death
        .equiv dstCustomShotToDeathCall, .+2
-        CALL @$null                        # call null :CustomShotToDeathCall_Plus2
-                                           # xor a
-        BIC  $0xFF00,(R5)                  # ld (hl),a ;Clear object animator
-                                           #
-        # TODO: implement sfx              # ld a,3
-                                           # call SFX_QueueSFX_Generic
+        CALL @$null
+        BIC  $0xFF00,(R5) # Clear object animator
+       .ppudo_ensure $PPU_PlaySoundEffect3
       # R2 LSB ixh = Sprite, R2 MSB iyh = Move
       # create a coin
        .equiv PointsSpriteC, .+2

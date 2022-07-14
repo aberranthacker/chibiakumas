@@ -4,6 +4,9 @@ uknc/build/*
 default.vim
 default.vim.lock
 
+# UKNCBTL saved states
+*.uknc
+
 # WinAPE breakpoints files
 *.bpt
 
