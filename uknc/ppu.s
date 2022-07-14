@@ -893,6 +893,8 @@ MusicPlayerCall:
         BR   .+4 # or CALL @(PC)+ when music is playing
        .word PLY_AKG_Play
 
+        CALL PLY_SE_PlaySoundEffectsStream
+
         MOV  (SP)+,R0
         MOV  (SP)+,R1
         MOV  (SP)+,R2

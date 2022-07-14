@@ -17,8 +17,6 @@
 start:
         JMP  @$LevelInit
        .incbin "resources/ep1_intro.spr"
-IntroMusic:
-       .incbin "build/ep1_intro_music.bin"
 
 slide01: .incbin "build/ep1-intro/ep1-intro-slide01.raw.lzsa1" # chibiki
 slide02: .incbin "build/ep1-intro/ep1-intro-slide02.raw.lzsa1" # fishing
@@ -184,8 +182,7 @@ EndLevel:
 
 LevelInit:
         CALL @$ScreenBuffer_Reset
-       .ppudo_ensure $PPU_LoadMusic,$IntroMusic
-       .ppudo_ensure $PPU_MusicRestart
+       .ppudo_ensure $PPU_IntroMusicRestart
         MOV  $EventStreamArray,R5
         CALL @$EventStream_Init
 

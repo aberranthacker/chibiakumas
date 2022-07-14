@@ -468,9 +468,9 @@ Player_OneDrone:
         MOV  R3,R0
         CALL dodrone
 Player_NoDrones:
-                                     # FireSfx:
-      # TODO: implement sound effect #     ld a,1
-1237$:  RETURN                       #     jp SFX_QueueSFX_Generic
+
+       .ppudo_ensure $PPU_PlaySoundEffect1
+1237$:  RETURN
 
 dodrone:
       # C = R1 = Y
@@ -574,9 +574,7 @@ SetFireDir_Fire:
       # R5 player array pointer
 Player_Handler_DoSmartBomb:
         MOV  $5,@$SmartBombTimer
-    # TODO: implement smartbomb SFX     #     ld a,5
-                                        #     jp SFX_QueueSFX_GenericHighPri
-
+       .ppudo_ensure $PPU_PlaySoundEffect5
 
         MOV  $StarArraySizeBytes >> 2,R3
         MOV  $StarArrayPointer,R4
@@ -669,14 +667,12 @@ Player_Hit: #-------------------------------------------------------------------
         RETURN                           # ret
 
 Player_Hit_Points:
-        # TODO: add sfx
-                                        # ld a,6
-                                        # call SFX_QueueSFX_GenericHighPri
+       .ppudo_ensure $PPU_PlaySoundEffect6
       # Object is Points for player
                                         # push bc
-       #MOVB 13(R4),R0                  #     ld bc,13
+       #MOVB 13(R5),R0                  #     ld bc,13
        #ADD  $5,R0                      #     add hl,bc
-       #MOVB R0,13(R4)                  #     ld a,(hl)
+       #MOVB R0,13(R5)                  #     ld a,(hl)
         MOVB @$P1_P13,R0                #     add 5
         ADD  $5,R0                      #     ld (hl),a
         MOVB R0,@$P1_P13                # pop bc
@@ -717,9 +713,9 @@ Player_Hit_PowerupShootPower:
                                         #         ld (P2_P14),a
         MOVB $1,@$P1_P14                #         ld (P1_P14),a
 PowerupPlaySfx:
+       .ppudo_ensure $PPU_PlaySoundEffect7
         RETURN
-                                        #         ld a,7
-                                        #         jp SFX_QueueSFX_GenericHighPri
+
 Player_Hit_Injure:
         MOV  R5,R0
         BR   Player_Hit_Process
@@ -740,8 +736,8 @@ Player_Hit_Process:
         DECB 9(R0) # lives
         BMI  1237$ # player already dead if below zero
         BZE  PlayerKilled
-        MOVB $0x07,7(R0)                # ld a,4
-      # TODO: play SFX                  # call SFX_QueueSFX_GenericHighPri
+        MOVB $0x07,7(R0)
+       .ppudo_ensure $PPU_PlaySoundEffect4
 1237$:  RETURN
 
 PlayerKilled:

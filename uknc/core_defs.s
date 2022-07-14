@@ -38,7 +38,18 @@
 .equiv PPU_MusicStop,     30
 .equiv PPU_DebugPrint,    32
 .equiv PPU_DebugPrintAt,  34
-.equiv PPU_LastJMPTableIndex, 34
+.equiv PPU_TitleMusicRestart, 36
+.equiv PPU_IntroMusicRestart, 38
+.equiv PPU_LevelMusicRestart, 40
+.equiv PPU_BossMusicRestart,  42
+.equiv PPU_PlaySoundEffect1,  44
+.equiv PPU_PlaySoundEffect2,  46
+.equiv PPU_PlaySoundEffect3,  48
+.equiv PPU_PlaySoundEffect4,  50
+.equiv PPU_PlaySoundEffect5,  52
+.equiv PPU_PlaySoundEffect6,  54
+.equiv PPU_PlaySoundEffect7,  56
+.equiv PPU_LastJMPTableIndex, 56
 #-------------------------------------------------------------------------------
 .equiv ExtMemSizeBytes, 7168
 
@@ -108,8 +119,8 @@
 # PPU memory map ---------------------------------------------------------------
 .equiv PPU_UserRamStart, 0023666 # 10166 0x27B6
 
-.equiv PPU_StrBuffer, 0036666 # 15798 0x3DB6 # auto-generated during a build
-.equiv PPU_MusicBuffer, PPU_StrBuffer + 320
+.equiv PPU_StrBuffer, 0047510 # 20296 0x4F48 # auto-generated during a build
+#.equiv PPU_MusicBuffer, PPU_StrBuffer + 320
 
 .equiv PPU_UserProcessMetadataAddr, 0077772 # 32762 0x7FFA
 
