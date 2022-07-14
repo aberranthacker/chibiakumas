@@ -33,10 +33,10 @@ ObjectArray_ConfigureForSizeB:
         BIS  $0b00000011,R0
         MOV  R0,@$SpriteSizeShiftHalfH
 
-        # Define player 1 and 2 hitboxes
+      # Define player 1 and 2 hitboxes
 ObjectArray_ConfigureForSize:
-        # We update player location in advance for fast collision detection
-        # Define player 1's hitbox
+      # We update player location in advance for fast collision detection
+      # Define player 1's hitbox
         CLR  R0
         BISB @$P1_P00,R0 # PlayerY
         MOV  R0,@$PlayerY2
@@ -57,25 +57,28 @@ ObjectArray_ConfigureForSize:
         CLR  R0
     2$:
         MOV  R0,@$PlayerX1
-      # Define player 2's hitbox # TODO uncomment for player 2
-   #    CLR  R0
-   #    BISB @$P2_P00,R0 # PlayerY
-   #    MOV  R0,@$Player2Y2
-   #   .equiv SpriteSizeShiftFullB, .+2
-   #    SUB  $24,R0
-   #    BHIS 3$
 
-   #    CLR  R0
-   #3$: MOV  R0,@$Player2Y1
-   #    CLR  R0
-   #    BISB @$P1_P01,R0 # PlayerX
-   #    MOV  R0,@$Player2X2
-   #   .equiv SpriteSizeShiftHalfD, .+2
-   #    SUB  $12,R0
-   #    BHIS 4$
+   .ifdef TwoPlayersGame # {{{
+      # Define player 2's hitbox
+        CLR  R0
+        BISB @$P2_P00,R0 # PlayerY
+        MOV  R0,@$Player2Y2
+       .equiv SpriteSizeShiftFullB, .+2
+        SUB  $24,R0
+        BHIS 3$
 
-   #    CLR  R0
-   #4$: MOV  R0,@$Player2X1
+        CLR  R0
+    3$: MOV  R0,@$Player2Y1
+        CLR  R0
+        BISB @$P1_P01,R0 # PlayerX
+        MOV  R0,@$Player2X2
+       .equiv SpriteSizeShiftHalfD, .+2
+        SUB  $12,R0
+        BHIS 4$
+
+        CLR  R0
+    4$: MOV  R0,@$Player2X1
+   .endif # }}}
 
         RETURN
 # ObjectArray_ConfigureForSize ----------------------------------------------}}}
@@ -131,12 +134,12 @@ ObjectArray_NextObject:                                     # ObjectArray_Turbo:
       # R2 LSB ixh = Sprite, R2 MSB iyh = Move
         MOV  R2,R0
         BIC  $0xFFC0,R0                                   # and %00111111
-        MOV  R0,@$SprShow_SprNum                       # ld (SprShow_SprNum),a
+        MOV  R0,@$SprShow_SprNum                          # ld (SprShow_SprNum),a
                                                           # ld a,iyh
         BIT  $0xC0,R2                                     # and %11000000
         BZE  Objectloop_SpriteBankSet  # one frame sprite # jr z,Objectloop_SpriteBankSet
 
-        MOV  @$Timer_CurrentTick,R0                    # bit 6,a
+        MOV  @$Timer_CurrentTick,R0                       # bit 6,a
         BIT  $0x40,R2                                     # ld a,(Timer_CurrentTick)
         BZE  Objectloop_TwoFrameSprite                    # jr z,Objectloop_TwoFrameSprite
 
@@ -145,8 +148,8 @@ ObjectArray_NextObject:                                     # ObjectArray_Turbo:
         BR   Objectloop_SpriteBankSet                     # jr Objectloop_SpriteBankSet
 
 Objectloop_TwoFrameSprite:
-        COM  R0                                           #         cpl
-        BIC  $0177775,R0                                  #         and %00000010
+        COM  R0                                           # cpl
+        BIC  $0177775,R0                                  # and %00000010
 
 Objectloop_SpriteBankSet:
       # R1 LSB b = X, R1 MSB c = Y
@@ -158,10 +161,10 @@ Objectloop_SpriteBankSet:
       # B=hurt by bullets,
       # P=hurts player,
       # xxxxxx = hit points (if not B then ages over time)
-        BIT  0x40,R3 # R3 Life=LSB, Program=MSB #     ld a,ixl
-                                                #     bit 6,a
-        BZE  ObjectLoopBothPlayerSkip           #     jr z,ObjectLoopBothPlayerSkip ; Doesn't hurt player
-                                                #
+        BIT  $0x40,R3 # R3 Life=LSB, Program=MSB # ld a,ixl
+                                                 # bit 6,a
+        BZE  ObjectLoopBothPlayerSkip            # jr z,ObjectLoopBothPlayerSkip ; Doesn't hurt player
+                                                 #
 # used to modify this, but now we assume the player is alway vunurable
 # we check anyway before deducting a life
 # ;Jp Objectloop_PlayerVunrable ;Objectloop_DoPlayerCollisions_Plus2
@@ -602,9 +605,9 @@ ObjectProgram_CustomPrograms:
         ASL  R3
         JMP  @ObjectProgram_CustomPrograms_JumpTable(R3)
 ObjectProgram_CustomPrograms_JumpTable:
-        ObjectProgram_Custom1: .word null   # jp null   :CustomProgram1_Plus2
-        ObjectProgram_Custom2: .word null   # jp z,null :CustomProgram2_Plus2
-        ObjectProgram_Custom3: .word null   # jp z,null :CustomProgram3_Plus2
+        ObjectProgram_Custom1: .word null # jp null   :CustomProgram1_Plus2
+        ObjectProgram_Custom2: .word null # jp z,null :CustomProgram2_Plus2
+        ObjectProgram_Custom3: .word null # jp z,null :CustomProgram3_Plus2
                                .word SpecialMoveChibiko # Only used by ep2 for a crap joke!
 
 ObjectProgram_Misc:
@@ -651,7 +654,9 @@ ObjectProgram_MovePlayerDone:
         RETURN
 
 ObjectProgram_FrameAnimate: # Used To animate spider legs in 1st boss
+    .ifdef DebugMode
        .inform_and_hang "no FrameAnimate"
+    .endif
                                         #     push bc
                                         #         ld a,iyl
                                         #         and %00000111
@@ -665,34 +670,34 @@ ObjectProgram_FrameAnimate: # Used To animate spider legs in 1st boss
                                         #         ld a,(Timer_CurrentTick)
                                         #         and b
                                         #     pop bc
-                                        #     ret
+        RETURN                          #     ret
 
 # Every other X column uses an alternate sprite - for background anim ----------
 ObjectProgram_BitShiftSprite:
                                 # ld a,b
-       #MOV  R4,@$SprShow_X  # ld (SprShow_X),a ; Makesure sprite pos is updated for Domoves
+       #MOV  R4,@$SprShow_X     # ld (SprShow_X),a ; Makesure sprite pos is updated for Domoves
                                 # bit 0,b ;2 pixel
 1237$:  RETURN                  # ret
 
 ObjectProgram_SnailFire:
        .equiv  FireFrequencyA, .+2
-        MOV  $0b00010000,R0     # ld a,%00010000  :FireFrequencyA_Plus1
-        BR   ObjectProgram_Fire # jr ObjectProgram_Fire
+        MOV  $0b00010000,R0
+        BR   ObjectProgram_Fire
 ObjectProgram_SlowFire:
        .equiv  FireFrequencyB, .+2
-        MOV  $0b00001000,R0     # ld a,%00001000  :FireFrequencyB_Plus1
-        BR   ObjectProgram_Fire # jr ObjectProgram_Fire
+        MOV  $0b00001000,R0
+        BR   ObjectProgram_Fire
 ObjectProgram_MidFire:
        .equiv  FireFrequencyC, .+2
-        MOV  $0b00001000,R0     # ld a,%00001000  :FireFrequencyC_Plus1
-        BR   ObjectProgram_Fire # jr ObjectProgram_Fire
+        MOV  $0b00001000,R0
+        BR   ObjectProgram_Fire
 ObjectProgram_AboveMidFire:
        .equiv  FireFrequencyD, .+2
-        MOV  $0b00000100,R0     # ld a,%00000100; :FireFrequencyD_Plus1
-        BR   ObjectProgram_Fire # jr ObjectProgram_Fire
+        MOV  $0b00000100,R0
+        BR   ObjectProgram_Fire
 ObjectProgram_FastFire:
        .equiv  FireFrequencyE, .+2
-        MOV  $0b00000010,R0     # ld a,%00000010; :FireFrequencyE_Plus1
+        MOV  $0b00000010,R0
 
 ObjectProgram_Fire:
                                        # ld d,a
@@ -714,9 +719,9 @@ ObjectProgram_HyperFire:
                                            # ld d,a
                                            # ld a,iyl
         BIC  $0xFFE0,R3                    # and %00011111
-        # B = R3 = pattern (0-15)          # ld b,a  ; top left
-        # C = R1 = Y pos                   #
-        # D = R2 = X pos                   # FireCustomStar:
+      # B = R3 = pattern (0-15)            # ld b,a  ; top left
+      # C = R1 = Y pos                     #
+      # D = R2 = X pos                     # FireCustomStar:
         JMP  @$Stars_AddObjectBatchDefault #     jp Stars_AddObjectBatchDefault
                                            #
                                            # Object_DecreaseShot_Player2:

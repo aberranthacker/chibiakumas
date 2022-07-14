@@ -8,7 +8,7 @@
 */
 
 Background_GradientScroll:
-        # | 0-Left | 1-Right | 2-Up | 3-Down |
+      # | 0-Left | 1-Right | 2-Up | 3-Down |
         MOV  $Background_ShiftNow,R1            #     ld bc,Background_ShiftNow
         TST  R0                                 #     or a
         BZE  Background_SetShiftDirJump         #     jr z,Event_BackgroundScrollDirection_2
@@ -26,10 +26,10 @@ Background_SetShiftDirJump:
         RETURN                                  #     ret
                                                 #
 Background_Gradient:
-        # R5 HL = ScreenMem pointer # ActiveScreen
-        # R3 DE = Gradient pointer  # GradientTop
-        # R1 B  = Lines             # GradientTopStart
-        # R2 C  = ScrollPosRate1 # Shift on Timer Ticks
+      # R5 HL = ScreenMem pointer # ActiveScreen
+      # R3 DE = Gradient pointer  # GradientTop
+      # R1 B  = Lines             # GradientTopStart
+      # R2 C  = ScrollPosRate1 # Shift on Timer Ticks
                                                 #     ld a,c
         MOV  R2,@$ScrollPosRate1             #     ld (ScrollPosRate1_Plus1 - 1),a
                                                 #     ex hl,de
@@ -138,7 +138,7 @@ Background_NotNextLine: # No change yet!
                                        # ret
                                        #
 Background_LeftScroll: # Alternate scroll routine for Right->Left
-        # Shift left by one pixel
+      # Shift left by one pixel
         MOV  R2,R0                            # ld a,c
         BIC  $0x7777,R0 # 0111 0111 0111 0111 # and &11     ; Keep leftmost X---
         ROL  R0                               # rlca

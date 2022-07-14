@@ -9,7 +9,7 @@
 # where B is the number of lines, DE is the start of a 32px (8 byte) wide
 # sprite and HL is the right hand side of the area to fill
 
-# R0 number of lines
+# R1 number of lines
 # R4 tile pointer
 # R5 screen memory pointer
 Background_FloodFillQuadSprite:
@@ -30,8 +30,6 @@ Background_FloodFillQuadSprite_Loop:
 
        .equiv Background_FloodFillQuadSprite_LinesCount, .+2
         DEC  $0x00
-        BZE  1237$
+        BNZ  Background_FloodFillQuadSprite_Loop
 
-        JMP  @$Background_FloodFillQuadSprite_Loop
-
-1237$:  RETURN
+        RETURN

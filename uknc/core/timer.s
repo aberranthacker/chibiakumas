@@ -50,8 +50,8 @@ SmartBombCountdown$:
                                                             #
 Timer_GetTimer: # Return current timer in I
        #MOV  @$Timer_CurrentTick,R0   # ld a,(Timer_CurrentTick) ; and 'Ticks occured' Xor bitmap
-                                         # ld i,a
-                                         # ld a, 0 :Timer_TicksOccured_Plus1
+                                      # ld i,a
+                                      # ld a, 0 :Timer_TicksOccured_Plus1
        .equiv Timer_TicksOccured, .+2
         MOV  $0x00,R0 # bootstrap's ResetCore resets the value to 0x00
 

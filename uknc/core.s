@@ -62,12 +62,12 @@ SavedSettings: #-------------------------------------------------------------{{{
         P1_P01: .byte 32         #  1 - X 0x20
         P1_P02: .byte 0          #  2 - shoot delay
         P1_P03: .byte 3          #  3 - smartbombs     # <= 127
-        P1_P04: .byte 2          #  4 - drones (0/1/2) # <= 127
+        P1_P04: .byte 0          #  4 - drones (0/1/2) # <= 127
         P1_P05: .byte 60         #  5 - continues
         P1_P06: .byte 0          #  6 - drone pos
         P1_P07: .byte 0b00000111 #  7 - Invincible for how many ticks
         P1_P08: .byte 0          #  8 - Player SpriteNum
-        P1_P09: .byte 3          #  9 - Lives          # <= 127
+        P1_P09: .byte 20          #  9 - Lives          # <= 127
         P1_P10: .byte 0          # 10 - Burst Fire (Xfire)
         P1_P11: .byte 0b00000100 # 11 - Fire Speed - PlayerShootSpeed_Plus1
         P1_P12: .byte 0          # 12 - Player num (0=1, 1=2)
@@ -75,6 +75,7 @@ SavedSettings: #-------------------------------------------------------------{{{
         P1_P14: .byte 0          # 14 - PlayerShootPower_Plus1
         P1_P15: .byte 0x67       # 15 - FireDir
 
+   .ifdef TwoPlayersGame
     Player_Array2:             #Player 2 is 16 bytes after player 1
         P2_P00: .byte 150        #  0 - Y 0x96
         P2_P01: .byte 32         #  1 - X 0x20
@@ -92,9 +93,12 @@ SavedSettings: #-------------------------------------------------------------{{{
         P2_P13: .byte 0          # 13 - Points to add to player 2 - used to make score 'roll up'
         P2_P14: .byte 0          # 14 - PlayerShootPower_Plus1
         P2_P15: .byte 0x67       # 15 - FireDir
+   .endif
 
     Player_ScoreBytes:  .space 8,0 # Player 1 current score
+   .ifdef TwoPlayersGame
     Player_ScoreBytes2: .space 8,0 # Player 2 current score
+   .endif
     HighScoreBytes:     .space 8,0 # Highscore
 SavedSettings_Last: # 0x80 bytes --------------------------------------------}}}
 
@@ -128,22 +132,22 @@ Event_VectorArray:
        .word null                               # 0x0E 0x1C
        .word null                               # 0x0F 0x1E  Event_CoreReprogram, legacy
 # Event_MoveVector:
-       .word Event_SetMoveLife                  # 0x10 0x20  evtSetMoveLife
-       .word Event_SetProgram                   # 0x11 0x22    defw Event_ProgramSwitch_0001
-       .word Event_SetLife                      # 0x12 0x24  evtSetLife
-       .word Event_SetMove                      # 0x13 0x26    defw Event_MoveSwitch_0011
-       .word Event_SetProgMoveLife              # 0x14 0x28  evtSetProgMoveLife
-       .word Event_SetSprite                    # 0x15 0x2A    defw Event_SpriteSwitch_0101
-       .word Event_AddToBackground              # 0x16 0x2C  evtAddToBackground
-       .word Event_AddToForeground              # 0x17 0x2E  evtAddToForeground
-       .word Event_ChangeStreamTime             # 0x18 0x30  evtChangeStreamTime
-       .word Event_CallSubroutine               # 0x19 0x32  evtCallAddress
-       .word Event_LoadLastAddedObjectToAddress # 0x1A 0x34  evtSaveLstObjToAdd
-       .word not_implemented_check_R0           # 0x1B 0x36    defw Event_ClearPowerups
-       .word not_implemented_check_R0           # 0x1C 0x38    defw Event_ChangeStreamSpeed_1100
-       .word Event_SetSpriteSize                # 0x1D 0x3A  evtSetObjectSize
-       .word Event_SetAnimator                  # 0x1E 0x3C  evtSetAnimator
-       .word not_implemented_check_R0           # 0x1F 0x3E    defw Event_CoreReprogram_AnimatorPointer
+       .word Event_SetMoveLife                   # 0x10 0x20  evtSetMoveLife
+       .word Event_SetProgram                    # 0x11 0x22    defw Event_ProgramSwitch_0001
+       .word Event_SetLife                       # 0x12 0x24  evtSetLife
+       .word Event_SetMove                       # 0x13 0x26    defw Event_MoveSwitch_0011
+       .word Event_SetProgMoveLife               # 0x14 0x28  evtSetProgMoveLife
+       .word Event_SetSprite                     # 0x15 0x2A    defw Event_SpriteSwitch_0101
+       .word Event_AddToBackground               # 0x16 0x2C  evtAddToBackground
+       .word Event_AddToForeground               # 0x17 0x2E  evtAddToForeground
+       .word Event_ChangeStreamTime              # 0x18 0x30  evtChangeStreamTime
+       .word Event_CallSubroutine                # 0x19 0x32  evtCallAddress
+       .word Event_LoadLastAddedObjectToAddress  # 0x1A 0x34  evtSaveLstObjToAdd
+       .word not_implemented_check_R0            # 0x1B 0x36    defw Event_ClearPowerups
+       .word not_implemented_check_R0            # 0x1C 0x38    defw Event_ChangeStreamSpeed_1100
+       .word Event_SetSpriteSize                 # 0x1D 0x3A  evtSetObjectSize
+       .word Event_SetAnimator                   # 0x1E 0x3C  evtSetAnimator
+       .word Event_CoreReprogram_AnimatorPointer # 0x1F 0x3E    defw Event_CoreReprogram_AnimatorPointer
 # Event_ReprogramVector:
        .word Event_CoreReprogram_Palette        # 0x20 0x40
        .word null                               # 0x21 0x42  Obsolete - Reserver for Plus Palette
@@ -166,7 +170,7 @@ null:   RETURN
 
 not_implemented_check_R0:
     .ifdef DebugMode
-       .inform_and_hang "core: not implemented, check R0 for jump vector"
+       .inform_and_hang "core: not implemented\ncheck R0 for jump vector"
     .else
         BR   null
     .endif
@@ -280,6 +284,9 @@ not_implemented_check_R0:
        .include "background_bit_shifter.s"
        .global BitShifter
        .global BitShifter_TicksOccured
+
+       .include "background_bit_shifter_double.s"
+       .global BitShifterDouble
 
        .include "background_get_sprite_mem_pos.s"
        .global GetSpriteMempos

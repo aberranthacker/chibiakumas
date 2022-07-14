@@ -10,9 +10,9 @@ Player_StarArray_Redraw:
         MOV  $PlayerBulletColor<<2,@$StarColor1
         MOV  $PlayerBulletColor<<4,@$StarColor2
         MOV  $PlayerBulletColor<<6,@$StarColor3
-        # configure the loop for the player star array
+      # configure the loop for the player star array
         MOV  $null,@$dstCurrentStarArrayCollisionsB2
-   .ifdef TwoPlayerGame
+   .ifdef TwoPlayersGame
         MOV  $null,@$dstCurrentStarArrayCollisions2B2
    .endif
 
@@ -25,7 +25,7 @@ StarArray_Redraw:
         BNZ  1$ # see if game is not paused (TicksOccurred != 0 )
         RETURN
     1$:
-        # Redraw the enemy star array
+      # Redraw the enemy star array
         MOV  $StarArraySize,R1
        .equiv EnemyBulletColor, 0x0303
         MOV  $EnemyBulletColor,   @$StarColor0
@@ -33,9 +33,9 @@ StarArray_Redraw:
         MOV  $EnemyBulletColor<<4,@$StarColor2
         MOV  $EnemyBulletColor<<6,@$StarColor3
 
-        #;;;;;;;;;;;;;;;;;;;;; Player 1 handler
-        # configure the loop for the enemy star array
-        # TODO: implement Player_Hit_Injure_1
+      #;;;;;;;;;;;;;;;;;;;;; Player 1 handler
+      # configure the loop for the enemy star array
+      # TODO: implement Player_Hit_Injure_1
         MOV  $Player_Hit_Injure_1,R5
         TSTB @$P1_P07
         BZE  StarArray_PlayerVulnerable
@@ -61,7 +61,7 @@ StarArray_Redraw:
         MOV  R5,@$dstCurrentStarArrayCollisionsB2
 
         # Player 2 handler --------------------------------------------------{{{
-   .ifdef TwoPlayerGame
+   .ifdef TwoPlayersGame
       # configure the loop for the enemy star array
         MOV  $Player_Hit_Injure_2,R5
         TSTB @$P2_P07
@@ -161,10 +161,12 @@ StarArray_FoundOne:
        .equiv opcStarSlowdownB, .
         ASR  R0
         ADD  R0,R3
+        
+        MOV  $24,R4 # we will use the value 3 times below
 
         CMP  R3,$24+ 160
         BHIS DoMovesStars_Kill
-        CMP  R3,$24
+        CMP  R3,R4 # R4=24
         BLO  DoMovesStars_Kill
 
       # check for collisions with player 1
@@ -207,10 +209,10 @@ StarCollisionsDone:
         MOVB R3,-(R5) # X
         MOVB R2,-(R5) # Y
 
-        SUB  $24,R3
-        SUB  $24,R2
+        SUB  R4,R3 # R4=24
+        SUB  R4,R2 # R4=24
 
-        # calculating screen memory address
+      # calculating screen memory address
         MOV  R3,R4
         ASR  R4    # X: calculate word offset
         ASL  R2
@@ -220,7 +222,7 @@ StarCollisionsDone:
 
         BIC  $0xFFFC,R3 # 0b11111100
         ASL  R3
-        # Draw the star, finally!
+      # Draw the star, finally!
         JMP  @DotOffsetTable(R3)
 DotOffsetTable:
        .word DotOffset0
@@ -229,38 +231,42 @@ DotOffsetTable:
        .word DotOffset3
 
 DotOffset0:
+        MOV  $0x0303,R2
        .equiv StarColor0, .+2
         MOV  $0x0303,R3
-        BIC  $0x0303,(R4)
+        BIC  R2,(R4)
         BIS  R3,(R4)
         ADD  $80,R4
-        BIC  $0x0303,(R4)
+        BIC  R2,(R4)
         BIS  R3,(R4)
         BR   StarArray_Loop_AfterDraw
 DotOffset1:
+        MOV  $0x0C0C,R2
        .equiv StarColor1, .+2
         MOV  $0x0C0C,R3
-        BIC  $0x0C0C,(R4)
+        BIC  R2,(R4)
         BIS  R3,(R4)
         ADD  $80,R4
-        BIC  $0x0C0C,(R4)
+        BIC  R2,(R4)
         BIS  R3,(R4)
         BR   StarArray_Loop_AfterDraw
 DotOffset2:
+        MOV  $0x3030,R2
        .equiv StarColor2, .+2
         MOV  $0x3030,R3
-        BIC  $0x3030,(R4)
+        BIC  R2,(R4)
         BIS  R3,(R4)
         ADD  $80,R4
-        BIC  $0x3030,(R4)
+        BIC  R2,(R4)
         BIS  R3,(R4)
         BR   StarArray_Loop_AfterDraw
 DotOffset3:
+        MOV  $0xC0C0,R2
        .equiv StarColor3, .+2
         MOV  $0xC0C0,R3
-        BIC  $0xC0C0,(R4)
+        BIC  R2,(R4)
         BIS  R3,(R4)
         ADD  $80,R4
-        BIC  $0xC0C0,(R4)
+        BIC  R2,(R4)
         BIS  R3,(R4)
         BR   StarArray_Loop_AfterDraw
