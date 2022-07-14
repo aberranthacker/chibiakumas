@@ -17,12 +17,6 @@
                .=PPU_UserRamStart
 
 start:
-                MOV  @$0100, @$SYS100
-                MOV  $VblankIntHandler,@$0100
-
-                MOV  @$KBINT, @$SYS300
-                MOV  $KeyboardIntHadler,@$KBINT
-
                 MOV  $0b001,@$PBPMSK  # disable writes to bitplane 0
 
                 MOV  @$PASWCR,-(SP)
@@ -249,56 +243,89 @@ SLTABInit:      MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
                 MOV  R1,(R0)         #--pointer back to record 308
 #----------------------------------------------------------------------------}}}
                 MOV  (SP)+,@$PASWCR
-#----------------------------------------------------------------------------{{{
+#-------------------------------------------------------------------------------
                 MOV  @$0272, @$SYS272 # store address of system SLTAB (186; 0xBA)
                 MOV  $SLTAB, @$0272   # use our SLTAB
+
+                MOV  $SoundEffects,R5
+                CALL PLY_SE_InitSoundEffects
+                MOV  @$0100, @$SYS100
+                MOV  $VblankIntHandler,@$0100
+
+                MOV  @$KBINT, @$SYS300
+                MOV  $KeyboardIntHadler,@$KBINT
+
+                MOV  @$0320,@$SYS320
+                MOV  $Channel0In_IntHandler,@$0320
+
+                MOV  @$0324,@$SYS324
+                MOV  $Channel0Out_IntHandler,@$0324
 
                 MOV  $PGM, @$07124    # add PGM to PPU's processes table
                 MOV  $1, @$07100      # add PGM to PPU's processes execution table
 
                 RETURN                # end of the init subroutine
-#----------------------------------------------------------------------------}}}
+#-------------------------------------------------------------------------------
 PGM: #--------------------------------------------------------------------------
                 MOV  R0, -(SP) # store R0 in order for the process manager to
                                # function correctly
-ShortLoop:      MOV  $PPU_PPUCommand, @$PBPADR
-                MOV  @$PBP12D,R0
+SingleProcess_Loop:
+                MOV  @$CommandsQueue_CurrentPosition,R5
+                CMP  R5,$CommandsQueue_Bottom
+                BEQ  EventLoop
+#-------------------------------------------------------------------------------
+CommandsQueue_Process:
+                MOV  (R5)+,R1
+                MOV  (R5)+,R0
+                MOV  R5,@$CommandsQueue_CurrentPosition
             .ifdef DebugMode
-                CMP  R0,$PPU_LastJMPTableIndex
+                CMP  R1,$PPU_LastJMPTableIndex
                 BHI  .
             .endif
-                JMP  @JMPTable(R0)
-JMPTable:      .word EventLoop            # do nothing
-               .word CommandExecuted      # PPU_NOP
-               .word Teardown             # PPU_Finalize
-               .word GoSingleProcess      # PPU_SingleProcess
-               .word GoMultiProcess       # PPU_MultiProcess
-               .word SetPalette           # PPU_SetPalette
-               .word Print                # PPU_Print
-               .word PrintAt              # PPU_PrintAt
-               .word FlipFB               # PPU_FlipFB
-               .word ShowFB0              # PPU_ShowFB0
-               .word ShowFB1              # PPU_ShowFB1
-               .word LoadText             # PPU_LoadText
-               .word ShowBossText         # PPU_ShowBossText
-               .word LoadMusic            # PPU_LoadMusic
-               .word MusicRestart         # PPU_MusicRestart
-               .word MusicStop            # PPU_MusicStop
-               .word Debug_Print          # PPU_Debug_Print
-               .word Debug_PrintAt        # PPU_Debug_PrintAt
-#-------------------------------------------------------------------------------
-CommandExecuted: #--------------------------------------------------------------
-                MOV  $PPU_PPUCommand, @$PBPADR
-                CLR  @$PBP12D        # inform CPU's program that we are done
-               .equiv SingleProcessFlag, .+2
-EventLoop:      TST  $0x00
-                BNZ  ShortLoop       # non-zero, flag is set, loop
+                CALL @JMPTable(R1)
+                MOV  @$CommandsQueue_CurrentPosition,R5
+                CMP  R5,$CommandsQueue_Bottom
+                BLO  CommandsQueue_Process
 
-                MOV  $PGM, @$07124   # add to processes table
-                MOV  $1, @$07100     # require execution
-                MOV  (SP)+, R0       # restore R0
-                JMP  @$0174170       # jump back to the process manager (63608; 0xF878)
+               .equiv SingleProcessFlag, .+2
+EventLoop:      TST  $0
+                BNZ  SingleProcess_Loop # non-zero, flag is set, loop
+
+                MOV  $PGM, @$07124      # add to processes table
+                MOV  $1, @$07100        # require execution
+                MOV  (SP)+, R0          # restore R0
+                JMP  @$0174170          # jump back to the process manager (63608; 0xF878)
 #-------------------------------------------------------------------------------
+JMPTable:      .word EventLoop             # do nothing
+               .word CommandsQueue_Process # PPU_NOP
+               .word Teardown              # PPU_Finalize
+               .word GoSingleProcess       # PPU_SingleProcess
+               .word GoMultiProcess        # PPU_MultiProcess
+               .word SetPalette            # PPU_SetPalette
+               .word Print                 # PPU_Print
+               .word PrintAt               # PPU_PrintAt
+               .word FlipFB                # PPU_FlipFB
+               .word ShowFB0               # PPU_ShowFB0
+               .word ShowFB1               # PPU_ShowFB1
+               .word LoadText              # PPU_LoadText
+               .word ShowBossText          # PPU_ShowBossText
+               .word LoadMusic             # PPU_LoadMusic
+               .word MusicRestart          # PPU_MusicRestart
+               .word MusicStop             # PPU_MusicStop
+               .word Debug_Print           # PPU_Debug_Print
+               .word Debug_PrintAt         # PPU_Debug_PrintAt
+               .word TitleMusicRestart
+               .word IntroMusicRestart
+               .word LevelMusicRestart
+               .word BossMusicRestart
+               .word PlaySoundEffect1
+               .word PlaySoundEffect2
+               .word PlaySoundEffect3
+               .word PlaySoundEffect4
+               .word PlaySoundEffect5
+               .word PlaySoundEffect6
+               .word PlaySoundEffect7
+
 Teardown: #------------------------------------------------------------------{{{
                 MOV  @$SYS272, @$0272 # restore default SLTAB (186; 0xBA)
                 MOV  @$SYS300, @$0300 # restore keyboard interrupt handler
@@ -313,26 +340,25 @@ Teardown: #------------------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 GoSingleProcess: #-----------------------------------------------------------{{{
                 MOV  $1,@$SingleProcessFlag # skip firmware processes
-                JMP  CommandExecuted
+                RETURN
 #----------------------------------------------------------------------------}}}
 GoMultiProcess: #------------------------------------------------------------{{{
                 CLR  @$SingleProcessFlag
-                JMP  CommandExecuted
+                RETURN
 #----------------------------------------------------------------------------}}}
 SetPalette: #----------------------------------------------------------------{{{
                 PUSH @$PASWCR
                 MOV  $0x010,@$PASWCR
 
-                MOV  $PPU_PPUCommandArg, @$PBPADR
-                MOV  @$PBP12D, @$PBPADR # get palette address
                 CLC
-                ROR  @$PBPADR           #
-                # R0 - first parameter word
-                # R1 - second parameter word
-                # R2 - display/color parameters flag
-                # R3 - current line
-                # R4 - next line where parameters change
-                # R5 - pointer to a word that we'll modify
+                ROR  R0
+                MOV  R0,@$PBPADR # palette address
+              # R0 - first parameter word
+              # R1 - second parameter word
+              # R2 - display/color parameters flag
+              # R3 - current line
+              # R4 - next line where parameters change
+              # R5 - pointer to a word that we'll modify
                 CLR  R3
                 BISB @$PBP1DT,R3  # get line number
                 MOV  R3,R4
@@ -374,22 +400,21 @@ SetPalette: #----------------------------------------------------------------{{{
     palette_is_set$:
                 POP  @$PASWCR
 
-                JMP  CommandExecuted
+                RETURN
 #----------------------------------------------------------------------------}}}
 PrintAt: #-------------------------------------------------------------------{{{
                 MOV  $PBP12D,R4
                 MOV  $PBPADR,R5
-                MOV  $PPU_PPUCommandArg,(R5)
-                MOV  (R4),R0
-                INC  (R4)
-                INC  (R4)
                 CLC
                 ROR  R0
                 MOV  R0,(R5)
-                MOV  (R4),R0
-                MOVB R0,@$CurrentChar
-                SWAB R0
-                MOVB R0,@$CurrentLine
+                ROL  R0
+                INC  R0
+                INC  R0
+                MOV  (R4),R1
+                MOVB R1,@$CurrentChar
+                SWAB R1
+                MOVB R1,@$CurrentLine
                 BR   Print
 #----------------------------------------------------------------------------}}}
 Print: #---------------------------------------------------------------------{{{
@@ -407,10 +432,8 @@ Print: #---------------------------------------------------------------------{{{
                 MOV  $PBP12D,R4
                 MOV  $PBPADR,R5
 
-                MOV  $PPU_PPUCommandArg, (R5) # setup address register
-                MOV  (R4),R0  # get address of a string from CPU RAM
                 CLC
-                ROR  R0       # divide it by 2 to calculate bitplane address
+                ROR  R0
                 MOV  R0,(R5)  # load address of a string into address register
 
 LoadNext2Bytes: MOV  (R4),R0  # load 2 bytes from CPU RAM
@@ -429,9 +452,9 @@ LoadNext2Bytes: MOV  (R4),R0  # load 2 bytes from CPU RAM
                 MOV  (R5),@$NextStringAddr
 
 3$:             MOV  @$CurrentLine,R1 # prepare to calculate relative char address
-                MUL  $CharLineSize,R1    # calculate relative address of the line
+                MUL  $CharLineSize,R1 # calculate relative address of the line
                 ADD  @$CurrentChar,R1 # calculate relative address of the char
-                ADD  $FbStart,R1         # calculate absolute address of the next char
+                ADD  $FbStart,R1      # calculate absolute address of the next char
 
                 MOV  $StrBuffer,R3
                 MOV  $BPDataReg,R4
@@ -455,18 +478,18 @@ NextChar:       MOV  R1,(R5)      # load address of the next char into address r
                 INC  R1
                 INC  (PC)+; CurrentChar: .word 0
                 CMP  @$CurrentChar,R2 # end of screen line? (R2 == 40)
-                BNE  NextChar            # no, print another character
+                BNE  NextChar         # no, print another character
 NewLine:        CLR  @$CurrentChar
                 INC  (PC)+; CurrentLine: .word 0
                 CMP  @$CurrentLine,$TextLinesCount # next line out of screen?
-                BNE  Recalculate      # no, recalculate screen address
+                BNE  Recalculate   # no, recalculate screen address
                 CLR  @$CurrentLine # yes, print from the beginning
 
 Recalculate:    MOV  @$CurrentLine,R1 #
-                MUL  $CharLineSize,R1    # calculate relative line address
+                MUL  $CharLineSize,R1 # calculate relative line address
                 ADD  @$CurrentChar,R1 # calculate relative char dst address
-                ADD  $FbStart,R1         # calculate screen address of the next char
-                MOV  R1,(R5)             # load screen address of the next char to address register
+                ADD  $FbStart,R1      # calculate screen address of the next char
+                MOV  R1,(R5)          # load screen address of the next char to address register
                 BR   NextChar
 
 NextString:     MOV  $StrBuffer,R3
@@ -479,7 +502,7 @@ NextString:     MOV  $StrBuffer,R3
                 INC  (R5)
                 BR   LoadNext2Bytes
 
-DonePrinting:   JMP  @$CommandExecuted
+DonePrinting:   RETURN
 
 #----------------------------------------------------------------------------}}}
 FlipFB: #--------------------------------------------------------------------{{{
@@ -505,7 +528,7 @@ ShowFB0: #-------------------------------------------------------------------{{{
                 MOV  (SP)+, @$PASWCR
                 MOV  $FB0>>1,@$ActiveFrameBuffer
 
-                JMP  CommandExecuted
+                RETURN
 #----------------------------------------------------------------------------}}}
 ShowFB1: #-------------------------------------------------------------------{{{
                 MOV  @$PASWCR,-(SP) # PPU address space window control register
@@ -525,17 +548,15 @@ ShowFB1: #-------------------------------------------------------------------{{{
                 MOV  (SP)+, @$PASWCR
                 MOV  $FB1>>1,@$ActiveFrameBuffer
 
-                JMP  CommandExecuted
+                RETURN
 #----------------------------------------------------------------------------}}}
 LoadText: #------------------------------------------------------------------{{{
                 MOV  $StrBuffer,R3
                 MOV  $PBP12D,R4
                 MOV  $PBPADR,R5
 
-                MOV  $PPU_PPUCommandArg, (R5) # setup address register
-                MOV  (R4),R0  # get address of a string from CPU RAM
                 CLC
-                ROR  R0       # divide it by 2 to calculate bitplane address
+                ROR  R0
                 MOV  R0,(R5)  # load address of a string into address register
 
                 MOV  (R4),(R3)+ # load and store coordinates of the first line of the text
@@ -551,7 +572,7 @@ LoadText: #------------------------------------------------------------------{{{
                 INC  (R5)     # next address
                 BR   10$
 
-1237$:          JMP  @$CommandExecuted
+1237$:          RETURN
 #----------------------------------------------------------------------------}}}
 ShowBossText: #--------------------------------------------------------------{{{
                 MOV  $10<<1,@$DTSCOL # foreground color
@@ -560,10 +581,7 @@ ShowBossText: #--------------------------------------------------------------{{{
                 MOV  $PBP12D,R4
                 MOV  $PBPADR,R5
 
-                MOV  $PPU_PPUCommandArg, (R5) # setup address register
-
-                MOV  (R4),@$CharsToPrint
-
+                MOV  R0,@$CharsToPrint
                 MOV  $DTSOCT,R4
 
 SBT_NextTextLine:
@@ -594,52 +612,82 @@ SBT_NextChar:   DEC  (PC)+; CharsToPrint: .word 0xFF
                 INC  R1
                 BR   SBT_NextChar
 
-1237$:          JMP  @$CommandExecuted
+1237$:          RETURN
 #----------------------------------------------------------------------------}}}
 
-LoadMusic: #-----------------------------------------------------------------{{{
-                MOV  $MusicBuffer,R3
-                MOV  $PBP12D,R4
-                MOV  $PBPADR,R5
-
-                MOV  $PPU_PPUCommandArg, (R5)
-                MOV  (R4),R0  # get address of a string from CPU RAM
-                CLC
-                ROR  R0
-                MOV  R0,(R5)
-
-                MOV  $1536>>2,R0
-        10$:
-                MOV  (R4),(R3)+
-                INC  (R5)
-                MOV  (R4),(R3)+
-                INC  (R5)
-
-                SOB  R0, 10$
-
-                JMP  @$CommandExecuted
-#----------------------------------------------------------------------------}}}
+LoadMusic:
+        RETURN
+TitleMusicRestart:
+        MOV  $TitleMusic,-(SP)
+        BR   MusicRestart
+IntroMusicRestart:
+        MOV  $IntroMusic,-(SP)
+        BR   MusicRestart
+LevelMusicRestart:
+        MOV  $LevelMusic,-(SP)
+        BR   MusicRestart
+BossMusicRestart:
+        MOV  $BossMusic,-(SP)
+        BR   MusicRestart
 MusicRestart: #--------------------------------------------------------------{{{
         # don't call PLY_AKG_Play on VblankInt
         MOV  $0000401,@$MusicPlayerCall # BR .+4
         CALL PLY_AKG_Stop
 
         CLR  R0 # Subsong0
-        MOV  $MusicBuffer, R5
+        MOV  (SP)+,R5
         CALL PLY_AKG_Init
-        # call PLY_Play on VblankInt
+      # call PLY_Play on VblankInt
         MOV  $0004737,@$MusicPlayerCall # CALL @(PC)+
 
-        JMP  @$CommandExecuted
+        RETURN
 #----------------------------------------------------------------------------}}}
 MusicStop: #-----------------------------------------------------------------{{{
-        # don't call PLY_Play on VblankInt
+      # don't call PLY_Play on VblankInt
         MOV  $0000401,@$MusicPlayerCall # BR .+4
         CALL PLY_AKG_Stop
 
-        JMP  @$CommandExecuted
+        RETURN
 #----------------------------------------------------------------------------}}}
+PlaySoundEffect1: # player fire
+        MOV  $1,R0 # R0 contains sound effect number (>0!)
+        CLR  $0,R1 # The channel where to play the sound effect (0, 1, 2)
+        CLR  R2    # Inverted volume (0 = full volume, 16 = no sound)
+        JMP  PLY_SE_PlaySoundEffect
+PlaySoundEffect2: # enemy fire
+        MOV  $2,R0 # R0 contains sound effect number (>0!)
+        MOV  $1,R1 # The channel where to play the sound effect (0, 1, 2)
+        CLR  R2    # Inverted volume (0 = full volume, 16 = no sound)
+        JMP  PLY_SE_PlaySoundEffect
+PlaySoundEffect3: # enemy dead
+        MOV  $3,R0 # R0 contains sound effect number (>0!)
+        MOV  $1,R1 # The channel where to play the sound effect (0, 1, 2)
+        CLR  R2    # Inverted volume (0 = full volume, 16 = no sound)
+        JMP  PLY_SE_PlaySoundEffect
+PlaySoundEffect4: # player dead
+        MOV  $4,R0 # R0 contains sound effect number (>0!)
+        CLR  $R1   # The channel where to play the sound effect (0, 1, 2)
+        CLR  R2    # Inverted volume (0 = full volume, 16 = no sound)
+        JMP  PLY_SE_PlaySoundEffect
+PlaySoundEffect5: # smartbomb
+        MOV  $5,R0 # R0 contains sound effect number (>0!)
+        MOV  $2,R1 # The channel where to play the sound effect (0, 1, 2)
+        CLR  R2    # Inverted volume (0 = full volume, 16 = no sound)
+        JMP  PLY_SE_PlaySoundEffect
+PlaySoundEffect6: # coin
+        MOV  $6,R0 # R0 contains sound effect number (>0!)
+        MOV  $2,R1 # The channel where to play the sound effect (0, 1, 2)
+        CLR  R2    # Inverted volume (0 = full volume, 16 = no sound)
+        JMP  PLY_SE_PlaySoundEffect
+PlaySoundEffect7: # powerup
+        MOV  $7,R0 # R0 contains sound effect number (>0!)
+        MOV  $2,R1 # The channel where to play the sound effect (0, 1, 2)
+        CLR  R2    # Inverted volume (0 = full volume, 16 = no sound)
+        JMP  PLY_SE_PlaySoundEffect
 
+# IN: R0 A = Sound effect number (>0!).
+#     R1 C = The channel where to play the sound effect (0, 1, 2).
+#     R2 B = Inverted volume (0 = full volume, 16 = no sound). Hardware sounds are also lowered.
 PrintDebugInfo: #------------------------------------------------------------{{{
         PUSH @$PASWCR
         # enable write-only direct access to the RAM above 0100000
@@ -701,23 +749,22 @@ LevelTimeStrEnd:
 Debug_PrintAt: #-------------------------------------------------------------{{{
         MOV  $PBP12D,R4
         MOV  $PBPADR,R5
-        MOV  $PPU_PPUCommandArg,(R5)
-        MOV  (R4),R0
-        INC  (R4)
-        INC  (R4)
         CLC
         ROR  R0
         MOV  R0,(R5)
-        MOV  (R4),R0
-        MOVB R0,@$Debug_CurrentChar
-        SWAB R0
-        MOVB R0,@$Debug_CurrentLine
+        ROL  R0
+        INC  R0
+        INC  R0
+        MOV  (R4),R1
+        MOVB R1,@$Debug_CurrentChar
+        SWAB R1
+        MOVB R1,@$Debug_CurrentLine
         BR   Debug_Print
 #----------------------------------------------------------------------------}}}
 Debug_Print: #---------------------------------------------------------------{{{
        #MTPS $PR7
         PUSH @$PASWCR
-        # enable write-only direct access to the RAM above 0100000
+      # enable write-only direct access to the RAM above 0100000
     .if OffscreenAreaAddr < 0120000     # 0100000..0117777
         MOV  $0x011,@$PASWCR
     .elseif OffscreenAreaAddr < 0140000 # 0120000..0137777
@@ -740,10 +787,8 @@ Debug_Print: #---------------------------------------------------------------{{{
         MOV  $PBP12D,R4
         MOV  $PBPADR,R5
 
-        MOV  $PPU_PPUCommandArg, (R5) # setup address register
-        MOV  (R4),R0  # get address of a string from CPU RAM
         CLC
-        ROR  R0       # divide it by 2 to calculate bitplane address
+        ROR  R0
         MOV  R0,(R5)  # load address of a string into address register
 
 Debug_LoadNext2Bytes:
@@ -763,9 +808,9 @@ Debug_LoadNext2Bytes:
         MOV  (R5),@$Debug_NextStringAddr
 
 3$:     MOV  @$Debug_CurrentLine,R1 # prepare to calculate relative char address
-        MUL  $Debug_CharLineSize,R1    # calculate relative address of the line
+        MUL  $Debug_CharLineSize,R1 # calculate relative address of the line
         ADD  @$Debug_CurrentChar,R1 # calculate relative address of the char
-        ADD  $Debug_FbStart,R1         # calculate absolute address of the next char
+        ADD  $Debug_FbStart,R1      # calculate absolute address of the next char
 
         MOV  $StrBuffer,R3
 Debug_NextChar:
@@ -789,19 +834,19 @@ Debug_NextChar:
        .equiv Debug_CurrentChar, .+2
         INC  $0x00
         CMP  @$Debug_CurrentChar,R2 # end of screen line? (R2 == 40)
-        BNE  Debug_NextChar            # no, print another character
+        BNE  Debug_NextChar         # no, print another character
 Debug_NewLine:
         CLR  @$Debug_CurrentChar
        .equiv Debug_CurrentLine, .+2
         INC  $0x00
         CMP  @$Debug_CurrentLine,$Debug_TextLinesCount # next line out of screen?
-        BNE  Debug_Recalculate      # no, recalculate screen address
+        BNE  Debug_Recalculate   # no, recalculate screen address
         CLR  @$Debug_CurrentLine # yes, print from the beginning
 Debug_Recalculate:
         MOV  @$Debug_CurrentLine,R1 #
-        MUL  $Debug_CharLineSize,R1    # calculate relative line address
+        MUL  $Debug_CharLineSize,R1 # calculate relative line address
         ADD  @$Debug_CurrentChar,R1 # calculate relative char dst address
-        ADD  $Debug_FbStart,R1         # calculate screen address of the next char
+        ADD  $Debug_FbStart,R1      # calculate screen address of the next char
         BR   Debug_NextChar
 
 Debug_NextString:
@@ -820,13 +865,13 @@ Debug_NextString:
 Debug_DonePrinting:
         POP  @$PASWCR
        #MTPS $PR0
-        JMP  @$CommandExecuted
+        RETURN
 #----------------------------------------------------------------------------}}}
 
 VblankIntHandler: #----------------------------------------------------------{{{
-        # we disabling "single process mode" to load data from disk only,
-        # and to avoid random disk loading issues, we disabling our
-        # Vblank handler as well
+      # we disabling "single process mode" to load data from disk only,
+      # and to avoid random disk loading issues, we disabling our
+      # Vblank handler as well
         TST  @$SingleProcessFlag
         BZE  SkipToFirmwareHandler
 
@@ -1040,25 +1085,76 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         MOV  (SP)+,R0
         RTI
 #----------------------------------------------------------------------------}}}
+Channel0In_IntHandler: #----------------------------------------------------------{{{
+        MOV  @$PBPADR,-(SP)
+        MOV  R5,-(SP)
+       #MOV  R4,-(SP)
+       #MOV  R3,-(SP)
+       #MOV  R2,-(SP)
+       #MOV  R1,-(SP)
+       #MOV  R0,-(SP)
+
+        MOV  @$CommandsQueue_CurrentPosition,R5
+        CMP  R5,$CommandsQueue_Top
+        BLOS CommandsQueue_Full
+        MOV  $PPU_PPUCommandArg,@$PBPADR
+        MOV  @$PBP12D,-(R5)
+        MOV  @$PCH0ID,-(R5)
+        MOV  R5,@$CommandsQueue_CurrentPosition
+
+       #MOV  (SP)+,R0
+       #MOV  (SP)+,R1
+       #MOV  (SP)+,R2
+       #MOV  (SP)+,R3
+       #MOV  (SP)+,R4
+        MOV  (SP)+,R5
+        MOV  (SP)+,@$PBPADR
+
+        RTI
+CommandsQueue_Full:
+        BR   .
+        NOP
+        MOV  (SP)+,R5
+        MOV  (SP)+,@$PBPADR
+        RTI
+
+#----------------------------------------------------------------------------}}}
+Channel0Out_IntHandler: #------------------------------------------------------------------
+        RTI
 
        .include "music/ep1_title_music_playerconfig.s"
        .include "music/ep1_intro_music_playerconfig.s"
        .include "music/ep1_level_music_playerconfig.s"
+       .include "music/ep1_boss_music_playerconfig.s"
+       .include "music/ep1_sfx_playerconfig.s"
        .include "../../akg_player/akg_player.s"
+       .include "../../akg_player/player_sound_effects.s"
+
+TitleMusic: .include "build/ep1_title_music.formatted.s"
+IntroMusic: .include "build/ep1_intro_music.formatted.s"
+LevelMusic: .include "build/ep1_level_music.formatted.s"
+BossMusic:  .include "build/ep1_boss_music.formatted.s"
+SoundEffects: .include "music/ep1_sfx.s"
 
 FontBitmap: .space 8 # whitespace symbol
             .incbin "resources/font.raw"
 CGAFontBitmap: .incbin "resources/cga8x8b.raw"
 
-SYS100:  .word 0174612 # address of default vertical blank interrupt handler
-SYS272:  .word 02270   # address of default scanlines table
-SYS300:  .word 0175412 # address of default keyboard interrupt handler
+SYS100:  .word 0174612 # firmware vertical blank interrupt handler
+SYS272:  .word 02270   # default scanlines table
+SYS300:  .word 0175412 # firmware keyboard interrupt handler
+SYS320:  .word 0175700 # firmware PPU channel 0 in  interrupt handler
+SYS324:  .word 0175700 # firmware PPU channel 0 out interrupt handler
 
 FBSLTAB: .word 0          # adrress of main screen SLTAB
 FirstLineAddress: .word 0 #
 
+CommandsQueue_Top:
+       .space 2*2*16
+CommandsQueue_Bottom:
+CommandsQueue_CurrentPosition: .word CommandsQueue_Bottom
 StrBuffer:
-.equiv MusicBuffer, StrBuffer + 320
+.asciz "aslkdhflksahfdksa"
        .even
 end:
        .nolist

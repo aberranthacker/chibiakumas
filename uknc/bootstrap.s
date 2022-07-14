@@ -39,9 +39,6 @@ Bootstrap_Launch: # used by bootsector linker script
         MOV  $ppu_module.bin,R0
         CALL Bootstrap_LoadDiskFile
 
-        # PPU will clear the command code when it ready to execute a new one
-       .ppudo $PPU_NOP
-
         JSR  R5,@$PPEXEC
        .word FB1 # PPU module location
        .word ppu_module_size >> 1
@@ -52,7 +49,7 @@ Bootstrap_Launch: # used by bootsector linker script
         MOV  $loading_screen.bin,R0
         CALL Bootstrap_LoadDiskFile
      .else
-        # clear main screen area
+      # clear main screen area
         MOV  $8000>>3, R0
         MOV  $FB1, R1
         CLR  R3
@@ -65,7 +62,6 @@ Bootstrap_Launch: # used by bootsector linker script
         #-----------------------------------------------------------------------
         # Load the game core - this is always in memory
         MOV  $core.bin,R0
-       .wait_ppu
         CALL Bootstrap_LoadDiskFile
        .ifdef ExtMemCore # copy core to extended memory
             MOV  $GameVarsEnd,R4
@@ -139,8 +135,6 @@ Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
 Bootstrap_Level_Intro:
-        # TODO: show loading screen
-        # call Akuyou_ShowCompiledSprite
        .ppudo_ensure $PPU_SetPalette, $BlackPalette
         CALL LevelReset0000
 
@@ -158,7 +152,7 @@ Bootstrap_Level_Intro:
         MOV  $SPReset,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
-Bootstrap_Level_1: # ../Aku/BootStrap.asm:838  main menu --------------------
+Bootstrap_Level_1: # --------------------------------------------------------
        .ppudo_ensure $PPU_SetPalette, $BlackPalette
         CALL LevelReset0000
 

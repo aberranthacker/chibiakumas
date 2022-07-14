@@ -18,7 +18,6 @@ start:
         JMP  @$LevelInit
 
 TITLETEX: .incbin "resources/titletex.spr"
-TitleMusic: .incbin "build/ep1_title_music.bin"
 
 EventStreamArray_Ep1: #------------------------------------------------------{{{
     .word 0, evtSetPalette, TitleScreenPalette
@@ -79,26 +78,24 @@ LevelInit:
         MOV  $Event_SavedSettings,R3  # Saved Settings
         CALL @$EventStream_Init
 
-       .ppudo_ensure $PPU_LoadMusic,$TitleMusic
-       .ppudo_ensure $PPU_MusicRestart
+       .ppudo_ensure $PPU_TitleMusicRestart
        .ppudo_ensure $PPU_PrintAt,$PressFireKeyStr # Aku/Level00-Menu.asm:1101
 
         CLR  @$KeyboardScanner_P1 # call Keys_WaitForRelease
 
 .ifdef ShowLoadingScreen
-       .wait_ppu
 ShowTitlePic_Loop: #---------------------------------------------------------{{{
-       .ppudo $PPU_SetPalette, $FireKeyDarkPalette
+       .ppudo_ensure $PPU_SetPalette, $FireKeyDarkPalette
         CALL glow_delay_and_wait_key$
-       .ppudo $PPU_SetPalette, $FireKeyNormalPalette
+       .ppudo_ensure $PPU_SetPalette, $FireKeyNormalPalette
         CALL glow_delay_and_wait_key$
-       .ppudo $PPU_SetPalette, $FireKeyBrightPalette
+       .ppudo_ensure $PPU_SetPalette, $FireKeyBrightPalette
         CALL glow_delay_and_wait_key$
-       .ppudo $PPU_SetPalette, $FireKeyNormalPalette
+       .ppudo_ensure $PPU_SetPalette, $FireKeyNormalPalette
         CALL glow_delay_and_wait_key$
-       .ppudo $PPU_SetPalette, $FireKeyDarkPalette
+       .ppudo_ensure $PPU_SetPalette, $FireKeyDarkPalette
         CALL glow_delay_and_wait_key$
-       .ppudo $PPU_SetPalette, $FireKeyBlackPalette
+       .ppudo_ensure $PPU_SetPalette, $FireKeyBlackPalette
         CALL glow_delay_and_wait_key$
 
         BR   ShowTitlePic_Loop

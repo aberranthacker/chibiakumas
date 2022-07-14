@@ -1,8 +1,8 @@
 
+      # input R3 = X char column
+      #       R4 = Y char row
+      # output R5 = screen mem pos
 GetMemPos:
-        # input R3 = X char column
-        #       R4 = Y char row
-        # output R5 = screen mem pos
         MOV  R4,R5
         ASL  R5 # 4x ASL 29% faster than ASH $4,R5
         ASL  R5
@@ -44,8 +44,8 @@ ScreenBuffer_Flip:
         BZE  ScreenBuffer_SetFB1Active
 
 ScreenBuffer_SetFB0Active:
-        # FB1 active, switch to FB0
-       .ppudo $PPU_ShowFB1
+      # FB1 active, switch to FB0
+       .ppudo_ensure $PPU_ShowFB1
         CLR  @$ScreenBuffer_ActiveScreenDirect
         CLR  @$StarArray_ActiveScreen
         CLRB @$FB_MSB
@@ -55,8 +55,8 @@ ScreenBuffer_SetFB0Active:
         RETURN
 
 ScreenBuffer_SetFB1Active:
-        # FB0 active, switch to FB1
-       .ppudo $PPU_ShowFB0
+      # FB0 active, switch to FB1
+       .ppudo_ensure $PPU_ShowFB0
         MOV  $0x4000, @$ScreenBuffer_ActiveScreenDirect
         MOV  $0x4000, @$StarArray_ActiveScreen
         MOVB $0x40, @$FB_MSB
