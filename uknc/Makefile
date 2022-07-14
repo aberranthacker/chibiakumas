@@ -22,7 +22,8 @@ build/chibiakumas.dsk : build_tools/build_dsk.rb \
                         build/ep1_intro.bin \
                         build/ep1_intro_slides.bin \
                         build/level_00.bin \
-                        build/level_01.bin
+                        build/level_01.bin \
+                        build/level_02.bin
 	build_tools/build_dsk.rb
 
 # build/bootsector.bin ------------------------------------------------------{{{
@@ -40,7 +41,8 @@ build/bootstrap.bin : build/bootstrap.o \
                       build/level_00_menu.o \
                       build/ep1_intro.o \
                       build/ep1_intro_slides.o \
-                      build/level_01.o
+                      build/level_01.o \
+                      build/level_02.o
 	build_tools/disk_map.rb
 	$(LD) $(LDFLAGS) \
 	      -T linker_scripts/bootstrap.cmd \
@@ -49,6 +51,7 @@ build/bootstrap.bin : build/bootstrap.o \
 	      -R build/ep1_intro.o \
 	      -R build/level_00_menu.o \
 	      -R build/level_01.o \
+	      -R build/level_02.o \
 	      -R build/ppu.o
 	ruby build_tools/aout2sav.rb build/bootstrap.out -b -s -o build/bootstrap.bin
 # build/bootsrap ------------------------------------------------------------}}}
@@ -182,19 +185,48 @@ build/level_01.o : $(common) \
                    background_quad_sprite.s \
                    background_bit_shifter.s \
                    background_get_sprite_mem_pos.s \
-		   resources/level01.spr \
+		   resources/level01_00.spr \
+		   resources/level01_01.spr \
 		   resources/level01_tiles.spr \
 		   resources/chibi_lr.spr
 	$(AS) -al level_01.s -o build/level_01.o | build_tools/format_list.rb
 
-resources/level01.spr : build_tools/spr_cpc_to_uknc.rb \
-                        ../ResCPC/LEVEL1A.SPR
-	build_tools/spr_cpc_to_uknc.rb ../ResCPC/LEVEL1A.SPR -o resources/level01.spr
+resources/level01_00.spr : build_tools/spr_cpc_to_uknc.rb \
+                           resources/level_01_bank_0.SPR
+	build_tools/spr_cpc_to_uknc.rb resources/level_01_bank_0.SPR -o resources/level01_00.spr
+resources/level01_01.spr : build_tools/spr_cpc_to_uknc.rb \
+                           resources/level_01_bank_1.SPR
+	build_tools/spr_cpc_to_uknc.rb resources/level_01_bank_1.SPR -o resources/level01_01.spr
 
 resources/level01_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
 	                      ../ResCPC/Level01-Tiles.SPR
 	build_tools/spr_cpc_to_uknc.rb ../ResCPC/Level01-Tiles.SPR -o resources/level01_tiles.spr
 # level_01.o ----------------------------------------------------------------}}}
+
+# level_02.bin --------------------------------------------------------------{{{
+build/level_02.bin : build/core.o \
+                     build/level_02.o
+	$(LD) $(LDFLAGS) build/level_02.o -R build/core.o -o build/level_02.out
+	ruby build_tools/aout2sav.rb build/level_02.out -b -s -o build/level_02.bin
+
+build/level_02.o : $(common) \
+                   level_02.s \
+                   background_quad_sprite.s \
+                   background_bit_shifter.s \
+                   background_get_sprite_mem_pos.s \
+		   resources/level02.spr \
+		   resources/level02_tiles.spr \
+		   resources/chibi_lr.spr
+	$(AS) -al level_02.s -o build/level_02.o | build_tools/format_list.rb
+
+resources/level02.spr : build_tools/spr_cpc_to_uknc.rb \
+                        ../ResCPC/LEVEL2A.SPR
+	build_tools/spr_cpc_to_uknc.rb ../ResCPC/LEVEL2A.SPR -o resources/level02.spr
+
+resources/level02_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
+	                      ../ResCPC/Level2-Tiles-CPC.SPR
+	build_tools/spr_cpc_to_uknc.rb ../ResCPC/Level2-Tiles-CPC.SPR -o resources/level02_tiles.spr
+# level_02.bin --------------------------------------------------------------}}}
 
 resources/font.raw : build_tools/spr_cpc_to_uknc.rb \
 	             ../ResCPC/font.bin

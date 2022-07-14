@@ -7,7 +7,8 @@ FILES = [
   'build/ep1_intro.bin',
   'build/ep1_intro_slides.bin',
   'build/level_00.bin',
-  'build/level_01.bin'
+  'build/level_01.bin',
+  'build/level_02.bin'
 ]
 
 FILLER = '#'.ord

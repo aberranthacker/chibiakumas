@@ -17,7 +17,7 @@
 
                 .equiv BootstrapSize, (end - start)
                 .equiv BootstrapSizeWords, BootstrapSize >> 1
-                .equiv BootstrapSizeDWords, BootstrapSize >> 2
+                .equiv BootstrapSizeDWords, BootstrapSize >> 2 + 1
 
                 .=BootstrapStart
 start:
@@ -110,14 +110,17 @@ Bootstrap_SystemEvent:
 
 Bootstrap_Level:
     .ifdef DebugMode
-        CMP  R5,$1
-        BHI  .
+        CMP  R5,$2
+        BLOS 1$
+        .inform_and_hang "bootstrap: no levels further than 2"
+        1$:
     .endif
         ASL  R5
         JMP  @LevelsJmpTable(R5)
     LevelsJmpTable:
        .word Bootstrap_Level_Intro
        .word Bootstrap_Level_1
+       .word Bootstrap_Level_2
 
 Bootstrap_StartGame:
 
@@ -160,6 +163,19 @@ Bootstrap_Level_1: # --------------------------------------------------------
         CALL Bootstrap_LoadDiskFile
         BCC  1$
        .inform_and_hang3 "level_01.bin loading error"
+    1$:
+       .ppudo_ensure $PPU_SingleProcess
+        MOV  $SPReset,SP # we are not returning, so reset the stack
+        JMP  @$Akuyou_LevelStart
+#----------------------------------------------------------------------------
+Bootstrap_Level_2: # --------------------------------------------------------
+       .ppudo_ensure $PPU_SetPalette, $BlackPalette
+        CALL LevelReset0000
+
+        MOV  $level_02.bin,R0
+        CALL Bootstrap_LoadDiskFile
+        BCC  1$
+       .inform_and_hang3 "level_02.bin loading error"
     1$:
        .ppudo_ensure $PPU_SingleProcess
         MOV  $SPReset,SP # we are not returning, so reset the stack
@@ -221,7 +237,7 @@ ContinueModeSet: # ../Aku/BootStrap.asm:2165
         MOV  $Player_Array, R5                              #
                                                             #     ld a,(iy-15)
         BITB $0x80,-14(R5)                                  #     and %10000000
-       .CALL NE, FireMode_4D                                #     call nz,FireMode_4D
+       .CALL NZ, FireMode_4D                                #     call nz,FireMode_4D
                                                             #     ld a,1
         MOVB $1,-6(R5)                                      #     ld (iy-7),a ;live players
                                                             #     ;multiplay support
@@ -239,8 +255,10 @@ StartANewGame_NoMultiplay: # ../Aku/BootStrap.asm:2195
 StartANewGame_NoControlFlip: # ../Aku/BootStrap.asm:2206
         MOV  $Player_Array, R5 # AkuYou_Player_GetPlayerVars
         CALL StartANewGamePlayer
+   .ifdef TwoPlayersGame
         MOV  $Player_Array2,R5 # AkuYou_Player_GetPlayerVars + 16
         CALL StartANewGamePlayer
+   .endif
 
         MOV  $Player_ScoreBytes,R3
         MOV  $8,R1
@@ -290,16 +308,16 @@ Difficulty_Hard:
         MOV  $0x08,R0 # bit 3
         BR   Difficulty_Generic
 Difficulty_Generic:
-        CLC
         MOV  R0,FireFrequencyA
-        ROR  R0
+        ASR  R0
         MOV  R0,FireFrequencyB
         MOV  R0,FireFrequencyC
-        ROR  R0
+        ASR  R0
         MOV  R0,FireFrequencyD
-        ROR  R0
+        ASR  R0
         MOV  R0,FireFrequencyE
-RETURN
+
+        RETURN
 
 StartANewGamePlayer: # ../Aku/BootStrap.asm:2256 ;player fire directions ----{{{
         ADD  $2,R5
@@ -318,7 +336,8 @@ StartANewGamePlayer: # ../Aku/BootStrap.asm:2256 ;player fire directions ----{{{
         MOVB R0,   (R5)+  # 13 Points to add
         MOVB R0,   (R5)+  # 14 player shoot power
         MOVB $0x67,(R5)+  # 15 Fire dir
-RETURN
+
+        RETURN
 #----------------------------------------------------------------------------}}}
 
 ClearR1Words:
@@ -375,7 +394,9 @@ ResetCore: # ../Aku/BootStrap.asm:2318
 
         # set stuff that happens every level
         MOV  $0x2064,@$Player_Array  # X:0x20 Y:0x64
+   .ifdef TwoPlayersGame
         MOV  $0x2096,@$Player_Array2 # X:0x20 Y:0x96
+   .endif
 
         MOV  $DoMoves,@$dstObjectDoMovesOverride
 
@@ -474,7 +495,7 @@ ParamsStruct:
 
 ppu_module.bin:
     .word FB1
-    .equiv ppu_module_size, 5642
+    .equiv ppu_module_size, 10148
     .word ppu_module_size >> 1
     .equiv ppu_module_block_num, 6
     .word ppu_module_block_num
@@ -486,13 +507,13 @@ loading_screen.bin:
     .word loading_screen_block_num
 core.bin:
     .word GameVarsEnd
-    .equiv core_size, 6622
+    .equiv core_size, 6596
     .word core_size >> 1
     .equiv core_block_num, (loading_screen_size + 511) >> 9 + loading_screen_block_num
     .word core_block_num
 ep1_intro.bin:
     .word Akuyou_LevelStart
-    .equiv ep1_intro_size, 15824
+    .equiv ep1_intro_size, 14620
     .word ep1_intro_size >> 1
     .equiv ep1_intro_block_num, (core_size + 511) >> 9 + core_block_num
     .word ep1_intro_block_num
@@ -504,16 +525,22 @@ ep1_intro_slides.bin:
     .word ep1_intro_slides_block_num
 level_00.bin:
     .word Akuyou_LevelStart
-    .equiv level_00_size, 10206
+    .equiv level_00_size, 9448
     .word level_00_size >> 1
     .equiv level_00_block_num, ep1_intro_slides_block_num + (ep1_intro_slides_size + 511) >> 9
     .word level_00_block_num
 level_01.bin:
     .word Akuyou_LevelStart
-    .equiv level_01_size, 9926
+    .equiv level_01_size, 10556
     .word level_01_size >> 1
     .equiv level_01_block_num, level_00_block_num + (level_00_size + 511) >> 9
     .word level_01_block_num
+level_02.bin:
+    .word Akuyou_LevelStart
+    .equiv level_02_size, 10340
+    .word level_02_size >> 1
+    .equiv level_02_block_num, level_01_block_num + (level_01_size + 511) >> 9
+    .word level_02_block_num
 #----------------------------------------------------------------------------}}}
 
        .include "./ppucmd.s"
@@ -707,35 +734,19 @@ BulletConfigHell: #----------------------------------------------------------{{{
 BulletConfigHell_End:
 #----------------------------------------------------------------------------}}}
 BlackPalette: #------------------------------------------------------{{{
-    .byte 1       #--line number
-    .byte 1       #  set colors
-    .word 0x0000  #
-    .word 0x0000  #
-    .byte 201     #--line number, 201 - end of the main screen params
-    .even
+    .byte 1, setColors, Black, Black, Black, Black
+    .word untilEndOfScreen
 #----------------------------------------------------------------------------}}}
 TitleScreenPalette: #--------------------------------------------------------{{{
-    .byte 0, 0    #--line number, 0 - set cursor/scale/palette
-    .word 0b10000 #  graphical cursor
-    .word 0b10101 #  320 dots per line, pallete 5
-
-    .byte 1,   1  #--line number, set colors
-    .byte 0x00, 0x99, 0xCC, 0xFF
-    .byte 49,  1  #--line number, set colors
-    .byte 0x00, 0x55, 0x11, 0xFF
-    .byte 63,  1  #--line number, set colors
-    .byte 0x00, 0x55, 0xDD, 0xFF
-    .byte 95,  1  #--line number, set colors
-    .byte 0x00, 0x22, 0xBB, 0xFF
-    .byte 185, 1  #--line number, set colors
-    .byte 0x00, 0x22, 0x00, 0xFF
-    .byte 192, 1  #--line number, set colors
-    .byte 0x00, 0x22, 0xBB, 0xFF
-    .byte 196, 1  #--line number, set colors
-    .byte 0x00, 0x22, 0xCC, 0xFF
-
-    .byte 201     #--line number, 201 - end of the main screen params
-    .even
+    .word   0, cursorGraphic, scale320 | 0b101
+    .byte   1, setColors, Black, brBlue, brRed, White
+    .byte  49, setColors, Black, Magenta, Blue, White
+    .byte  63, setColors, Black, Magenta, brMagenta, White
+    .byte  95, setColors, Black, Green, brCyan, White
+    .byte 185, setColors, Black, Green, Black, White
+    .byte 192, setColors, Black, Green, brCyan, White
+    .byte 196, setColors, Black, Green, brRed, White
+    .word untilEndOfScreen
 #----------------------------------------------------------------------------}}}
 #0         1         2         3         4         5         6         7
 #01234567890123456789012345678901234567890123456789012345678901234567890123456789
@@ -749,7 +760,6 @@ TestStr: .byte 0,10
          .byte 0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77,0x78,0x79,0x7A,0x7B,0x7C,0x7D,0x7E,0x7F
          .byte 0x80,0x81,0x82,0x83,0x84,0x85
          .byte 0x00
-
     .even
 end:
 
