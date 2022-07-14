@@ -223,9 +223,8 @@ LevelLoop:
         MOV  $0xFF,@$ShowTextUpdate
         ASL  R0
 
-       .wait_ppu
         MOV  SubtitlesTable(R0), @$PPUCommandArg
-        MOV  $PPU_LoadText, @$PPUCommand
+       .ppudo_ensure $PPU_LoadText
 
         MOV  $1, @$CharsToPrint
         MOV  $ShowBossText, @$dstShowBossTextCommand
@@ -234,9 +233,8 @@ LevelLoop:
 
         TST  R0
         BZE  skip_palette_change$
-       .wait_ppu
         MOV  PalettesTable(R0), @$PPUCommandArg
-        MOV  $PPU_SetPalette, @$PPUCommand
+       .ppudo_ensure $PPU_SetPalette
 
     skip_palette_change$:
         MOV  $0x0000,R1
@@ -412,7 +410,7 @@ ShowBossText: # ../Aku/Level252-Intro.asm:1950
         INC  @$CharsToPrint
        .equiv CharsToPrint, .+2
         MOV  $1, @$PPUCommandArg
-        MOV  $PPU_ShowBossText, @$PPUCommand
+       .ppudo_ensure $PPU_ShowBossText
 RETURN
 
 # Subtitles #----------------------------------------------------------------{{{

@@ -1,15 +1,15 @@
 # vim: set fileformat=unix filetype=gas tabstop=8 expandtab shiftwidth=4 autoindent :
 
 .macro .wait_ppu
-    TST  @$PPUCommand
-    BNE  .-4
+    TSTB @$CCH0OS
+    BPL  .-4
 .endm
 
 .macro .ppudo cmd:req,arg=0
   .if \arg != 0
     MOV  \arg, @$PPUCommandArg
   .endif
-    MOV  \cmd, @$PPUCommand
+    MOV  \cmd, @$CCH0OD
 .endm
 
 .macro .ppudo_ensure cmd:req,arg=0
@@ -17,15 +17,8 @@
    .ppudo \cmd, \arg
 .endm
 
-.macro .puts str_addr
-   .wait_ppu
-   .ppudo $PPU_Print,\str_addr
-   .wait_ppu
-.endm
-
 .macro .inform_and_hang str
-   .wait_ppu
-   .ppudo $PPU_DebugPrintAt, $.+14
+   .ppudo_ensure $PPU_DebugPrintAt, $.+14
     BR   .
    .byte 0,1
    .asciz "\str"
@@ -33,8 +26,7 @@
 .endm
 
 .macro .inform_and_hang2 str
-   .wait_ppu
-   .ppudo $PPU_DebugPrintAt, $.+14
+   .ppudo_ensure $PPU_DebugPrintAt, $.+14
     BR   .
    .byte 0,2
    .asciz "\str"
@@ -42,8 +34,7 @@
 .endm
 
 .macro .inform_and_hang3 str
-   .wait_ppu
-   .ppudo $PPU_DebugPrintAt, $.+14
+   .ppudo_ensure $PPU_DebugPrintAt, $.+14
     BR   .
    .byte 0,3
    .asciz "\str"

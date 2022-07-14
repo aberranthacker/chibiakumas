@@ -63,8 +63,8 @@ PrintStr:
 10$:    MOVB (R0)+,R1
         BZE  1237$
 
-20$:    BIT  $0x80, @$TTYOST
-        BZE  20$
+20$:    TSTB @$TTYOST
+        BPL  20$
 
         MOV  R1, @$TTYODT
         BR   10$
