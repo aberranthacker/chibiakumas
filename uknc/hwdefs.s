@@ -88,12 +88,12 @@
 # PPU: to CPU communication channels
 .equiv PCH0II, 0320    # PPU channel 0 in  data interrupt
 .equiv PCH0ID, 0177060 # PPU channel 0 in  data register
-.equiv PCH0OI, 0324    # PPU channel 0 out  data interrupt
-.equiv PCH0OD, 0177070 # PPU channel 0 out  data register
+.equiv PCH0OI, 0324    # PPU channel 0 out data interrupt
+.equiv PCH0OD, 0177070 # PPU channel 0 out data register
 .equiv PCH1II, 0330    # PPU channel 1 in  data interrupt
 .equiv PCH1ID, 0177062 # PPU channel 1 in  data register
-.equiv PCH1OI, 0334    # PPU channel 1 out  data interrupt
-.equiv PCH1OD, 0177072 # PPU channel 1 out  data register
+.equiv PCH1OI, 0334    # PPU channel 1 out data interrupt
+.equiv PCH1OD, 0177072 # PPU channel 1 out data register
 .equiv PCH2II, 0340    # PPU channel 2 in  data interrupt
 .equiv PCH2ID, 0177064 # PPU channel 2 in  data register
 .equiv PCHSIS, 0177066 # PPU channels 0, 1, 2 in - state register

@@ -9,35 +9,36 @@
 .equiv MainMenu, 0x8000
 .equiv Episode1_Intro, 0x0000
 .equiv Level1, 0x0001
+.equiv Level2, 0x0002
 
 #.equiv StartOnLevel, MainMenu
 #.equiv StartOnLevel, Episode1_Intro
  .equiv StartOnLevel, Level1
+#.equiv StartOnLevel, Level2
 
 .if StartOnLevel == MainMenu
   .equiv ShowLoadingScreen, 1
 .endif
 
-.equiv PPU_PPUCommand,    PPUCommand >> 1
 .equiv PPU_PPUCommandArg, PPUCommandArg >> 1
 
-.equiv PPU_NOP,            2
-.equiv PPU_Finalize,       4
-.equiv PPU_SingleProcess,  6
-.equiv PPU_MultiProcess,   8
-.equiv PPU_SetPalette,    10
-.equiv PPU_Print,         12
-.equiv PPU_PrintAt,       14
-.equiv PPU_FlipFB,        16
-.equiv PPU_ShowFB0,       18
-.equiv PPU_ShowFB1,       20
-.equiv PPU_LoadText,      22
-.equiv PPU_ShowBossText,  24
-.equiv PPU_LoadMusic,     26
-.equiv PPU_MusicRestart,  28
-.equiv PPU_MusicStop,     30
-.equiv PPU_DebugPrint,    32
-.equiv PPU_DebugPrintAt,  34
+.equiv PPU_NOP,           2
+.equiv PPU_Finalize,      4
+.equiv PPU_SingleProcess, 6
+.equiv PPU_MultiProcess,  8
+.equiv PPU_SetPalette,   10
+.equiv PPU_Print,        12
+.equiv PPU_PrintAt,      14
+.equiv PPU_FlipFB,       16
+.equiv PPU_ShowFB0,      18
+.equiv PPU_ShowFB1,      20
+.equiv PPU_LoadText,     22
+.equiv PPU_ShowBossText, 24
+.equiv PPU_LoadMusic,    26
+.equiv PPU_MusicRestart, 28
+.equiv PPU_MusicStop,    30
+.equiv PPU_DebugPrint,   32
+.equiv PPU_DebugPrintAt, 34
 .equiv PPU_TitleMusicRestart, 36
 .equiv PPU_IntroMusicRestart, 38
 .equiv PPU_LevelMusicRestart, 40
@@ -49,6 +50,7 @@
 .equiv PPU_PlaySoundEffect5,  52
 .equiv PPU_PlaySoundEffect6,  54
 .equiv PPU_PlaySoundEffect7,  56
+
 .equiv PPU_LastJMPTableIndex, 56
 #-------------------------------------------------------------------------------
 .equiv ExtMemSizeBytes, 7168
@@ -77,7 +79,15 @@
 .equiv GameVarsArraySizeWords, GameVarsArraySize >> 1
 #-------------------------------------------------------------------------------
 # CPU memory map ---------------------------------------------------------------
-.equiv FB0, 384 # 0600 0x0180
+# 040 dummy interrupt handler, see bootsector
+.equiv KeyboardScanner_P1, 042 # 34 0x22
+.equiv KeyboardScanner_P2, 044 # 36 0x24
+.equiv storedSP,      046 # 38 0x26 place to store SP, if we need yet another register
+.equiv PPUCommandArg, 050 # 40 0x28 command for PPU argument
+# 052, 054, 056 three word are available
+
+.equiv SPReset, 0600 # 3382 0x17E Initial stack pointer
+.equiv FB0, 0600 # 0384 0x0180
 .equiv FB_gap, FB0 + 16000
 .equiv PlayerStarArrayPointer, FB_gap # it fits nicely into the gap
 .equiv FB1, FB_gap + 384
@@ -89,9 +99,7 @@
     .equiv ObjectArrayPointer,  GameVarsStart
     .equiv StarArrayPointer,    ObjectArrayPointer + ObjectArraySizeBytes
     .equiv Event_SavedSettings, StarArrayPointer + StarArraySizeBytes
-    .equiv KeyboardScanner_P1, Event_SavedSettings + Event_SavedSettingsSizeBytes
-    .equiv KeyboardScanner_P2, KeyboardScanner_P1 + 2
-.equiv GameVarsEnd,   KeyboardScanner_P2 + 2
+.equiv GameVarsEnd,   Event_SavedSettings + Event_SavedSettingsSizeBytes
 
     .ifdef ExtMemCore
 .equiv CoreStart, 0160000
@@ -100,17 +108,12 @@
     .endif
 
     .ifndef ExtMemCore
-.equiv Akuyou_LevelStart, 0x9F3A # 40762 0117472 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9FE6 # 40934 0117746 # auto-generated during a build
     .else
 .equiv Akuyou_LevelStart, GameVarsEnd
     .endif
 
 .equiv LevelSprites, Akuyou_LevelStart + 4
-
-.equiv SPReset,       0157770 # Initial stack pointer
-.equiv storedSP,      0157772 # place where we store SP, in case if we need yet another register
-.equiv PPUCommand,    0157774 # command for PPU code
-.equiv PPUCommandArg, 0157776 # command for PPU argument
 # 0160000 57344 0xE000 end of RAM ----------------------------------------------
 #-------------------------------------------------------------------------------
 .equiv PPU_UserRamSize,  0054104 # 22596 0x5844
@@ -119,7 +122,7 @@
 # PPU memory map ---------------------------------------------------------------
 .equiv PPU_UserRamStart, 0023666 # 10166 0x27B6
 
-.equiv PPU_StrBuffer, 0047510 # 20296 0x4F48 # auto-generated during a build
+.equiv PPU_StrBuffer, 0047562 # 20338 0x4F72 # auto-generated during a build
 #.equiv PPU_MusicBuffer, PPU_StrBuffer + 320
 
 .equiv PPU_UserProcessMetadataAddr, 0077772 # 32762 0x7FFA
