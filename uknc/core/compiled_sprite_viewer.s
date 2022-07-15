@@ -14,7 +14,8 @@ CLS:
         # clear the screen
         CLR  R0
         MOV  $8000>>4,R1
-        MOV  @$ScreenBuffer_ActiveScreen,R2
+       .equiv ScreenBuffer_ActiveScreen, .+2
+        MOV  $FB1,R2
 100$:
        .rept 1<<4
         MOV  R0,(R2)+

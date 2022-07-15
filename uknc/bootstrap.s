@@ -213,7 +213,7 @@ FireMode_Both: # ../Aku/BootStrap.asm:2143
 
 StartANewGame: # ../Aku/BootStrap.asm:2151
         # reset the core                 # xor a
-        CLR  @$ShowContinueCounter    # ld (ShowContinueCounter_Plus1-1),a
+        CLR  @$ShowContinueCounter       # ld (ShowContinueCounter_Plus1-1),a
 
         MOV  $0012700,R0 # MOV (PC)+,R0  # ld bc,&3E0D ;Split Continues ; 3E n == LD A,n
         MOV  $0x0D,R1
@@ -234,22 +234,23 @@ ContinueModeSet: # ../Aku/BootStrap.asm:2165
 
         CALL FireMode_Normal # set our standard Left-Right Firemode
         # reset all the scores n stuff
-        MOV  $Player_Array, R5                              #
-                                                            #     ld a,(iy-15)
-        BITB $0x80,-14(R5)                                  #     and %10000000
-       .CALL NZ, FireMode_4D                                #     call nz,FireMode_4D
-                                                            #     ld a,1
-        MOVB $1,-6(R5)                                      #     ld (iy-7),a ;live players
-                                                            #     ;multiplay support
-        MOV  $0x003E,R3                                     #     ld hl,&003E
-                                                            #     ld a,(MultiplayConfig)
-        BITB $0,@$MultiplayConfig                           #     bit 0,a
-        BEQ  StartANewGame_NoMultiplay                      #     jr z,StartANewGame_NoMultiplay
-                                                            #     ld bc,&F990
-                                                            #     in a,(c) ;Test if the multiplay is really there!
-                                                            #     inc a
-                                                            #     jr z,StartANewGame_NoMultiplay
-                                                            #     ld hl,&78ED
+                                         # ld a,(iy-15)
+        TSTB @$FireMode                  # and %10000000
+        BPL  NormalFireMode
+        CALL FireMode_4D                 # call nz,FireMode_4D
+NormalFireMode:
+                                         # ld a,1
+        MOVB $1,@$LivePlayers            # ld (iy-7),a ;live players
+                                         # ;multiplay support
+        MOV  $0x003E,R3                  # ld hl,&003E
+                                         # ld a,(MultiplayConfig)
+        BITB $1,@$MultiplayConfig        # bit 0,a
+        BZE  StartANewGame_NoMultiplay   # jr z,StartANewGame_NoMultiplay
+                                         # ld bc,&F990
+                                         # in a,(c) ;Test if the multiplay is really there!
+                                         # inc a
+                                         # jr z,StartANewGame_NoMultiplay
+                                         # ld hl,&78ED
 StartANewGame_NoMultiplay: # ../Aku/BootStrap.asm:2195
         # TODO: implement this
 StartANewGame_NoControlFlip: # ../Aku/BootStrap.asm:2206
@@ -266,7 +267,7 @@ StartANewGame_NoControlFlip: # ../Aku/BootStrap.asm:2206
 
         MOV  $Player_Array, R5 # AkuYou_Player_GetPlayerVars
         MOV  $0010000,R2 # MOV R0,R0 # slightly faster than NOP
-        BITB $0x40,-10(R5) # test bit 6
+        BITB $0x40,@$GameDifficulty  # test bit 6
         BNZ  NoBulletSlowdown
         MOV  $0006200,R2 # ASR R0
 
@@ -278,8 +279,8 @@ NoBulletSlowdown: # ../Aku/BootStrap.asm:2206
         MOV  $BulletConfigSizeWords,R1
         MOV  $BulletConfigHeaven,R3
         MOV  $2,R0
-        BITB $0x80,-10(R5) # test bit 7
-        BNZ  useheaven
+        TSTB @$GameDifficulty # test bit 7
+        BMI  useheaven
 
         MOV  $BulletConfigHell,R3
         MOV  $1,R0
@@ -289,7 +290,7 @@ useheaven: # ../Aku/BootStrap.asm:2242
             MOV  (R3)+,(R2)+
         SOB  R1,100$
 
-        MOVB -10(R5),R0
+        MOVB @$GameDifficulty,R0
         BIC  $0xFFFC,R0 # 0b11111100
         BEQ  Difficulty_Normal
         CMP  R0,$1
@@ -495,7 +496,7 @@ ParamsStruct:
 
 ppu_module.bin:
     .word FB1
-    .equiv ppu_module_size, 10148
+    .equiv ppu_module_size, 10186
     .word ppu_module_size >> 1
     .equiv ppu_module_block_num, 6
     .word ppu_module_block_num
@@ -507,13 +508,13 @@ loading_screen.bin:
     .word loading_screen_block_num
 core.bin:
     .word GameVarsEnd
-    .equiv core_size, 6596
+    .equiv core_size, 6798
     .word core_size >> 1
     .equiv core_block_num, (loading_screen_size + 511) >> 9 + loading_screen_block_num
     .word core_block_num
 ep1_intro.bin:
     .word Akuyou_LevelStart
-    .equiv ep1_intro_size, 14620
+    .equiv ep1_intro_size, 14632
     .word ep1_intro_size >> 1
     .equiv ep1_intro_block_num, (core_size + 511) >> 9 + core_block_num
     .word ep1_intro_block_num
@@ -525,13 +526,13 @@ ep1_intro_slides.bin:
     .word ep1_intro_slides_block_num
 level_00.bin:
     .word Akuyou_LevelStart
-    .equiv level_00_size, 9448
+    .equiv level_00_size, 9294
     .word level_00_size >> 1
     .equiv level_00_block_num, ep1_intro_slides_block_num + (ep1_intro_slides_size + 511) >> 9
     .word level_00_block_num
 level_01.bin:
     .word Akuyou_LevelStart
-    .equiv level_01_size, 10556
+    .equiv level_01_size, 10568
     .word level_01_size >> 1
     .equiv level_01_block_num, level_00_block_num + (level_00_size + 511) >> 9
     .word level_01_block_num

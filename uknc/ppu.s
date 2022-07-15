@@ -331,9 +331,6 @@ Teardown: #------------------------------------------------------------------{{{
                 MOV  @$SYS300, @$0300 # restore keyboard interrupt handler
                 MOV  @$SYS100, @$0100 # restore Vblank interrupt handler
 
-                MOV  $PPU_PPUCommand, @$PBPADR
-                CLR  @$PBP12D         # inform CPU program that we are done
-
                 MOV  (SP)+,R0
                 CLR  @$07100          # do not run the PGM anymore
                 JMP  @$0174170        # jump back to the process manager (63608; 0xF878)
