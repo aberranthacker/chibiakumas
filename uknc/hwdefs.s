@@ -32,12 +32,13 @@
 .equiv CBP12D, CBP1DT  # CPU bitplanes 1 and 2 data register
                        # alias for word access
 
-# CPU: to PPU communication channels
 # serial port
 .equiv S2IST, 0176570
 .equiv S2IDT, 0176572
 .equiv S2OST, 0176574
 .equiv S2ODT, 0176576
+
+# CPU: to PPU communication channels
 # parallel port access channel
 .equiv CCH1II, 0460    # CPU channel 1 in   state interrupt
 .equiv CCH1IS, 0176660 # CPU channel 1 in   state register

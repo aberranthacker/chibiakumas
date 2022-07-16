@@ -113,7 +113,6 @@ build/core.o : $(common) \
                core/object_driver.s \
                core/player_driver.s \
                core/screen_memory.s \
-               core/sfx.s \
                core/show_sprite.s \
                core/stararray.s \
                core/stararray_add.s \

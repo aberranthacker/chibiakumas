@@ -257,18 +257,20 @@ SLTABInit:      MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
 
                 MOV  @$0320,@$SYS320
                 MOV  $Channel0In_IntHandler,@$0320
+              # read from the channel before replacing, just in case
+                TST  @$PCH0ID
 
                 MOV  @$0324,@$SYS324
                 MOV  $Channel0Out_IntHandler,@$0324
 
-                MOV  $PGM, @$07124    # add PGM to PPU's processes table
-                MOV  $1, @$07100      # add PGM to PPU's processes execution table
 
-                RETURN                # end of the init subroutine
+                MOV  $PGM, @$07124 # add PGM to PPU's processes table
+                MOV  $1, @$07100   # add PGM to PPU's processes execution table
+
+                RETURN             # end of the init subroutine
 #-------------------------------------------------------------------------------
 PGM: #--------------------------------------------------------------------------
-                MOV  R0, -(SP) # store R0 in order for the process manager to
-                               # function correctly
+                MOV  R0,-(SP) # the process manager requires R0 to be intact
 SingleProcess_Loop:
                 MOV  @$CommandsQueue_CurrentPosition,R5
                 CMP  R5,$CommandsQueue_Bottom
@@ -282,7 +284,7 @@ CommandsQueue_Process:
                 CMP  R1,$PPU_LastJMPTableIndex
                 BHI  .
             .endif
-                CALL @JMPTable(R1)
+                CALL @CommandVectors(R1)
                 MOV  @$CommandsQueue_CurrentPosition,R5
                 CMP  R5,$CommandsQueue_Bottom
                 BLO  CommandsQueue_Process
@@ -291,12 +293,13 @@ CommandsQueue_Process:
 EventLoop:      TST  $0
                 BNZ  SingleProcess_Loop # non-zero, flag is set, loop
 
-                MOV  $PGM, @$07124      # add to processes table
-                MOV  $1, @$07100        # require execution
-                MOV  (SP)+, R0          # restore R0
-                JMP  @$0174170          # jump back to the process manager (63608; 0xF878)
+                MOV  $PGM, @$07124 # add to processes table
+                MOV  $1, @$07100   # require execution
+                MOV  (SP)+,R0      # restore R0
+                JMP  @$0174170     # jump back to the process manager (63608; 0xF878)
 #-------------------------------------------------------------------------------
-JMPTable:      .word EventLoop             # do nothing
+CommandVectors:
+               .word EventLoop             # do nothing
                .word CommandsQueue_Process # PPU_NOP
                .word Teardown              # PPU_Finalize
                .word GoSingleProcess       # PPU_SingleProcess
@@ -627,7 +630,7 @@ BossMusicRestart:
         MOV  $BossMusic,-(SP)
         BR   MusicRestart
 MusicRestart: #--------------------------------------------------------------{{{
-        # don't call PLY_AKG_Play on VblankInt
+      # don't call PLY_AKG_Play on VblankInt
         MOV  $0000401,@$MusicPlayerCall # BR .+4
         CALL PLY_AKG_Stop
 
@@ -643,53 +646,56 @@ MusicStop: #-----------------------------------------------------------------{{{
       # don't call PLY_Play on VblankInt
         MOV  $0000401,@$MusicPlayerCall # BR .+4
         CALL PLY_AKG_Stop
+        MOV  $0,R0
+        CALL PLY_SE_StopSoundEffectFromChannel
+        MOV  $1,R0
+        CALL PLY_SE_StopSoundEffectFromChannel
+        MOV  $2,R0
+        CALL PLY_SE_StopSoundEffectFromChannel
 
         RETURN
 #----------------------------------------------------------------------------}}}
 PlaySoundEffect1: # player fire
-        MOV  $1,R0 # R0 contains sound effect number (>0!)
-        CLR  R1    # The channel where to play the sound effect (0, 1, 2)
-        CLR  R2    # Inverted volume (0 = full volume, 16 = no sound)
+        MOV  $1,R0 # effect number, starts from 1
+        CLR  R1    # channel number 0, 1, 2
+        CLR  R2    # inverted volume (0 = full volume, 16 = no sound)
         JMP  PLY_SE_PlaySoundEffect
 
 PlaySoundEffect2: # enemy fire
-        MOV  $2,R0 # R0 contains sound effect number (>0!)
-        MOV  $1,R1 # The channel where to play the sound effect (0, 1, 2)
-        CLR  R2    # Inverted volume (0 = full volume, 16 = no sound)
+        MOV  $2,R0 # effect number, starts from 1
+        MOV  $1,R1 # channel number 0, 1, 2
+        CLR  R2    # inverted volume (0 = full volume, 16 = no sound)
         JMP  PLY_SE_PlaySoundEffect
 
 PlaySoundEffect3: # enemy dead
-        MOV  $3,R0 # R0 contains sound effect number (>0!)
-        MOV  $1,R1 # The channel where to play the sound effect (0, 1, 2)
-        CLR  R2    # Inverted volume (0 = full volume, 16 = no sound)
+        MOV  $3,R0 # effect number, starts from 1
+        MOV  $1,R1 # channel number 0, 1, 2
+        CLR  R2    # inverted volume (0 = full volume, 16 = no sound)
         JMP  PLY_SE_PlaySoundEffect
 
 PlaySoundEffect4: # player dead
-        MOV  $4,R0 # R0 contains sound effect number (>0!)
-        CLR  R1    # The channel where to play the sound effect (0, 1, 2)
-        CLR  R2    # Inverted volume (0 = full volume, 16 = no sound)
+        MOV  $4,R0 # effect number, starts from 1
+        CLR  R1    # channel number 0, 1, 2
+        CLR  R2    # inverted volume (0 = full volume, 16 = no sound)
         JMP  PLY_SE_PlaySoundEffect
 
 PlaySoundEffect5: # smartbomb
-        MOV  $5,R0 # R0 contains sound effect number (>0!)
-        MOV  $2,R1 # The channel where to play the sound effect (0, 1, 2)
-        CLR  R2    # Inverted volume (0 = full volume, 16 = no sound)
+        MOV  $5,R0 # effect number, starts from 1
+        CLR  R1 # channel number 0, 1, 2
+        CLR  R2    # inverted volume (0 = full volume, 16 = no sound)
         JMP  PLY_SE_PlaySoundEffect
 PlaySoundEffect6: # coin
-        MOV  $6,R0 # R0 contains sound effect number (>0!)
-        MOV  $2,R1 # The channel where to play the sound effect (0, 1, 2)
-        CLR  R2    # Inverted volume (0 = full volume, 16 = no sound)
+        MOV  $6,R0 # effect number, starts from 1
+        MOV  $2,R1 # channel number 0, 1, 2
+        CLR  R2    # inverted volume (0 = full volume, 16 = no sound)
         JMP  PLY_SE_PlaySoundEffect
 
 PlaySoundEffect7: # powerup
-        MOV  $7,R0 # R0 contains sound effect number (>0!)
-        MOV  $2,R1 # The channel where to play the sound effect (0, 1, 2)
-        CLR  R2    # Inverted volume (0 = full volume, 16 = no sound)
+        MOV  $7,R0 # effect number, starts from 1
+        MOV  $2,R1 # channel number 0, 1, 2
+        CLR  R2    # inverted volume (0 = full volume, 16 = no sound)
         JMP  PLY_SE_PlaySoundEffect
 
-# IN: R0 A = Sound effect number (>0!).
-#     R1 C = The channel where to play the sound effect (0, 1, 2).
-#     R2 B = Inverted volume (0 = full volume, 16 = no sound). Hardware sounds are also lowered.
 PrintDebugInfo: #------------------------------------------------------------{{{
         PUSH @$PASWCR
         # enable write-only direct access to the RAM above 0100000
@@ -1092,25 +1098,17 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
 Channel0In_IntHandler: #----------------------------------------------------------{{{
         MOV  @$PBPADR,-(SP)
         MOV  R5,-(SP)
-       #MOV  R4,-(SP)
-       #MOV  R3,-(SP)
-       #MOV  R2,-(SP)
-       #MOV  R1,-(SP)
-       #MOV  R0,-(SP)
 
         MOV  @$CommandsQueue_CurrentPosition,R5
+   .ifdef DebugMode
         CMP  R5,$CommandsQueue_Top
         BLOS CommandsQueue_Full
+   .endif
         MOV  $PPU_PPUCommandArg,@$PBPADR
         MOV  @$PBP12D,-(R5)
         MOV  @$PCH0ID,-(R5)
         MOV  R5,@$CommandsQueue_CurrentPosition
 
-       #MOV  (SP)+,R0
-       #MOV  (SP)+,R1
-       #MOV  (SP)+,R2
-       #MOV  (SP)+,R3
-       #MOV  (SP)+,R4
         MOV  (SP)+,R5
         MOV  (SP)+,@$PBPADR
 
@@ -1118,10 +1116,6 @@ Channel0In_IntHandler: #--------------------------------------------------------
 CommandsQueue_Full:
         BR   .
         NOP
-        MOV  (SP)+,R5
-        MOV  (SP)+,@$PBPADR
-        RTI
-
 #----------------------------------------------------------------------------}}}
 Channel0Out_IntHandler: #------------------------------------------------------------------
         RTI
@@ -1144,11 +1138,11 @@ FontBitmap: .space 8 # whitespace symbol
             .incbin "resources/font.raw"
 CGAFontBitmap: .incbin "resources/cga8x8b.raw"
 
-SYS100:  .word 0174612 # firmware vertical blank interrupt handler
-SYS272:  .word 02270   # default scanlines table
-SYS300:  .word 0175412 # firmware keyboard interrupt handler
-SYS320:  .word 0175700 # firmware PPU channel 0 in  interrupt handler
-SYS324:  .word 0175700 # firmware PPU channel 0 out interrupt handler
+SYS100: .word 0174612 # firmware vertical blank interrupt handler
+SYS272: .word 02270   # default scanlines table
+SYS300: .word 0175412 # firmware keyboard interrupt handler
+SYS320: .word 0175700 # firmware PPU channel 0 in  interrupt handler
+SYS324: .word 0175540 # firmware PPU channel 0 out interrupt handler
 
 FBSLTAB: .word 0          # adrress of main screen SLTAB
 FirstLineAddress: .word 0 #
@@ -1156,9 +1150,9 @@ FirstLineAddress: .word 0 #
 CommandsQueue_Top:
        .space 2*2*16
 CommandsQueue_Bottom:
-CommandsQueue_CurrentPosition: .word CommandsQueue_Bottom
+CommandsQueue_CurrentPosition:
+       .word CommandsQueue_Bottom
 StrBuffer:
-.asciz "aslkdhflksahfdksa"
        .even
 end:
        .nolist
