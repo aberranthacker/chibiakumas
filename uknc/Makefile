@@ -43,8 +43,7 @@ build/bootstrap.bin : build/bootstrap.o \
                       build/ep1_intro_slides.o \
                       build/level_01.o \
                       build/level_02.o
-	build_tools/disk_map.rb
-	$(LD) $(LDFLAGS) \
+	$(LD) $(LDFLAGS) -M \
 	      -T linker_scripts/bootstrap.cmd \
 	      -R build/core.o \
 	      -R build/ep1_intro_slides.o \
@@ -52,8 +51,9 @@ build/bootstrap.bin : build/bootstrap.o \
 	      -R build/level_00_menu.o \
 	      -R build/level_01.o \
 	      -R build/level_02.o \
-	      -R build/ppu.o
+	      -R build/ppu.o > build/bootstrap.map.txt
 	ruby build_tools/aout2sav.rb build/bootstrap.out -b -s -o build/bootstrap.bin
+	build_tools/update_bootstrap_disk_map.rb
 # build/bootsrap ------------------------------------------------------------}}}
 
 build/ppu_module.bin : build/ppu.o \

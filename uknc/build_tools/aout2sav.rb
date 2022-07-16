@@ -59,22 +59,8 @@ unless options.brief
  puts "entry: #{a_entry} size: #{a_text - a_entry} ends: #{a_text}"
 end
 
-info = "#{options.out_filename},#{a_entry},#{a_text - a_entry},#{a_text}\n"
-info_file = if File.exists?("build/#{BINARIES_INFO_FILENAME}")
-              File.read("build/#{BINARIES_INFO_FILENAME}")
-            else
-              ''
-            end
-
-info_line_idx = info_file.lines.find_index { |line| line.include?(options.out_filename) }
-
-output_info = if info_line_idx.nil?
-                info_file << info
-              else
-                info_file.lines.tap { |lines| lines[info_line_idx] = info }.join
-              end
-
-File.write("build/#{BINARIES_INFO_FILENAME}", output_info)
+info = "#{a_entry},#{a_text - a_entry},#{a_text}"
+File.write("#{options.out_filename}._", info)
 
 # the start of the text segment in the file is 20(8)
 text = if options.binary

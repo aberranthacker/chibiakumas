@@ -41,7 +41,7 @@ Bootstrap_Launch: # used by bootsector linker script
 
         JSR  R5,@$PPEXEC
        .word FB1 # PPU module location
-       .word ppu_module_size >> 1
+       .word PPU_ModuleSizeWords
         #-----------------------------------------------------------------------
      .ifdef ShowLoadingScreen
        .ppudo_ensure $PPU_SetPalette, $TitleScreenPalette
@@ -438,17 +438,17 @@ Bootstrap_LoadDiskFile: # ---------------------------------------------------{{{
 
         MOV  $ParamsAddr,R0 # R0 - pointer to channel's init sequence array
         MOV  $8,R1          # R1 - size of the array, 8 bytes
-    1$:
-        MOVB (R0)+,@$CCH2OD # Send a byte to channel 2
-    2$:
-        TSTB @$CCH2OS       #
-        BPL  2$             # Wait until channel is ready
 
-        SOB  R1,1$          # Next byte
-    3$:
-        MOVB @$PS.Status,R0
-        TSTB R0
-        BMI  3$
+        SendNextByteToChannel2:
+            MOVB (R0)+,@$CCH2OD
+            CheckChannel2Readiness:
+                TSTB @$CCH2OS
+            BPL  CheckChannel2Readiness
+        SOB  R1,SendNextByteToChannel2
+
+        CheckLoadDiskFileStatus:
+            MOVB @$PS.Status,R0
+        BMI  CheckLoadDiskFileStatus
         BZE  1237$
         # +------------------------------------------------------+
         # | Код ответа |  Значение                               |
@@ -471,7 +471,6 @@ Bootstrap_LoadDiskFile: # ---------------------------------------------------{{{
         # |     14     | Не найден индекс (ошибка линии ИНДЕКС)  |
         # +------------------------------------------------------+
         SEC  # set carry flag to indicate that there was an error
-        MOVB @$PS.Status,R0
 
 1237$:  RETURN
 
@@ -489,59 +488,51 @@ ParamsStruct:
 #----------------------------------------------------------------------------}}}
 
 # files related data --------------------------------------------------------{{{
-# each record is 3 words:
-#    address for the data from a disk
-#    words count to read from a disk
-#    starting block of a file
 
+.global ppu_module.bin
+.global loading_screen.bin
+.global core.bin
+.global ep1_intro.bin
+.global ep1_intro_slides.bin
+.global level_00.bin
+.global level_01.bin
+.global level_02.bin
+# each record is 3 words:
+#   .word address for the data from a disk
+#   .word size in words
+#   .word starting block of a file
 ppu_module.bin:
     .word FB1
-    .equiv ppu_module_size, 10186
-    .word ppu_module_size >> 1
-    .equiv ppu_module_block_num, 6
-    .word ppu_module_block_num
+    .word 0
+    .word 0
 loading_screen.bin:
     .word FB1
-    .equiv loading_screen_size, 16000
-    .word loading_screen_size >> 1
-    .equiv loading_screen_block_num, (ppu_module_size + 511) >> 9 + ppu_module_block_num
-    .word loading_screen_block_num
+    .word 0
+    .word 0
 core.bin:
     .word GameVarsEnd
-    .equiv core_size, 6798
-    .word core_size >> 1
-    .equiv core_block_num, (loading_screen_size + 511) >> 9 + loading_screen_block_num
-    .word core_block_num
+    .word 0
+    .word 0
 ep1_intro.bin:
     .word Akuyou_LevelStart
-    .equiv ep1_intro_size, 14632
-    .word ep1_intro_size >> 1
-    .equiv ep1_intro_block_num, (core_size + 511) >> 9 + core_block_num
-    .word ep1_intro_block_num
+    .word 0
+    .word 0
 ep1_intro_slides.bin:
     .word Ep1IntroSlidesStart
-    .equiv ep1_intro_slides_size, 9022
-    .word ep1_intro_slides_size >> 1
-    .equiv ep1_intro_slides_block_num, ep1_intro_block_num + (ep1_intro_size + 511) >> 9
-    .word ep1_intro_slides_block_num
+    .word 0
+    .word 0
 level_00.bin:
     .word Akuyou_LevelStart
-    .equiv level_00_size, 9294
-    .word level_00_size >> 1
-    .equiv level_00_block_num, ep1_intro_slides_block_num + (ep1_intro_slides_size + 511) >> 9
-    .word level_00_block_num
+    .word 0
+    .word 0
 level_01.bin:
     .word Akuyou_LevelStart
-    .equiv level_01_size, 10568
-    .word level_01_size >> 1
-    .equiv level_01_block_num, level_00_block_num + (level_00_size + 511) >> 9
-    .word level_01_block_num
+    .word 0
+    .word 0
 level_02.bin:
     .word Akuyou_LevelStart
-    .equiv level_02_size, 10340
-    .word level_02_size >> 1
-    .equiv level_02_block_num, level_01_block_num + (level_01_size + 511) >> 9
-    .word level_02_block_num
+    .word 0
+    .word 0
 #----------------------------------------------------------------------------}}}
 
        .include "./ppucmd.s"

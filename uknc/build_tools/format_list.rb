@@ -1,7 +1,5 @@
 #!/bin/ruby
 
-require 'pry'
-
 def convert_opcode(str)
   str.scan(/.{4}/)
     .map { |w| w.scan(/.{2}/).reverse.join.to_i(16).to_s(8).rjust(7, '0') }
