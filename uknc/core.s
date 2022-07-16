@@ -39,7 +39,7 @@
 start: FileBeginCore:
 SavedSettings: #-------------------------------------------------------------{{{
     GameOptions:     .byte 0b00000001   #  GameOptions (xxxxxxxS) Screen shake
-    FireMode:        .byte   0          #  playmode 0 normal / 128 - 4D
+    FireMode:        .byte 0b00000000   #  playmode 0 normal / 128 - 4D
     ContinueMode:    .byte   0          #  Continue Sharing (0/1)
     SmartBombsReset: .byte   3          #  SmartbombsReset
     ContinuesReset:  .byte  60          #  Continues Reset
@@ -256,7 +256,7 @@ not_implemented_check_R0:
 
        .include "core/stararray_add.s"
        .global Stars_AddBurst_Top
-       .global BurstSpacing
+       .global IncreaseBurstSpacing
 
        .include "core/timer.s"
        .global Timer_GetTimer
