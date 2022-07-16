@@ -6,7 +6,6 @@ require_relative 'dsk_image_constants'
 module BuildDskImage
   extend self
 
-  BINARIES_INFO = File.read('build/binaries_info.txt').lines
   COL1_WIDTH = FILES.map(&:length).max
 
   def call
@@ -43,7 +42,11 @@ module BuildDskImage
   private
 
   def print_info(file_name, bin, target_size, sectors_used)
-    binary_info = BINARIES_INFO.find { |line| line.include?(file_name) }
+    binary_info = if File.exists?("#{file_name}._")
+                    File.read("#{file_name}._").split(',')
+                  else
+                    nil
+                  end
 
     puts [
       file_name.ljust(COL1_WIDTH, ' '),
@@ -58,19 +61,19 @@ module BuildDskImage
   def entry_address_str(binary_info)
     return ' ' * 6 if binary_info.nil?
 
-    binary_info.split(',')[1].rjust(6, ' ')
+    binary_info[0].rjust(6, ' ')
   end
 
   def bin_size_str(binary_info, bin)
     return bin.size.to_s.rjust(6, ' ') if binary_info.nil?
 
-    binary_info.split(',')[2].rjust(6, ' ')
+    binary_info[1].rjust(6, ' ')
   end
 
   def ending_address_str(binary_info)
     return ' ' * 6 if binary_info.nil?
 
-    ending_address = binary_info.split(',')[3].chomp.to_i
+    ending_address = binary_info[2].chomp.to_i
     str = ending_address.to_s.rjust(6, ' ')
     return str unless ending_address >= 56*1024
     return "\u001b[31m#{str}\u001b[0m" unless ending_address >= 63*1024
