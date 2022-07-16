@@ -278,14 +278,15 @@ NoBulletSlowdown: # ../Aku/BootStrap.asm:2206
         MOV  $Stars_AddBurst_Top,R2
         MOV  $BulletConfigSizeWords,R1
         MOV  $BulletConfigHeaven,R3
-        MOV  $2,R0
+
+        MOV  $0010303,R0 # MOV R3,R3 opcode
         TSTB @$GameDifficulty # test bit 7
-        BMI  useheaven
+        BMI  HeavenMode
 
         MOV  $BulletConfigHell,R3
-        MOV  $1,R0
-useheaven: # ../Aku/BootStrap.asm:2242
-        MOV  R0,@$BurstSpacing
+        MOV  $0005303,R0 # DEC R3 opcode
+HeavenMode: # ../Aku/BootStrap.asm:2242
+        MOV  R0,@$IncreaseBurstSpacing
         100$:
             MOV  (R3)+,(R2)+
         SOB  R1,100$
@@ -540,188 +541,188 @@ level_02.bin:
 BulletConfigHeaven: #--------------------------------------------------------{{{
     # Starbust code - we use RST 6 as an 'add command' to save memory - RST 6 calls IY
     # See EventStreamDefinitions for details of how the 'Directions' work
-    # Stars_AddBurst_Top
-    .word 0xFFFF
-    .word 0xFFFF
-    .word 0xFFFF
-    .word 0x1F1D
-    # Stars_AddBurst_TopLeft
-    .word 0xFFFF
-    .word 0xFFFF
-    .word 0xFFFF
-    .word 0x1B19
+   # Stars_AddBurst_Top
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+    .word 0x1F,0x1D
+   # Stars_AddBurst_TopLeft
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+    .word 0x1B,0x19
     .word 0
-    # Stars_AddBurst_Right #
-    .word 0x2725
-    .word 0xFFFF
-    .word 0xFFFF
-    .word 0xFFFF
-    # Stars_AddBurst_TopRight
-    .word 0xFFFF
-    .word 0xFFFF
-    .word 0xFFFF
-    .word 0x1F1D
+   # Stars_AddBurst_Right
+    .word 0x27,0x25
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+   # Stars_AddBurst_TopRight
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+    .word 0x1F,0x1D
     .word 0
-    # Stars_AddBurst_Left
-    .word 0xFFFF
-    .word 0xFFFF
-    .word 0xFFFF
-    .word 0x1b19
-    # Stars_AddBurst_BottomLeft
-    .word 0x2321
-    .word 0xFFFF
-    .word 0xFFFF
-    .word 0xFFFF
+   # Stars_AddBurst_Left
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+    .word 0x1b,0x19
+   # Stars_AddBurst_BottomLeft
+    .word 0x23,0x21
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+    .word 0xFF,0x00
     .word 0
-    # Stars_AddBurst_Bottom
-    .word 0x2321
-    .word 0xFFFF
-    .word 0xFFFF
-    .word 0xFFFF
-    # Stars_AddBurst_BottomRight
-    .word 0x2725
-    .word 0xFFFF
-    .word 0xFFFF
-    .word 0xFFFF
+   # Stars_AddBurst_Bottom
+    .word 0x23,0x21
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+   # Stars_AddBurst_BottomRight
+    .word 0x27,0x25
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+    .word 0xFF,0x00
     .word 0
-    # Stars_AddBurst_Outer
-    .word 0xFFFF
-    .word 0xFFFF
-    .word 0xFFFF
-    .word 0xFFFF
-    .word 0xFFFF
-    .word 0xFFFF
-    # OuterBurstPatternMini
-    .word 0x2F2F
-    .word 0x1F1F
-    .word 0x2929
-    .word 0x1919
-    .word 0x3F39
-    .word 0x0F09
-    # Stars_AddObjectOne
+   # Stars_AddBurst_Outer
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+   # OuterBurstPatternMini
+    .word 0x2F,0x2F
+    .word 0x1F,0x1F
+    .word 0x29,0x29
+    .word 0x19,0x19
+    .word 0x3F,0x39
+    .word 0x0F,0x09
+   # Stars_AddObjectOne
     .word 0
-    # Stars_AddBurst
-    .word 0xFFFF
-    .word 0xFFFF
-    # Stars_AddBurst_Small
-    .word 0x3632
-    .word 0x2e2A
-    .word 0x2622
-    .word 0x1e1A
-    .word 0x1612
+   # Stars_AddBurst
+    .word 0xFF,0x00
+    .word 0xFF,0x00
+   # Stars_AddBurst_Small
+    .word 0x36,0x32
+    .word 0x2E,0x2A
+    .word 0x26,0x22
+    .word 0x1E,0x1A
+    .word 0x16,0x12
     .word 0
-    # Stars_AddBurst_TopWide:
-    .word 0x1d1b
-    .word 0xFFFF
-    .word 0xFFFF
+   # Stars_AddBurst_TopWide:
+    .word 0x1D,0x1B
+    .word 0xFF,0x00
+    .word 0xFF,0x00
     .word 0
-    # Stars_AddBurst_RightWide:
-    .word 0x2726
-    .word 0xFFFF
-    .word 0xFFFF
+   # Stars_AddBurst_RightWide:
+    .word 0x27,0x26
+    .word 0xFF,0x00
+    .word 0xFF,0x00
     .word 0
-    # Stars_AddBurst_LeftWide:
-    .word 0x2221
-    .word 0xFFFF
-    .word 0xFFFF
+   # Stars_AddBurst_LeftWide:
+    .word 0x22,0x21
+    .word 0xFF,0x00
+    .word 0xFF,0x00
     .word 0
-    # Stars_AddBurst_BottomWide:
-    .word 0x2d2b
-    .word 0xFFFF
-    .word 0xFFFF
+   # Stars_AddBurst_BottomWide:
+    .word 0x2D,0x2B
+    .word 0xFF,0x00
+    .word 0xFF,0x00
     .word 0
 BulletConfigHeaven_End:
 #----------------------------------------------------------------------------}}}
 BulletConfigHell: #----------------------------------------------------------{{{
-    # Stars_AddBurst_Top
-    .word 0x0705
-    .word 0x0F0d
-    .word 0x1715
-    .word 0x1F1D
-    # Stars_AddBurst_TopLeft
-    .word 0x0301
-    .word 0x0b09
-    .word 0x1311
-    .word 0x1b19
+   # Stars_AddBurst_Top:
+    .word 0x07,0x05
+    .word 0x0F,0x0D
+    .word 0x17,0x15
+    .word 0x1F,0x1D
+   # Stars_AddBurst_TopLeft:
+    .word 0x03,0x01
+    .word 0x0B,0x09
+    .word 0x13,0x11
+    .word 0x1B,0x19
     .word 0
-    # Stars_AddBurst_Right
-    .word 0x2725
-    .word 0x2f2D
-    .word 0x3735
-    .word 0x3f3D
-    # Stars_AddBurst_TopRight
-    .word 0x0705
-    .word 0x0F0d
-    .word 0x1715
-    .word 0x1F1D
+   # Stars_AddBurst_Right:
+    .word 0x27,0x25
+    .word 0x2F,0x2D
+    .word 0x37,0x35
+    .word 0x3F,0x3D
+   # Stars_AddBurst_TopRight:
+    .word 0x07,0x05
+    .word 0x0F,0x0D
+    .word 0x17,0x15
+    .word 0x1F,0x1D
     .word 0
-    # Stars_AddBurst_Left
-    .word 0x0301
-    .word 0x0b09
-    .word 0x1311
-    .word 0x1b19
-    # Stars_AddBurst_BottomLeft
-    .word 0x2321
-    .word 0x2b29
-    .word 0x3331
-    .word 0x3b39
+   # Stars_AddBurst_Left:
+    .word 0x03,0x01
+    .word 0x0B,0x09
+    .word 0x13,0x11
+    .word 0x1B,0x19
+   # Stars_AddBurst_BottomLeft:
+    .word 0x23,0x21
+    .word 0x2B,0x29
+    .word 0x33,0x31
+    .word 0x3B,0x39
     .word 0
-    # Stars_AddBurst_Bottom
-    .word 0x2321
-    .word 0x2b29
-    .word 0x3331
-    .word 0x3b39
-    # Stars_AddBurst_BottomRight
-    .word 0x2725
-    .word 0x2f2D
-    .word 0x3735
-    .word 0x3f3D
+   # Stars_AddBurst_Bottom:
+    .word 0x23,0x21
+    .word 0x2B,0x29
+    .word 0x33,0x31
+    .word 0x3B,0x39
+   # Stars_AddBurst_BottomRight:
+    .word 0x27,0x25
+    .word 0x2F,0x2D
+    .word 0x37,0x35
+    .word 0x3F,0x3D
     .word 0
-    # Stars_AddBurst_Outer
-    .word 0x3737
-    .word 0x2727
-    .word 0x1717
-    .word 0x3131
-    .word 0x2121
-    .word 0x1111
-    # OuterBurstPatternMini
-    .word 0x2F2F
-    .word 0x1F1F
-    .word 0x2929
-    .word 0x1919
-    .word 0x3F39
-    .word 0x0F09
-    # Stars_AddObjectOne
+   # Stars_AddBurst_Outer:
+    .word 0x37,0x37
+    .word 0x27,0x27
+    .word 0x17,0x17
+    .word 0x31,0x31
+    .word 0x21,0x21
+    .word 0x11,0x11
+   # OuterBurstPatternMini:
+    .word 0x2F,0x2F
+    .word 0x1F,0x1F
+    .word 0x29,0x29
+    .word 0x19,0x19
+    .word 0x3F,0x39
+    .word 0x0F,0x09
+   # Stars_AddObjectOne:
     .word 0
-    # Stars_AddBurst
-    .word 0x3f08
+   # Stars_AddBurst:
+    .word 0x3F,0x08
     .word 0
-    # Stars_AddBurst_Small
-    .word 0x3632
-    .word 0x2e2A
-    .word 0x2622
-    .word 0x1e1A
-    .word 0x1612
+   # Stars_AddBurst_Small:
+    .word 0x36,0x32
+    .word 0x2E,0x2A
+    .word 0x26,0x22
+    .word 0x1E,0x1A
+    .word 0x16,0x12
     .word 0
-    # Stars_AddBurst_TopWide
-    .word 0x1d1b
-    .word 0x1513
-    .word 0x0d0b
+   # Stars_AddBurst_TopWide:
+    .word 0x1D,0x1B
+    .word 0x15,0x13
+    .word 0x0D,0x0B
     .word 0
-    # Stars_AddBurst_RightWide
-    .word 0x2726
-    .word 0x2f2d
-    .word 0x1f1d
+   # Stars_AddBurst_RightWide:
+    .word 0x27,0x26
+    .word 0x2F,0x2D
+    .word 0x1F,0x1D
     .word 0
-    # Stars_AddBurst_LeftWide
-    .word 0x2221
-    .word 0x1b19
-    .word 0x2b29
+   # Stars_AddBurst_LeftWide:
+    .word 0x22,0x21
+    .word 0x1B,0x19
+    .word 0x2B,0x29
     .word 0
-    # Stars_AddBurst_BottomWide
-    .word 0x2d2b
-    .word 0x3533
-    .word 0x3d3b
+   # Stars_AddBurst_BottomWide:
+    .word 0x2D,0x2B
+    .word 0x35,0x33
+    .word 0x3D,0x3B
     .word 0
 BulletConfigHell_End:
 #----------------------------------------------------------------------------}}}
