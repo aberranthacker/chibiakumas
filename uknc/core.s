@@ -252,7 +252,7 @@ not_implemented_check_R0:
 
        .include "core/stararray_add.s"
        .global Stars_AddBurst_Top
-       .global IncreaseBurstSpacing
+       .global BurstSpacing
 
        .include "core/timer.s"
        .global Timer_GetTimer
