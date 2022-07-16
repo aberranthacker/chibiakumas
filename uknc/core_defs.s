@@ -82,9 +82,8 @@
 # 040 dummy interrupt handler, see bootsector
 .equiv KeyboardScanner_P1, 042 # 34 0x22
 .equiv KeyboardScanner_P2, 044 # 36 0x24
-.equiv storedSP,      046 # 38 0x26 place to store SP, if we need yet another register
-.equiv PPUCommandArg, 050 # 40 0x28 command for PPU argument
-# 052, 054, 056 three word are available
+.equiv PPUCommandArg, 046 # 38 0x26 command for PPU argument
+# 050, 052, 054, 056 four words are available
 
 .equiv SPReset, 0600 # 3382 0x17E Initial stack pointer
 .equiv FB0, 0600 # 0384 0x0180
@@ -108,7 +107,7 @@
     .endif
 
     .ifndef ExtMemCore
-.equiv Akuyou_LevelStart, 0x9FE6 # 40934 0117746 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0xA04E # 41038 0120116 # auto-generated during a build
     .else
 .equiv Akuyou_LevelStart, GameVarsEnd
     .endif

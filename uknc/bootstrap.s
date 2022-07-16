@@ -409,8 +409,6 @@ ResetCore: # ../Aku/BootStrap.asm:2318
         MOV  R3,@$dstCustomShotToDeathCall
 
         CLR  R0
-        MOV  R0,@$Sfx_CurrentPriority # clear the to-do
-        MOV  R0,@$Sfx_Sound           # clear the note
         CALL DoMovesBackground_SetScroll # TODO: implement the subroutine
 
         RETURN

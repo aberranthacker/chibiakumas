@@ -347,7 +347,7 @@ ObjectLoop_SaveChanges:
         SWAB R3                       # or a
         BZE  ObjectLoop_ShowSprite    # call nz, ObjectProgram
 
-        CALL ObjectProgram            #
+        CALL ObjectProgram
 ObjectLoop_ShowSprite:
                                       # ld b,Akuyou_LevelStart_Bank;&C0
                                       # ld hl,Akuyou_LevelStart;&4000   ;ObjectSpritePointer_Plus2
@@ -364,192 +364,192 @@ ObjectLoop_ShowSprite:
         JMP  @$ObjectArray_NextObject #     jp ObjectArray_Turbo
 
 # ObjectAnimator not implemented --------------------------------------------{{{
-Animator_VectorArray:
-       .word ObjectAnimator_Update         #  0
-       .word ObjectAnimator_Sprite         #  1
-       .word ObjectAnimator_Move           #  2
-       .word ObjectAnimator_Program        #  3
-       .word ObjectAnimator_EndOfLoop      #  4
-       .word ObjectAnimator_SpriteMoveProg #  5
-       .word ObjectAnimator_Animator       #  6
-       .word ObjectAnimator_CondLoop       #  7
-       .word ObjectAnimator_CondJmp        #  8
-       .word ObjectAnimator_Spawn          #  9
-       .word ObjectAnimator_Kill           # 10
-       .word ObjectAnimator_Call           # 11
-       .word ObjectAnimator_Halt           # 12
-
-ObjectAnimator_Spawn:
-                                        # ld a,(hl)
-                                        # push hl
-                                        #    call DoObjectSpawn
-                                        # pop hl
-                                        # call ObjectAnimator_IncreaseTick
-                                        # jr ObjectAnimatorAgain
-
-ObjectAnimator_CondLoopTrue:
-                                        # call ObjectAnimator_IncreaseTick
-                                        # exx
+#Animator_VectorArray:
+#       .word ObjectAnimator_Update         #  0
+#       .word ObjectAnimator_Sprite         #  1
+#       .word ObjectAnimator_Move           #  2
+#       .word ObjectAnimator_Program        #  3
+#       .word ObjectAnimator_EndOfLoop      #  4
+#       .word ObjectAnimator_SpriteMoveProg #  5
+#       .word ObjectAnimator_Animator       #  6
+#       .word ObjectAnimator_CondLoop       #  7
+#       .word ObjectAnimator_CondJmp        #  8
+#       .word ObjectAnimator_Spawn          #  9
+#       .word ObjectAnimator_Kill           # 10
+#       .word ObjectAnimator_Call           # 11
+#       .word ObjectAnimator_Halt           # 12
+#
+#ObjectAnimator_Spawn:
+#                                        # ld a,(hl)
+#                                        # push hl
+#                                        #    call DoObjectSpawn
+#                                        # pop hl
+#                                        # call ObjectAnimator_IncreaseTick
+#                                        # jr ObjectAnimatorAgain
+#
+#ObjectAnimator_CondLoopTrue:
+#                                        # call ObjectAnimator_IncreaseTick
+#                                        # exx
 ObjectAnimator:
-#:bpt
-      # our animator is in A
-      # format is
-      # TTTTAAAA
-      #     AAAA = animator (1-15) ; 0 = do nothing
-      #     TTTT = time (0-15) ; loops
-      # If you need more than that use custommoves!
-                                        # di
-                                        # exx
-        PUSH R5
-      # R2 LSB ixh = Move, R2 MSB iyh = Sprite
-      # R3 LSB ixl = Life, R3 MSB iyl = Program Code
-      # R4 LSB = Animator, R4 MSB = Sprite size
-ObjectAnimatorAgain:
-        MOV  R4,R0
-        CALL GetAnimatorMempos          # call getAnimatorMempos
-                                        # ;check if a tick has occured
-                                        # ld a,(hl)
-                                        # ld e,a
-                                        # ld a,(Timer_TicksOccured)
-        BITB (R5)+,@$Timer_TicksOccured # and e
-        BZE  ObjectAnimator_Done        # jp z,ObjectAnimator_Done    ;no tick, so end
-                                        # inc hl
-
-ObjectAnimator_ExecuteTick:
-        MOV  R4,R0                      # ld a,b
-        BIC  $0xFF0F,R0                 # and %11110000 ;convert ticknum to a byte
-        ASR  R0                         # rrca          ;each tick's commands takes 4 bytes
-        ASR  R0                         # rrca
-                                        #
-                                        # ld d,0
-                                        # ld e,a
-        ADD  R0,R5                      # add hl,de
-        MOVB (R5)+,R0                   # ld a,(hl)
-                                        # inc hl
-                                        #
-        ASL  R0                         # push hl         ;
-                                        # ld hl,Animator_VectorArray
-        JMP  @Animator_VectorArray(R0)  # jp VectorJump_PushHlFirst
-                                        # jr ObjectAnimator_Update
-
-ObjectAnimator_Sprite:
-        SWAB R2
-        CLRB R2                         # ld a,(hl)
-        BISB (R5),R2                    # ld iyh,a
-        SWAB R2
-        BR   ObjectAnimator_Update      # jr ObjectAnimator_Update
-
-ObjectAnimator_Move:
-        CLRB R2                         # ld a,(hl)
-        BISB (R5),R2                    # ld ixh,a
-        BR   ObjectAnimator_Update      # jr ObjectAnimator_Update
-
-ObjectAnimator_SpriteMoveProg:
-        CLR  R2                         # ld a,(hl)
-        BISB (R5)+,R2                   # ld iyh,a
-                                        # inc hl
-        SWAB R2                         # ld a,(hl)
-        BISB (R5)+,R2                   # ld ixh,a
-                                        # inc hl  ;Fall in to program
-ObjectAnimator_Program:
-        SWAB R3
-        CLRB R3                         # ld a,(hl)
-        BISB (R5),R3                    # ld iyl,a
-        SWAB R3
-        BR   ObjectAnimator_Update      # jr ObjectAnimator_Update
-
-ObjectAnimator_Call:
-        CLR  R0                         # ld e,(hl)
-        BISB (R5)+,R0                   # inc hl
-        SWAB R0                         # ld d,(hl)
-        BISB (R5)+,R0                   # inc hl
-        SWAB R0
-        CALL (R0)                       # call CallDE
-        BR   ObjectAnimator_Update      # jr ObjectAnimator_Update
-
-ObjectAnimator_Animator:
-                                        # ld a,(hl)
-                                        # or a      ;see if new animator is zero (No animator)
-                                        # jr z,ObjectAnimator_Save
-                                        # jr ObjectAnimatorAgain
-                                        #
-ObjectAnimator_CondJmp:
-                                        # ld e,(hl)
-                                        # ld a,(Timer_TicksOccured)
-                                        # and e
-                                        # jr z,ObjectAnimator_CondLoopTrue    ; Just read the next frame
-                                        # inc hl
-                                        # ld c,(hl)
-                                        # ;change tick if condition is true
-
-ObjectAnimatorNextTick:
-                                        # ld a,b
-                                        # and %00001111
-                                        # or c
-                                        # jr ObjectAnimatorAgain
-
-ObjectAnimator_CondLoop:
-                                        # ld e,(hl)
-                                        # ld a,(Timer_TicksOccured)
-                                        # and e
-                                        # jp nz,ObjectAnimator_CondLoopTrue   ;Fall into endofloop
-
-ObjectAnimator_EndOfLoop:
-                                        # ld a,b
-                                        # and %00001111
-                                        # call GetAnimatorMempos
-                                        # inc hl
-                                        # jp ObjectAnimator_ExecuteTick
-ObjectAnimator_IncreaseTick:
-        MOV  R4,R0                      # ld a,b
-        ADD  $0b00010000,R0             # add %00010000
-        BIC  $0xFF0F,R0                 # and %11110000
-                                        # ld c,a
-                                        # ld a,b
-        BICB $0xF0,R4                   # and %00001111
-        BIS  R0,R4                      # or c
-        RETURN                          # ret
-
-ObjectAnimator_Halt:
-                                        # ld a,b
-                                        # jr ObjectAnimator_Save
-ObjectAnimator_Update:
-      # We're done, so update the tick
-        CALL @$ObjectAnimator_IncreaseTick # Call ObjectAnimator_IncreaseTick
-ObjectAnimator_Save:
-        POP  R5                         # exx
-        SWAB R4                         # ei
-        MOV  R4,(R5)                    # ld (hl),a
-        RETURN                          # ret
-ObjectAnimator_Kill:
-                                        #     exx
-                                        # ;   ei
-                                        # ; *********** SHOULD THERE BE AN EI HERE?
-                                        #
-                                        #     xor a
-                                        #     ld c,a
-                                        #     ld iyl,a    ;wipe program
-                                        #     ld ixh,a
-                                        # ret
-                                        #
-ObjectAnimator_Done:
-        POP  R5                         #     exx
-                                        #     ei
-        RETURN                          # ret
-                                        #
-GetAnimatorMempos:
-                                        #     ld b,a
-                                        #     ld hl,&6969 :AnimatorPointers_Plus2
-                                        #     ld d,0
-        BIC  $0xFFF0,R0                 #     and %00001111
-        DEC  R0                         #     dec a
-        ASL  R0                         #     rlca
-                                        #     ld e,a
-                                        #     ;read the mempointer to the animator
-                                        #     add hl,de
-                                        #     ld a,(hl)
-                                        #     inc hl
-                                        #     ld h,(hl)
+       .inform_and_hang "no ObjectAnimator"
+#      # our animator is in A
+#      # format is
+#      # TTTTAAAA
+#      #     AAAA = animator (1-15) ; 0 = do nothing
+#      #     TTTT = time (0-15) ; loops
+#      # If you need more than that use custommoves!
+#                                        # di
+#                                        # exx
+#        PUSH R5
+#      # R2 LSB ixh = Move, R2 MSB iyh = Sprite
+#      # R3 LSB ixl = Life, R3 MSB iyl = Program Code
+#      # R4 LSB = Animator, R4 MSB = Sprite size
+#ObjectAnimatorAgain:
+#        MOV  R4,R0
+#        CALL GetAnimatorMempos          # call getAnimatorMempos
+#                                        # ;check if a tick has occured
+#                                        # ld a,(hl)
+#                                        # ld e,a
+#                                        # ld a,(Timer_TicksOccured)
+#        BITB (R5)+,@$Timer_TicksOccured # and e
+#        BZE  ObjectAnimator_Done        # jp z,ObjectAnimator_Done    ;no tick, so end
+#                                        # inc hl
+#
+#ObjectAnimator_ExecuteTick:
+#        MOV  R4,R0                      # ld a,b
+#        BIC  $0xFF0F,R0                 # and %11110000 ;convert ticknum to a byte
+#        ASR  R0                         # rrca          ;each tick's commands takes 4 bytes
+#        ASR  R0                         # rrca
+#                                        #
+#                                        # ld d,0
+#                                        # ld e,a
+#        ADD  R0,R5                      # add hl,de
+#        MOVB (R5)+,R0                   # ld a,(hl)
+#                                        # inc hl
+#                                        #
+#        ASL  R0                         # push hl         ;
+#                                        # ld hl,Animator_VectorArray
+#        JMP  @Animator_VectorArray(R0)  # jp VectorJump_PushHlFirst
+#                                        # jr ObjectAnimator_Update
+#
+#ObjectAnimator_Sprite:
+#        SWAB R2
+#        CLRB R2                         # ld a,(hl)
+#        BISB (R5),R2                    # ld iyh,a
+#        SWAB R2
+#        BR   ObjectAnimator_Update      # jr ObjectAnimator_Update
+#
+#ObjectAnimator_Move:
+#        CLRB R2                         # ld a,(hl)
+#        BISB (R5),R2                    # ld ixh,a
+#        BR   ObjectAnimator_Update      # jr ObjectAnimator_Update
+#
+#ObjectAnimator_SpriteMoveProg:
+#        CLR  R2                         # ld a,(hl)
+#        BISB (R5)+,R2                   # ld iyh,a
+#                                        # inc hl
+#        SWAB R2                         # ld a,(hl)
+#        BISB (R5)+,R2                   # ld ixh,a
+#                                        # inc hl  ;Fall in to program
+#ObjectAnimator_Program:
+#        SWAB R3
+#        CLRB R3                         # ld a,(hl)
+#        BISB (R5),R3                    # ld iyl,a
+#        SWAB R3
+#        BR   ObjectAnimator_Update      # jr ObjectAnimator_Update
+#
+#ObjectAnimator_Call:
+#        CLR  R0                         # ld e,(hl)
+#        BISB (R5)+,R0                   # inc hl
+#        SWAB R0                         # ld d,(hl)
+#        BISB (R5)+,R0                   # inc hl
+#        SWAB R0
+#        CALL (R0)                       # call CallDE
+#        BR   ObjectAnimator_Update      # jr ObjectAnimator_Update
+#
+#ObjectAnimator_Animator:
+#                                        # ld a,(hl)
+#                                        # or a      ;see if new animator is zero (No animator)
+#                                        # jr z,ObjectAnimator_Save
+#                                        # jr ObjectAnimatorAgain
+#                                        #
+#ObjectAnimator_CondJmp:
+#                                        # ld e,(hl)
+#                                        # ld a,(Timer_TicksOccured)
+#                                        # and e
+#                                        # jr z,ObjectAnimator_CondLoopTrue    ; Just read the next frame
+#                                        # inc hl
+#                                        # ld c,(hl)
+#                                        # ;change tick if condition is true
+#
+#ObjectAnimatorNextTick:
+#                                        # ld a,b
+#                                        # and %00001111
+#                                        # or c
+#                                        # jr ObjectAnimatorAgain
+#
+#ObjectAnimator_CondLoop:
+#                                        # ld e,(hl)
+#                                        # ld a,(Timer_TicksOccured)
+#                                        # and e
+#                                        # jp nz,ObjectAnimator_CondLoopTrue   ;Fall into endofloop
+#
+#ObjectAnimator_EndOfLoop:
+#                                        # ld a,b
+#                                        # and %00001111
+#                                        # call GetAnimatorMempos
+#                                        # inc hl
+#                                        # jp ObjectAnimator_ExecuteTick
+#ObjectAnimator_IncreaseTick:
+#        MOV  R4,R0                      # ld a,b
+#        ADD  $0b00010000,R0             # add %00010000
+#        BIC  $0xFF0F,R0                 # and %11110000
+#                                        # ld c,a
+#                                        # ld a,b
+#        BICB $0xF0,R4                   # and %00001111
+#        BIS  R0,R4                      # or c
+#        RETURN                          # ret
+#
+#ObjectAnimator_Halt:
+#                                        # ld a,b
+#                                        # jr ObjectAnimator_Save
+#ObjectAnimator_Update:
+#      # We're done, so update the tick
+#        CALL @$ObjectAnimator_IncreaseTick # Call ObjectAnimator_IncreaseTick
+#ObjectAnimator_Save:
+#        POP  R5                         # exx
+#        SWAB R4                         # ei
+#        MOV  R4,(R5)                    # ld (hl),a
+#        RETURN                          # ret
+#ObjectAnimator_Kill:
+#                                        #     exx
+#                                        # ;   ei
+#                                        # ; *********** SHOULD THERE BE AN EI HERE?
+#                                        #
+#                                        #     xor a
+#                                        #     ld c,a
+#                                        #     ld iyl,a    ;wipe program
+#                                        #     ld ixh,a
+#                                        # ret
+#                                        #
+#ObjectAnimator_Done:
+#        POP  R5                         #     exx
+#                                        #     ei
+#        RETURN                          # ret
+#                                        #
+#GetAnimatorMempos:
+#                                        #     ld b,a
+#                                        #     ld hl,&6969 :AnimatorPointers_Plus2
+#                                        #     ld d,0
+#        BIC  $0xFFF0,R0                 #     and %00001111
+#        DEC  R0                         #     dec a
+#        ASL  R0                         #     rlca
+#                                        #     ld e,a
+#                                        #     ;read the mempointer to the animator
+#                                        #     add hl,de
+#                                        #     ld a,(hl)
+#                                        #     inc hl
+#                                        #     ld h,(hl)
        .equiv ObjectAnimator_AnimatorPointers, .+2
         MOV  0(R0),R5                   #     ld l,a
         RETURN                          # ret
@@ -709,7 +709,7 @@ ObjectProgram_Fire:
         BZE  1237$                     # and d
                                        # ret z
 ObjectProgram_HyperFire:
-       .ppudo_ensure $PPU_PlaySoundEffect2
+       .ppudo $PPU_PlaySoundEffect2
       # B=R4=X, C=R1=Y, IYL=R3=Prg         #
         MOV  @$SpriteSizeShiftHalfB,R2     # ld a,(SpriteSizeShiftHalfB_Plus1 - 1)
         ADD  R2,R1                         # ld d,a
@@ -767,7 +767,7 @@ Object_DecreaseShotToDeathB:
        .equiv dstCustomShotToDeathCall, .+2
         CALL @$null
         BIC  $0xFF00,(R5) # Clear object animator
-       .ppudo_ensure $PPU_PlaySoundEffect3
+       .ppudo $PPU_PlaySoundEffect3
       # R2 LSB ixh = Sprite, R2 MSB iyh = Move
       # create a coin
        .equiv PointsSpriteC, .+2

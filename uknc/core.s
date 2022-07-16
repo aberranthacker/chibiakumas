@@ -242,10 +242,6 @@ not_implemented_check_R0:
        .global ScreenBuffer_Init
        .global ScreenBuffer_Reset
 
-       .include "core/sfx.s"
-       .global Sfx_CurrentPriority
-       .global Sfx_Sound
-
        .include "core/show_sprite.s"
        .global SprShow_BankAddr
 

@@ -469,7 +469,7 @@ Player_OneDrone:
         CALL dodrone
 Player_NoDrones:
 
-       .ppudo_ensure $PPU_PlaySoundEffect1
+       .ppudo $PPU_PlaySoundEffect1
 1237$:  RETURN
 
 dodrone:
@@ -556,15 +556,6 @@ SetFireDir_Fire:
 
         RETURN
 
-                                                            # DoSmartBombCall:
-                                                            #     ; a=2 All FX
-                                                            #     ; a=1 no sound, screen flash
-                                                            #     ; a=0 No FX
-                                                            #     push af
-                                                            #     call DoSmartBomb
-                                                            #     pop af
-                                                            #     jr DoSmartBombFX
-
 # ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 # ;;                               Smart Bomb                                   ;;
 # ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -574,7 +565,7 @@ SetFireDir_Fire:
       # R5 player array pointer
 Player_Handler_DoSmartBomb:
         MOV  $5,@$SmartBombTimer
-       .ppudo_ensure $PPU_PlaySoundEffect5
+       .ppudo $PPU_PlaySoundEffect5
 
         MOV  $StarArraySizeBytes >> 2,R3
         MOV  $StarArrayPointer,R4
@@ -667,7 +658,7 @@ Player_Hit: #-------------------------------------------------------------------
         RETURN                           # ret
 
 Player_Hit_Points:
-       .ppudo_ensure $PPU_PlaySoundEffect6
+       .ppudo $PPU_PlaySoundEffect6
       # Object is Points for player
                                         # push bc
        #MOVB 13(R5),R0                  #     ld bc,13
@@ -713,7 +704,7 @@ Player_Hit_PowerupShootPower:
                                         #         ld (P2_P14),a
         MOVB $1,@$P1_P14                #         ld (P1_P14),a
 PowerupPlaySfx:
-       .ppudo_ensure $PPU_PlaySoundEffect7
+       .ppudo $PPU_PlaySoundEffect7
         RETURN
 
 Player_Hit_Injure:
@@ -737,7 +728,7 @@ Player_Hit_Process:
         BMI  1237$ # player already dead if below zero
         BZE  PlayerKilled
         MOVB $0x07,7(R0)
-       .ppudo_ensure $PPU_PlaySoundEffect4
+       .ppudo $PPU_PlaySoundEffect4
 1237$:  RETURN
 
 PlayerKilled:

@@ -16,9 +16,6 @@
 68$:    MOV  $040,@$0100    # set dummy Vblank int handler
         MOV  $SPReset,SP
 
-        BIC  $0x0080, @$CCH1OS # disable channel 1 output interrupt
-        BIC  $0x0080, @$CCH2OS # disable channel 2 output interrupt
-
         MOV  $TitleStr,R0
         CALL @$PrintStr
 

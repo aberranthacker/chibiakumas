@@ -165,7 +165,7 @@ Stars_AddBurst_Loop:
         DEC  R3
        .equiv IncreaseBurstSpacing, .+2
         MOV  R3,R3 # or DEC R3 to reduce fire, sets from bootstrap
-        BLE  1237$
+        BLE  1237$ # return if 0 or negative
 
         CMP  R3,R0
         BLO  1237$
