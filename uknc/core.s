@@ -43,7 +43,7 @@ SavedSettings: #-------------------------------------------------------------{{{
     ContinueMode:    .byte   0          #  Continue Sharing (0/1)
     SmartBombsReset: .byte   3          #  SmartbombsReset
     ContinuesReset:  .byte  60          #  Continues Reset
-    GameDifficulty:  .byte   0          #  Game difficulty
+    GameDifficulty:  .byte 0b00000000   #  Game difficulty
                                         #  (enemy Fire Speed 0=normal, ;1=easy, 2=hard)
                                         #  +128 = heaven mode , +64 = star Speedup
     Achivements:     .byte 0b00000000   #  Achievements (WPx54321) (W=Won P=Played)

@@ -39,15 +39,19 @@ Bootstrap_Launch: # used by bootsector linker script
         MOV  $ppu_module.bin,R0
         CALL Bootstrap_LoadDiskFile
 
+        MOV  $-1,@$PPUCommandArg
         JSR  R5,@$PPEXEC
        .word FB1 # PPU module location
        .word PPU_ModuleSizeWords
+
+Bootstrap_Launch_WaitForPPUInit:
+        TST  @$PPUCommandArg
+        BNZ  Bootstrap_Launch_WaitForPPUInit
         #-----------------------------------------------------------------------
      .ifdef ShowLoadingScreen
-       .ppudo_ensure $PPU_SetPalette, $TitleScreenPalette
-
         MOV  $loading_screen.bin,R0
         CALL Bootstrap_LoadDiskFile
+       .ppudo_ensure $PPU_SetPalette, $TitleScreenPalette
      .else
       # clear main screen area
         MOV  $8000>>3, R0
@@ -278,14 +282,15 @@ NoBulletSlowdown: # ../Aku/BootStrap.asm:2206
        .equiv BulletConfigSize, (BulletConfigHeaven_End - BulletConfigHeaven)
         MOV  $Stars_AddBurst_Top,R2
         MOV  $BulletConfigSize,R1
-        MOV  $BulletConfigHeaven,R3
 
-        MOV  $0110303,R0 # MOVB R3,R3 opcode
+        MOV  $BulletConfigHeaven,R3
+        MOV  $0105303,R0 # DECB R3 opcode
+
         TSTB @$GameDifficulty # test bit 7
         BMI  HeavenMode
 
         MOV  $BulletConfigHell,R3
-        MOV  $0105303,R0 # DECB R3 opcode
+        MOV  $0110303,R0 # MOVB R3,R3 opcode
 HeavenMode: # ../Aku/BootStrap.asm:2242
         MOV  R0,@$BurstSpacing
         100$:
@@ -311,14 +316,14 @@ Difficulty_Hard:
         MOV  $0x08,R0 # bit 3
         BR   Difficulty_Generic
 Difficulty_Generic:
-        MOV  R0,FireFrequencyA
+        MOV  R0,@$FireFrequencyA
         ASR  R0
-        MOV  R0,FireFrequencyB
-        MOV  R0,FireFrequencyC
+        MOV  R0,@$FireFrequencyB
+        MOV  R0,@$FireFrequencyC
         ASR  R0
-        MOV  R0,FireFrequencyD
+        MOV  R0,@$FireFrequencyD
         ASR  R0
-        MOV  R0,FireFrequencyE
+        MOV  R0,@$FireFrequencyE
 
         RETURN
 
@@ -696,7 +701,7 @@ BulletConfigHell: #----------------------------------------------------------{{{
     .byte 0
    # Stars_AddBurst:
     .byte 0x3F,0x08
-    .byte 0
+    .byte 0, 0
    # Stars_AddBurst_Small:
     .byte 0x36,0x32
     .byte 0x2E,0x2A

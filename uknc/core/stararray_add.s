@@ -60,7 +60,7 @@ Stars_AddObjectOne:
     .byte 0
 Stars_AddBurst:
     .byte 0x3F,0x08
-    .byte 0
+    .byte 0, 0
 Stars_AddBurst_Small:
     .byte 0x36,0x32
     .byte 0x2E,0x2A
@@ -88,7 +88,7 @@ Stars_AddBurst_BottomWide:
     .byte 0x35,0x33
     .byte 0x3D,0x3B
     .byte 0
-# patterns above take 270 bytes of RAM
+# patterns above take 136 bytes of RAM
     .even
 
 Stars_AddToPlayer: # used by player_driver.s
