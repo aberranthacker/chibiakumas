@@ -32,11 +32,11 @@ ClrTextArea: # --------------------------------------------------------------{{{
                 MOV  $0x081,@$PASWCR
             .endif
 
-                MOV  $88*20>>1, R0
+                MOV  $88*20>>3, R0
                 CLR  R1
                 MOV  $OffscreenAreaAddr,R5
 
-1$:            .rept 2
+1$:            .rept 8
                 MOV  R1,(R5)+
                .endr
                 SOB  R0,1$
@@ -257,24 +257,51 @@ SLTABInit:      MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
 
                 MOV  @$0320,@$SYS320
                 MOV  $Channel0In_IntHandler,@$0320
-              # read from the channel before replacing, just in case
+              # read from the channel, just in case
                 TST  @$PCH0ID
 
                 MOV  @$0324,@$SYS324
                 MOV  $Channel0Out_IntHandler,@$0324
 
+                MOV  $0177400,R1
+                MOV  $0177362,R2
+                MOV  $Trap4,@$4
+              # Aberrant Sound Module uses addresses range 0177360-0177377
+              # 16 addresses in total and 8 even addresses
+                MOV  $8,R0
+                TestNextSoundBoardAddress:
+                    TST  -(R1)
+                SOB  R0,TestNextSoundBoardAddress
+
+                TST  @$Trap4Detected
+                BZE  PSGPresent
+
+                MOV  $DummyPSG,R1
+                MOV  R1,R2
+PSGPresent:
+                MOV  R1,@$PLY_AKG_PSGAddress
+                MOV  R2,@$PLY_SE_PSGAddress
+                CLR  @$Trap4Detected
+               #MOV  $0173362,@$4 # restore back trap 4 handler
 
                 MOV  $PGM, @$07124 # add PGM to PPU's processes table
                 MOV  $1, @$07100   # add PGM to PPU's processes execution table
 
+                MOV  $PPU_PPUCommandArg,@$PBPADR
+                CLR  @$PBP12D # inform bootstrap that the initialization is done
+
                 RETURN             # end of the init subroutine
 #-------------------------------------------------------------------------------
+Trap4:
+               .equiv Trap4Detected, .+4
+                MOV  $0xFFFF,$0
+                RTI
 PGM: #--------------------------------------------------------------------------
                 MOV  R0,-(SP) # the process manager requires R0 to be intact
 SingleProcess_Loop:
                 MOV  @$CommandsQueue_CurrentPosition,R5
                 CMP  R5,$CommandsQueue_Bottom
-                BEQ  EventLoop
+                BEQ  CommandsQueue_Empty
 #-------------------------------------------------------------------------------
 CommandsQueue_Process:
                 MOV  (R5)+,R1
@@ -289,8 +316,9 @@ CommandsQueue_Process:
                 CMP  R5,$CommandsQueue_Bottom
                 BLO  CommandsQueue_Process
 
+CommandsQueue_Empty:
                .equiv SingleProcessFlag, .+2
-EventLoop:      TST  $0
+                TST  $0
                 BNZ  SingleProcess_Loop # non-zero, flag is set, loop
 
                 MOV  $PGM, @$07124 # add to processes table
@@ -299,7 +327,6 @@ EventLoop:      TST  $0
                 JMP  @$0174170     # jump back to the process manager (63608; 0xF878)
 #-------------------------------------------------------------------------------
 CommandVectors:
-               .word EventLoop             # do nothing
                .word CommandsQueue_Process # PPU_NOP
                .word Teardown              # PPU_Finalize
                .word GoSingleProcess       # PPU_SingleProcess
@@ -332,6 +359,8 @@ CommandVectors:
 Teardown: #------------------------------------------------------------------{{{
                 MOV  @$SYS272, @$0272 # restore default SLTAB (186; 0xBA)
                 MOV  @$SYS300, @$0300 # restore keyboard interrupt handler
+                MOV  @$SYS320, @$0320 # restore
+                MOV  @$SYS324, @$0324 # restore
                 MOV  @$SYS100, @$0100 # restore Vblank interrupt handler
 
                 MOV  (SP)+,R0
@@ -655,6 +684,7 @@ MusicStop: #-----------------------------------------------------------------{{{
 
         RETURN
 #----------------------------------------------------------------------------}}}
+# Play Sound Effects --------------------------------------------------------{{{
 PlaySoundEffect1: # player fire
         MOV  $1,R0 # effect number, starts from 1
         CLR  R1    # channel number 0, 1, 2
@@ -695,7 +725,7 @@ PlaySoundEffect7: # powerup
         MOV  $2,R1 # channel number 0, 1, 2
         CLR  R2    # inverted volume (0 = full volume, 16 = no sound)
         JMP  PLY_SE_PlaySoundEffect
-
+#----------------------------------------------------------------------------}}}
 PrintDebugInfo: #------------------------------------------------------------{{{
         PUSH @$PASWCR
         # enable write-only direct access to the RAM above 0100000
@@ -878,7 +908,7 @@ Debug_DonePrinting:
 
 VblankIntHandler: #----------------------------------------------------------{{{
       # we disabling "single process mode" to load data from disk only,
-      # and to avoid random disk loading issues, we disabling our
+      # to avoid random disk loading issues, we disabling our
       # Vblank handler as well
         TST  @$SingleProcessFlag
         BZE  SkipToFirmwareHandler
@@ -1095,7 +1125,7 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         MOV  (SP)+,R0
         RTI
 #----------------------------------------------------------------------------}}}
-Channel0In_IntHandler: #----------------------------------------------------------{{{
+Channel0In_IntHandler: #-----------------------------------------------------{{{
         MOV  @$PBPADR,-(SP)
         MOV  R5,-(SP)
 
@@ -1124,8 +1154,8 @@ Channel0Out_IntHandler: #-------------------------------------------------------
        .include "music/ep1_intro_music_playerconfig.s"
        .include "music/ep1_level_music_playerconfig.s"
        .include "music/ep1_boss_music_playerconfig.s"
-       .include "music/ep1_sfx_playerconfig.s"
        .include "../../akg_player/akg_player.s"
+       .include "music/ep1_sfx_playerconfig.s"
        .include "../../akg_player/player_sound_effects.s"
 
 TitleMusic: .include "build/ep1_title_music.formatted.s"
@@ -1146,6 +1176,7 @@ SYS324: .word 0175540 # firmware PPU channel 0 out interrupt handler
 
 FBSLTAB: .word 0          # adrress of main screen SLTAB
 FirstLineAddress: .word 0 #
+DummyPSG: .word 0
 
 CommandsQueue_Top:
        .space 2*2*16
