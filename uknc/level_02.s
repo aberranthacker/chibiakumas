@@ -15,6 +15,7 @@
 start:
         JMP  @$LevelInit
 
+LevelSprites2:
        .incbin "resources/level02.spr"
 ChibiSprites:
        .incbin "resources/chibi_lr.spr"
@@ -318,7 +319,7 @@ HandAttack1:
    .word     evtSingleSprite, sprTwoFrame | 21+9, (24)<<X | (24+ 24*4)<<Y
    .word     evtSingleSprite, sprTwoFrame | 21+9, (24)<<X | (24+ 24*6)<<Y
    .word     evtSingleSprite, sprTwoFrame | 21+9, (24)<<X | (24+ 24*8)<<Y
-   
+
    .word 81, evtMultipleCommands | 6
    .word     evtLoadObjSettings | 5
    .word     evtSingleSprite, sprTwoFrame | 21, (160)<<X | (24+ 24*1)<<Y
@@ -350,20 +351,28 @@ LevelEndAnim:
 # defw    EndLevel
 
 EndLevel:
-                                            # pop hl  ;
-                                            # ld hl,  &0103               ;load level 2
-                                            # jp  Akuyou_ExecuteBootStrap ; Start the game, no return
+        MOV  $3,R5
+        JMP  ExecuteBootstrap # Start the game, no return
 
-LevelInit:
-                                            # read "..\SrcALL\Akuyou_Multiplatform_Level_GenericInit.asm"
+LevelInit:                                  # read "..\SrcALL\Akuyou_Multiplatform_Level_GenericInit.asm"
        .ppudo_ensure $PPU_BossMusicRestart
-        MOV  $EventStreamArray,R5     # Event Stream
-       #MOV  $Event_SavedSettingsB,R3 # Saved Settings
-        CALL @$EventStream_Init
 
+        MOV  $LevelSprites,R0
+        MOV  $SpriteBanksVectors,R1
+        MOV  R0,(R1)+
+        MOV  R0,(R1)+
+   .ifdef ExtMemCore
+        MOV  $LevelSprites2,(R1)+
+   .else
+        MOV  R0,(R1)+
+   .endif
+        MOV  R0,(R1)+
+
+        MOV  $EventStreamArray,R5     # Event Stream
+        CALL EventStream_Init
         CALL ScreenBuffer_Init
         MTPS $PR0
-
+#-------------------------------------------------------------------------------
 LevelLoop:
       #.include "level_levelloop_preflip.s" # read "..\SrcALL\Akuyou_Multiplatform_Level_Levelloop_PreFlip.asm"
 
@@ -372,7 +381,6 @@ LevelLoop:
 
         CALL @$EventStream_Process
 
-        MOV  $LevelSprites,@$SprShow_BankAddr
         CALL @$ObjectArray_Redraw
 
         MOV  $ChibiSprites,@$SprShow_BankAddr

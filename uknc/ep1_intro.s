@@ -183,37 +183,45 @@ EndLevel:
 LevelInit:
         CALL @$ScreenBuffer_Reset
        .ppudo_ensure $PPU_IntroMusicRestart
+
+        MOV  $LevelSprites,R0
+        MOV  $SpriteBanksVectors,R1
+        MOV  R0,(R1)+
+        MOV  R0,(R1)+
+        MOV  R0,(R1)+
+        MOV  R0,(R1)+
+
         MOV  $EventStreamArray,R5
         CALL @$EventStream_Init
 
         MTPS $PR0 # enable interrupts
 LevelLoop:
+       .equiv dstClearScreenPoint, .+2
         CALL @$null
-       .equiv dstClearScreenPoint, .-2
+       .equiv dstFadeCommand, .+2
         CALL @$null
-       .equiv dstFadeCommand, .-2
 
         CALL @$Timer_UpdateTimer
         CALL @$EventStream_Process
 
+       .equiv dstDoubleStreamProcess, .+2
         CALL @$null
-       .equiv dstDoubleStreamProcess, .-2
 
         BITB @$KeyboardScanner_P1,$Keymap_AnyFire
         BNZ  EndLevel
 
         CALL @$ObjectArray_Redraw
 
+       .equiv dstShowBossTextCommand, .+2
         CALL @$null
-       .equiv dstShowBossTextCommand, .-2
         WAIT
         WAIT
         WAIT
         WAIT
         WAIT
 
+       .equiv ShowTextUpdate, .+2
         MOV  $0, R0
-       .equiv ShowTextUpdate, .-2
         CMP  R0,$22
         BHI  LevelLoop
 

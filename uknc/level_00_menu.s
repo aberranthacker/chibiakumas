@@ -132,7 +132,6 @@ ShowMenu:
         WAIT
 
        .ppudo_ensure $PPU_PrintAt,$MenuText
-        MOV  $LevelSprites,@$SprShow_BankAddr  
         CALL @$ObjectArray_Redraw
 
         JSR  R5,@$OnscreenCursorDefine

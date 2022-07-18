@@ -15,40 +15,22 @@
 start:
         JMP  @$LevelInit
 
-       .incbin "resources/level01.spr"
+       .incbin "resources/level01_00.spr"
+   .ifdef ExtMemCore
+LevelSprites2:
+       .incbin "resources/level01_01.spr"
+   .endif
 ChibiSprites:
        .incbin "resources/chibi_lr.spr"
 LevelTiles:
        .incbin "resources/level01_tiles.spr"
 
-################################################################################
-#                                  Animators                                   #
-################################################################################
-AnimatorPointers:
-    .word AnimatorData
-AnimatorData:
-    # First byte is the 'Tick map' which defines when the animation should
-    # update
-    .byte 0b00000010    # Anim Freq
-    # all remaining bytes are anim frames in the form Command-Var-Var-Var
-    .byte 01,128+01,0,0 # Sprite Anim
-    .byte 01,128+02,0,0 # Sprite Anim
-    .byte 00            # End of loop
-    .even
-
-################################################################################
-#                             Data Allocations                                 #
-################################################################################
-Event_SavedSettingsB:   # 2nd bank Saved settings array
-    .byte 128, 0x00
-    .even
-
 EventStreamArray_Ep1: #----------------------------------------------------------{{{
-        # ; We will use 4 Paralax layers
-        # ;  ---------()- (sky)        %11001000
-        # ;  ------------ (Far)        %11000100
-        # ;  -----X---X-- (mid)        %11000010   Bank 1
-        # ;  []=====[]=== (foreground) %11000001   Bank 0
+   # We will use 4 Paralax layers
+   # ---------()- (sky)        %11001000
+   # ------------ (Far)        %11000100
+   # -----X---X-- (mid)        %11000010   Bank 1
+   # []=====[]=== (foreground) %11000001   Bank 0
 
 #   .word 0 # Time
 #   .word evtReprogram_PowerupSprites # Event_CoreReprogram_PowerupSprites
@@ -191,14 +173,14 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .byte        24+ 90, 24+ 50 # Y, X : 114, 74 : 90, 100
 
    # Clouds (3 wide)
-    .word 0, evtMultipleCommands | 4
+    .word 0, evtMultipleCommands | 3
     .word    evtSetMove, mveBackground | 0b0100
     .word    evtSingleSprite, sprSingleFrame | 41
     .byte        24+ 14, 24+ 159
     .word    evtSingleSprite, sprSingleFrame | 42
     .byte        24+ 14, 24+ 159+12
-    .word    evtSingleSprite, sprSingleFrame | 43
-    .byte        24+ 14, 24+ 159+24
+#   .word    evtSingleSprite, sprSingleFrame | 43
+#   .byte        24+ 14, 24+ 159+24
 
    # Spikeyrock
     .word 0, evtMultipleCommands | 3
@@ -589,17 +571,28 @@ LevelEndAnim:
 #----------------------------------------------------------------------------}}}
 
 EndLevel:
-        MOV  $0x8000,R5
-        JMP  @$ExecuteBootstrap
+        MOV  $2,R5
+        JMP  ExecuteBootstrap
 
 LevelInit:
         MOV  $Player_Array,R5
         MOVB $3,9(R5) # set number of lives for the first player
 
        .ppudo_ensure $PPU_LevelMusicRestart
-        MOV  $EventStreamArray_Ep1,R5 # Event Stream
-        CALL @$EventStream_Init
 
+        MOV  $LevelSprites,R0
+        MOV  $SpriteBanksVectors,R1
+        MOV  R0,(R1)+
+        MOV  R0,(R1)+
+   .ifdef ExtMemCore
+        MOV  $LevelSprites2,(R1)+
+   .else
+        MOV  R0,(R1)+
+   .endif
+        MOV  R0,(R1)+
+
+        MOV  $EventStreamArray_Ep1,R5 # Event Stream
+        CALL EventStream_Init
         CALL ScreenBuffer_Init
         MTPS $PR0
 #-------------------------------------------------------------------------------
@@ -608,7 +601,6 @@ LevelLoop:
 
         CALL @$EventStream_Process
 
-        MOV  $LevelSprites,@$SprShow_BankAddr
         CALL @$ObjectArray_Redraw
 
         MOV  $ChibiSprites,@$SprShow_BankAddr
