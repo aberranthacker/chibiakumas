@@ -24,6 +24,7 @@
        .global SavedSettings
        .global SavedSettings_Last
        .global SmartBombsReset
+       .global SpriteBanksVectors
        .global null
 #----------------------------------------------------------------------------}}}
 
@@ -97,6 +98,12 @@ SavedSettings: #-------------------------------------------------------------{{{
 .endif
     HighScoreBytes:     .space 8,0 # Highscore
 SavedSettings_Last: # 0x80 bytes --------------------------------------------}}}
+
+SpriteBanksVectors:
+       .word LevelSprites
+       .word LevelSprites
+       .word LevelSprites
+       .word LevelSprites
 
 # to effect transparency without an 'alpha map'
 TranspColors: .byte 0x00 # 0b00000000

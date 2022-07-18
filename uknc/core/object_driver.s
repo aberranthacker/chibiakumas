@@ -130,32 +130,38 @@ ObjectArray_NextObject:                                     # ObjectArray_Turbo:
         BZE  2$
         CALL ObjectAnimator
    2$:
-        SWAB R2                                           # ld a,iyh
-      # R2 LSB ixh = Sprite, R2 MSB iyh = Move
+        SWAB R2
+      # R2 LSB iyh = Sprite, R2 MSB ixh = Move
         MOV  R2,R0
-        BIC  $0xFFC0,R0                                   # and %00111111
-        MOV  R0,@$SprShow_SprNum                          # ld (SprShow_SprNum),a
-                                                          # ld a,iyh
-        BIT  $0xC0,R2                                     # and %11000000
-        BZE  Objectloop_SpriteBankSet  # one frame sprite # jr z,Objectloop_SpriteBankSet
+        BIC  $0xFFC0,R0
+        MOV  R0,@$SprShow_SprNum
 
-        MOV  @$Timer_CurrentTick,R0                       # bit 6,a
-        BIT  $0x40,R2                                     # ld a,(Timer_CurrentTick)
-        BZE  Objectloop_TwoFrameSprite                    # jr z,Objectloop_TwoFrameSprite
+        BIT  $0xC0,R2
+        BZE  Objectloop_OneFrameSprite
+
+        MOV  @$Timer_CurrentTick,R0
+        BIT  $0x40,R2
+        BZE  Objectloop_TwoFrameSprite
 
       # it's a FourFrameSprite if we got here
-        BIC  $0177774,R0                                  # and %00000011
-        BR   Objectloop_SpriteBankSet                     # jr Objectloop_SpriteBankSet
+        BIC  $0177774,R0 # ------XX
+        BR   Objectloop_SpriteBankSet
+
+Objectloop_OneFrameSprite:
+        CLR  R0
+        BR   Objectloop_SpriteBankSet
 
 Objectloop_TwoFrameSprite:
-        COM  R0                                           # cpl
-        BIC  $0177775,R0                                  # and %00000010
+        COM  R0
+        BIC  $0177775,R0 # ------X-
 
 Objectloop_SpriteBankSet:
       # R1 LSB b = X, R1 MSB c = Y
       # R2 LSB ixh = Sprite, R2 MSB iyh = Move
       # R3 LSB ixl = Life, R3 MSB iyl = Program Code
       # R4 LSB = Animator, R4 MSB = Sprite size
+        ASL  R0
+        MOV  SpriteBanksVectors(R0),@$SprShow_BankAddr
 
       # Life BPxxxxx
       # B=hurt by bullets,
@@ -164,7 +170,7 @@ Objectloop_SpriteBankSet:
         BIT  $0x40,R3 # R3 Life=LSB, Program=MSB # ld a,ixl
                                                  # bit 6,a
         BZE  ObjectLoopBothPlayerSkip            # jr z,ObjectLoopBothPlayerSkip ; Doesn't hurt player
-                                                 #
+
 # used to modify this, but now we assume the player is alway vunurable
 # we check anyway before deducting a life
 # ;Jp Objectloop_PlayerVunrable ;Objectloop_DoPlayerCollisions_Plus2
@@ -657,30 +663,26 @@ ObjectProgram_MovePlayerDone:
         RETURN
 
 ObjectProgram_FrameAnimate: # Used To animate spider legs in 1st boss
-    .ifdef DebugMode
-       .inform_and_hang "no FrameAnimate"
-    .endif
-                                        #     push bc
-                                        #         ld a,iyl
-                                        #         and %00000111
-                                        #         ld b,a
-                                        #         inc b
-                                        #         ld a,128    ; do at least 1 shift, so result is at least 1
-                                        # ObjectProgram_FrameAnimate_Bitshifts:
-                                        #         rlca
-                                        #         djnz ObjectProgram_FrameAnimate_Bitshifts
-                                        #         ld b,a
-                                        #         ld a,(Timer_CurrentTick)
-                                        #         and b
-                                        #     pop bc
-        RETURN                          #     ret
+      # R3 LSB iyl = Program code, MSB = 0
+        BIC  $0xFFF8,R3 # -----XXX
+        CLR  R0
+        INC  R0 # MOV $1,R0
+        ASH  R3,R0
+        BIT  R0,@$Timer_CurrentTick
+        BZE  1237$
+
+        MOV  @$SpriteBanksVectors+4,@$SprShow_BankAddr
+1237$:  RETURN
 
 # Every other X column uses an alternate sprite - for background anim ----------
 ObjectProgram_BitShiftSprite:
-                                # ld a,b
-       #MOV  R4,@$SprShow_X     # ld (SprShow_X),a ; Makesure sprite pos is updated for Domoves
-                                # bit 0,b ;2 pixel
-1237$:  RETURN                  # ret
+      # R4 b = X
+        MOV  R4,@$SprShow_X # Makesure sprite pos is updated for Domoves
+        BIT  $2,R4          # 4 pixel
+        BZE  1237$
+
+        MOV  @$SpriteBanksVectors+4,@$SprShow_BankAddr
+1237$:  RETURN
 
 ObjectProgram_SnailFire:
        .equiv  FireFrequencyA, .+2
@@ -721,7 +723,7 @@ ObjectProgram_HyperFire:
         ADD  R4,R2                         # add b
                                            # ld d,a
                                            # ld a,iyl
-        BIC  $0xFFE0,R3                    # and %00011111
+        BIC  $0xFFE0,R3 # ---XXXXX         # and %00011111
       # B = R3 = pattern (0-15)            # ld b,a  ; top left
       # C = R1 = Y pos                     #
       # D = R2 = X pos                     # FireCustomStar:
