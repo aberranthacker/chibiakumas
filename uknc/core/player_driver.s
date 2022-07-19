@@ -24,22 +24,22 @@ SpendCheck:                             # SpendCheck:
                                         # or Keymap_AnyFire
                                         # inc a
         BNZ  SpendCredit                # ret z
-        RETURN                          #
-SpendCredit:                            # SpendCredit:
-         PUSH R5                        #  push iy
-        SpendCreditSelfMod:             # SpendCreditSelfMod:
-         MOV  $Player_Array,R5          #      ld iy,Player_Array ; All credits are (currently) stored in player 1's var!
-         MOVB 5(R5),R0                  #      ld a,(iy+5)
-         DECB R0                        #      sub 1
-         POP  R4                        #  pop ix
-         BMI  1237$                     #  ret c ;no credits left!
 
-         MOVB R0,5(R5)                  #  ld (iy+5),a
-                                        #  ld a,3
-         MOVB $3,9(R4) # lives          #  ld (ix+9),a
-                                        #  ld a,(SmartbombsReset)
-         MOVB @$SmartBombsReset,3(R4)   #  ld (ix+3),a
-1237$:   RETURN                         # ret
+SpendCredit:                         # SpendCredit:
+        PUSH R5                      #  push iy
+        SpendCreditSelfMod:          # SpendCreditSelfMod:
+        MOV  $Player_Array,R5        #      ld iy,Player_Array ; All credits are (currently) stored in player 1's var!
+        MOVB 5(R5),R0                #      ld a,(iy+5)
+        DECB R0                      #      sub 1
+        POP  R4                      #  pop ix
+        BMI  1237$                   #  ret c ;no credits left!
+
+        MOVB R0,5(R5)                #  ld (iy+5),a
+                                     #  ld a,3
+        MOVB $3,9(R4) # lives        #  ld (ix+9),a
+                                     #  ld a,(SmartbombsReset)
+        MOVB @$SmartBombsReset,3(R4) #  ld (ix+3),a
+1237$:  RETURN                       # ret
 
 # Both players are dead, so pause the game and show the continue screen
 PlayersDead:                            # Players_Dead:
@@ -55,33 +55,35 @@ PlayersDead:                            # Players_Dead:
                                         # jp ScreenBuffer_Init
 
 PlayerHandler:
-        # Used to update the live player count
+      # Used to update the live player count
         CLR  R0                         # xor a
 
 PlayerCounter:
         INC  R0 # or NOP if player 1 is dead # inc a
-       #INC  R0 # or NOP if player 2 is dead # inc a
-        MOVB R0,@$LivePlayers           #     ld (LivePlayers),a
-                                        #     or a
-        BZE  PlayersDead                #     jr z, Players_Dead
+   .ifdef TwoPlayersGame
+        INC  R0 # or NOP if player 2 is dead # inc a
+   .endif
+        MOVB R0,@$LivePlayers           # ld (LivePlayers),a
+                                        # or a
+        BZE  PlayersDead                # jr z, Players_Dead
 
-        MOV  $000240,@$PlayerCounter    #     ld hl,&0000     ;nop,nop
-       #MOV  $000240,@$PlayerCounter+2  #     ld (PlayerCounter),hl
-                                        #     call KeyboardScanner_Read
-                                        #     ; returns
-                                        #     ; ixl = Keypress bitmap Player
-                                        #     ; HL Direct pointer to the keymap
-                                        #     call Player_ReadControls
+        MOV  $000240,@$PlayerCounter    # ld hl,&0000     ;nop,nop
+       #MOV  $000240,@$PlayerCounter+2  # ld (PlayerCounter),hl
+                                        # call KeyboardScanner_Read
+                                        # ; returns
+                                        # ; ixl = Keypress bitmap Player
+                                        # ; HL Direct pointer to the keymap
+                                        # call Player_ReadControls
 
-        MOV  $Player_Array,R5           #     ld iy,Player_Array
-        TSTB 9(R5)                      #     ld a,(P1_P09)   ;See how many lives are left
-                                        #     or a
-        BNZ  Player1NotDead             #     jr nz,Player1NotDead
+        MOV  $Player_Array,R5           # ld iy,Player_Array
+        TSTB 9(R5)                      # ld a,(P1_P09)   ;See how many lives are left
+                                        # or a
+        BNZ  Player1NotDead             # jr nz,Player1NotDead
       # player 1 is dead if for some reason we got here
-        RETURN                          #     ;if we got here, player 1 is dead
+        RETURN                          # ;if we got here, player 1 is dead
                                         #
-                                        #     call SpendCheck
-                                        #     jr Player2Start
+                                        # call SpendCheck
+                                        # jr Player2Start
                                         #
 Player1NotDead:                         # Player1NotDead:
         MOV  $0005200,@$PlayerCounter   #     ld a,&3C
@@ -357,8 +359,8 @@ Player_NotInvincible:
         RETURN
 
 SetDronePos:
-        # C = R1 = Y
-        # B = R2 = X
+      # C = R1 = Y
+      # B = R2 = X
        .equiv DroneDirPos5, .
         NOP # or ASR R0
        .equiv DroneDirPos2, .
@@ -413,10 +415,10 @@ SetDronePos:
         # XfireSml:
         #     defb &49,&4F,&79,&7F,0
 
-        # input  C = R1 = Y
-        #        B = R2 = X
-        #        IY = R5 = Player_Array pointer
-        #        R0, R3, R4 free
+      # input  C = R1 = Y
+      #        B = R2 = X
+      #        IY = R5 = Player_Array pointer
+      #        R0, R3, R4 free
 Player_Fire4D: # Fire bullets!
         MOVB 8(R5),R0 # player sprite num
         BIC  $0xFF7F,R0
@@ -592,7 +594,7 @@ Player_Handler_SmartBomb_ObjLoop:
         INCB R0
         BZE  Player_Handler_SmartBomb_NextObj # ???
 
-       .equiv  dstCustomSmartBombEnemy, .+2
+       .equiv dstCustomSmartBombEnemy, .+2
         CALL @$null
 
         MOVB 5(R4),R0    # Program
@@ -630,82 +632,74 @@ Player_Hit: #-------------------------------------------------------------------
       # R3 LSB ixl = Life, R3 MSB iyl = Program Code
       # R4 use at will
       # R5 points to Player_Array
-                                        # ld (PlayerHitMempointer_Plus2 - 2),hl
-        MOV  R3,R0                      # ld a,iyl
+        MOV  R3,R0
         SWAB R0
-        CMPB R0,$16+2                   # cp 16+2
-        BNZ  1$
+        CMPB R0,$16+2
+        BNZ  Player_Hit_SkipCustomPlayerHitter
+
        .equiv  dstCustomPlayerHitter, .+2
-        CALL @$null                     # call z,null :customPlayerHitter_Plus2
-    1$:
-        CMPB R0,$3                      # cp 3
-        BNZ  Player_Hit_Injure          # jp nz,Player_Hit_Injure
-                                        #
+        CALL @$null
+
+Player_Hit_SkipCustomPlayerHitter:
+        CMPB R0,$3
+        BNZ  Player_Hit_Injure
+
       # we hit a powerup if we got here
-        CLR  R1                         # ld b,0  ; remove the powerup
-                                        # ld c,b
-                                        # ld d,b
-                                        # ld a,iyh
+        CLR  R1 # remove the powerup
        .equiv DroneSprite, .+2
-        CMPB R2, $128+38                 # cp 128+38   :DroneSprite_Plus1
-        BEQ  Player_Hit_PowerupDrone     # jr z,Player_Hit_PowerupDrone
+        CMPB R2, $128+38
+        BEQ  Player_Hit_PowerupDrone
+
        .equiv ShootSpeedSprite, .+2
-        CMPB R2, $128+39                 # cp 128+39   :ShootSpeedSprite_Plus1
-        BEQ  Player_Hit_PowerupShootSpeed# jr z,Player_Hit_PowerupShootSpeed
+        CMPB R2, $128+39
+        BEQ  Player_Hit_PowerupShootSpeed
+
        .equiv ShootPowerSprite, .+2
-        CMPB R2, $128+40                 # cp 128+40   :ShootPowerSprite_Plus1
-        BEQ  Player_Hit_PowerupShootPower# jr z,Player_Hit_PowerupShootPower
+        CMPB R2, $128+40
+        BEQ  Player_Hit_PowerupShootPower
+
        .equiv PointsSprite, .+2
-        CMPB R2, $128+16                 # cp 128+16   :PointsSprite_Plus1
-        BEQ  Player_Hit_Points           # jr z,Player_Hit_Points
-        RETURN                           # ret
+        CMPB R2, $128+16
+        BEQ  Player_Hit_Points
+
+        RETURN
 
 Player_Hit_Points:
        .ppudo $PPU_PlaySoundEffect6
       # Object is Points for player
-                                        # push bc
-       #MOVB 13(R5),R0                  #     ld bc,13
-       #ADD  $5,R0                      #     add hl,bc
-       #MOVB R0,13(R5)                  #     ld a,(hl)
-        MOVB @$P1_P13,R0                #     add 5
-        ADD  $5,R0                      #     ld (hl),a
-        MOVB R0,@$P1_P13                # pop bc
-        RETURN                          # ret
+       #MOVB 13(R5),R0
+       #ADD  $5,R0
+       #MOVB R0,13(R5)
+        MOVB @$P1_P13,R0
+        ADD  $5,R0
+        MOVB R0,@$P1_P13
+        RETURN
 
 Player_Hit_PowerupShootSpeed:
-                                            # push iy
-                                            # ld iy,(PlayerHitMempointer_Plus2-2)
-        MOVB @$P1_P11,R0                    # ld a,(iy+11)
-        RORB R0                             # srl a
-                                            # or a
-        BNZ  Player_Hit_PowerupShootSpeedNZ # jr nz,Player_Hit_PowerupShootSpeedNZ
-        INCB R0                             # inc a ; dont let a=0
+        MOVB @$P1_P11,R0
+        RORB R0
+        BNZ  Player_Hit_PowerupShootSpeedNZ
+
+        INCB R0
 Player_Hit_PowerupShootSpeedNZ:
-        MOVB R0,@$P1_P11                    # ld (iy+11),a
-                                            # pop iy
-        BR   PowerupPlaySfx                 # jr PowerupPlaySfx
-                                            #
+        MOVB R0,@$P1_P11
+        BR   PowerupPlaySfx
+
 Player_Hit_PowerupDrone:
-                                        # push iy
-                                        # ld iy,(PlayerHitMempointer_Plus2-2)
-                                        # ld a,(iy+4)
-        CMPB @$P1_P04,$2                # cp 2
-        BHIS Player_Hit_PowerupDroneFull# jr nc,Player_Hit_PowerupDroneFull
-        INC  @$P1_P04                   # inc a
-                                        # ld (iy+4),a
+        CMPB @$P1_P04,$2
+        BHIS Player_Hit_PowerupDroneFull
+        INC  @$P1_P04
+
 Player_Hit_PowerupDroneFull:
-                                        # pop iy
-        BR   PowerupPlaySfx             # jr PowerupPlaySfx
+        BR   PowerupPlaySfx
+
 Player_Hit_PowerupShootPower:
         MOV  $0x0303,@$PlayerStarColor0
         MOV  $0x3030,@$PlayerStarColor1
-                                        #         ld a,&96
-                                        #         ld (PlayerStarColor_Plus1 - 1),a
-                                        #
-                                        #         ld a, 1
-                                        # ;       power up both players
-                                        #         ld (P2_P14),a
-        MOVB $1,@$P1_P14                #         ld (P1_P14),a
+   .ifdef TwoPlayersGame
+        MOVB $1,@$P2_P14 # power up both players
+   .endif
+        MOVB $1,@$P1_P14
 PowerupPlaySfx:
        .ppudo $PPU_PlaySoundEffect7
         RETURN
@@ -714,11 +708,11 @@ Player_Hit_Injure:
         MOV  R5,R0
         BR   Player_Hit_Process
 
-       .ifdef TwoPlayersGame
+   .ifdef TwoPlayersGame
 Player_Hit_Injure_2:
         MOV  $Player_Array2,R0
         BR   Player_Hit_Process
-       .endif
+   .endif
 
 Player_Hit_Injure_1:
         MOV  $Player_Array,R0
@@ -735,14 +729,10 @@ Player_Hit_Process:
 1237$:  RETURN
 
 PlayerKilled:
-                                           # xor a
-        CLRB 3(R0)                         # ld (iy+3),a
-                                           # pop iy
-                                           # ld a,20
-        MOV  $20,@$SpendTimeout            # ld (SpendTimeout_Plus1-1),a
-                                           # ld a,100
-        MOV  $100,@$ShowContinueCounter    # ld (ShowContinueCounter_Plus1-1),a
-        RETURN                             # ret
+        CLRB 3(R0)
+        MOV  $20,@$SpendTimeout
+        MOV  $100,@$ShowContinueCounter
+        RETURN
 
 #******************************************************************************#
 #*                                  Player UI                                 *#
@@ -770,46 +760,44 @@ Player_DrawUI_DrawIcons: # Used for Health and Smartbomb icons
 
 Player1DoContinue:
        .equiv ShowContinueCounter, .+2
-        TST  $0                           # ld a,(ShowContinueCounter_Plus1 - 1)
-                                          # or a
-        BZE  Player1_DeadUI               # call nz, Player1Continue
-        CALL Player1Continue              # jr Player1_DeadUI
+        TST  $0
+        BZE  Player1_DeadUI
+
+        CALL Player1Continue
         BR   Player1_DeadUI
 
    .ifdef TwoPlayersGame
 Player2DoContinue:
-        TST  @$ShowContinueCounter        # ld a,100    :ShowContinueCounter_Plus1
-                                          # or a
-        BZE  Player2_DeadUI               # call nz,Player2Continue
-        CALL Player2Continue              # jr Player2_DeadUI
+        TST  @$ShowContinueCounter
+        BZE  Player2_DeadUI
+
+        CALL Player2Continue
         BR   Player2_DeadUI
    .endif
 #-------------------------------------------------------------------------------
 # We put Plus sprite anims here, as they have to be run
 # after the playerhandler and mess up practically ALL registers
 Player_DrawUI:
-        MOV  $Player_Array,R5           # ld iy,Player_Array
-        TSTB @$P1_P09                   # ld a,(P1_P09)   ;See how many lives are left
-                                        # or a
-        BZE  Player1DoContinue          # jr z,Player1DoContinue
-        CALL Player1DrawUI              # call Player1DrawUI
+        MOV  $Player_Array,R5
+        TSTB @$P1_P09 # See how many lives are left
+        BZE  Player1DoContinue
+
+        CALL Player1DrawUI
 
 Player1_DeadUI:
    .ifdef TwoPlayersGame # {{{
-        MOV  $PlayerArray2,R5           # ld iy,Player_Array2
-        TSTB @$P1_P09                   # ld a,(P2_P09)   ;See how many lives are left
-                                        # or a
-        BZE  Player2DoContinue          # jr z,Player2DoContinue
-        CALL Player2DrawUI              # call Player2DrawUI
+        MOV  $PlayerArray2,R5
+        TSTB @$P1_P09 # See how many lives are left
+        BZE  Player2DoContinue
+
+        CALL Player2DrawUI
 
 Player2_DeadUI:
-        CMPB @$LivePlayers,$2           # ld a,(LivePlayers)
-                                        # cp 2
-        BHIS 1237$                      # ret nc
+        CMPB @$LivePlayers,$2
+        BHIS 1237$
    .endif # }}}
       # 1 player or less!
         TST  @$ShowContinueCounter      # ld a,(ShowContinueCounter_Plus1-1)
-                                        # or a
         BZE  1237$                      # ret z
                                         # call SpriteBank_Font2
                                         # ld l,&00;14  ; show how many credits are left
@@ -854,7 +842,7 @@ Player1Continue:
                                         #         db "Credits",":"+&80
                                         #     txtPressButtonMsg2:
                                         #         db "Continue","?"+&80
-                                        #
+
 Player_DrawUIDual:
         MOV  R0,@$Player_DrawUI_DrawIcons_IconWidth
 

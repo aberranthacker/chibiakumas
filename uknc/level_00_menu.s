@@ -116,7 +116,7 @@ ShowTitlePic_Loop: #---------------------------------------------------------{{{
 .endif
 
 ShowMenu:
-        # CALL CallFade # Aku/Level00-Menu.asm:1170
+      # CALL CallFade # Aku/Level00-Menu.asm:1170
         CALL Fader
 
     .ifdef CompileEP2
@@ -329,22 +329,21 @@ Fader: #---------------------------------------------------------------------{{{
         CLR  R0
         MOV  $FB1+16000,R5
         MOV  $8,R3
-    8$:
-        MOV  $25,R2
-        SUB  $16000+80,R5
-       .rept 1
-        WAIT
-       .endr
-    25$:
-        ADD  $80*9,R5
-        MOV  $4,R1
-    4$:
-       .rept 10
-        MOV  R0,-(R5)
-       .endr
-
-        SOB  R1,4$
-        SOB  R2,25$
+        8$:
+            SUB  $16000+80,R5
+           .rept 1
+            WAIT
+           .endr
+            MOV  $25,R2
+            25$:
+                ADD  $80*9,R5
+                MOV  $4,R1
+                4$:
+                   .rept 10
+                    MOV  R0,-(R5)
+                   .endr
+                 SOB  R1,4$
+            SOB  R2,25$
         SOB  R3,8$
 
         MOV  (SP)+,R5

@@ -196,7 +196,7 @@ ShowSprite_OK_TurboRenderer:
 
 1237$:  RETURN
 
-# This is our most basic render, its slow, but can do any size and clipping
+# This is our most basic render, its slow, but can do any size and clipping ----
 SprDraw_BasicRenderer: # (SprDrawChooseRender)-------------------------------{{{
       # R2 number of lines
       # R4 sprite  address
@@ -265,9 +265,8 @@ SprDrawLn_DoubleLine:
 
 1237$:  RETURN
 #----------------------------------------------------------------------------}}}
-
-# Turbo version
-# SprDraw_TurboRenderer (SprDrawChooseRender)---------------------------------{{{
+# Turbo version ----------------------------------------------------------------
+# SprDraw_TurboRenderer (SprDrawChooseRender)--------------------------------{{{
 SprDraw_TurboRenderer_LineDoubler:
         MOV  $80-6,R1
         ASL  R2
@@ -377,8 +376,7 @@ SprDraw_TurboRenderer_LineSkip:
 SprDraw_TurboRenderer_Done:
         RETURN
 #----------------------------------------------------------------------------}}}
-
-# Pset Version! no transparentcy, so fast! ----------------
+# Pset Version! no transparentcy, so fast! -------------------------------------
 # SprDraw_PsetRenderer (SprDrawChooseRenderPset)-----------------------------{{{
 SprDraw_PsetRenderer_LineDoubler:
         MOV  $80-6,R1

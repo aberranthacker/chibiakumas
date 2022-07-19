@@ -274,20 +274,20 @@ not_implemented_check_R0:
        .include "decoders/lzsa1.s"
        .global unlzsa1
 
-       .include "background_solid_fill.s"
+       .include "core/background_solid_fill.s"
        .global Background_SolidFill
 
-       .include "background_quad_sprite.s"
+       .include "core/background_quad_sprite.s"
        .global Background_FloodFillQuadSprite
 
-       .include "background_bit_shifter.s"
+       .include "core/background_bit_shifter.s"
        .global BitShifter
        .global BitShifter_TicksOccured
 
-       .include "background_bit_shifter_double.s"
+       .include "core/background_bit_shifter_double.s"
        .global BitShifterDouble
 
-       .include "background_get_sprite_mem_pos.s"
+       .include "core/background_get_sprite_mem_pos.s"
        .global GetSpriteMempos
 
        .even

@@ -242,8 +242,8 @@ LevelLoop:
        .ppudo_ensure $PPU_SetPalette
 
     skip_palette_change$:
+       .equiv PicAddr, .+2
         MOV  $0x0000,R1
-       .equiv PicAddr, .-2
         BZE  1237$ # address is zero, no slide to display
         MOV  $FB0,R2
         CALL @$unlzsa1
@@ -251,11 +251,10 @@ LevelLoop:
         MOV  $FB0,R1
         MOV  $FB1+(12*2),R2
         MOV  $96,R3
-96$:    MOV  $4,R4
-4$:    .rept 4
-        MOV  (R1)+,(R2)+
-       .endr
-        SOB  R4,4$
+        96$:
+           .rept 16
+            MOV  (R1)+,(R2)+
+           .endr
         ADD  $24*2,R2
         SOB  R3,96$
 

@@ -289,6 +289,7 @@ ObjectLoop_AgelessIXLCheck:
            .equiv ObjectHitYA, .+2                  # ld a,(hl)   ;check Y of star
             CMPB R0,$0x00                           # cp 00 :ObjectHitYA_Plus1
             BHIS ObjectLoop_PlayerStarScanContinue  # jr nc,ObjectLoop_PlayerStarScanContinue
+
         ObjectLoop_PlayerStarSkip:
             INC  R4                                 # inc l
             INC  R4
@@ -311,7 +312,7 @@ ObjectLoop_AgelessIXLCheck:
                                                     # inc h
         INC  R4                                     # inc h
         MOVB (R4),R0                                # ld a,(hl)
-        # TODO: uncomment for two players
+      # TODO: uncomment for two players
        #BIC  $0xFF7F,R0                             # and %10000000   ; CHeck if this is player 1's bullet or not
        #                                            # dec h
        #                                            # dec h
@@ -630,17 +631,19 @@ ObjectProgram_Misc:
 
 ObjectProgram_MovePlayer: # Used by end of level code to make player fly to a point
       # R4 b = X, R1 c = Y, R3 iyl = Program
-      # TODO: uncomment for 2 players game
-       #MOV  $Player_Array2,R5
-       #CALL ObjectProgram_DoMovePlayer
+   .ifdef TwoPlayersGame
+        MOV  $Player_Array2,R5
+        CALL ObjectProgram_DoMovePlayer
+   .endif
 SpecialMoveChibiko:
         MOV  $Player_Array,R5
 
-# ObjectProgram_DoMovePlayer:
+ObjectProgram_DoMovePlayer:
         MOVB (R5),R0
         CMPB R0,R1
         BEQ  ObjectProgram_MovePlayerX
         BHIS ObjectProgram_MovePlayerYUp
+
         ADD  $8,R0
         BR   ObjectProgram_MovePlayerX
 ObjectProgram_MovePlayerYUp:

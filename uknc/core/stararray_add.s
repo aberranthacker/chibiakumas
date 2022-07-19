@@ -88,8 +88,8 @@ Stars_AddBurst_BottomWide:
     .byte 0x35,0x33
     .byte 0x3D,0x3B
     .byte 0
-# patterns above take 136 bytes of RAM
     .even
+# patterns above take 136 bytes of RAM
 
 Stars_AddToPlayer: # used by player_driver.s
         CLR  @$StarArrayFullMarker
@@ -218,9 +218,9 @@ Stars_SeekLoopNext:
         RETURN
 
 Stars_AddObjectBatch2:
-        # B = R3 = pattern (0-15)
-        # C = R1 = Y pos
-        # D = R2 = X pos
+      # B = R3 = pattern (0-15)
+      # C = R1 = Y pos
+      # D = R2 = X pos
         SUB  $16,R3
         MOVB StarsOneByteDirs(R3),R3
         BR   Stars_AddObjectFromR3
