@@ -41,7 +41,7 @@ ClrTextArea: # --------------------------------------------------------------{{{
                .endr
                 SOB  R0,1$
 #----------------------------------------------------------------------------}}}
-                # replace ROM with RAM in the range 0100000..0117777
+              # replace ROM with RAM in the range 0100000..0117777
                 MOV  $0x010,@$PASWCR
 # initialize our scanlines parameters table (SLTAB): ------------------------{{{
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -153,8 +153,8 @@ SLTABInit:      MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
                 MOV  R1,(R0)+        #--address of records 3..17
                 SOB  R2,1$
 
-                # we are switching from 2-word records to 4-word records
-                # so we have to align at 4 words (8 bytes)
+              # we are switching from 2-word records to 4-word records
+              # so we have to align at 4 words (8 bytes)
                 CLR  (R0)+           #--address of line 17
                 ADD  $0b1000,R1      #  align
 
@@ -178,7 +178,7 @@ SLTABInit:      MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
                 ADD  $8,R1           #  calculate pointer to next record
                 MOV  R1,(R0)+        #--pointer to the record 20
 #------------------------------------- top region, header
-                MOV  $OffscreenAreaAddr,R2     # scanlines 20..307 are visible
+                MOV  $OffscreenAreaAddr,R2 # scanlines 20..307 are visible
                 MOV  $43,R3          #
 2$:             MOV  R2,(R0)+        #--address of screenline
                 ADD  $4,R1           #  calc address of next record of SLTAB
@@ -186,8 +186,8 @@ SLTABInit:      MOV  $SLTAB,R0       # set R0 to beginning of SLTAB
                 ADD  $40,R2          #  calculate address of next screenline
                 SOB  R3,2$           #
 
-                # we are switching from 2-word records to 4-word records
-                # so we have to align at 8 bytes
+              # we are switching from 2-word records to 4-word records
+              # so we have to align at 8 bytes
                 MOV  R2,(R0)+        #--address of a screenline
                 BIS  $0b0010,R1      #  next record is 4-word
                 BIC  $0b0100,R1      #  display settings
@@ -290,7 +290,7 @@ PSGPresent:
                 MOV  $PPU_PPUCommandArg,@$PBPADR
                 CLR  @$PBP12D # inform bootstrap that the initialization is done
 
-                RETURN             # end of the init subroutine
+                RETURN        # end of the init subroutine
 #-------------------------------------------------------------------------------
 Trap4:
                .equiv Trap4Detected, .+4
@@ -1153,7 +1153,7 @@ CommandsQueue_Full:
         BR   .
         NOP
 #----------------------------------------------------------------------------}}}
-Channel0Out_IntHandler: #------------------------------------------------------------------
+Channel0Out_IntHandler: #-------------------------------------------------------
         RTI
 
        .include "music/ep1_title_music_playerconfig.s"

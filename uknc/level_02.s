@@ -311,7 +311,7 @@ HandAttack1:
    .word     evtSingleSprite, sprTwoFrame | 22+7, (24+ 12* 8)<<X | (24)<<Y
    .word     evtSingleSprite, sprTwoFrame | 22+7, (24+ 12*10)<<X | (24)<<Y
    .word     evtSingleSprite, sprTwoFrame | 22+7, (24+ 12*12)<<X | (24)<<Y
-   
+
    .word 79, evtMultipleCommands | 6
    .word     evtLoadObjSettings | 6
    .word     evtSingleSprite, sprTwoFrame | 21+9, (24)<<X | (24+ 24*0)<<Y
@@ -398,7 +398,7 @@ LevelLoop:
 
        .equiv FadeCommandCall, .+2
         CALL @$null
-                                            #
+
                                             #     ld a,r
                                             #     xor 0 :Randomizer_Plus1
                                             #     ld (Randomizer_Plus1-1),a

@@ -3,12 +3,12 @@
 
         CALL @$EventStream_Process
 
-        MOV  $LevelSprites,@$SprShow_BankAddr  
+        MOV  $LevelSprites,@$SprShow_BankAddr
         CALL @$ObjectArray_Redraw
 
         MOV  $ChibiSprites,@$SprShow_BankAddr
         CALL @$PlayerHandler
-        MOV  $ChibiSprites,@$SprShow_BankAddr  
+        MOV  $ChibiSprites,@$SprShow_BankAddr
         CALL @$Player_StarArray_Redraw
 
         CALL @$StarArray_Redraw

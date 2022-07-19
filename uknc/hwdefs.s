@@ -133,3 +133,6 @@
 
 .equiv CTRLRG, 0177716 # system control register
 
+.equiv PSG0, 0177360
+.equiv PSG1, 0177362
+.equiv PSG2, 0177364

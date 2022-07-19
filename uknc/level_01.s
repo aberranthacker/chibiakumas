@@ -669,8 +669,8 @@ Background_DrawB:
 # Tile Bitshifts ---------------------------------------------------------------
         MOV  (SP)+,R5 # ponter to the first tile
        .equiv TileWidthBytes, 8
-        # we do MOV  -(R5),R0 to read words, to be able to use ASH for shifts
-        # so R5 should point to next line
+      # we do MOV  -(R5),R0 to read words, to be able to use ASH for shifts
+      # so R5 should point to next line
         ADD  $TileWidthBytes,R5
 
         MOV  $0b11111100,R0     # shift on timer ticks
