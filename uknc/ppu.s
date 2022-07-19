@@ -1001,6 +1001,7 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
 # | 105 | 45 | HP      | Shift    | 177 | 7F | 9 / ) |           |
 #-----------------------------------------------------------------}}}
         MOV  R0,-(SP)
+        MOV  R1,-(SP)
         MOV  @$PBPADR,-(SP)
 
         MOV  $PPU_KeyboardScanner_P1,@$PBPADR
@@ -1009,32 +1010,36 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         BMI  key_released$
 
     key_pressed$: #------------------
-        CMPB R0,$070  # Y
+        MOV  $KeyPressesCodes,R1
+        CMPB R0,(R1)+
         BEQ  fire_right_pressed$
-
-        CMPB R0,$047  # F
+        CMPB R0,(R1)+
         BEQ  fire_left_pressed$
-
-        CMPB R0,$0134 # Down
+        CMPB R0,(R1)+
         BEQ  down_pressed$
-
-        CMPB R0,$0154 # Up
+        CMPB R0,(R1)+
         BEQ  up_pressed$
-
-        CMPB R0,$0133 # Right
+        CMPB R0,(R1)+
         BEQ  right_pressed$
-
-        CMPB R0,$0116 # Left
+        CMPB R0,(R1)+
         BEQ  left_pressed$
-
-        CMPB R0,$046  # УПР
+        CMPB R0,(R1)+
         BEQ  fire_smartbomb_pressed$
-
-        CMPB R0,$015  # К5
+        CMPB R0,(R1)+
         BEQ  pause_pressed$
 
         BR   1237$
     #--------------------------------
+    KeyPressesCodes:
+        FireRight: .byte 070  # Y
+        FireLeft:  .byte 047  # F
+        MoveDown:  .byte 0134 # Down
+        MoveUp:    .byte 0154 # Up
+        MoveRight: .byte 0133 # Right
+        MoveLeft:  .byte 0116 # Left
+        SmartBomb: .byte 046  # УПР
+        Pause:     .byte 015  # К5
+
     key_released$: #-----------------
         CMPB R0,$0210  # Y
         BEQ  fire_right_released$
@@ -1045,7 +1050,7 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         CMPB R0,$0214 # Up? or Down?
         BNE  not_up_down$
 
-        BITB @$PBP12D,$1
+        BITB @$PBP12D,$2
         BZE  up_released$
         BR   down_released$
 
@@ -1064,50 +1069,50 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
 
         BR   1237$
     #--------------------------------
-    down_pressed$: #-----------------
+    fire_smartbomb_pressed$: #-------
         MOV  $0x01,R0
         BR   set_bit$
-    up_pressed$:
+    down_pressed$: 
         MOV  $0x02,R0
         BR   set_bit$
-    right_pressed$:
+    up_pressed$:
         MOV  $0x04,R0
         BR   set_bit$
-    left_pressed$:
+    right_pressed$:
         MOV  $0x08,R0
         BR   set_bit$
-    fire_right_pressed$:
+    left_pressed$:
         MOV  $0x10,R0
         BR   set_bit$
-    fire_left_pressed$:
+    fire_right_pressed$:
         MOV  $0x20,R0
         BR   set_bit$
-    fire_smartbomb_pressed$:
+    fire_left_pressed$:
         MOV  $0x40,R0
         BR   set_bit$
     pause_pressed$:
         MOV  $0x80,R0
         BR   set_bit$
     #--------------------------------
-    down_released$: #----------------
+    fire_smartbomb_released$: #------
         MOV  $0x01,R0
         BR   clear_bit$
-    up_released$:
+    down_released$:
         MOV  $0x02,R0
         BR   clear_bit$
-    right_released$:
+    up_released$:
         MOV  $0x04,R0
         BR   clear_bit$
-    left_released$:
+    right_released$:
         MOV  $0x08,R0
         BR   clear_bit$
-    fire_right_released$:
+    left_released$:
         MOV  $0x10,R0
         BR   clear_bit$
-    fire_left_released$:
+    fire_right_released$:
         MOV  $0x20,R0
         BR   clear_bit$
-    fire_smartbomb_released$:
+    fire_left_released$:
         MOV  $0x40,R0
         BR   clear_bit$
     pause_released$:
@@ -1122,6 +1127,7 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
 
 1237$:
         MOV  (SP)+,@$PBPADR
+        MOV  (SP)+,R1
         MOV  (SP)+,R0
         RTI
 #----------------------------------------------------------------------------}}}

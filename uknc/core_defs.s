@@ -120,23 +120,21 @@
 # PPU memory map ---------------------------------------------------------------
 .equiv PPU_UserRamStart, 0023666 # 10166 0x27B6
 
-.equiv PPU_StrBuffer, 0047630 # 20376 0x4F98 # auto-generated during a build
-#.equiv PPU_MusicBuffer, PPU_StrBuffer + 320
-
 .equiv PPU_UserProcessMetadataAddr, 0077772 # 32762 0x7FFA
 
-.equiv SLTAB, 0100000# 32768 0x8000
+.equiv SLTAB, 0100000 # 32768 0x8000
 .equiv OffscreenAreaAddr, 0140000 # 49152 0xC000
 #-end of PPU memory map---------------------------------------------------------
-.equiv Keymap_Down,  0x01
-.equiv Keymap_Up,    0x02
-.equiv Keymap_Right, 0x04
-.equiv Keymap_Left,  0x08
-.equiv Keymap_F1,    0x10
-.equiv Keymap_F2,    0x20
-.equiv Keymap_F3,    0x40
+#-------------------------------------------------------------------------------
 .equiv Keymap_Pause, 0x80
-.equiv Keymap_AnyFire, 0b01110000
+.equiv Keymap_F2,    0x40
+.equiv Keymap_F1,    0x20
+.equiv Keymap_Left,  0x10
+.equiv Keymap_Right, 0x08
+.equiv Keymap_Up,    0x04
+.equiv Keymap_Down,  0x02
+.equiv Keymap_F3,    0x01
+.equiv Keymap_AnyFire, 0b01100001
 #-------------------------------------------------------------------------------
 .equiv chr1Up,   0x7B # 0173
 .equiv chr2Up,   0x7C # 0174
