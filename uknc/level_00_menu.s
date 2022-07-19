@@ -104,7 +104,7 @@ ShowTitlePic_Loop: #---------------------------------------------------------{{{
         MOV  $5,R0
     100$:
         WAIT
-        BITB @$KeyboardScanner_P1,$Keymap_AnyFire
+        BITB $Keymap_AnyFire,@$KeyboardScanner_P1
         BNZ  finalize_title_pic_loop$
 
         SOB  R0,100$
@@ -239,9 +239,9 @@ OnscreenCursor: #------------------------------------------------------------{{{
         BEQ  draw_cursor$
 
         MOV  R0,@$LastKeyMapChange
-    # is down pressed?
-        ROR  R0
-        BCC  not_down$
+      # is down pressed?
+        BITB $Keymap_Down,R0
+        BZE  not_down$
 
        .equiv CursorMaxY, .+2
         CMP  R4,$0x11
@@ -254,8 +254,8 @@ OnscreenCursor: #------------------------------------------------------------{{{
         INC  R4 # skip "Start 2 Players Game"
 
     not_down$:
-        ROR  R0
-        BCC  not_up$
+        BITB $Keymap_Up,R0
+        BZE  not_up$
 
        .equiv CursorMinY, .+2
         CMP  R4,$0x0C
@@ -268,8 +268,8 @@ OnscreenCursor: #------------------------------------------------------------{{{
         DEC  R4 # skip "Start as Bochan"
 
     not_up$:
-        ROR  R0
-        BCC  not_right$
+        BITB $Keymap_Right,R0
+        BZE  not_right$
 
        .equiv CursorMaxX, .+2
         CMP  R3,$0x26
@@ -277,8 +277,8 @@ OnscreenCursor: #------------------------------------------------------------{{{
         ADD  R1,R3
 
     not_right$:
-        ROR  R0
-        BCC  not_left$
+        BITB $Keymap_Left,R0
+        BZE  not_left$
 
        .equiv CursorMinX, .+2
         CMP  R3,$0x02

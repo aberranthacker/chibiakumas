@@ -126,11 +126,13 @@ Player_HandlerOne:                      # Player_HandlerOne:
                                         #     ld (PlayerSpriteBank_Plus1-1),a; call Akuyou_BankSwitch_C0_SetCurrent
                                         #     ld a,ixl
       # Check if the game is paused
-        BIT  $Keymap_Pause, @$KeyboardScanner_P1
-        BZE  Player_Handler_PauseCheckDone
+        TSTB @$KeyboardScanner_P1
+        BPL  Player_Handler_PauseCheckDone
 
-   1$:  BIT  $Keymap_Pause, @$KeyboardScanner_P1
-        BNZ  1$
+        CheckIfPauseKeyReleased:
+            TSTB @$KeyboardScanner_P1
+        BMI  CheckIfPauseKeyReleased
+
         COM  @$Timer_Pause # Z=normal, NZ=paused
 
 1237$:  RETURN
@@ -166,19 +168,19 @@ Player_Handler_DronePosOk:
        .equiv PlayerMoveSpeedFast, .+2
         MOV  $8,R3 # Fast move speed - will be overriden if we're firing
 
-        MOV  @$KeyboardScanner_P1,R0
-# SelfModifyingFire1:
-        BIT  $Keymap_F2,R0
-        BZE  Player_Handler_KeyreadJoy1Fire2
-        # fire bullets
-# SelfModifyingFire2:
-        BIT  $Keymap_F1,R0
-        BZE  Player_Handler_KeyreadJoy1Fire1
+        MOV  @$KeyboardScanner_P1,R4
+        ROLB R4 # push out pause bit
+
+        ROLB R4 # push out fire left bit
+        BCC  Player_Handler_KeyreadJoy1Fire2
+
+        ROLB R4 # push out fire right bit
+        BCC  Player_Handler_KeyreadJoy1Fire1
 
       # Xfire is a secret feature planned for the sequel
       # it activates when both fire buttons are pressed
        #CALL Player_Handler_FireX
-        BR   Player_Handler_KeyreadJoy1Up
+        BR   Player_Handler_KeyreadJoy1Left
 
 Player_Handler_KeyreadJoy1Fire1: # Fire right
        .equiv Fire1Handler, .+2
@@ -186,42 +188,21 @@ Player_Handler_KeyreadJoy1Fire1: # Fire right
 
        .equiv PlayerMoveSpeedSlow1, .+2
         MOV  $2,R3 # slow move speed as we're firing
-        BR   Player_Handler_KeyreadJoy1Up
+        BR   Player_Handler_KeyreadJoy1Left
 
 Player_Handler_KeyreadJoy1Fire2: # Fire left
-# SelfModifyingFire1B: # supposed to be reset from bootstrap
-        BIT  $Keymap_F1,R0
-        BZE  Player_Handler_KeyreadJoy1Up
+        ROLB R4 # push out fire right bit
+        BCC  Player_Handler_KeyreadJoy1Left
 
        .equiv Fire2Handler, .+2
         CALL @$SetFireDir_RIGHTsave # fire bullets
 
        .equiv PlayerMoveSpeedSlow2, .+2
         MOV  $2,R3 # Slow move speed as we're firing
-Player_Handler_KeyreadJoy1Up:
-        BIT  $Keymap_Up,@$KeyboardScanner_P1
-        BZE  Player_Handler_KeyreadJoy1Down
-        CMP  R1,$24+ 24 # Check we're onscreen
-        BLO  Player_Handler_KeyreadJoy1Down
-
-        SUB  R3,R1
-       .equiv FireUpHandler, .+2
-        CALL @$null
-
-Player_Handler_KeyreadJoy1Down:
-        BIT  $Keymap_Down,@$KeyboardScanner_P1
-        BZE  Player_Handler_KeyreadJoy1Left
-
-        CMP  R1,$24+ 200-16 # Check we're onscreen
-        BHIS Player_Handler_KeyreadJoy1Left
-
-        ADD  R3,R1
-       .equiv FireDownHandler, .+2
-        CALL @$null
 
 Player_Handler_KeyreadJoy1Left:
-        BIT  $Keymap_Left,@$KeyboardScanner_P1
-        BZE  Player_Handler_KeyreadJoy1Right
+        ROLB R4 # push out move left bit
+        BCC  Player_Handler_KeyreadJoy1Right
 
         CMP  R2,$24+ 12 # Check we're onscreen
         BLO  Player_Handler_KeyreadJoy1Right
@@ -231,19 +212,41 @@ Player_Handler_KeyreadJoy1Left:
         CALL @$null
 
 Player_Handler_KeyreadJoy1Right:
-        BIT  $Keymap_Right,@$KeyboardScanner_P1
-        BZE  Player_Handler_SmartBomb
+        ROLB R4 # push out move right bit
+        BCC  Player_Handler_KeyreadJoy1Up
 
         CMP  R2,$24+ 160-12 # Check we're onscreen
-        BHIS Player_Handler_SmartBomb
+        BHIS Player_Handler_KeyreadJoy1Up
 
         ADD  R3,R2
        .equiv FireRightHandler, .+2
         CALL @$null
 
+Player_Handler_KeyreadJoy1Up:
+        ROLB R4 # push out move up bit
+        BCC  Player_Handler_KeyreadJoy1Down
+
+        CMP  R1,$24+ 24 # Check we're onscreen
+        BLO  Player_Handler_KeyreadJoy1Down
+
+        SUB  R3,R1
+       .equiv FireUpHandler, .+2
+        CALL @$null
+
+Player_Handler_KeyreadJoy1Down:
+        ROLB R4 # push out move down bit
+        BCC  Player_Handler_SmartBomb
+
+        CMP  R1,$24+ 200-16 # Check we're onscreen
+        BHIS Player_Handler_SmartBomb
+
+        ADD  R3,R1
+       .equiv FireDownHandler, .+2
+        CALL @$null
+
 Player_Handler_SmartBomb: # Check if we should fire the smarbomb
-        BIT  $Keymap_F3,@$KeyboardScanner_P1
-        BZE  Player_Handler_KeyreadDone
+        ROLB R4 # push out smartbomb bit
+        BCC  Player_Handler_KeyreadDone
 
         TST  @$SmartBombTimer # smartbomb active?
         BNZ  Player_Handler_KeyreadDone
