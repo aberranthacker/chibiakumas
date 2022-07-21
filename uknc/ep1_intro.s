@@ -207,7 +207,7 @@ LevelLoop:
        .equiv dstDoubleStreamProcess, .+2
         CALL @$null
 
-        BITB @$KeyboardScanner_P1,$Keymap_AnyFire
+        BITB $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
         BNZ  EndLevel
 
         CALL @$ObjectArray_Redraw

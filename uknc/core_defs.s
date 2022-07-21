@@ -129,15 +129,15 @@
 .equiv OffscreenAreaAddr, 0160000 # 49152 0xC000 # banks 0, 1 and 2
 #-end of VRAM memory map--------------------------------------------------------
 #-------------------------------------------------------------------------------
-.equiv Keymap_Pause, 0x80
-.equiv Keymap_F2,    0x40
-.equiv Keymap_F1,    0x20
-.equiv Keymap_Left,  0x10
-.equiv Keymap_Right, 0x08
-.equiv Keymap_Up,    0x04
-.equiv Keymap_Down,  0x02
-.equiv Keymap_F3,    0x01
-.equiv Keymap_AnyFire, 0b01100001
+.equiv KEYMAP_PAUSE, 0x80
+.equiv KEYMAP_F2,    0x40
+.equiv KEYMAP_F1,    0x20
+.equiv KEYMAP_LEFT,  0x10
+.equiv KEYMAP_RIGHT, 0x08
+.equiv KEYMAP_UP,    0x04
+.equiv KEYMAP_DOWN,  0x02
+.equiv KEYMAP_F3,    0x01
+.equiv KEYMAP_ANY_FIRE, 0b01100001
 #-------------------------------------------------------------------------------
 .equiv chr1Up,   0x7B # 0173
 .equiv chr2Up,   0x7C # 0174
