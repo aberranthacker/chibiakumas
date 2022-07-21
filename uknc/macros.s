@@ -18,27 +18,37 @@
 .endm
 
 .macro .inform_and_hang str
-   .ppudo_ensure $PPU_DebugPrintAt, $.+14
+   .ppudo_ensure $PPU_DebugPrintAt, $inform_and_hang_string\@
     BR   .
+inform_and_hang_string\@:
    .byte 0,1
    .asciz "\str"
    .even
 .endm
 
 .macro .inform_and_hang2 str
-   .ppudo_ensure $PPU_DebugPrintAt, $.+14
+   .ppudo_ensure $PPU_DebugPrintAt, $inform_and_hang2_string\@
     BR   .
+inform_and_hang2_string\@:
    .byte 0,2
    .asciz "\str"
    .even
 .endm
 
 .macro .inform_and_hang3 str
-   .ppudo_ensure $PPU_DebugPrintAt, $.+14
+   .ppudo_ensure $PPU_DebugPrintAt, $inform_and_hang3_string\@
     BR   .
+inform_and_hang3_string\@:
    .byte 0,3
    .asciz "\str"
    .even
+.endm
+
+.macro .check_for_loading_error file_name
+    BCC no_loading_error\@
+   .inform_and_hang3 "\file_name loading error"
+
+no_loading_error\@:
 .endm
 
 # generic macros

@@ -22,7 +22,7 @@ ScreenBuffer_Reset:
         MOV  $0x4000, @$StarArray_ActiveScreen
         MOVB $0x40, @$FB_MSB
         MOV  $FB1, @$ScreenBuffer_ActiveScreen
-       .ppudo_ensure $PPU_ShowFB1
+        MOV  $1,@$CCH1OD
         CALL CLS
         RETURN
 
@@ -34,16 +34,16 @@ ScreenBuffer_Init:
         CALL CLS
         MOV  $FB1, @$ScreenBuffer_ActiveScreen
         CALL CLS
-       .ppudo_ensure $PPU_ShowFB0
+        MOV  $0,@$CCH1OD
         RETURN
 
 ScreenBuffer_Flip:
         TST  @$ScreenBuffer_ActiveScreenDirect
         BZE  ScreenBuffer_SetFB1Active
 
-ScreenBuffer_SetFB0Active:
       # FB1 active, switch to FB0
-       .ppudo_ensure $PPU_ShowFB1
+ScreenBuffer_SetFB0Active:
+        MOV  $1,@$CCH1OD
         CLR  @$ScreenBuffer_ActiveScreenDirect
         CLR  @$StarArray_ActiveScreen
         CLRB @$FB_MSB
@@ -51,9 +51,9 @@ ScreenBuffer_SetFB0Active:
         MOV  R5, @$ScreenBuffer_ActiveScreen
         RETURN
 
-ScreenBuffer_SetFB1Active:
       # FB0 active, switch to FB1
-       .ppudo_ensure $PPU_ShowFB0
+ScreenBuffer_SetFB1Active:
+        MOV  $0,@$CCH1OD
         MOV  $0x4000,R5
         MOV  R5, @$ScreenBuffer_ActiveScreenDirect
         MOV  R5, @$StarArray_ActiveScreen

@@ -10,45 +10,45 @@
 .equiv Level1, 0x0001
 .equiv Level2, 0x0002
 
- .equiv StartOnLevel, MainMenu
+#.equiv StartOnLevel, MainMenu
 #.equiv StartOnLevel, Episode1_Intro
-#.equiv StartOnLevel, Level1
+ .equiv StartOnLevel, Level1
 #.equiv StartOnLevel, Level2
 
 .if StartOnLevel == MainMenu
   .equiv ShowLoadingScreen, 1
 .endif
 
-.equiv PPU_PPUCommandArg, PPUCommandArg >> 1
+.equiv CPU_PPUCommandArg, PPUCommandArg >> 1
 
-.equiv PPU_NOP,           0
-.equiv PPU_Finalize,      2
-.equiv PPU_SingleProcess, 4
-.equiv PPU_MultiProcess,  6
-.equiv PPU_SetPalette,    8
-.equiv PPU_Print,        10
-.equiv PPU_PrintAt,      12
-.equiv PPU_FlipFB,       14
-.equiv PPU_ShowFB0,      16
-.equiv PPU_ShowFB1,      18
-.equiv PPU_LoadText,     20
-.equiv PPU_ShowBossText, 22
-.equiv PPU_LoadMusic,    24
-.equiv PPU_MusicRestart, 26
-.equiv PPU_MusicStop,    28
-.equiv PPU_DebugPrint,   30
-.equiv PPU_DebugPrintAt, 32
-.equiv PPU_TitleMusicRestart, 34
-.equiv PPU_IntroMusicRestart, 36
-.equiv PPU_LevelMusicRestart, 38
-.equiv PPU_BossMusicRestart,  40
-.equiv PPU_PlaySoundEffect1,  42
-.equiv PPU_PlaySoundEffect2,  44
-.equiv PPU_PlaySoundEffect3,  46
-.equiv PPU_PlaySoundEffect4,  48
-.equiv PPU_PlaySoundEffect5,  50
-.equiv PPU_PlaySoundEffect6,  52
-.equiv PPU_PlaySoundEffect7,  54
+.equiv PPU_NOP,                0
+.equiv PPU_Finalize,           2
+.equiv PPU_SingleProcess,      4
+.equiv PPU_MultiProcess,       6
+.equiv PPU_SetPalette,         8
+.equiv PPU_Print,             10
+.equiv PPU_PrintAt,           12
+.equiv PPU_LoadText,          14
+.equiv PPU_ShowBossText,      16
+.equiv PPU_LoadMusic,         18
+.equiv PPU_MusicRestart,      20
+.equiv PPU_MusicStop,         22
+.equiv PPU_DebugPrint,        24
+.equiv PPU_DebugPrintAt,      26
+.equiv PPU_TitleMusicRestart, 28
+.equiv PPU_IntroMusicRestart, 30
+.equiv PPU_LevelMusicRestart, 32
+.equiv PPU_BossMusicRestart,  34
+.equiv PPU_PlaySoundEffect1,  36
+.equiv PPU_PlaySoundEffect2,  38
+.equiv PPU_PlaySoundEffect3,  40
+.equiv PPU_PlaySoundEffect4,  42
+.equiv PPU_PlaySoundEffect5,  44
+.equiv PPU_PlaySoundEffect6,  46
+.equiv PPU_PlaySoundEffect7,  48
+.equiv PPU_StartANewGame,     50
+.equiv PPU_LevelEnd,          52
+.equiv PPU_DrawPlayerUI,      54
 
 .equiv PPU_LastJMPTableIndex, 54
 #-------------------------------------------------------------------------------
@@ -119,12 +119,15 @@
 #-------------------------------------------------------------------------------
 # PPU memory map ---------------------------------------------------------------
 .equiv PPU_UserRamStart, 0023666 # 10166 0x27B6
-
+.equiv PPU_UserRamEnd,   0077771 # 32761 0x7FF9
 .equiv PPU_UserProcessMetadataAddr, 0077772 # 32762 0x7FFA
-
-.equiv SLTAB, 0100000 # 32768 0x8000
-.equiv OffscreenAreaAddr, 0140000 # 49152 0xC000
 #-end of PPU memory map---------------------------------------------------------
+#-------------------------------------------------------------------------------
+# VRAM memory map --------------------------------------------------------------
+.equiv SLTAB, 0100000 # 32768 0x8000 # bank 0
+.equiv BootstrapCopyAddr, 0100000 # banks 1 and 2
+.equiv OffscreenAreaAddr, 0160000 # 49152 0xC000 # banks 0, 1 and 2
+#-end of VRAM memory map--------------------------------------------------------
 #-------------------------------------------------------------------------------
 .equiv Keymap_Pause, 0x80
 .equiv Keymap_F2,    0x40
@@ -170,3 +173,4 @@
 .equiv untilEndOfScreen, 201
 .equiv endOfScreen, 201
 #-------------------------------------------------------------------------------
+.equiv COIN_COST, 4

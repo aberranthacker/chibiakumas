@@ -1,7 +1,7 @@
 .equiv PR7, 7 * 040 # highest priority to the processor
-                    # MTPS PR7 disables interrupts
+                    # MTPS $PR7 disables interrupts
 .equiv PR0, 0       # lowest priority to the processor
-                    # MTPS PR0 enables interrupts
+                    # MTPS $PR0 enables interrupts
 
 # CPU USER mode interrupt vectors and priorities
 # Vect Prty Source

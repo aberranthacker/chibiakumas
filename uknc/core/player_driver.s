@@ -142,7 +142,7 @@ Player_HandlerOne:                      # Player_HandlerOne:
 Player_Handler_PauseCheckDone:
         MOV  @$Timer_TicksOccured,R0
         BZE  1237$  # abort handler if game paused
-                                       # xor a
+
         CLR  @$PlayerSaveShot
         CLR  @$PlayerDoFire
 
@@ -671,7 +671,7 @@ Player_Hit_Points:
        #ADD  $5,R0
        #MOVB R0,13(R5)
         MOVB @$P1_P13,R0
-        ADD  $5,R0
+        ADD  $COIN_COST,R0
         MOVB R0,@$P1_P13
         RETURN
 
@@ -863,15 +863,15 @@ Player_DrawUIDual:
 1237$:  RETURN # to use with player_driver.s:831
 
 Player1DrawUI:
-        MOV  $4,R0 # icon width, bytes        # ld a,4
-        CLR  R2    # Xpos, word               # ld b,0
-        CALL Player_DrawUIDual                # call Player_DrawUIDual
+        MOV  $4,R0 # icon width, bytes  # ld a,4
+        CLR  R2    # Xpos, word         # ld b,0
+        CALL Player_DrawUIDual          # call Player_DrawUIDual
 
-                                              # ld a,7
-                                              # ld hl,&0003
-                                              # ld iy,Player_Array
-                                              # ld de,Player_ScoreBytes
-        BR   Player_DrawUI_PlusAsWell         # jr Player_DrawUI_PlusAsWell
+                                        # ld a,7
+                                        # ld hl,&0003
+                                        # ld iy,Player_Array
+                                        # ld de,Player_ScoreBytes
+        BR   Player_DrawUI_PlusAsWell   # jr Player_DrawUI_PlusAsWell
 
    .ifdef TwoPlayersGame
 Player2DrawUI:
@@ -891,53 +891,6 @@ Player2DrawUI:
    .endif
 
 Player_DrawUI_PlusAsWell:
-                                        #     ld (PlayerScorePos_Plus2 - 1),a
-                                        #     ld (BurstDrawPos_Plus2 - 2),hl
-                                        #     push de
-                                        #     push iy
-                                        #
-                                        #         ;Draw score digits
-                                        #         ld hl,&0700:PlayerScorePos_Plus2
-                                        #         call DrawText_LocateSprite
-                                        #
-                                        #         call SpriteBank_Font2
-                                        #
-                                        #         ex hl,de
-                                        #
-                                        # Player_DrawUI_NextDigit:
-                                        #     push hl
-                                        #
-                                        #         ld a,(hl)
-                                        #         add 48 ; Move to the correct digit (first 32 are not in font)
-                                        #
-                                        #         ld b,-2 ; we are drawing backwards!
-                                        #
-                                        #         call DrawText_CharSpriteDirect ;DrawText_DigitSprite
-                                        #
-                                        #     pop hl
-                                        #         inc l
-                                        #         ld a,%00000111
-                                        #         and l
-                                        #         jp nz,Player_DrawUI_NextDigit
-                                        #     pop iy
-                                        #     pop hl
-                                        #     ; check if we need to show the continue screen
-                                        #
-                                        # ScoreAddRepeat: ;This does our rolling up effect on the score!
-                                        #     push hl
-                                        #         call Player_UpdateScore
-                                        #     pop hl
-                                        #     ld a,(iy+13)
-                                        #     cp 30  ; if waiting score goes over 30, add faster
-                                        #     jr nc,ScoreAddRepeat ; this is for the 'coffee time' effect at the
-                                        #                          ; end of level 9
-                                        #
-                                        #     ;Show the remaining 'burst fire' power
-                                        #     ld hl,&0003 : BurstDrawPos_Plus2
-                                        #     call DrawText_LocateSprite
-                                        #     ld a,(iy+10)
-                                        #     or a
-                                        #     call nz,DrawText_Decimal
        .equiv CheadMode, .
         RETURN                          #     ret: CheatMode_Plus1
 
@@ -952,52 +905,4 @@ Player_DrawUI_PlusAsWell:
                                         #     ld (P1_P14),a
                                         #     ld a,%00000001
                                         #     ld (P1_P11),a
-                                        # ret
-                                        #
-                                        # Player_UpdateScore:         ;Add score to the first digit
-                                        #     ld a,(iy+13)
-                                        #     or a
-                                        #     ret z ;nothing to add
-                                        #     ld b,a
-                                        #     ld c,0
-                                        #     dec a
-                                        #     ld (iy+13),a
-                                        #
-                                        #     ld a,(hl)
-                                        #     inc a
-                                        #     ld (hl),a
-                                        #     cp 10
-                                        #     ret C   ; return if nothing to carry
-                                        #     inc c   ; We've rolled into another digit.
-                                        #
-                                        # Player_AddScore_NextDigit:
-                                        #     xor a
-                                        #     cp c
-                                        #     ret z   ; check if C is zero
-                                        #
-                                        #     ld c,a
-                                        #     ld a,(hl)
-                                        #     inc a
-                                        #     cp 10
-                                        #     jp C,Player_AddScore_Inc
-                                        #     xor a
-                                        #     inc c
-                                        #
-                                        # Player_AddScore_Inc:
-                                        #     ld (hl),a
-                                        #     inc l
-                                        #     ld a,l
-                                        #     and 7
-                                        #     cp 3
-                                        #     jp nz,NoBurstPower
-                                        #     ld a,(iy+10)
-                                        #     add 10
-                                        #     jr nc,Player_AddScore_NoOverflow
-                                        #     ld a,255
-                                        # Player_AddScore_NoOverflow:
-                                        #     ld (iy+10),a
-                                        # NoBurstPower:
-                                        #     ld a,%00000111
-                                        #     or l    ; repeat until we get to 8 - if so we've run out of digits
-                                        #     jr nz,Player_AddScore_NextDigit
                                         # ret

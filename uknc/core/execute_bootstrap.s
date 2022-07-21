@@ -1,13 +1,14 @@
 
 ExecuteBootstrap:
        .ppudo_ensure $PPU_MusicStop
+       .ppudo_ensure $PPU_LevelEnd
         CALL ScreenBuffer_Reset
 
         MOV  $BootstrapSizeDWords,R0
         MOV  $CBPADR,R1
         MOV  $CBP12D,R2
         MOV  $BootstrapStart,R3
-        MOV  $0x8000,(R1)
+        MOV  $BootstrapCopyAddr,(R1)
 
         100$:
            .rept 2

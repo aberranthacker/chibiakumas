@@ -22,51 +22,70 @@
                 .=BootstrapStart
 start:
 Bootstrap_Launch: # used by bootsector linker script
-        MOV  $BootstrapSizeDWords,R0
-        MOV  $CBPADR,R1
-        MOV  $CBP12D,R2
-        MOV  $BootstrapStart,R3
-        MOV  $0x8000,(R1)
-
-        100$:
-            .rept 2
-             MOV  (R3)+,(R2)
-             INC  (R1)
-            .endr
-        SOB  R0,100$
-
 # Load core modules ---------------------------------------------------------{{{
         MOV  $ppu_module.bin,R0
-        CALL Bootstrap_LoadDiskFile
+        CALL Bootstrap_LoadDiskFile_Start
+          # copy the bootstrap to upper memory while PPU module loads
+            MOV  $BootstrapSizeDWords,R0
+            MOV  $CBPADR,R1
+            MOV  $CBP12D,R2
+            MOV  $BootstrapStart,R3
+            MOV  $BootstrapCopyAddr,(R1)
+            100$:
+                .rept 2
+                 MOV  (R3)+,(R2)
+                 INC  (R1)
+                .endr
+            SOB  R0,100$
+        CALL Bootstrap_LoadDiskFile_WaitForFinish
 
+      # PPU will clear the value when finishes initializiton
         MOV  $-1,@$PPUCommandArg
+
         JSR  R5,@$PPEXEC
        .word FB1 # PPU module location
        .word PPU_ModuleSizeWords
 
-Bootstrap_Launch_WaitForPPUInit:
-        TST  @$PPUCommandArg
+      # clear offscreen area bitplanes 1 and 2  while PPU module initializes
+        MOV  $88*40>>2,R0
+        MOV  $CBPADR,R5
+        MOV  $OffscreenAreaAddr,(R5)
+        MOV  $CBP12D,R4
+        200$:
+           .rept 1<<2
+            CLR  (R4)
+            INC  (R5)
+           .endr
+        SOB  R0,200$
+
+        Bootstrap_Launch_WaitForPPUInit:
+            TST  @$PPUCommandArg
         BNZ  Bootstrap_Launch_WaitForPPUInit
         #-----------------------------------------------------------------------
      .ifdef ShowLoadingScreen
         MOV  $loading_screen.bin,R0
-        CALL Bootstrap_LoadDiskFile
-       .ppudo_ensure $PPU_SetPalette, $TitleScreenPalette
-     .else
-      # clear main screen area
-        MOV  $8000>>3, R0
-        MOV  $FB1, R1
-        CLR  R3
-        1$:
-           .rept 1<<3
-            MOV  R3, (R1)+
-           .endr
-        SOB  R0, 1$
+        CALL Bootstrap_LoadDiskFile_Start
+           .ppudo_ensure $PPU_SetPalette, $TitleScreenPalette
+        CALL Bootstrap_LoadDiskFile_WaitForFinish
      .endif
         #-----------------------------------------------------------------------
         # Load the game core - this is always in memory
         MOV  $core.bin,R0
-        CALL Bootstrap_LoadDiskFile
+        CALL Bootstrap_LoadDiskFile_Start
+       .ifndef ShowLoadingScreen
+          # clear main screen area
+            MOV  $8000>>3, R0
+            MOV  $FB1, R1
+            CLR  R3
+            1$:
+               .rept 1<<3
+                MOV  R3, (R1)+
+               .endr
+            SOB  R0, 1$
+       .endif
+        CALL Bootstrap_LoadDiskFile_WaitForFinish
+       .check_for_loading_error "core.bin"
+
        .ifdef ExtMemCore # copy core to extended memory
             MOV  $GameVarsEnd,R4
             MOV  $CoreStart,R5
@@ -77,12 +96,8 @@ Bootstrap_Launch_WaitForPPUInit:
             SOB R1,200$
        .endif
 
-        BCC  10$
-       .inform_and_hang3 "core.bin loading error"
-10$:
         # TODO: Load saved settings
         # TODO: player sprites load
-        # TODO: Initialize the Sound Effects.
 #----------------------------------------------------------------------------}}}
 
         MOV  $StartOnLevel,R5
@@ -116,7 +131,7 @@ Bootstrap_Level:
     .ifdef DebugMode
         CMP  R5,$2
         BLOS 1$
-        .inform_and_hang "bootstrap: no levels further than 2"
+       .inform_and_hang2 "bootstrap: no levels further than 2"
         1$:
     .endif
         ASL  R5
@@ -129,94 +144,67 @@ Bootstrap_Level:
 Bootstrap_StartGame:
 
 Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
-        CALL StartANewGame
-        CALL LevelReset0000
-
         MOV  $level_00.bin,R0
-        CALL Bootstrap_LoadDiskFile
-        BCC  1$
-       .inform_and_hang3 "level_00.bin loading error"
-1$:
+        CALL Bootstrap_LoadDiskFile_Start
+            CALL StartANewGame
+            CALL LevelReset0000
+        CALL Bootstrap_LoadDiskFile_WaitForFinish
+       .check_for_loading_error "level_00.bin"
+
        .ppudo_ensure $PPU_SingleProcess
         MOV  $SPReset,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
 Bootstrap_Level_Intro:
-       .ppudo_ensure $PPU_SetPalette, $BlackPalette
-        CALL LevelReset0000
-
         MOV  $ep1_intro.bin,R0
-        CALL Bootstrap_LoadDiskFile
-        BCC  1$
-       .inform_and_hang3 "ep1_intro.bin loading error"
-    1$:
+        CALL Bootstrap_LoadDiskFile_Start
+           .ppudo_ensure $PPU_SetPalette, $BlackPalette
+            CALL LevelReset0000
+        CALL Bootstrap_LoadDiskFile_WaitForFinish
+       .check_for_loading_error "ep1_intro.bin"
+
         MOV  $ep1_intro_slides.bin,R0
-        CALL Bootstrap_LoadDiskFile
-        BCC  2$
-       .inform_and_hang3 "ep1_intro_slides.bin loading error"
-    2$:
+        CALL Bootstrap_LoadDiskFile_Start
+        CALL Bootstrap_LoadDiskFile_WaitForFinish
+       .check_for_loading_error "ep1_intro_slides.bin"
+
        .ppudo_ensure $PPU_SingleProcess
         MOV  $SPReset,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
 Bootstrap_Level_1: # --------------------------------------------------------
-       .ppudo_ensure $PPU_SetPalette, $BlackPalette
-        CALL LevelReset0000
-
         MOV  $level_01.bin,R0
-        CALL Bootstrap_LoadDiskFile
-        BCC  1$
-       .inform_and_hang3 "level_01.bin loading error"
-    1$:
+        CALL Bootstrap_LoadDiskFile_Start
+           .ppudo_ensure $PPU_SetPalette, $BlackPalette
+            CALL LevelReset0000
+        CALL Bootstrap_LoadDiskFile_WaitForFinish
+       .check_for_loading_error "level_01.bin"
+
        .ppudo_ensure $PPU_SingleProcess
         MOV  $SPReset,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
 Bootstrap_Level_2: # --------------------------------------------------------
-       .ppudo_ensure $PPU_SetPalette, $BlackPalette
-        CALL LevelReset0000
-
         MOV  $level_02.bin,R0
-        CALL Bootstrap_LoadDiskFile
-        BCC  1$
-       .inform_and_hang3 "level_02.bin loading error"
-    1$:
+        CALL Bootstrap_LoadDiskFile_Start
+           .ppudo_ensure $PPU_SetPalette, $BlackPalette
+            CALL LevelReset0000
+        CALL Bootstrap_LoadDiskFile_WaitForFinish
+       .check_for_loading_error "level_02.bin"
+
        .ppudo_ensure $PPU_SingleProcess
         MOV  $SPReset,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
 
+BootsStrap_ContinueScreen: # ../Aku/BootStrap.asm:1324
 Player_Dead_ResumeB: # ../Aku/BootStrap.asm:1411
         SpendCreditSelfMod2:
             MOV  $Player_Array,R5 # ld iy,Player_Array ; All credits are (currently) stored in player 1's var!
+       # TODO: finish or remove this!
 
-# StartANewGame -------------------------------------------------------------{{{
-FireMode_Normal: # ../Aku/BootStrap.asm:2116
-        MOV  $null,R3
-        MOV  R3,@$FireUpHandler
-        MOV  R3,@$FireDownHandler
-        MOV  R3,@$FireLeftHandler
-        MOV  R3,@$FireRightHandler
-
-        MOV  $SetFireDir_LEFTsave, @$Fire1Handler
-        MOV  $SetFireDir_RIGHTsave,@$Fire2Handler
-        BR   FireMode_Both
-
-FireMode_4D: # ../Aku/BootStrap.asm:2128
-        MOV  $SetFireDir_UP,   @$FireUpHandler
-        MOV  $SetFireDir_DOWN, @$FireDownHandler
-        MOV  $SetFireDir_LEFT, @$FireLeftHandler
-        MOV  $SetFireDir_RIGHT,@$FireRightHandler
-
-        MOV  $SetFireDir_Fire, @$Fire1Handler
-        MOV  $SetFireDir_FireAndSaveRestore,@$Fire2Handler
-
-FireMode_Both: # ../Aku/BootStrap.asm:2143
-        MOV $255,@$DroneFlipFireCurrent
-        RETURN
-
-StartANewGame: # ../Aku/BootStrap.asm:2151
-        # reset the core                 # xor a
+StartANewGame: # ../Aku/BootStrap.asm:2151 #---------------------------------{{{
+      # reset the core                   # xor a
         CLR  @$ShowContinueCounter       # ld (ShowContinueCounter_Plus1-1),a
 
         MOV  $0012700,R0 # MOV (PC)+,R0  # ld bc,&3E0D ;Split Continues ; 3E n == LD A,n
@@ -237,24 +225,24 @@ ContinueModeSet: # ../Aku/BootStrap.asm:2165
         MOV  R2,@$SpendCreditSelfMod2
 
         CALL FireMode_Normal # set our standard Left-Right Firemode
-        # reset all the scores n stuff
-                                         # ld a,(iy-15)
-        TSTB @$FireMode                  # and %10000000
+      # reset all the scores n stuff
+                                       # ld a,(iy-15)
+        TSTB @$FireMode                # and %10000000
         BPL  NormalFireMode
-        CALL FireMode_4D                 # call nz,FireMode_4D
+        CALL FireMode_4D               # call nz,FireMode_4D
 NormalFireMode:
-                                         # ld a,1
-        MOVB $1,@$LivePlayers            # ld (iy-7),a ;live players
-                                         # ;multiplay support
-        MOV  $0x003E,R3                  # ld hl,&003E
-                                         # ld a,(MultiplayConfig)
-        BITB $1,@$MultiplayConfig        # bit 0,a
-        BZE  StartANewGame_NoMultiplay   # jr z,StartANewGame_NoMultiplay
-                                         # ld bc,&F990
-                                         # in a,(c) ;Test if the multiplay is really there!
-                                         # inc a
-                                         # jr z,StartANewGame_NoMultiplay
-                                         # ld hl,&78ED
+                                       # ld a,1
+        MOVB $1,@$LivePlayers          # ld (iy-7),a ;live players
+                                       # ;multiplay support
+        MOV  $0x003E,R3                # ld hl,&003E
+                                       # ld a,(MultiplayConfig)
+        BITB $1,@$MultiplayConfig      # bit 0,a
+        BZE  StartANewGame_NoMultiplay # jr z,StartANewGame_NoMultiplay
+                                       # ld bc,&F990
+                                       # in a,(c) ;Test if the multiplay is really there!
+                                       # inc a
+                                       # jr z,StartANewGame_NoMultiplay
+                                       # ld hl,&78ED
 StartANewGame_NoMultiplay: # ../Aku/BootStrap.asm:2195
         # TODO: implement this
 StartANewGame_NoControlFlip: # ../Aku/BootStrap.asm:2206
@@ -266,8 +254,13 @@ StartANewGame_NoControlFlip: # ../Aku/BootStrap.asm:2206
    .endif
 
         MOV  $Player_ScoreBytes,R3
+   .ifdef TwoPlayersGame
         MOV  $8,R1
-        CALL @$ClearR1Words # wipe highscores
+   .else
+        MOV  $4,R1
+   .endif
+       #CALL @$ClearR1Words # wipe highscores
+       .ppudo_ensure $PPU_StartANewGame # resets score
 
         MOV  $Player_Array, R5 # AkuYou_Player_GetPlayerVars
         MOV  $0010000,R2 # MOV R0,R0 # slightly faster than NOP
@@ -304,7 +297,29 @@ HeavenMode: # ../Aku/BootStrap.asm:2242
         BEQ  Difficulty_Easy
         CMP  R0,$2
         BEQ  Difficulty_Hard
-RETURN
+
+        RETURN
+
+FireMode_Normal: # ../Aku/BootStrap.asm:2116
+        MOV  $null,R3
+        MOV  R3,@$FireUpHandler
+        MOV  R3,@$FireDownHandler
+        MOV  R3,@$FireLeftHandler
+        MOV  R3,@$FireRightHandler
+        MOV  $SetFireDir_LEFTsave, @$Fire1Handler
+        MOV  $SetFireDir_RIGHTsave,@$Fire2Handler
+        BR   FireMode_Both
+FireMode_4D: # ../Aku/BootStrap.asm:2128
+        MOV  $SetFireDir_UP,   @$FireUpHandler
+        MOV  $SetFireDir_DOWN, @$FireDownHandler
+        MOV  $SetFireDir_LEFT, @$FireLeftHandler
+        MOV  $SetFireDir_RIGHT,@$FireRightHandler
+        MOV  $SetFireDir_Fire, @$Fire1Handler
+        MOV  $SetFireDir_FireAndSaveRestore,@$Fire2Handler
+FireMode_Both: # ../Aku/BootStrap.asm:2143
+        MOV $255,@$DroneFlipFireCurrent
+
+        RETURN
 
 Difficulty_Easy: # ../Aku/BootStrap.asm:2286
         MOV  $0x20,R0 # bit 5
@@ -326,7 +341,7 @@ Difficulty_Generic:
         MOV  R0,@$FireFrequencyE
 
         RETURN
-
+# StartANewGame -------------------------------------------------------------}}}
 StartANewGamePlayer: # ../Aku/BootStrap.asm:2256 ;player fire directions ----{{{
         ADD  $2,R5
         CLR  R0
@@ -363,7 +378,7 @@ ClearR1Words:
         RETURN
 
 LevelReset0000: # ../Aku/BootStrap.asm:2306 ---------------------------------{{{
-        # wipe our memory, to clear out any junk from old levels
+      # wipe our memory, to clear out any junk from old levels
         MOV  $ObjectArraySizeBytes >> 1,R1
         MOV  $ObjectArrayPointer,R3
         CALL @$ClearR1Words
@@ -380,8 +395,8 @@ LevelReset0000: # ../Aku/BootStrap.asm:2306 ---------------------------------{{{
         MOV  $Event_SavedSettings,R3
         CALL @$ClearR1Words
 
-        # This resets anything the last level may have messed with during
-        # play so we can start a new level with everything back to normal
+      # This resets anything the last level may have messed with during
+      # play so we can start a new level with everything back to normal
 ResetCore: # ../Aku/BootStrap.asm:2318
         MOV  $1,R0
         CALL ShowSpriteReconfigureEnableDisable # ./SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm:82
@@ -420,14 +435,14 @@ ResetCore: # ../Aku/BootStrap.asm:2318
         RETURN
 # LevelReset0000 end --------------------------------------------------------}}}
 
-Bootstrap_LoadDiskFile: # ---------------------------------------------------{{{
+Bootstrap_LoadDiskFile_Start: # ---------------------------------------------{{{
         MOV  (R0)+,@$PS.CPU_RAM_Address
         MOV  (R0)+,@$PS.WordsCount
         MOV  (R0),R0 # starting block number
-        # calculate location of a file on a disk from the starting block number
-        CLR  R2     # R2 - most significant word
-        MOV  R0,R3  # R3 - least significant word
-        DIV  $20,R2 # quotient -> R2, remainder -> R3
+      # calculate location of a file on a disk from the starting block number
+        CLR  R2      # R2 - most significant word
+        MOV  R0,R3   # R3 - least significant word
+        DIV  $20,R2  # quotient -> R2, remainder -> R3
         MOVB R2,@$PS.AddressOnDevice     # track number (0-79)
 
         CLR  R2
@@ -451,34 +466,8 @@ Bootstrap_LoadDiskFile: # ---------------------------------------------------{{{
             BPL  CheckChannel2Readiness
         SOB  R1,SendNextByteToChannel2
 
-        CheckLoadDiskFileStatus:
-            MOVB @$PS.Status,R0
-        BMI  CheckLoadDiskFileStatus
-        BZE  1237$
-        # +------------------------------------------------------+
-        # | Код ответа |  Значение                               |
-        # +------------+-----------------------------------------+
-        # |     00     | Операция завершилась нормально          |
-        # |     01     | Ошибка контрольной суммы зоны данных    |
-        # |     02     | Ошибка контрольной суммы зоны заголовка |
-        # |     03     | Не найден адресный маркер               |
-        # |    100     | Дискета не отформатированна             |
-        # |    101     | Не обнаружен межсекторный промежуток    |
-        # |    102     | Не найден сектор с заданным номером     |
-        # |     04     | Не найден маркер данных                 |
-        # |     05     | Сектор на найден                        |
-        # |     06     | Защита от записи                        |
-        # |     07     | Нулевая дорожка не обнаружена           |
-        # |     10     | Дорожка не обнаружена                   |
-        # |     11     | Неверный массив параметров              |
-        # |     12     | Резерв                                  |
-        # |     13     | Неверный формат сектора                 |
-        # |     14     | Не найден индекс (ошибка линии ИНДЕКС)  |
-        # +------------------------------------------------------+
-        SEC  # set carry flag to indicate that there was an error
-
-1237$:  RETURN
-
+        RETURN
+# Bootstrap_LoadDiskFile_Start #---------------------------------------------}}}
 ParamsAddr: .byte 0, 0, 0, 0xFF # init sequence (just in case)
             .word ParamsStruct
             .byte 0xFF, 0xFF    # two termination bytes 0xff, 0xff
@@ -490,7 +479,34 @@ ParamsStruct:
     PS.AddressOnDevice: .byte 0, 1     # track 0(0-79), sector 1(1-10)
     PS.CPU_RAM_Address: .word 0
     PS.WordsCount:      .word 0        # number of words to transfer
-#----------------------------------------------------------------------------}}}
+Bootstrap_LoadDiskFile_WaitForFinish: #--------------------------------------{{{
+      # +------------------------------------------------------+
+      # | Код ответа |  Значение                               |
+      # +------------+-----------------------------------------+
+      # |     00     | Операция завершилась нормально          |
+      # |     01     | Ошибка контрольной суммы зоны данных    |
+      # |     02     | Ошибка контрольной суммы зоны заголовка |
+      # |     03     | Не найден адресный маркер               |
+      # |    100     | Дискета не отформатированна             |
+      # |    101     | Не обнаружен межсекторный промежуток    |
+      # |    102     | Не найден сектор с заданным номером     |
+      # |     04     | Не найден маркер данных                 |
+      # |     05     | Сектор на найден                        |
+      # |     06     | Защита от записи                        |
+      # |     07     | Нулевая дорожка не обнаружена           |
+      # |     10     | Дорожка не обнаружена                   |
+      # |     11     | Неверный массив параметров              |
+      # |     12     | Резерв                                  |
+      # |     13     | Неверный формат сектора                 |
+      # |     14     | Не найден индекс (ошибка линии ИНДЕКС)  |
+      # +------------------------------------------------------+
+        MOVB @$PS.Status,R0
+        BMI  Bootstrap_LoadDiskFile_WaitForFinish
+        BZE  1237$
+
+        SEC  # set carry flag to indicate that there was an error
+1237$:  RETURN
+# Bootstrap_LoadDiskFile_WaitForFinish #-------------------------------------}}}
 
 # files related data --------------------------------------------------------{{{
 
