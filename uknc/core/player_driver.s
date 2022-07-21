@@ -20,8 +20,8 @@ SpendCheck:                             # SpendCheck:
         DEC  R0                         # dec a
         BNZ  NoSpend                    # jr nz,NoSpend
                                         #
-        BIT  $Keymap_AnyFire,@$KeyboardScanner_P1 # ld a, ixl ; read the keymap
-                                        # or Keymap_AnyFire
+        BIT  $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1 # ld a, ixl ; read the keymap
+                                        # or KEYMAP_ANY_FIRE
                                         # inc a
         BNZ  SpendCredit                # ret z
 

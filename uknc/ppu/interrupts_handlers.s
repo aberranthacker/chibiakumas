@@ -1,5 +1,6 @@
 DummyInterruptHandler: #-------------------------------------------------------
         RTI
+
 VblankIntHandler: #----------------------------------------------------------{{{
       # we disabling "single process mode" to load data from disk only,
       # to avoid random disk loading issues, we disabling our
@@ -46,6 +47,7 @@ SkipToFirmwareHandler:
 
 1237$:  RTI
 #----------------------------------------------------------------------------}}}
+
 KeyboardIntHadler: #---------------------------------------------------------{{{
 # key codes #-----------------------------------------------------{{{
 # | oct | hex|  key    | note     | oct | hex|  key  |  note     |
@@ -104,7 +106,7 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         BMI  key_released$
 
     key_pressed$: #------------------
-        MOV  $KeyPressesCodes,R1
+        MOV  $KeyPressesScanCodes,R1
         CMPB R0,(R1)+
         BEQ  fire_right_pressed$
         CMPB R0,(R1)+
@@ -124,7 +126,7 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
 
         BR   1237$
     #--------------------------------
-    KeyPressesCodes:
+    KeyPressesScanCodes:
         FireRight: .byte 070  # Y
         FireLeft:  .byte 047  # F
         MoveDown:  .byte 0134 # Down
@@ -144,7 +146,7 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         CMPB R0,$0214 # Up? or Down?
         BNE  not_up_down$
 
-        BITB @$PBP12D,$2
+        BITB $KEYMAP_DOWN,@$PBP12D
         BZE  up_released$
         BR   down_released$
 
@@ -164,53 +166,53 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         BR   1237$
     #--------------------------------
     fire_smartbomb_pressed$: #-------
-        MOV  $0x01,R0
+        MOV  $KEYMAP_F3,R0
         BR   set_bit$
     down_pressed$: 
-        MOV  $0x02,R0
+        MOV  $KEYMAP_DOWN,R0
         BR   set_bit$
     up_pressed$:
-        MOV  $0x04,R0
+        MOV  $KEYMAP_UP,R0
         BR   set_bit$
     right_pressed$:
-        MOV  $0x08,R0
+        MOV  $KEYMAP_RIGHT,R0
         BR   set_bit$
     left_pressed$:
-        MOV  $0x10,R0
+        MOV  $KEYMAP_LEFT,R0
         BR   set_bit$
     fire_right_pressed$:
-        MOV  $0x20,R0
+        MOV  $KEYMAP_F1,R0
         BR   set_bit$
     fire_left_pressed$:
-        MOV  $0x40,R0
+        MOV  $KEYMAP_F2,R0
         BR   set_bit$
     pause_pressed$:
-        MOV  $0x80,R0
+        MOV  $KEYMAP_PAUSE,R0
         BR   set_bit$
     #--------------------------------
     fire_smartbomb_released$: #------
-        MOV  $0x01,R0
+        MOV  $KEYMAP_F3,R0
         BR   clear_bit$
     down_released$:
-        MOV  $0x02,R0
+        MOV  $KEYMAP_DOWN,R0
         BR   clear_bit$
     up_released$:
-        MOV  $0x04,R0
+        MOV  $KEYMAP_UP,R0
         BR   clear_bit$
     right_released$:
-        MOV  $0x08,R0
+        MOV  $KEYMAP_RIGHT,R0
         BR   clear_bit$
     left_released$:
-        MOV  $0x10,R0
+        MOV  $KEYMAP_LEFT,R0
         BR   clear_bit$
     fire_right_released$:
-        MOV  $0x20,R0
+        MOV  $KEYMAP_F1,R0
         BR   clear_bit$
     fire_left_released$:
-        MOV  $0x40,R0
+        MOV  $KEYMAP_F2,R0
         BR   clear_bit$
     pause_released$:
-        MOV  $0x80,R0
+        MOV  $KEYMAP_PAUSE,R0
         BR   clear_bit$
     #--------------------------------
     set_bit$:
@@ -225,6 +227,7 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
         MOV  (SP)+,R0
         RTI
 #----------------------------------------------------------------------------}}}
+
 Channel0In_IntHandler: #-----------------------------------------------------{{{
         MOV  @$PBPADR,-(SP)
         MOV  R5,-(SP)
@@ -247,6 +250,7 @@ CommandsQueue_Full:
         BR   .
         NOP
 #----------------------------------------------------------------------------}}}
+
 Channel1In_IntHandler: #-----------------------------------------------------{{{
         PUSH R0
         PUSH R1
