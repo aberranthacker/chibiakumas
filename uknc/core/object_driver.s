@@ -201,10 +201,10 @@ Objectloop_SpriteBankSet:
                                     # or a
         BZE  ObjectLoopP1Skip       # jr z,ObjectLoopP1Skip
                                     #
-                                    # push hl
-                                    #     ld hl,Player_Array
+        PUSH R5                     # push hl
+        MOV  $Player_Array,R5       #     ld hl,Player_Array
         CALL Player_Hit             #     call Player_Hit
-                                    # pop hl
+        POP  R5                     # pop hl
                                     #
                                     # ld a,b
         TST  R1                     # or a

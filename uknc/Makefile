@@ -78,6 +78,7 @@ build/ppu_module.bin : build/ppu.o \
 	ruby build_tools/aout2sav.rb build/ppu.out -b -s -o build/ppu_module.bin
 build/ppu.o : $(common) \
               ppu.s \
+              ppu/interrupts_handlers.s \
               music/ep1_title_music_playerconfig.s \
               music/ep1_intro_music_playerconfig.s \
               music/ep1_level_music_playerconfig.s \
