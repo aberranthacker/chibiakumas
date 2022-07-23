@@ -8,6 +8,8 @@ CPU_KeyboardScanner_P1 = KeyboardScanner_P1 / 2;
 CPU_KeyboardScanner_P2 = KeyboardScanner_P2 / 2;
 CPU_Event_LevelTime = Event_LevelTime / 2;
 CPU_Player_ScoreBytes = Player_ScoreBytes / 2;
+CPU_P1_P03 = P1_P03 / 2;
+CPU_P1_P09 = P1_P09 / 2;
 CPU_P1_P13 = P1_P13 / 2;
 
 SECTIONS

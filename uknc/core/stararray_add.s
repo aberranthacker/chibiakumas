@@ -178,10 +178,10 @@ Stars_AddBurst_Loop:
         BR   Stars_AddBurst_Loop
 1237$:  RETURN
 
-      # input C = R1 = Y
-      #       D = R2 = X
-      # output:   R3 = move
-      # corrupts  R4
+      # input: C = R1 = Y
+      #        D = R2 = X
+      # output: R3 = move
+      # corrupts: R4
 Stars_AddObjectFromR3:
         MOVB R3,@$StarObjectMoveToAdd
 Stars_AddObject:

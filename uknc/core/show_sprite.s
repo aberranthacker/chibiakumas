@@ -50,42 +50,42 @@ ShowSprite_ReadInfo: # ------------------------------------------------------{{{
 # ShowSpriteDirect is a cruder version of ShowSprite, it does not use the
 # 'virtual' screen res of (160x200) and cannot do clipping - it was designed for
 # the UI objects which never moved and never needed clipping
-ShowSpriteDirect: #----------------------------------------------------------{{{
-      # set draw pos into Temp_X and Temp_Y
-        CALL ShowSprite_ReadInfo
-
-        ADD  R1,@$SprShow_ScrLine
-      # ;Quick shortcuts for fonts
-        DEC  R2
-        BZE  ShowSpriteDirectOneByteSpecial
-
-        DEC  R2
-        BZE  ShowSpriteDirectTwoByteSpecial
-
-        DEC  R2
-        DEC  R2
-        BZE  ShowSpriteDirectFourByteSpecial
-
-        CLR  @$TranspBitA
-        MOV  $SprDraw_TurboRenderer,R2
-        ASLB R0
-        BCC  ShowSpite_DoNotForcePSet
-
-        MOV  $SprDraw_PsetRenderer,R2
-ShowSpite_DoNotForcePSet:
-        MOV  R2,@$jmpShowSprite_DrawAndReturn
-        JMP  ShowSprite_SkipCrop
-
-ShowSpriteDirectFourByteSpecial:
-        CLR  @$TranspBitA
-        MOV  $SprDraw_TurboRenderer_16pxInit, @$jmpShowSprite_DrawAndReturn
-        JMP  ShowSprite_SkipCrop
-ShowSpriteDirectTwoByteSpecial: # shortcut for our minifont!
-        MOV  $SprDraw_PsetRenderer8pxInit, @$jmpShowSprite_DrawAndReturn
-        JMP  ShowSprite_SkipCrop
-ShowSpriteDirectOneByteSpecial: # shortcut for our minifont!
-        MOV  $SprDraw_BasicRenderer, @$jmpShowSprite_DrawAndReturn
-        JMP  ShowSprite_SkipCrop
+#ShowSpriteDirect: #----------------------------------------------------------{{{
+#      # set draw pos into Temp_X and Temp_Y
+#        CALL ShowSprite_ReadInfo
+#
+#        ADD  R1,@$SprShow_ScrLine
+#      # ;Quick shortcuts for fonts
+#        DEC  R2
+#        BZE  ShowSpriteDirectOneByteSpecial
+#
+#        DEC  R2
+#        BZE  ShowSpriteDirectTwoByteSpecial
+#
+#        DEC  R2
+#        DEC  R2
+#        BZE  ShowSpriteDirectFourByteSpecial
+#
+#        CLR  @$TranspBitA
+#        MOV  $SprDraw_TurboRenderer,R2
+#        ASLB R0
+#        BCC  ShowSpite_DoNotForcePSet
+#
+#        MOV  $SprDraw_PsetRenderer,R2
+#ShowSpite_DoNotForcePSet:
+#        MOV  R2,@$jmpShowSprite_DrawAndReturn
+#        JMP  ShowSprite_SkipCrop
+#
+#ShowSpriteDirectFourByteSpecial:
+#        CLR  @$TranspBitA
+#        MOV  $SprDraw_TurboRenderer_16pxInit, @$jmpShowSprite_DrawAndReturn
+#        JMP  ShowSprite_SkipCrop
+#ShowSpriteDirectTwoByteSpecial: # shortcut for our minifont!
+#        MOV  $SprDraw_PsetRenderer8pxInit, @$jmpShowSprite_DrawAndReturn
+#        JMP  ShowSprite_SkipCrop
+#ShowSpriteDirectOneByteSpecial: # shortcut for our minifont!
+#        MOV  $SprDraw_BasicRenderer, @$jmpShowSprite_DrawAndReturn
+#        JMP  ShowSprite_SkipCrop
 
 # GetSpriteXY:
         # ld a,(SprShow_X)

@@ -90,9 +90,19 @@ build/ppu.o : $(common) \
 	      music/ep1_sfx.s \
               ../../akg_player/akg_player.s \
               ../../akg_player/akg_sound_effects.s \
+	      build/hitpoint_icon.bin \
+	      build/smartbomb_icon.bin \
               resources/font.raw \
               resources/cga8x8b.raw
 	$(AS) ppu.s -I../../akg_player -al -o build/ppu.o | build_tools/format_list.rb
+
+build/smartbomb_icon.bin : build_tools/bmp_to_raw.rb \
+                           resources/icons/smartbomb_icon-3bpp.bmp
+	build_tools/bmp_to_raw.rb resources/icons/smartbomb_icon-3bpp.bmp build/smartbomb_icon.bin -b 3
+
+build/hitpoint_icon.bin : build_tools/bmp_to_raw.rb \
+                          resources/icons/hitpoint_icon-3bpp.bmp
+	build_tools/bmp_to_raw.rb resources/icons/hitpoint_icon-3bpp.bmp build/hitpoint_icon.bin -b 3
 
 resources/font.raw : build_tools/spr_cpc_to_uknc.rb \
 	             ../ResCPC/font.bin
@@ -153,15 +163,15 @@ build/level_00_menu.o : $(common) \
                         level_00_menu.s \
                         resources/titletex.spr \
                         resources/menu_cursor.spr
-	$(AS) -al level_00_menu.s -o build/level_00_menu.o
+	$(AS) -al level_00_menu.s -o build/level_00_menu.o | build_tools/format_list.rb
 
 resources/titletex.spr : build_tools/spr_cpc_to_uknc.rb \
 	                 ../Aku/Sprites/TITLETEX.SPR
 	build_tools/spr_cpc_to_uknc.rb ../Aku/Sprites/TITLETEX.SPR -o resources/titletex.spr
 
-resources/menu_cursor.spr : build_tools/bmp_to_uknc_raw.rb \
+resources/menu_cursor.spr : build_tools/bmp_to_raw.rb \
                             resources/menu_cursor-Sheet.bmp
-	build_tools/bmp_to_uknc_raw.rb
+	build_tools/bmp_to_raw.rb resources/menu_cursor-Sheet.bmp resources/menu_cursor.spr
 # level_00_menu.o -----------------------------------------------------------}}}
 
 # ep1_intro.bin -------------------------------------------------------------{{{
@@ -186,7 +196,7 @@ build/ep1_intro.o : $(common) \
                     build/ep1-intro/ep1-intro-slide06.raw.lzsa1 \
                     build/ep1-intro/ep1-intro-slide07.raw.lzsa1 \
                     build/ep1-intro/ep1-intro-slide08.raw.lzsa1
-	$(AS) -al ep1_intro.s -o build/ep1_intro.o
+	$(AS) -al ep1_intro.s -o build/ep1_intro.o | build_tools/format_list.rb
 
 build/ep1_intro_slides.bin : build/ep1_intro_slides.o
 	$(LD) $(LDFLAGS) build/ep1_intro_slides.o -o build/ep1_intro_slides.out
