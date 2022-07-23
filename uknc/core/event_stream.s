@@ -97,24 +97,20 @@ EventStream_Init:
 EventStream_Process:
        .equiv Event_LevelSpeed, .+2 # how often ticks occur
         BIT  $0x04,@$Timer_TicksOccured
-        BNZ  EventStream_ForceNow
-        RETURN # no ticks occured
+        BZE  1237$ # no ticks occured
 
-EventStream_ForceNow:
        .equiv Event_LevelTime, .+2
         INC  $0xFFFF
 
 Event_MoreEvents:
-        # compare NextEventTime with LevelTime
+      # compare NextEventTime with LevelTime
        .equiv Event_NextEventTime, .+2 # The time the event should occur
-        CMP  $0x01, @$Event_LevelTime
-        BEQ  Event_GetEventsNow
-        RETURN # event does not happen yet
+        CMP  $1, @$Event_LevelTime
+        BNE  1237$ # event does not happen yet
 
 Event_GetEventsNow: # ../SrcALL/Akuyou_Multiplatform_EventStream.asm:121
-        # We do a dirty trick to save space, all these actions end in a RET
+      # We do a dirty trick to save space, all these actions end in a RET
         MOV  $Event_LoadNextEvt,-(SP)
-
        .equiv Event_NextEventPointer, .+2 # mem pointer of next byte
         MOV  $0x0000,R5
 
@@ -135,27 +131,27 @@ Event_LoadNextEvt:
         TST  $0x00
         BZE  events_processed
 
-        # multiple events at the same timepoint
+      # multiple events at the same timepoint
         DEC  @$Event_MultipleEventCount
         MOV  R5,@$Event_NextEventPointer
-        JMP  @$Event_GetEventsNow
+        BR   Event_GetEventsNow
+
 events_processed:
         MOV  (R5)+,@$Event_NextEventTime
         MOV  R5,@$Event_NextEventPointer
-
-        JMP  @$Event_MoreEvents
+        BR   Event_MoreEvents
 
 Event_StarBust:
-        MOV  R1,R3     # pattern
+        MOV  R1,R3    # pattern
         CLR  R1
-        BISB (R5)+,R1  # Y
+        BISB (R5)+,R1 # Y
         CLR  R2
-        BISB (R5)+,R2  # X
+        BISB (R5)+,R2 # X
         PUSH R5
         CALL @$Stars_AddObjectBatchDefault
         POP  R5
 
-        RETURN
+1237$:  RETURN
 
 # By default each time can only have ONE event, but we can use this commend to declare
 # XX events will occur at this time to save memory!
@@ -530,14 +526,15 @@ Event_SaveObjSettings:
         ASL  R1
         ASL  R1
         ADD  $Event_SavedSettings,R1
+        MOV  $ObjectSettingsVectors,R0
 
-        MOVB @$EventObjectProgramToAdd,   (R1)+
-        MOVB @$EventObjectMoveToAdd,      (R1)+
-        MOVB @$EventObjectLifeToAdd,      (R1)+
-        MOVB @$EventObjectSpriteToAdd,    (R1)+
-        MOVB @$EventObjectSpriteSizeToAdd,(R1)+
-        MOVB @$EventObjectAnimatorToAdd,  (R1)+
-        MOVB @$ObjectAddToForeBack,       (R1)
+        MOVB @(R0)+,(R1)+
+        MOVB @(R0)+,(R1)+
+        MOVB @(R0)+,(R1)+
+        MOVB @(R0)+,(R1)+
+        MOVB @(R0)+,(R1)+
+        MOVB @(R0)+,(R1)+
+        MOVB @(R0)+,(R1)
 
         RETURN
 
@@ -546,16 +543,26 @@ Event_LoadObjSettings:
         ASL  R1
         ASL  R1
         ADD  $Event_SavedSettings,R1
+        MOV  $ObjectSettingsVectors,R0
 
-        MOVB (R1)+, @$EventObjectProgramToAdd
-        MOVB (R1)+, @$EventObjectMoveToAdd
-        MOVB (R1)+, @$EventObjectLifeToAdd
-        MOVB (R1)+, @$EventObjectSpriteToAdd
-        MOVB (R1)+, @$EventObjectSpriteSizeToAdd
-        MOVB (R1)+, @$EventObjectAnimatorToAdd
-        MOVB (R1),  @$ObjectAddToForeBack
+        MOVB (R1)+,@(R0)+
+        MOVB (R1)+,@(R0)+
+        MOVB (R1)+,@(R0)+
+        MOVB (R1)+,@(R0)+
+        MOVB (R1)+,@(R0)+
+        MOVB (R1)+,@(R0)+
+        MOVB (R1), @(R0)+
 
         RETURN
+
+ObjectSettingsVectors:
+       .word EventObjectProgramToAdd
+       .word EventObjectMoveToAdd
+       .word EventObjectLifeToAdd
+       .word EventObjectSpriteToAdd
+       .word EventObjectSpriteSizeToAdd
+       .word EventObjectAnimatorToAdd
+       .word ObjectAddToForeBack
 
                                         # ; --------------------------------------------------
                                         # ;                 Reset Powerup

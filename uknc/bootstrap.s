@@ -46,7 +46,7 @@ Bootstrap_Launch: # used by bootsector linker script
        .word FB1 # PPU module location
        .word PPU_ModuleSizeWords
 
-      # clear offscreen area bitplanes 1 and 2  while PPU module initializes
+      # clear offscreen area bitplanes 1 and 2 while PPU module initializes
         MOV  $88*40>>2,R0
         MOV  $CBPADR,R5
         MOV  $OffscreenAreaAddr,(R5)
@@ -89,7 +89,7 @@ Bootstrap_Launch: # used by bootsector linker script
        .ifdef ExtMemCore # copy core to extended memory
             MOV  $GameVarsEnd,R4
             MOV  $CoreStart,R5
-            MOV  $ExtMemSizeBytes>>2,R1
+            MOV  $ExtMemSizeBytes>>2 - 2,R1 # -2 to preserve stack
             200$:
                 MOV  (R4)+, (R5)+
                 MOV  (R4)+, (R5)+
@@ -152,7 +152,7 @@ Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
        .check_for_loading_error "level_00.bin"
 
        .ppudo_ensure $PPU_SingleProcess
-        MOV  $SPReset,SP # we are not returning, so reset the stack
+        MOV  $SP_RESET,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
 Bootstrap_Level_Intro:
@@ -169,19 +169,21 @@ Bootstrap_Level_Intro:
        .check_for_loading_error "ep1_intro_slides.bin"
 
        .ppudo_ensure $PPU_SingleProcess
-        MOV  $SPReset,SP # we are not returning, so reset the stack
+        MOV  $SP_RESET,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
 Bootstrap_Level_1: # --------------------------------------------------------
         MOV  $level_01.bin,R0
         CALL Bootstrap_LoadDiskFile_Start
            .ppudo_ensure $PPU_SetPalette, $BlackPalette
+           #CALL StartANewGame
             CALL LevelReset0000
+           .ppudo_ensure $PPU_LevelStart
         CALL Bootstrap_LoadDiskFile_WaitForFinish
        .check_for_loading_error "level_01.bin"
 
        .ppudo_ensure $PPU_SingleProcess
-        MOV  $SPReset,SP # we are not returning, so reset the stack
+        MOV  $SP_RESET,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
 Bootstrap_Level_2: # --------------------------------------------------------
@@ -189,11 +191,12 @@ Bootstrap_Level_2: # --------------------------------------------------------
         CALL Bootstrap_LoadDiskFile_Start
            .ppudo_ensure $PPU_SetPalette, $BlackPalette
             CALL LevelReset0000
+           .ppudo_ensure $PPU_LevelStart
         CALL Bootstrap_LoadDiskFile_WaitForFinish
        .check_for_loading_error "level_02.bin"
 
        .ppudo_ensure $PPU_SingleProcess
-        MOV  $SPReset,SP # we are not returning, so reset the stack
+        MOV  $SP_RESET,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
 

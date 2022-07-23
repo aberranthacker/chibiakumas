@@ -734,30 +734,6 @@ PlayerKilled:
         MOV  $100,@$ShowContinueCounter
         RETURN
 
-#******************************************************************************#
-#*                                  Player UI                                 *#
-#******************************************************************************#
-Player_DrawUI_DrawIcons: # Used for Health and Smartbomb icons
-        TST  R0 # number of icons to draw
-        BZE  1237$
-
-        100$:
-            MOVB R2,@$SprShow_ScrWord
-            MOV  R1,@$SprShow_ScrLine
-            PUSH R0
-            PUSH R1
-            PUSH R2
-            CALL ShowSpriteDirect
-            POP  R2
-            POP  R1
-            POP  R0
-
-           .equiv Player_DrawUI_DrawIcons_IconWidth, .+2
-            ADD  $4,R2
-        SOB  R0,100$
-
-1237$:  RETURN
-
 Player1DoContinue:
        .equiv ShowContinueCounter, .+2
         TST  $0
@@ -842,55 +818,9 @@ Player1Continue:
                                         #         db "Credits",":"+&80
                                         #     txtPressButtonMsg2:
                                         #         db "Continue","?"+&80
-
-Player_DrawUIDual:
-        MOV  R0,@$Player_DrawUI_DrawIcons_IconWidth
-
-        MOV  $8,R1    # Y pos, line
-        MOVB 9(R5),R0 # Lives, number of icons
-        MOV  $7,@$SprShow_SprNum
-        PUSH R2
-        PUSH R5
-        CALL Player_DrawUI_DrawIcons
-        POP  R5
-        POP  R2
-
-        MOV  $180,R1  # Y pos, line
-        MOVB 3(R5),R0 # Smart bombs, number of icons
-        MOV  $6,@$SprShow_SprNum
-        JMP  Player_DrawUI_DrawIcons
-
 1237$:  RETURN # to use with player_driver.s:831
 
 Player1DrawUI:
-        MOV  $4,R0 # icon width, bytes  # ld a,4
-        CLR  R2    # Xpos, word         # ld b,0
-        CALL Player_DrawUIDual          # call Player_DrawUIDual
-
-                                        # ld a,7
-                                        # ld hl,&0003
-                                        # ld iy,Player_Array
-                                        # ld de,Player_ScoreBytes
-        BR   Player_DrawUI_PlusAsWell   # jr Player_DrawUI_PlusAsWell
-
-   .ifdef TwoPlayersGame
-Player2DrawUI:
-   .error "Player2DrawUI not implemented"
-                                        # ld a,-4
-                                        # ld b,80-4
-                                        #
-                                        # ld de,3*4+PlusSprites_Config2+3
-                                        # ld hl,PlusSprites_Config1+3
-                                        #
-                                        # call Player_DrawUIDual
-                                        #
-                                        # ld hl,&2503
-                                        # ld a,40-1
-                                        # ld iy,Player_Array2
-                                        # ld de, Player_ScoreBytes2
-   .endif
-
-Player_DrawUI_PlusAsWell:
        .equiv CheadMode, .
         RETURN                          #     ret: CheatMode_Plus1
 

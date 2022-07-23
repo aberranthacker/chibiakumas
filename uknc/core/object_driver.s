@@ -18,8 +18,8 @@
 # ObjectArray_ConfigureForSize ----------------------------------------------{{{
 ObjectArray_reConfigureForSize:
         TSTB R4
-        BNE  ObjectArray_ConfigureForSizeB
-        RETURN
+        BZE  1237$
+
 ObjectArray_ConfigureForSizeB:
         CLR  R0
         BISB R4,R0
@@ -80,29 +80,28 @@ ObjectArray_ConfigureForSize:
     4$: MOV  R0,@$Player2X1
    .endif # }}}
 
-        RETURN
+1234$:  RETURN
 # ObjectArray_ConfigureForSize ----------------------------------------------}}}
-ObjectArray_Redraw:                                         # ObjectArray_Redraw:
-        TST  @$Timer_TicksOccured                        #     ld a,(Timer_TicksOccured)
-                                                            #     or a
-        BZE  game_paused                                    #     ret z   ; see if game is paused (TicksOccurred = 0 )
-        # Define player 1 and 2 hitboxes                    #
-        CALL @$ObjectArray_ConfigureForSize                 #     call ObjectArray_ConfigureForSize
-                                                            #
-        MOV  $ObjectArraySize,R4                            #     ld B,ObjectArraySize ;00ObjectArray_Size_Plus1
-        MOV  $ObjectArrayPointer,R5                         #     ld hl,ObjectArrayPointer;(ObjectArrayAddress)
-                                                            #     xor a ; Zero
-    object_loop:                                            # Objectloop2:
-        MOV  (R5)+,R1 # Screen Y=LSB co-ordinate (one byte) #     ld c,(hl)   ; Y
-        TSTB R1       # 0 means this object is unused       #     cp c
-        BNZ  object_present                                 #     jr NZ,Objectloop_NotZero ;if object Y =0 the object is dead
+ObjectArray_Redraw:
+        TST  @$Timer_TicksOccured # see if game is paused (TicksOccurred = 0)
+        BZE  game_paused
+      # Define player 1 and 2 hitboxes
+        CALL @$ObjectArray_ConfigureForSize
 
-ObjectArray_NextObject:                                     # ObjectArray_Turbo:
-        ADD  $6,R5                                          #     inc l
-        SOB  R4,object_loop                                 #     djnz Objectloop2
+        MOV  $ObjectArraySize,R4
+        MOV  $ObjectArrayPointer,R5
 
-    game_paused:                                            #
-        RETURN                                              #     ret
+    object_loop:
+        MOV  (R5)+,R1 # object Y=LSB, X=MSB
+        TSTB R1       # if object Y=0 the object is dead
+        BNZ  object_present
+
+ObjectArray_NextObject:
+        ADD  $6,R5
+        SOB  R4,object_loop
+
+    game_paused:
+        RETURN
 
     object_present:
         PUSH R4
@@ -708,11 +707,11 @@ ObjectProgram_FastFire:
         MOV  $0b00000010,R0
 
 ObjectProgram_Fire:
-                                       # ld d,a
-                                       # ei  ; Why is interrupts disabled here??
-        BIT  @$Timer_TicksOccured,R0# ld a,(Timer_TicksOccured)
-        BZE  1237$                     # and d
-                                       # ret z
+                                     # ld d,a
+                                     # ei  ; Why is interrupts disabled here??
+        BIT  R0,@$Timer_TicksOccured # ld a,(Timer_TicksOccured)
+        BZE  1237$                   # and d
+                                     # ret z
 ObjectProgram_HyperFire:
        .ppudo $PPU_PlaySoundEffect2
       # B=R4=X, C=R1=Y, IYL=R3=Prg         #
@@ -777,10 +776,10 @@ Object_DecreaseShotToDeathB:
       # create a coin
        .equiv PointsSpriteC, .+2
         MOV (PC)+,R2
-       .byte 128+16     # ld iyh,128+16 :PointsSpriteC_Plus1  ; Sprite
+       .byte 128+16     # ld iyh,128+16 :PointsSpriteC_Plus1 ; Sprite
        .byte 0b10000111 # ld ixh,%10000111 ; Seaker Fast 1000001XX XX=Speed
 
-                        # ld a,(ObjectShotShooter_Plus1-1)    ;1=Player 1, 129 = player 2
+                        # ld a,(ObjectShotShooter_Plus1-1) ;1=Player 1, 129 = player 2
                         # dec a
                         # jr z,Object_DecreaseShotToDeath_Player1
                         # ld ixh,%10010011; Seaker Fast P2 1000100XX XX=Speed

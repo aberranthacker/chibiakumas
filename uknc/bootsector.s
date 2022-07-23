@@ -14,7 +14,7 @@
         RTI                 # dummy interrupt handler
        .=0104
 68$:    MOV  $040,@$0100    # set dummy Vblank int handler
-        MOV  $SPReset,SP
+        MOV  $SP_RESET,SP
 
         MOV  $TitleStr,R0
         CALL @$PrintStr

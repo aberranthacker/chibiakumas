@@ -2,7 +2,7 @@
 # Note that the PRESENCE of those variables is tested, NOT their values. -------
 #.equiv DebugMode, 1
 #.equiv DebugSprite, 1
-#.equiv ExtMemCore, 1 # do `make clean` after commenting/uncommenting this line
+#.equiv ExtMemCore, 1
 #.equiv TwoPlayersGame, 1
 #-------------------------------------------------------------------------------
 .equiv MainMenu, 0x8000
@@ -47,10 +47,11 @@
 .equiv PPU_PlaySoundEffect6,  46
 .equiv PPU_PlaySoundEffect7,  48
 .equiv PPU_StartANewGame,     50
-.equiv PPU_LevelEnd,          52
-.equiv PPU_DrawPlayerUI,      54
+.equiv PPU_LevelStart,        52
+.equiv PPU_LevelEnd,          54
+.equiv PPU_DrawPlayerUI,      56
 
-.equiv PPU_LastJMPTableIndex, 54
+.equiv PPU_LastJMPTableIndex, 56
 #-------------------------------------------------------------------------------
 .equiv ExtMemSizeBytes, 7168
 
@@ -84,11 +85,16 @@
 .equiv PPUCommandArg, 046 # 38 0x26 command for PPU argument
 # 050, 052, 054, 056 four words are available
 
-.equiv SPReset, 0600 # 3384 0x180 Initial stack pointer
+    .ifndef ExtMemCore
+.equiv SP_RESET, 0600 # 3384 0x0180 Initial stack pointer
+    .else
+.equiv SP_RESET, 0176000 # 64512 0xFC00 Initial stack pointer
+    .endif
+
 .equiv FB0, 0600 # 0384 0x0180
-.equiv FB_gap, FB0 + 16000
-.equiv PlayerStarArrayPointer, FB_gap # it fits nicely into the gap
-.equiv FB1, FB_gap + 384
+.equiv FB_GAP, FB0 + 16000
+.equiv PlayerStarArrayPointer, FB_GAP # it fits nicely into the gap
+.equiv FB1, FB_GAP + 384
 
 .equiv BootstrapStart,  FB0
 .equiv Ep1IntroSlidesStart, FB0 + 4096
@@ -99,14 +105,14 @@
     .equiv Event_SavedSettings, StarArrayPointer + StarArraySizeBytes
 .equiv GameVarsEnd,   Event_SavedSettings + Event_SavedSettingsSizeBytes
 
-    .ifdef ExtMemCore
-.equiv CoreStart, 0160000
-    .else
+    .ifndef ExtMemCore
 .equiv CoreStart, GameVarsEnd
+    .else
+.equiv CoreStart, 0160000
     .endif
 
     .ifndef ExtMemCore
-.equiv Akuyou_LevelStart, 0x9E44 # 40516 0117104 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9D90 # 40336 0116620 # auto-generated during a build
     .else
 .equiv Akuyou_LevelStart, GameVarsEnd
     .endif
@@ -129,6 +135,8 @@
 .equiv OffscreenAreaAddr, 0160000 # 49152 0xC000 # banks 0, 1 and 2
 #-end of VRAM memory map--------------------------------------------------------
 #-------------------------------------------------------------------------------
+# player_driver uses ROLB to check which keys were pressed
+# so if you change keymap here, modify player_driver code as well
 .equiv KEYMAP_PAUSE, 0x80
 .equiv KEYMAP_F2,    0x40
 .equiv KEYMAP_F1,    0x20
