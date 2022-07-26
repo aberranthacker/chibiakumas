@@ -69,7 +69,7 @@ sprites_metadata = []
     height: file[i].ord,
     width: file[i + 1].ord,
     y_offset: file[i + 2].ord,
-    settings: file[i + 3].ord,
+    settings: file[i + 3].ord >> 5 & 0b110, # transparency data not used
     offset: file[i + 4, 2].unpack1('v')
   }
   rec[:y_offset] = 7 if rec[:y_offset] == 255

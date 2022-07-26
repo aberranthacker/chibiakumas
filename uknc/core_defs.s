@@ -112,7 +112,7 @@
     .endif
 
     .ifndef ExtMemCore
-.equiv Akuyou_LevelStart, 0x9D90 # 40336 0116620 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9E46 # 40518 0117106 # auto-generated during a build
     .else
 .equiv Akuyou_LevelStart, GameVarsEnd
     .endif
@@ -185,6 +185,6 @@
 #-------------------------------------------------------------------------------
 .equiv COIN_COST, 4
 
-.equiv SPR_PSET, 1<<7
-.equiv SPR_DOUBLE, 1<<6
-.equiv SPR_HAS_MASK, 1<<5
+.equiv SPR_DOUBLE,   1<<1
+.equiv SPR_PSET,     1<<2
+.equiv SPR_HAS_MASK, 1<<3

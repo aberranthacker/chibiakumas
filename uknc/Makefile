@@ -6,12 +6,15 @@ LDFLAGS += --strip-all
 
 .SUFFIXES:
 .SUFFIXES: .s .o
+.PHONY: clean
 
 # --just-symbols= -R include only symbols from the file
 # --print-map -M
 # --strip-all -s
 
 common = core_defs.s event_stream_definitions.s hwdefs.s macros.s
+
+all : pre-build build/chibiakumas.dsk
 
 # chibiakumas.dsk -----------------------------------------------------------{{{
 build/chibiakumas.dsk : build_tools/build_dsk.rb \
@@ -216,7 +219,7 @@ build/ep1_intro.bin : build/core.o \
 
 build/ep1_intro.o : $(common) \
                     ep1_intro.s \
-                    resources/ep1_intro.spr \
+                    build/ep1_intro.spr \
                     build/ep1-intro/ep1-intro-slide01.raw.lzsa1 \
                     build/ep1-intro/ep1-intro-slide02.raw.lzsa1 \
                     build/ep1-intro/ep1-intro-slide03.raw.lzsa1 \
@@ -241,9 +244,9 @@ build/ep1_intro_slides.o : ep1_intro_slides.s \
                            build/ep1-intro/ep1-intro-slide15.raw.lzsa1
 	$(AS) -al ep1_intro_slides.s -o build/ep1_intro_slides.o
 
-resources/ep1_intro.spr : build_tools/spr_cpc_to_uknc.rb \
-	                  ../ResCPC/LEVEL252A.SPR
-	build_tools/spr_cpc_to_uknc.rb ../ResCPC/LEVEL252A.SPR -o resources/ep1_intro.spr
+build/ep1_intro.spr : build_tools/spr_cpc_to_uknc.rb \
+	              ../ResCPC/LEVEL252A.SPR
+	build_tools/spr_cpc_to_uknc.rb ../ResCPC/LEVEL252A.SPR -o build/ep1_intro.spr
 
 build/ep1-intro/ep1-intro-slide01.raw.lzsa1: resources/ep1-intro-slides-1.raw
 	ruby build_tools/build_intro_slides.rb
@@ -282,25 +285,25 @@ build/level_01.bin : build/core.o \
                      build/level_01.o
 	$(LD) $(LDFLAGS) build/level_01.o -R build/core.o -o build/level_01.out
 	ruby build_tools/aout2sav.rb build/level_01.out -b -s -o build/level_01.bin
+
 build/level_01.o : $(common) \
                    level_01.s \
-		   resources/level_01a.spr \
-		   resources/level_01b.spr \
-		   resources/level_01_tiles.spr \
-		   resources/chibi_lr.spr \
+		   build/level_01.0.spr \
+		   build/level_01.1.spr \
+		   build/level_01_tiles.spr \
 		   build/chibi_lr.spr
 	$(AS) -al level_01.s -o build/level_01.o | build_tools/format_list.rb
 
-resources/level_01a.spr : build_tools/spr_cpc_to_uknc.rb \
-                           resources/level_01a.CPC.SPR
-	build_tools/spr_cpc_to_uknc.rb resources/level_01a.CPC.SPR -o resources/level_01a.spr
-resources/level_01b.spr : build_tools/spr_cpc_to_uknc.rb \
+build/level_01.0.spr : build_tools/spr_cpc_to_uknc.rb \
+                       resources/level_01a.CPC.SPR
+	build_tools/spr_cpc_to_uknc.rb resources/level_01a.CPC.SPR -o build/level_01.0.spr
+build/level_01.1.spr : build_tools/spr_cpc_to_uknc.rb \
                            resources/level_01b.CPC.SPR
-	build_tools/spr_cpc_to_uknc.rb resources/level_01b.CPC.SPR -o resources/level_01b.spr
+	build_tools/spr_cpc_to_uknc.rb resources/level_01b.CPC.SPR -o build/level_01.1.spr
 
-resources/level_01_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
-	                      ../ResCPC/Level01-Tiles.SPR
-	build_tools/spr_cpc_to_uknc.rb ../ResCPC/Level01-Tiles.SPR -o resources/level_01_tiles.spr
+build/level_01_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
+	                       ../ResCPC/Level01-Tiles.SPR
+	build_tools/spr_cpc_to_uknc.rb ../ResCPC/Level01-Tiles.SPR -o build/level_01_tiles.spr
 # level_01.bin --------------------------------------------------------------}}}
 
 # level_02.bin --------------------------------------------------------------{{{
@@ -311,22 +314,22 @@ build/level_02.bin : build/core.o \
 
 build/level_02.o : $(common) \
                    level_02.s \
-		   resources/level_02a.spr \
-		   resources/level_02b.spr \
-		   resources/level_02_tiles.spr \
-		   resources/chibi_lr.spr
+		   build/level_02.0.spr \
+		   build/level_02.1.spr \
+		   build/level_02_tiles.spr \
+		   build/chibi_lr.spr
 	$(AS) -al level_02.s -o build/level_02.o | build_tools/format_list.rb
 
-resources/level_02a.spr : build_tools/spr_cpc_to_uknc.rb \
+build/level_02.0.spr : build_tools/spr_cpc_to_uknc.rb \
                            resources/level_02a.CPC.SPR
-	build_tools/spr_cpc_to_uknc.rb resources/level_02a.CPC.SPR -o resources/level_02a.spr
-resources/level_02b.spr : build_tools/spr_cpc_to_uknc.rb \
+	build_tools/spr_cpc_to_uknc.rb resources/level_02a.CPC.SPR -o build/level_02.0.spr
+build/level_02.1.spr : build_tools/spr_cpc_to_uknc.rb \
                            resources/level_02b.CPC.SPR
-	build_tools/spr_cpc_to_uknc.rb resources/level_02b.CPC.SPR -o resources/level_02b.spr
+	build_tools/spr_cpc_to_uknc.rb resources/level_02b.CPC.SPR -o build/level_02.1.spr
 
-resources/level_02_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
+build/level_02_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
 	                      ../ResCPC/Level2-Tiles-CPC.SPR
-	build_tools/spr_cpc_to_uknc.rb ../ResCPC/Level2-Tiles-CPC.SPR -o resources/level_02_tiles.spr
+	build_tools/spr_cpc_to_uknc.rb ../ResCPC/Level2-Tiles-CPC.SPR -o build/level_02_tiles.spr
 # level_02.bin --------------------------------------------------------------}}}
 
 # chibi_lr.spr --------------------------------------------------------------{{{
@@ -396,9 +399,8 @@ build/chibi/drone_mask.1.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb -b 1 resources/chibi/drone_mask.1.bmp build/chibi/drone_mask.1.bin
 # chibi_lr.spr --------------------------------------------------------------}}}
 
-resources/chibi_lr.spr : build_tools/spr_cpc_to_uknc.rb \
-			 resources/chibi_lr.cpc.spr
-	build_tools/spr_cpc_to_uknc.rb resources/chibi/chibi_lr.cpc.spr -o resources/chibi_lr.spr
+pre-build :
+	mkdir -p build/chibi
 
 clean :
 	rm -rf build/*

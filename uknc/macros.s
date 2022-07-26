@@ -46,7 +46,7 @@ inform_and_hang3_string\@:
 
 .macro .check_for_loading_error file_name
     BCC no_loading_error\@
-   .inform_and_hang3 "\file_name loading error"
+   .inform_and_hang2 "\file_name loading error"
 
 no_loading_error\@:
 .endm

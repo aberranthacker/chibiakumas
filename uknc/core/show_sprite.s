@@ -36,8 +36,8 @@ ShowSprite_ReadInfo: # ------------------------------------------------------{{{
         MOV  R2,@$SprShow_SpriteWidth
 
       # Sprite attributes such as PSet, Doubleheight and transp color
-        MOVB (R0),R0  # sign extension is irrelevant
-        MOV  R0,@$SprShow_SprAttrs
+        MOVB (R0),R5
+        MOV  R5,@$SprShow_SprAttrs
 
         RETURN
 
@@ -94,59 +94,37 @@ ShowSprite_ReadInfo: # ------------------------------------------------------{{{
         # ld c,a
         # ret
 #----------------------------------------------------------------------------}}}
-
+SpriteRenderersVectors:
+       .word SprDraw_TurboRenderer             # 0b0000
+       .word SprDraw_TurboRenderer_LineDoubler # 0b0010  2
+       .word SprDraw_PsetRenderer              # 0b0100  4
+       .word SprDraw_PsetRenderer_LineDoubler  # 0b0110  6
+       .word SprDraw_WithMaskRenderer          # 0b1000  8
 #-------------------------------------------------------------------------------
 ShowSprite: # ShowSprite is the main routine of our program!
         CALL @$ShowSprite_ReadInfo # Get Sprite Details
-      # A  R0 sprite attributes
+      # A  R5 sprite attributes
       #    R1 Y offset
       # B  R2 width
        .equiv SpriteSizeConfig6, .+2
         CMP  R2,$6 # 6 bytes, default sprite width
-        BEQ  1$
+        BEQ  ShowSprite_SizeNotChanged
 
        .equiv dstShowSpriteReconfigureCommand, .+2
         CALL @$ShowSpriteReconfigure
-    1$:
-        MOV  R0,R5
-        BIC  $0xFFF8,R5 # Bits 2,1,0 - transparency
-        MOVB TranspColors(R5),@$TranspBitA
 
+ShowSprite_SizeNotChanged:
        .equiv SprShow_Y, .+2
         ADD  $48,R1
        .equiv SprShow_X, .+2
         MOV  $48,R2
 
-        MOV  $SprDraw_WithMaskRenderer,R5
-        BIT  $0x20,R0
-        BNZ  ShowSprite_OK_SetRenderer
       # Set renderer according to the sprite attributes
-      # Bit 7 forces "pset" - wipes background but faster
-      # Bit 6 doubles height
-      # Bits 2,1,0 - transparency
-        ASLB R0
-        BCC  ShowSprite_OK_TurboRenderer
-
-      # PSET sprite - deletes background, fast no transp
-        MOV  $SprDraw_PsetRenderer,R5
-        ASLB R0
-        BCC  ShowSprite_OK_SetRenderer
-
-      # Double height with Pset (no transparency - much faster)
-        MOV  $SprDraw_PsetRenderer_LineDoubler,R5
-        BR   ShowSprite_OK_SetRenderer
-
-ShowSprite_OK_TurboRenderer:
-        MOV  $SprDraw_TurboRenderer,R5
-        ASLB R0
-        BCC  ShowSprite_OK_SetRenderer # Normal sprite
-
-      # Doubler gives an interlacing effect, used for faux big sprites
-      # without significant slowdown
-        MOV  $SprDraw_TurboRenderer_LineDoubler,R5
-
-    ShowSprite_OK_SetRenderer:
-        MOV  R5,@$jmpShowSprite_DrawAndReturn
+      # Bit 3 sprite with a bit-mask to clear background
+      # Bit 2 forces "pset" - wipes background but faster
+      # Bit 1 double height with bitmask
+      # Bit 0 has to be clear
+        MOV  SpriteRenderersVectors(R5),@$jmpShowSprite_DrawAndReturn
 
       # R1 Y
       # R2 X
@@ -210,7 +188,7 @@ SprDraw_BasicRenderer: # (SprDrawChooseRender)-------------------------------{{{
         MOV  $LineLoopBR,R0
 
        .equiv SprShow_SprAttrs, .+4
-        BIT  $0x40,$0x00
+        BIT  $0x02,$0x00
         BZE  SprDrawLn_SetLineLoopBR
 
         MOV  $000240,R0 # NOP to remove BR to execute double line related code
@@ -492,11 +470,11 @@ SprDraw_WithMaskRenderer:
        .word SprDraw_WithMaskRenderer_96pxInit  # 24 96
 
     SprDraw_WithMask_InitVectors:
-       .word SprDraw_WithMaskRenderer_BIC_SOB
+       .word SprDraw_WithMaskRenderer_BICB_SOB
        .word SprDraw_WithMaskRenderer_BIS_SOB
        .word SprDraw_BR_to_BIS
 
-    SprDraw_WithMaskRenderer_8pxInit: #-------------------------------------------{{{
+    SprDraw_WithMaskRenderer_8pxInit: #--------------------------------------{{{
         MOV  $80-2,R1
         MOV  $opcSOBToEndOfWithMaskBICBChain+ 2,@(R0)+ #
         MOV  $opcSOBToEndOfWithMaskBISChain+ 1,@(R0)+ #  2/2=1
@@ -580,7 +558,7 @@ SprDraw_WithMaskRenderer:
 
     SprDraw_WithMaskRenderer_LineSkip:
         ADD  R1,R5
-    SprDraw_WithMaskRenderer_BIC_SOB:
+    SprDraw_WithMaskRenderer_BICB_SOB:
         SOB  R2,SprDraw_WithMaskRenderer_24pxBICB
 
         POP  R2
@@ -623,4 +601,4 @@ SprDraw_WithMaskRenderer:
         RETURN
 #----------------------------------------------------------------------------}}}
 SprDraw_WidthNotSupported:
-        .inform_and_hang2 "SprDraw: Width not supported"
+       .inform_and_hang2 "Spr Width not supported"

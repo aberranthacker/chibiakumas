@@ -14,7 +14,7 @@ OptionParser.new do |opts|
   end
 end.parse!
 raise "Need to specify a file to process" unless options.src_filename = ARGV[0]
-raise "Need to specify output filse" unless options.dst_filename = ARGV[1]
+raise "Need to specify an output file" unless options.dst_filename = ARGV[1]
 options.bpp = 2 if options.bpp.nil?
 
 # https://github.com/bordeeinc/bmp-ruby

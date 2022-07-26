@@ -15,15 +15,15 @@
 start:
         JMP  @$LevelInit
 
-       .incbin "resources/level_01a.spr"
+       .incbin "build/level_01.0.spr"
    .ifdef ExtMemCore
 LevelSprites2:
-       .incbin "resources/level_01b.spr"
+       .incbin "build/level_01.1.spr"
    .endif
 ChibiSprites:
        .incbin "build/chibi_lr.spr"
 LevelTiles:
-       .incbin "resources/level_01_tiles.spr"
+       .incbin "build/level_01_tiles.spr"
 
 EventStreamArray_Ep1: #----------------------------------------------------------{{{
    # We will use 4 Paralax layers
