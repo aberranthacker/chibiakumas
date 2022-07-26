@@ -56,12 +56,14 @@ VirtualPosToScreenByte:
         ADD  R2,R3
         ASR  R3
         ASR  R3
-        ASL  R3
+        ASL  R3 # align to word boundary
         ADD  R3,R5 # X pos is ok, but plot R5 less bytes
 
     VirtualPos_2$:
         SUB  R0,R2 # R0 = 24
-        RORB R2    # halve the result, as we have 80 bytes, but 160 x co-ords
+        ASR  R2 # halve the result, as we have 80 bytes, but 160 x co-ords
+        ASR  R2
+        ASL  R2 # align to word boundary
       # using MOVB because MSB contains frame buffer offset
       # show_sprite.s:265
         MOVB R2,@$SprShow_ScrWord

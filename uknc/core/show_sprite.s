@@ -117,6 +117,9 @@ ShowSprite: # ShowSprite is the main routine of our program!
        .equiv SprShow_X, .+2
         MOV  $48,R2
 
+        MOV  $SprDraw_WithMaskRenderer,R5
+        BIT  $0x20,R0
+        BNZ  ShowSprite_OK_SetRenderer
       # Set renderer according to the sprite attributes
       # Bit 7 forces "pset" - wipes background but faster
       # Bit 6 doubles height
@@ -287,18 +290,18 @@ SprDraw_TurboRenderer: # Pick the render based on width
         JMP  @SprDraw_TurboRenderer_JumpTable-2(R1)
 
     SprDraw_TurboRenderer_JumpTable:
-       .word SprDraw_TurboRenderer_8pxInit  #  2
-       .word SprDraw_TurboRenderer_16pxInit #  4
-       .word SprDraw_TurboRenderer_24pxInit #  6
-       .word SprDraw_TurboRenderer_32pxInit #  8
-       .word SprDraw_TurboRenderer_40pxInit # 10
-       .word SprDraw_TurboRenderer_48pxInit # 12
-       .word SprDraw_BasicRenderer          # 14 56
-       .word SprDraw_BasicRenderer          # 16 64
-       .word SprDraw_TurboRenderer_72pxInit # 18
-       .word SprDraw_BasicRenderer          # 20 80
-       .word SprDraw_BasicRenderer          # 22 88
-       .word SprDraw_TurboRenderer_96pxInit # 24
+       .word SprDraw_TurboRenderer_8pxInit  #  2  8
+       .word SprDraw_TurboRenderer_16pxInit #  4 16
+       .word SprDraw_TurboRenderer_24pxInit #  6 24
+       .word SprDraw_TurboRenderer_32pxInit #  8 32
+       .word SprDraw_WidthNotSupported      # 10 40
+       .word SprDraw_TurboRenderer_48pxInit # 12 48
+       .word SprDraw_WidthNotSupported      # 14 56
+       .word SprDraw_WidthNotSupported      # 16 64
+       .word SprDraw_WidthNotSupported      # 18 72
+       .word SprDraw_WidthNotSupported      # 20 80
+       .word SprDraw_WidthNotSupported      # 22 88
+       .word SprDraw_TurboRenderer_96pxInit # 24 96
 
     SprDraw_TurboRenderer_8pxInit:
         MOV  $80-2,R1
@@ -316,17 +319,9 @@ SprDraw_TurboRenderer: # Pick the render based on width
         MOV  $80-8,R1
         MOV  $SprDraw_TurboRenderer_32px,R3
         JMP  (R3)
-    SprDraw_TurboRenderer_40pxInit:
-        MOV  $80-10,R1
-        MOV  $SprDraw_TurboRenderer_40px,R3
-        JMP  (R3)
     SprDraw_TurboRenderer_48pxInit:
         MOV  $80-12,R1
         MOV  $SprDraw_TurboRenderer_48px,R3
-        JMP  (R3)
-    SprDraw_TurboRenderer_72pxInit:
-        MOV  $80-18,R1
-        MOV  $SprDraw_TurboRenderer_72px,R3
         JMP  (R3)
     SprDraw_TurboRenderer_96pxInit:
         MOV  $80-24,R1
@@ -342,31 +337,31 @@ SprDraw_TurboRenderer_24px_Double: # Line doubler - does two nextlines each time
         BR   SprDraw_TurboRenderer_LineSkip
 
 # TODO: implement skipping the word if it has trasparency
-SprDraw_TurboRenderer_96px:
+    SprDraw_TurboRenderer_96px:
         MOV  (R4)+,(R5)+
-SprDraw_TurboRenderer_88px: # unused
+    #SprDraw_TurboRenderer_88px: # not used
         MOV  (R4)+,(R5)+
-SprDraw_TurboRenderer_80px: # unused
+    #SprDraw_TurboRenderer_80px: # not used
         MOV  (R4)+,(R5)+
-SprDraw_TurboRenderer_72px:
+    #SprDraw_TurboRenderer_72px: # not used
         MOV  (R4)+,(R5)+
-SprDraw_TurboRenderer_64px: # unused
+    #SprDraw_TurboRenderer_64px: # not used
         MOV  (R4)+,(R5)+
-SprDraw_TurboRenderer_56px: # unused
+    #SprDraw_TurboRenderer_56px: # not used
         MOV  (R4)+,(R5)+
-SprDraw_TurboRenderer_48px:
+    SprDraw_TurboRenderer_48px:
         MOV  (R4)+,(R5)+
-SprDraw_TurboRenderer_40px:
+    #SprDraw_TurboRenderer_40px: # not used
         MOV  (R4)+,(R5)+
-SprDraw_TurboRenderer_32px:
+    SprDraw_TurboRenderer_32px:
         MOV  (R4)+,(R5)+
-SprDraw_TurboRenderer_24px:
+    SprDraw_TurboRenderer_24px:
         MOV  (R4)+,(R5)+
-SprDraw_TurboRenderer_16px:
+    SprDraw_TurboRenderer_16px:
         MOV  (R4)+,(R5)+
-SprDraw_TurboRenderer_8px:
+    SprDraw_TurboRenderer_8px:
         MOV  (R4)+,(R5)+
-SprDraw_TurboRenderer_LineSkip:
+    SprDraw_TurboRenderer_LineSkip:
         DEC  R2
         BZE  SprDraw_TurboRenderer_Done
 
@@ -388,7 +383,7 @@ SprDraw_PsetRenderer:
         MOV  @$SprShow_DrawWidth,R1
 
     .ifdef DebugMode
-        CMP  R1,$32
+        CMP  R1,$24
         BLOS SprDraw_PsetRendererJump
        .inform_and_hang "PsetRenderer jump out of range"
     .endif
@@ -400,18 +395,14 @@ SprDraw_PsetRenderer:
        .word SprDraw_PsetRenderer16pxInit  #  4
        .word SprDraw_PsetRenderer24pxInit  #  6
        .word SprDraw_PsetRenderer32pxInit  #  8
-       .word SprDraw_PsetRenderer40pxInit  # 10
+       .word SprDraw_WidthNotSupported     # 10
        .word SprDraw_PsetRenderer48pxInit  # 12
-       .word SprDraw_BasicRenderer         # 14 56
-       .word SprDraw_PsetRenderer64pxInit  # 16
-       .word SprDraw_PsetRenderer72pxInit  # 18
-       .word SprDraw_PsetRenderer80pxInit  # 20
-       .word SprDraw_BasicRenderer         # 22 88
+       .word SprDraw_WidthNotSupported     # 14 56
+       .word SprDraw_WidthNotSupported     # 16
+       .word SprDraw_WidthNotSupported     # 18
+       .word SprDraw_WidthNotSupported     # 20
+       .word SprDraw_WidthNotSupported     # 22 88
        .word SprDraw_PsetRenderer96pxInit  # 24
-       .word SprDraw_BasicRenderer         # 26 104
-       .word SprDraw_BasicRenderer         # 28 112
-       .word SprDraw_BasicRenderer         # 30 120
-       .word SprDraw_PsetRenderer128pxInit # 32
     #------------------------------------------------------------------------}}}
     SprDraw_PsetRenderer8pxInit: #-------------------------------------------{{{
         MOV  $80-2,R1
@@ -429,34 +420,14 @@ SprDraw_PsetRenderer:
         MOV  $80-8,R1
         MOV  $opcSOBToEndOfPsetDrawChain+ 4,@$SprDraw_PsetRenderer_SOB #  8/2=4
         BR   SprDraw_PsetRenderer32pxVer
-    SprDraw_PsetRenderer40pxInit:
-        MOV  $80-10,R1
-        MOV  $opcSOBToEndOfPsetDrawChain+ 5,@$SprDraw_PsetRenderer_SOB # 10/2=5
-        BR   SprDraw_PsetRenderer40pxVer
     SprDraw_PsetRenderer48pxInit:
         MOV  $80-12,R1
         MOV  $opcSOBToEndOfPsetDrawChain+ 6,@$SprDraw_PsetRenderer_SOB # 12/2=6
         BR   SprDraw_PsetRenderer48pxVer
-    SprDraw_PsetRenderer64pxInit:
-        MOV  $80-16,R1
-        MOV  $opcSOBToEndOfPsetDrawChain+ 8,@$SprDraw_PsetRenderer_SOB # 16/2=8
-        BR   SprDraw_PsetRenderer64pxVer
-    SprDraw_PsetRenderer72pxInit:
-        MOV  $80-18,R1
-        MOV  $opcSOBToEndOfPsetDrawChain+ 9,@$SprDraw_PsetRenderer_SOB # 18/2=9
-        BR   SprDraw_PsetRenderer72pxVer
-    SprDraw_PsetRenderer80pxInit:
-        MOV  $80-20,R1
-        MOV  $opcSOBToEndOfPsetDrawChain+10,@$SprDraw_PsetRenderer_SOB # 20/2=10
-        BR   SprDraw_PsetRenderer80pxVer
     SprDraw_PsetRenderer96pxInit:
         MOV  $80-24,R1
         MOV  $opcSOBToEndOfPsetDrawChain+12,@$SprDraw_PsetRenderer_SOB # 24/2=12
         BR   SprDraw_PsetRenderer96pxVer
-    SprDraw_PsetRenderer128pxInit:
-        MOV  $80-32,R1
-        MOV  $opcSOBToEndOfPsetDrawChain+16,@$SprDraw_PsetRenderer_SOB # 32/2=16
-        BR   SprDraw_PsetRenderer128pxVer
 #----------------------------------------------------------------------------}}}
     SprDraw_PsetRenderer_Double:
         BIT  $1,R2
@@ -464,24 +435,19 @@ SprDraw_PsetRenderer:
         ADD  $6,R5
         BR   SprDraw_PsetRenderer_LineSkip
 
-    SprDraw_PsetRenderer128pxVer: #---------------------------------------------
-        MOV  (R4)+,(R5)+
-        MOV  (R4)+,(R5)+
-        MOV  (R4)+,(R5)+
-        MOV  (R4)+,(R5)+
     SprDraw_PsetRenderer96pxVer:
         MOV  (R4)+,(R5)+
         MOV  (R4)+,(R5)+
-    SprDraw_PsetRenderer80pxVer:
+   #SprDraw_PsetRenderer80pxVer: # not used
         MOV  (R4)+,(R5)+
-    SprDraw_PsetRenderer72pxVer:
+   #SprDraw_PsetRenderer72pxVer: # not used
         MOV  (R4)+,(R5)+
-    SprDraw_PsetRenderer64pxVer:
+   #SprDraw_PsetRenderer64pxVer: # not used
         MOV  (R4)+,(R5)+
         MOV  (R4)+,(R5)+
     SprDraw_PsetRenderer48pxVer:
         MOV  (R4)+,(R5)+
-    SprDraw_PsetRenderer40pxVer:
+   #SprDraw_PsetRenderer40pxVer: # not used
         MOV  (R4)+,(R5)+
     SprDraw_PsetRenderer32pxVer:
         MOV  (R4)+,(R5)+
@@ -501,3 +467,160 @@ SprDraw_PsetRenderer:
 
         RETURN
 #----------------------------------------------------------------------------}}}
+
+# SprDraw_WithMaskRenderer -----------------------------{{{
+SprDraw_WithMaskRenderer:
+        MOV  @$SprShow_DrawWidth,R1
+        PUSH R5
+        PUSH R2
+        MOV  $SprDraw_WithMask_InitVectors,R0
+
+    SprDraw_WithMaskRenderer_Jump:
+        JMP  @SprDraw_WithMaskRenderer_Vectors-2(R1)
+    SprDraw_WithMaskRenderer_Vectors:
+       .word SprDraw_WithMaskRenderer_8pxInit   #  2  8
+       .word SprDraw_WithMaskRenderer_16pxInit  #  4 16
+       .word SprDraw_WithMaskRenderer_24pxInit  #  6 24
+       .word SprDraw_WithMaskRenderer_32pxInit  #  8 32
+       .word SprDraw_WidthNotSupported          # 10 40
+       .word SprDraw_WithMaskRenderer_48pxInit  # 12 48
+       .word SprDraw_WidthNotSupported          # 14 56
+       .word SprDraw_WidthNotSupported          # 16 64
+       .word SprDraw_WidthNotSupported          # 18 72
+       .word SprDraw_WidthNotSupported          # 20 80
+       .word SprDraw_WidthNotSupported          # 22 88
+       .word SprDraw_WithMaskRenderer_96pxInit  # 24 96
+
+    SprDraw_WithMask_InitVectors:
+       .word SprDraw_WithMaskRenderer_BIC_SOB
+       .word SprDraw_WithMaskRenderer_BIS_SOB
+       .word SprDraw_BR_to_BIS
+
+    SprDraw_WithMaskRenderer_8pxInit: #-------------------------------------------{{{
+        MOV  $80-2,R1
+        MOV  $opcSOBToEndOfWithMaskBICBChain+ 2,@(R0)+ #
+        MOV  $opcSOBToEndOfWithMaskBISChain+ 1,@(R0)+ #  2/2=1
+        MOVB $11,(R0)+
+        BR   SprDraw_WithMaskRenderer_8pxBICB
+    SprDraw_WithMaskRenderer_16pxInit:
+        MOV  $80-4,R1
+        MOV  $opcSOBToEndOfWithMaskBICBChain+ 4,@(R0)+ #
+        MOV  $opcSOBToEndOfWithMaskBISChain+ 2,@(R0)+ #  4/2=2
+        MOVB $10,@(R0)+
+        BR   SprDraw_WithMaskRenderer_16pxBICB
+    SprDraw_WithMaskRenderer_24pxInit:
+        MOV  $80-6,R1
+        MOV  $opcSOBToEndOfWithMaskBICBChain+ 6,@(R0)+ #
+        MOV  $opcSOBToEndOfWithMaskBISChain+ 3,@(R0)+ #  6/2=3
+        MOVB $9,@(R0)+
+        BR   SprDraw_WithMaskRenderer_24pxBICB
+    SprDraw_WithMaskRenderer_32pxInit:
+        MOV  $80-8,R1
+        MOV  $opcSOBToEndOfWithMaskBICBChain+ 8,@(R0)+ #
+        MOV  $opcSOBToEndOfWithMaskBISChain+ 4,@(R0)+ #  8/2=4
+        MOVB $8,@(R0)+
+        BR   SprDraw_WithMaskRenderer_32pxBICB
+    SprDraw_WithMaskRenderer_48pxInit:
+        MOV  $80-12,R1
+        MOV  $opcSOBToEndOfWithMaskBICBChain+12,@(R0)+ #
+        MOV  $opcSOBToEndOfWithMaskBISChain+ 6,@(R0)+ # 12/2=6
+        MOVB $6,@$SprDraw_BR_to_BIS
+        BR   SprDraw_WithMaskRenderer_48pxBICB
+    SprDraw_WithMaskRenderer_96pxInit:
+        MOV  $80-24,R1
+        MOV  $opcSOBToEndOfWithMaskBICBChain+24,@(R0)+ #
+        MOV  $opcSOBToEndOfWithMaskBISChain+12,@(R0)+ # 24/2=12
+        MOVB $0,@(R0)+
+        BR   SprDraw_WithMaskRenderer_96pxBICB
+#----------------------------------------------------------------------------}}}
+    SprDraw_WithMaskRenderer_Double:
+        BIT  $1,R2
+        BZE  SprDraw_WithMaskRenderer_24pxBICB
+        ADD  $6,R5
+        BR   SprDraw_WithMaskRenderer_LineSkip
+
+    SprDraw_WithMaskRenderer_96pxBICB:
+        BICB (R4) ,(R5)+
+        BICB (R4)+,(R5)+
+   #SprDraw_WithMaskRenderer_88pxBICB: # not used
+        BICB (R4) ,(R5)+
+        BICB (R4)+,(R5)+
+   #SprDraw_WithMaskRenderer_80pxBICB: # not used
+        BICB (R4) ,(R5)+
+        BICB (R4)+,(R5)+
+   #SprDraw_WithMaskRenderer_72pxBICB: # not used
+        BICB (R4) ,(R5)+
+        BICB (R4)+,(R5)+
+   #SprDraw_WithMaskRenderer_64pxBICB: # not used
+        BICB (R4) ,(R5)+
+        BICB (R4)+,(R5)+
+   #SprDraw_WithMaskRenderer_56pxBICB: # not used
+        BICB (R4) ,(R5)+
+        BICB (R4)+,(R5)+
+    SprDraw_WithMaskRenderer_48pxBICB:
+        BICB (R4) ,(R5)+
+        BICB (R4)+,(R5)+
+   #SprDraw_WithMaskRenderer_40pxBICB: # not used
+        BICB (R4) ,(R5)+
+        BICB (R4)+,(R5)+
+    SprDraw_WithMaskRenderer_32pxBICB:
+        BICB (R4) ,(R5)+
+        BICB (R4)+,(R5)+
+    SprDraw_WithMaskRenderer_24pxBICB:
+        BICB (R4) ,(R5)+
+        BICB (R4)+,(R5)+
+    SprDraw_WithMaskRenderer_16pxBICB:
+        BICB (R4) ,(R5)+
+        BICB (R4)+,(R5)+
+    SprDraw_WithMaskRenderer_8pxBICB:
+        BICB (R4) ,(R5)+
+        BICB (R4)+,(R5)+
+    #---------------------------------------------------------------------------
+       .equiv opcSOBToEndOfWithMaskBICBChain, 0077202
+
+    SprDraw_WithMaskRenderer_LineSkip:
+        ADD  R1,R5
+    SprDraw_WithMaskRenderer_BIC_SOB:
+        SOB  R2,SprDraw_WithMaskRenderer_24pxBICB
+
+        POP  R2
+        POP  R5
+    SprDraw_BR_to_BIS:
+        BR   SprDraw_WithMaskRenderer_24pxBIS
+
+    SprDraw_WithMaskRenderer_96pxBIS:
+        BIS  (R4)+,(R5)+
+   #SprDraw_WithMaskRenderer_88pxBIS: # not used
+        BIS  (R4)+,(R5)+
+   #SprDraw_WithMaskRenderer_80pxBIS: # not used
+        BIS  (R4)+,(R5)+
+   #SprDraw_WithMaskRenderer_72pxBIS: # not used
+        BIS  (R4)+,(R5)+
+   #SprDraw_WithMaskRenderer_64pxBIS: # not used
+        BIS  (R4)+,(R5)+
+   #SprDraw_WithMaskRenderer_56pxBIS: # not used
+        BIS  (R4)+,(R5)+
+    SprDraw_WithMaskRenderer_48pxBIS:
+        BIS  (R4)+,(R5)+
+   #SprDraw_WithMaskRenderer_40pxBIS: # not used
+        BIS  (R4)+,(R5)+
+    SprDraw_WithMaskRenderer_32pxBIS:
+        BIS  (R4)+,(R5)+
+    SprDraw_WithMaskRenderer_24pxBIS:
+        BIS  (R4)+,(R5)+
+    SprDraw_WithMaskRenderer_16pxBIS:
+        BIS  (R4)+,(R5)+
+    SprDraw_WithMaskRenderer_8pxBIS:
+        BIS  (R4)+,(R5)+
+    #---------------------------------------------------------------------------
+       .equiv opcSOBToEndOfWithMaskBISChain, 0077202
+
+    SprDraw_WithMaskRenderer_BIS_LineSkip:
+        ADD  R1,R5
+    SprDraw_WithMaskRenderer_BIS_SOB:
+        SOB  R2,SprDraw_WithMaskRenderer_24pxBIS
+
+        RETURN
+#----------------------------------------------------------------------------}}}
+SprDraw_WidthNotSupported:
+        .inform_and_hang2 "SprDraw: Width not supported"

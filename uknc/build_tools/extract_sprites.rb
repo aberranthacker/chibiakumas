@@ -24,7 +24,6 @@
 #
 # These 6 bytes will be repeated for the next sprite, and so on
 
-require 'pry'
 require 'optparse'
 
 options = Struct.new(:in_filename, :out_prefix, :font).new
