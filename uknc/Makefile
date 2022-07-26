@@ -47,7 +47,13 @@ build/bootstrap.bin : build/bootstrap.o \
                       build/ep1_intro.o \
                       build/ep1_intro_slides.o \
                       build/level_01.o \
-                      build/level_02.o
+                      build/level_02.o \
+                      build/high_score.bin \
+                      build/continue.bin \
+                      build/level_01_loading.bin \
+                      build/level_03_loading.bin \
+                      build/level_05_loading.bin \
+                      build/level_07_loading.bin
 	$(LD) $(LDFLAGS) -M \
 	      -T linker_scripts/bootstrap.cmd \
 	      -R build/core.o \
@@ -64,6 +70,25 @@ build/bootstrap.o : $(common) \
                     bootstrap.s \
                     ppucmd.s
 	$(AS) -al bootstrap.s -o build/bootstrap.o | build_tools/format_list.rb
+
+build/high_score.bin : build_tools/bmp_to_raw.rb \
+                       resources/high_score.bmp
+	build_tools/bmp_to_raw.rb resources/high_score.bmp build/high_score.bin
+build/continue.bin : build_tools/spr_cpc_to_uknc.rb \
+                     resources/continue.bmp
+	build_tools/bmp_to_raw.rb resources/continue.bmp build/continue.bin
+build/level_01_loading.bin : build_tools/bmp_to_raw.rb \
+                             resources/level_01-loading.bmp
+	build_tools/bmp_to_raw.rb resources/level_01-loading.bmp build/level_01_loading.bin
+build/level_03_loading.bin : build_tools/bmp_to_raw.rb \
+                             resources/level_03-loading.bmp
+	build_tools/bmp_to_raw.rb resources/level_03-loading.bmp build/level_03_loading.bin
+build/level_05_loading.bin : build_tools/bmp_to_raw.rb \
+                             resources/level_05-loading.bmp
+	build_tools/bmp_to_raw.rb resources/level_05-loading.bmp build/level_05_loading.bin
+build/level_07_loading.bin : build_tools/bmp_to_raw.rb \
+                             resources/level_07-loading.bmp
+	build_tools/bmp_to_raw.rb resources/level_07-loading.bmp build/level_07_loading.bin
 # bootsrap.bin --------------------------------------------------------------}}}
 
 # loading_screen.bin --------------------------------------------------------{{{
@@ -255,22 +280,22 @@ build/level_01.bin : build/core.o \
 	ruby build_tools/aout2sav.rb build/level_01.out -b -s -o build/level_01.bin
 build/level_01.o : $(common) \
                    level_01.s \
-		   resources/level01_00.spr \
-		   resources/level01_01.spr \
-		   resources/level01_tiles.spr \
+		   resources/level_01a.spr \
+		   resources/level_01b.spr \
+		   resources/level_01_tiles.spr \
 		   resources/chibi_lr.spr
 	$(AS) -al level_01.s -o build/level_01.o | build_tools/format_list.rb
 
-resources/level01_00.spr : build_tools/spr_cpc_to_uknc.rb \
-                           resources/level_01_bank_0.SPR
-	build_tools/spr_cpc_to_uknc.rb resources/level_01_bank_0.SPR -o resources/level01_00.spr
-resources/level01_01.spr : build_tools/spr_cpc_to_uknc.rb \
-                           resources/level_01_bank_1.SPR
-	build_tools/spr_cpc_to_uknc.rb resources/level_01_bank_1.SPR -o resources/level01_01.spr
+resources/level_01a.spr : build_tools/spr_cpc_to_uknc.rb \
+                           resources/level_01a.CPC.SPR
+	build_tools/spr_cpc_to_uknc.rb resources/level_01a.CPC.SPR -o resources/level_01a.spr
+resources/level_01b.spr : build_tools/spr_cpc_to_uknc.rb \
+                           resources/level_01b.CPC.SPR
+	build_tools/spr_cpc_to_uknc.rb resources/level_01b.CPC.SPR -o resources/level_01b.spr
 
-resources/level01_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
+resources/level_01_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
 	                      ../ResCPC/Level01-Tiles.SPR
-	build_tools/spr_cpc_to_uknc.rb ../ResCPC/Level01-Tiles.SPR -o resources/level01_tiles.spr
+	build_tools/spr_cpc_to_uknc.rb ../ResCPC/Level01-Tiles.SPR -o resources/level_01_tiles.spr
 # level_01.bin --------------------------------------------------------------}}}
 
 # level_02.bin --------------------------------------------------------------{{{
@@ -281,18 +306,22 @@ build/level_02.bin : build/core.o \
 
 build/level_02.o : $(common) \
                    level_02.s \
-		   resources/level02.spr \
-		   resources/level02_tiles.spr \
+		   resources/level_02a.spr \
+		   resources/level_02b.spr \
+		   resources/level_02_tiles.spr \
 		   resources/chibi_lr.spr
 	$(AS) -al level_02.s -o build/level_02.o | build_tools/format_list.rb
 
-resources/level02.spr : build_tools/spr_cpc_to_uknc.rb \
-                        ../ResCPC/LEVEL2A.SPR
-	build_tools/spr_cpc_to_uknc.rb ../ResCPC/LEVEL2A.SPR -o resources/level02.spr
+resources/level_02a.spr : build_tools/spr_cpc_to_uknc.rb \
+                           resources/level_02a.CPC.SPR
+	build_tools/spr_cpc_to_uknc.rb resources/level_02a.CPC.SPR -o resources/level_02a.spr
+resources/level_02b.spr : build_tools/spr_cpc_to_uknc.rb \
+                           resources/level_02b.CPC.SPR
+	build_tools/spr_cpc_to_uknc.rb resources/level_02b.CPC.SPR -o resources/level_02b.spr
 
-resources/level02_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
+resources/level_02_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
 	                      ../ResCPC/Level2-Tiles-CPC.SPR
-	build_tools/spr_cpc_to_uknc.rb ../ResCPC/Level2-Tiles-CPC.SPR -o resources/level02_tiles.spr
+	build_tools/spr_cpc_to_uknc.rb ../ResCPC/Level2-Tiles-CPC.SPR -o resources/level_02_tiles.spr
 # level_02.bin --------------------------------------------------------------}}}
 
 resources/chibi_lr.spr : build_tools/spr_cpc_to_uknc.rb \

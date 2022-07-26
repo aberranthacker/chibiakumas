@@ -30,7 +30,7 @@ image_size         = bmp[0x22,4].unpack1('V')
 
 raise 'Unknown file type.' unless signature == 'BM'
 raise 'Number of color planes other than 1 in not supported.' unless planes == 1
-raise 'Number of bits per pixel other than 8 is not supported.' unless bits_per_pixel == 8
+raise "#{bits_per_pixel} bits per pixel not supported, 8 bits only." unless bits_per_pixel == 8
 raise 'Compression is not supported.' unless compression == 0
 raise 'Padded pixel array is not supported.' unless image_width * image_height == image_size
 
