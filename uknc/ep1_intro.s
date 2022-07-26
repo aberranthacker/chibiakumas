@@ -16,7 +16,7 @@
 
 start:
         JMP  @$LevelInit
-       .incbin "resources/ep1_intro.spr"
+       .incbin "build/ep1_intro.spr"
 
 slide01: .incbin "build/ep1-intro/ep1-intro-slide01.raw.lzsa1" # chibiki
 slide02: .incbin "build/ep1-intro/ep1-intro-slide02.raw.lzsa1" # fishing

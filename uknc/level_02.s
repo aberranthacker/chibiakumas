@@ -16,11 +16,11 @@ start:
         JMP  @$LevelInit
 
 LevelSprites2:
-       .incbin "resources/level_02b.spr"
+       .incbin "build/level_02.0.spr"
 ChibiSprites:
-       .incbin "resources/chibi_lr.spr"
+       .incbin "build/chibi_lr.spr"
 LevelTiles:
-       .incbin "resources/level_02_tiles.spr"
+       .incbin "build/level_02_tiles.spr"
 
 EventStreamArray:
 # defb 0,evtReprogram_PowerupSprites,128+99,128+99,128+99, 21+128+10  ; Define powerup sprites
