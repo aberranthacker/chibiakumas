@@ -45,58 +45,10 @@ ShowSprite_ReadInfo: # ------------------------------------------------------{{{
       # Forcably quit not just getting info - but showing the sprite
         TST  (SP)+
         RETURN
-#----------------------------------------------------------------------------}}}
-
-# ShowSpriteDirect is a cruder version of ShowSprite, it does not use the
-# 'virtual' screen res of (160x200) and cannot do clipping - it was designed for
-# the UI objects which never moved and never needed clipping
-#ShowSpriteDirect: #----------------------------------------------------------{{{
-#      # set draw pos into Temp_X and Temp_Y
-#        CALL ShowSprite_ReadInfo
-#
-#        ADD  R1,@$SprShow_ScrLine
-#      # ;Quick shortcuts for fonts
-#        DEC  R2
-#        BZE  ShowSpriteDirectOneByteSpecial
-#
-#        DEC  R2
-#        BZE  ShowSpriteDirectTwoByteSpecial
-#
-#        DEC  R2
-#        DEC  R2
-#        BZE  ShowSpriteDirectFourByteSpecial
-#
-#        CLR  @$TranspBitA
-#        MOV  $SprDraw_TurboRenderer,R2
-#        ASLB R0
-#        BCC  ShowSpite_DoNotForcePSet
-#
-#        MOV  $SprDraw_PsetRenderer,R2
-#ShowSpite_DoNotForcePSet:
-#        MOV  R2,@$jmpShowSprite_DrawAndReturn
-#        JMP  ShowSprite_SkipCrop
-#
-#ShowSpriteDirectFourByteSpecial:
-#        CLR  @$TranspBitA
-#        MOV  $SprDraw_TurboRenderer_16pxInit, @$jmpShowSprite_DrawAndReturn
-#        JMP  ShowSprite_SkipCrop
-#ShowSpriteDirectTwoByteSpecial: # shortcut for our minifont!
-#        MOV  $SprDraw_PsetRenderer8pxInit, @$jmpShowSprite_DrawAndReturn
-#        JMP  ShowSprite_SkipCrop
-#ShowSpriteDirectOneByteSpecial: # shortcut for our minifont!
-#        MOV  $SprDraw_BasicRenderer, @$jmpShowSprite_DrawAndReturn
-#        JMP  ShowSprite_SkipCrop
-
-# GetSpriteXY:
-        # ld a,(SprShow_X)
-        # ld b,a
-        # ld a,(SprShow_Y)
-        # ld c,a
-        # ret
-#----------------------------------------------------------------------------}}}
+#-------------------------------------------------------------------------------
 SpriteRenderersVectors:
-       .word SprDraw_TurboRenderer             # 0b0000
-       .word SprDraw_TurboRenderer_LineDoubler # 0b0010  2
+       .word SprDraw_PsetRenderer              # 0b0000
+       .word SprDraw_PsetRenderer_LineDoubler  # 0b0010  2
        .word SprDraw_PsetRenderer              # 0b0100  4
        .word SprDraw_PsetRenderer_LineDoubler  # 0b0110  6
        .word SprDraw_WithMaskRenderer          # 0b1000  8
@@ -182,7 +134,7 @@ SprDraw_BasicRenderer: # (SprDrawChooseRender)-------------------------------{{{
       # R2 number of lines
       # R4 sprite  address
       # R5 screen memory dst address
-        MOV  @$TranspBitA,@$TranspBitB
+       #MOV  @$TranspBitA,@$TranspBitB
 
        .equiv LineLoopBR, 000400 + (SprDrawLn_LineLoop - SprDrawLn_LineLoopBR - 2) >> 1 & 0xFF
         MOV  $LineLoopBR,R0
@@ -248,113 +200,113 @@ SprDrawLn_DoubleLine:
 #----------------------------------------------------------------------------}}}
 # Turbo version ----------------------------------------------------------------
 # SprDraw_TurboRenderer (SprDrawChooseRender)--------------------------------{{{
-SprDraw_TurboRenderer_LineDoubler:
-        MOV  $80-6,R1
-        ASL  R2
-        MOV  $SprDraw_TurboRenderer_24px_Double,R3
-        JMP  (R3)
-SprDraw_TurboRenderer: # Pick the render based on width
-       .equiv TranspBitA, .+2
-        MOV  $0x00,R0 # Set R0 to ZERO / Transp byte
-        MOV  @$SprShow_DrawWidth,R1
-
-    .ifdef DebugMode
-        CMP  R1,$24
-        BLOS SprDraw_TurboRenderer_Jump
-       .inform_and_hang "TurboRenderer: jump out of range"
-    .endif
-
-    SprDraw_TurboRenderer_Jump:
-        JMP  @SprDraw_TurboRenderer_JumpTable-2(R1)
-
-    SprDraw_TurboRenderer_JumpTable:
-       .word SprDraw_TurboRenderer_8pxInit  #  2  8
-       .word SprDraw_TurboRenderer_16pxInit #  4 16
-       .word SprDraw_TurboRenderer_24pxInit #  6 24
-       .word SprDraw_TurboRenderer_32pxInit #  8 32
-       .word SprDraw_WidthNotSupported      # 10 40
-       .word SprDraw_TurboRenderer_48pxInit # 12 48
-       .word SprDraw_WidthNotSupported      # 14 56
-       .word SprDraw_WidthNotSupported      # 16 64
-       .word SprDraw_WidthNotSupported      # 18 72
-       .word SprDraw_WidthNotSupported      # 20 80
-       .word SprDraw_WidthNotSupported      # 22 88
-       .word SprDraw_TurboRenderer_96pxInit # 24 96
-
-    SprDraw_TurboRenderer_8pxInit:
-        MOV  $80-2,R1
-        MOV  $SprDraw_TurboRenderer_8px,R3
-        JMP  (R3)
-    SprDraw_TurboRenderer_16pxInit:
-        MOV  $80-4,R1
-        MOV  $SprDraw_TurboRenderer_16px,R3
-        JMP  (R3)
-    SprDraw_TurboRenderer_24pxInit:
-        MOV  $80-6,R1
-        MOV  $SprDraw_TurboRenderer_24px,R3
-        JMP  (R3)
-    SprDraw_TurboRenderer_32pxInit:
-        MOV  $80-8,R1
-        MOV  $SprDraw_TurboRenderer_32px,R3
-        JMP  (R3)
-    SprDraw_TurboRenderer_48pxInit:
-        MOV  $80-12,R1
-        MOV  $SprDraw_TurboRenderer_48px,R3
-        JMP  (R3)
-    SprDraw_TurboRenderer_96pxInit:
-        MOV  $80-24,R1
-        MOV  $SprDraw_TurboRenderer_96px,R3
-        JMP  (R3)
-
-# ********** A MUST BE the transparent byte for THIS WHOLE LOOP! ***********
-
-SprDraw_TurboRenderer_24px_Double: # Line doubler - does two nextlines each time
-        BIT  $1,R2
-        BZE  SprDraw_TurboRenderer_24px
-        ADD  $6,R5
-        BR   SprDraw_TurboRenderer_LineSkip
-
-# TODO: implement skipping the word if it has trasparency
-    SprDraw_TurboRenderer_96px:
-        MOV  (R4)+,(R5)+
-    #SprDraw_TurboRenderer_88px: # not used
-        MOV  (R4)+,(R5)+
-    #SprDraw_TurboRenderer_80px: # not used
-        MOV  (R4)+,(R5)+
-    #SprDraw_TurboRenderer_72px: # not used
-        MOV  (R4)+,(R5)+
-    #SprDraw_TurboRenderer_64px: # not used
-        MOV  (R4)+,(R5)+
-    #SprDraw_TurboRenderer_56px: # not used
-        MOV  (R4)+,(R5)+
-    SprDraw_TurboRenderer_48px:
-        MOV  (R4)+,(R5)+
-    #SprDraw_TurboRenderer_40px: # not used
-        MOV  (R4)+,(R5)+
-    SprDraw_TurboRenderer_32px:
-        MOV  (R4)+,(R5)+
-    SprDraw_TurboRenderer_24px:
-        MOV  (R4)+,(R5)+
-    SprDraw_TurboRenderer_16px:
-        MOV  (R4)+,(R5)+
-    SprDraw_TurboRenderer_8px:
-        MOV  (R4)+,(R5)+
-    SprDraw_TurboRenderer_LineSkip:
-        DEC  R2
-        BZE  SprDraw_TurboRenderer_Done
-
-        ADD  R1,R5
-        JMP  (R3)
-
-SprDraw_TurboRenderer_Done:
-        RETURN
+#SprDraw_TurboRenderer_LineDoubler:
+#        MOV  $80-6,R1
+#        ASL  R2
+#        MOV  $SprDraw_TurboRenderer_24px_Double,R3
+#        JMP  (R3)
+#SprDraw_TurboRenderer: # Pick the render based on width
+#       .equiv TranspBitA, .+2
+#        MOV  $0x00,R0 # Set R0 to ZERO / Transp byte
+#        MOV  @$SprShow_DrawWidth,R1
+#
+#    .ifdef DebugMode
+#        CMP  R1,$24
+#        BLOS SprDraw_TurboRenderer_Jump
+#       .inform_and_hang "TurboRenderer: jump out of range"
+#    .endif
+#
+#    SprDraw_TurboRenderer_Jump:
+#        JMP  @SprDraw_TurboRenderer_JumpTable-2(R1)
+#
+#    SprDraw_TurboRenderer_JumpTable:
+#       .word SprDraw_TurboRenderer_8pxInit  #  2  8
+#       .word SprDraw_TurboRenderer_16pxInit #  4 16
+#       .word SprDraw_TurboRenderer_24pxInit #  6 24
+#       .word SprDraw_TurboRenderer_32pxInit #  8 32
+#       .word SprDraw_WidthNotSupported      # 10 40
+#       .word SprDraw_TurboRenderer_48pxInit # 12 48
+#       .word SprDraw_WidthNotSupported      # 14 56
+#       .word SprDraw_WidthNotSupported      # 16 64
+#       .word SprDraw_WidthNotSupported      # 18 72
+#       .word SprDraw_WidthNotSupported      # 20 80
+#       .word SprDraw_WidthNotSupported      # 22 88
+#       .word SprDraw_TurboRenderer_96pxInit # 24 96
+#
+#    SprDraw_TurboRenderer_8pxInit:
+#        MOV  $80-2,R1
+#        MOV  $SprDraw_TurboRenderer_8px,R3
+#        JMP  (R3)
+#    SprDraw_TurboRenderer_16pxInit:
+#        MOV  $80-4,R1
+#        MOV  $SprDraw_TurboRenderer_16px,R3
+#        JMP  (R3)
+#    SprDraw_TurboRenderer_24pxInit:
+#        MOV  $80-6,R1
+#        MOV  $SprDraw_TurboRenderer_24px,R3
+#        JMP  (R3)
+#    SprDraw_TurboRenderer_32pxInit:
+#        MOV  $80-8,R1
+#        MOV  $SprDraw_TurboRenderer_32px,R3
+#        JMP  (R3)
+#    SprDraw_TurboRenderer_48pxInit:
+#        MOV  $80-12,R1
+#        MOV  $SprDraw_TurboRenderer_48px,R3
+#        JMP  (R3)
+#    SprDraw_TurboRenderer_96pxInit:
+#        MOV  $80-24,R1
+#        MOV  $SprDraw_TurboRenderer_96px,R3
+#        JMP  (R3)
+#
+## ********** A MUST BE the transparent byte for THIS WHOLE LOOP! ***********
+#
+#SprDraw_TurboRenderer_24px_Double: # Line doubler - does two nextlines each time
+#        BIT  $1,R2
+#        BZE  SprDraw_TurboRenderer_24px
+#        ADD  $6,R5
+#        BR   SprDraw_TurboRenderer_LineSkip
+#
+## TODO: implement skipping the word if it has trasparency
+#    SprDraw_TurboRenderer_96px:
+#        MOV  (R4)+,(R5)+
+#    #SprDraw_TurboRenderer_88px: # not used
+#        MOV  (R4)+,(R5)+
+#    #SprDraw_TurboRenderer_80px: # not used
+#        MOV  (R4)+,(R5)+
+#    #SprDraw_TurboRenderer_72px: # not used
+#        MOV  (R4)+,(R5)+
+#    #SprDraw_TurboRenderer_64px: # not used
+#        MOV  (R4)+,(R5)+
+#    #SprDraw_TurboRenderer_56px: # not used
+#        MOV  (R4)+,(R5)+
+#    SprDraw_TurboRenderer_48px:
+#        MOV  (R4)+,(R5)+
+#    #SprDraw_TurboRenderer_40px: # not used
+#        MOV  (R4)+,(R5)+
+#    SprDraw_TurboRenderer_32px:
+#        MOV  (R4)+,(R5)+
+#    SprDraw_TurboRenderer_24px:
+#        MOV  (R4)+,(R5)+
+#    SprDraw_TurboRenderer_16px:
+#        MOV  (R4)+,(R5)+
+#    SprDraw_TurboRenderer_8px:
+#        MOV  (R4)+,(R5)+
+#    SprDraw_TurboRenderer_LineSkip:
+#        DEC  R2
+#        BZE  SprDraw_TurboRenderer_Done
+#
+#        ADD  R1,R5
+#        JMP  (R3)
+#
+#SprDraw_TurboRenderer_Done:
+#        RETURN
 #----------------------------------------------------------------------------}}}
 # Pset Version! no transparentcy, so fast! -------------------------------------
 # SprDraw_PsetRenderer (SprDrawChooseRenderPset)-----------------------------{{{
 SprDraw_PsetRenderer_LineDoubler:
         MOV  $80-6,R1
         ASL  R2
-        MOV  $opcSOBToEndOfPsetDrawChain+22,@$SprDraw_PsetRenderer_SOB
+        MOV  $opcSOBToEndOfPsetDrawChain+18,@$SprDraw_PsetRenderer_SOB
         BR   SprDraw_PsetRenderer_Double
 
 SprDraw_PsetRenderer:
