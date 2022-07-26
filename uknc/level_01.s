@@ -21,9 +21,9 @@ LevelSprites2:
        .incbin "resources/level_01b.spr"
    .endif
 ChibiSprites:
-       .incbin "resources/chibi_lr.spr"
+       .incbin "build/chibi_lr.spr"
 LevelTiles:
-       .incbin "resources/level01_tiles.spr"
+       .incbin "resources/level_01_tiles.spr"
 
 EventStreamArray_Ep1: #----------------------------------------------------------{{{
    # We will use 4 Paralax layers
@@ -356,14 +356,14 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtSingleSprite | 8  # Row 15, last Column, Last Sprite
 
    # Clouds (3 wide)
-    .word 120, evtMultipleCommands | 4
+    .word 120, evtMultipleCommands | 3
     .word      evtSetProgMoveLife, prgNone, mveBackground | 0b0100, lifeImmortal
     .word      evtSingleSprite, sprSingleFrame | 41
     .byte          24+ 14, 24+ 159
     .word      evtSingleSprite, sprSingleFrame | 42
     .byte          24+ 14, 24+ 159+12
-    .word      evtSingleSprite, sprSingleFrame | 43
-    .byte          24+ 14, 24+ 159+24
+   #.word      evtSingleSprite, sprSingleFrame | 43
+   #.byte          24+ 14, 24+ 159+24
 
    # rock chick enemy
     .word 120, evtMultipleCommands | 3
@@ -466,14 +466,14 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word      evtSingleSprite | 7  # Row 13, last Column, Last Sprite
 
    # Clouds (3 wide)
-    .word 200, evtMultipleCommands | 4
+    .word 200, evtMultipleCommands | 3
     .word      evtSetProgMoveLife, prgNone, mveBackground | 0b0100, lifeImmortal
     .word      evtSingleSprite, sprSingleFrame | 41
     .byte          24+ 14, 24+ 159
     .word      evtSingleSprite, sprSingleFrame | 42
     .byte          24+ 14, 24+ 159+12
-    .word      evtSingleSprite, sprSingleFrame | 43
-    .byte          24+ 14, 24+ 159+24
+   #.word      evtSingleSprite, sprSingleFrame | 43
+   #.byte          24+ 14, 24+ 159+24
 
    # rock chick enemy
     .word 200, evtMultipleCommands | 3
@@ -597,10 +597,9 @@ LevelInit:
         MTPS $PR0
 #-------------------------------------------------------------------------------
 LevelLoop:
-        CALL @$Background_Draw
-
         CALL @$EventStream_Process
 
+        CALL @$Background_Draw
         CALL @$ObjectArray_Redraw
 
         MOV  $ChibiSprites,@$SprShow_BankAddr
@@ -718,11 +717,13 @@ GradientBottom:
    .word 0xFFFF
 #----------------------------------------------------------------------------}}}
 BluePalette: #---------------------------------------------------------------{{{
+    .word 0 | setOffscreenColors << 8, 0x0010, 0x1111
     .word 0, cursorGraphic, scale320 | 0b000
     .byte 1, setColors, Black, Blue, Blue, Magenta
     .word endOfScreen
 #----------------------------------------------------------------------------}}}
 DarkRealPalette: #---- ------------------------------------------------------{{{
+    .word 0 | setOffscreenColors << 8, 0x3210, 0x7654
     .word   0, cursorGraphic, scale320 | 0b000
     .byte   1, setColors, Black, brBlue, brYellow, White
     .byte  49, setColors, Black, Magenta, Blue, White
@@ -730,6 +731,7 @@ DarkRealPalette: #---- ------------------------------------------------------{{{
     .word endOfScreen
 #----------------------------------------------------------------------------}}}
 RealPalette: #---------------------------------------------------------------{{{
+    .word 0 | setOffscreenColors << 8, 0xBA90, 0xFEDC
     .word   0, cursorGraphic, scale320 | 0b111
     .byte   1, setColors, Black, brBlue, brYellow, White
     .word  32, cursorGraphic, scale320 | 0b110

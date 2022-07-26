@@ -80,15 +80,19 @@ build/continue.bin : build_tools/spr_cpc_to_uknc.rb \
 build/level_01_loading.bin : build_tools/bmp_to_raw.rb \
                              resources/level_01-loading.bmp
 	build_tools/bmp_to_raw.rb resources/level_01-loading.bmp build/level_01_loading.bin
+	build_tools/lzsa -f 1 -r build/level_01_loading.bin build/level_01_loading.bin.lzsa1
 build/level_03_loading.bin : build_tools/bmp_to_raw.rb \
                              resources/level_03-loading.bmp
 	build_tools/bmp_to_raw.rb resources/level_03-loading.bmp build/level_03_loading.bin
+	build_tools/lzsa -f 1 -r build/level_03_loading.bin build/level_03_loading.bin.lzsa1
 build/level_05_loading.bin : build_tools/bmp_to_raw.rb \
                              resources/level_05-loading.bmp
 	build_tools/bmp_to_raw.rb resources/level_05-loading.bmp build/level_05_loading.bin
+	build_tools/lzsa -f 1 -r build/level_05_loading.bin build/level_05_loading.bin.lzsa1
 build/level_07_loading.bin : build_tools/bmp_to_raw.rb \
                              resources/level_07-loading.bmp
 	build_tools/bmp_to_raw.rb resources/level_07-loading.bmp build/level_07_loading.bin
+	build_tools/lzsa -f 1 -r build/level_07_loading.bin build/level_07_loading.bin.lzsa1
 # bootsrap.bin --------------------------------------------------------------}}}
 
 # loading_screen.bin --------------------------------------------------------{{{
@@ -283,7 +287,8 @@ build/level_01.o : $(common) \
 		   resources/level_01a.spr \
 		   resources/level_01b.spr \
 		   resources/level_01_tiles.spr \
-		   resources/chibi_lr.spr
+		   resources/chibi_lr.spr \
+		   build/chibi_lr.spr
 	$(AS) -al level_01.s -o build/level_01.o | build_tools/format_list.rb
 
 resources/level_01a.spr : build_tools/spr_cpc_to_uknc.rb \
@@ -324,9 +329,76 @@ resources/level_02_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
 	build_tools/spr_cpc_to_uknc.rb ../ResCPC/Level2-Tiles-CPC.SPR -o resources/level_02_tiles.spr
 # level_02.bin --------------------------------------------------------------}}}
 
+# chibi_lr.spr --------------------------------------------------------------{{{
+build/chibi_lr.spr : build_tools/bmp_to_raw.rb \
+		     build/chibi/chibi_r.0.bin \
+		     build/chibi/chibi_r_mask.0.bin \
+		     build/chibi/chibi_r.1.bin \
+		     build/chibi/chibi_r_mask.1.bin \
+		     build/chibi/chibi_l.0.bin \
+		     build/chibi/chibi_l_mask.0.bin \
+		     build/chibi/chibi_l.1.bin \
+		     build/chibi/chibi_l_mask.1.bin \
+		     build/chibi/drone.0.bin \
+		     build/chibi/drone_mask.0.bin \
+		     build/chibi/drone.1.bin \
+		     build/chibi/drone_mask.1.bin \
+		     chibi_lr.s
+	$(AS) -al chibi_lr.s -o build/chibi_lr.o
+	$(LD) $(LDFLAGS) build/chibi_lr.o -T linker_scripts/sprites.cmd -o build/chibi_lr.spr
+
+build/chibi/chibi_r.0.bin : build_tools/bmp_to_raw.rb \
+	                    resources/chibi/chibi_r.0.bmp
+	build_tools/bmp_to_raw.rb resources/chibi/chibi_r.0.bmp build/chibi/chibi_r.0.bin
+
+build/chibi/chibi_r_mask.0.bin : build_tools/bmp_to_raw.rb \
+	                         resources/chibi/chibi_r_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/chibi/chibi_r_mask.0.bmp build/chibi/chibi_r_mask.0.bin
+
+build/chibi/chibi_r.1.bin : build_tools/bmp_to_raw.rb \
+	                    resources/chibi/chibi_r.1.bmp
+	build_tools/bmp_to_raw.rb resources/chibi/chibi_r.1.bmp build/chibi/chibi_r.1.bin
+
+build/chibi/chibi_r_mask.1.bin : build_tools/bmp_to_raw.rb \
+	                         resources/chibi/chibi_r_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/chibi/chibi_r_mask.1.bmp build/chibi/chibi_r_mask.1.bin
+
+build/chibi/chibi_l.0.bin : build_tools/bmp_to_raw.rb \
+	                    resources/chibi/chibi_l.0.bmp
+	build_tools/bmp_to_raw.rb resources/chibi/chibi_l.0.bmp build/chibi/chibi_l.0.bin
+
+build/chibi/chibi_l_mask.0.bin : build_tools/bmp_to_raw.rb \
+	                         resources/chibi/chibi_l_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/chibi/chibi_l_mask.0.bmp build/chibi/chibi_l_mask.0.bin
+
+build/chibi/chibi_l.1.bin : build_tools/bmp_to_raw.rb \
+	                    resources/chibi/chibi_l.1.bmp
+	build_tools/bmp_to_raw.rb resources/chibi/chibi_l.1.bmp build/chibi/chibi_l.1.bin
+
+build/chibi/chibi_l_mask.1.bin : build_tools/bmp_to_raw.rb \
+	                         resources/chibi/chibi_r_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/chibi/chibi_l_mask.1.bmp build/chibi/chibi_l_mask.1.bin
+
+build/chibi/drone.0.bin : build_tools/bmp_to_raw.rb \
+	                  resources/chibi/drone.0.bmp
+	build_tools/bmp_to_raw.rb resources/chibi/drone.0.bmp build/chibi/drone.0.bin
+
+build/chibi/drone_mask.0.bin : build_tools/bmp_to_raw.rb \
+	                       resources/chibi/drone_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/chibi/drone_mask.0.bmp build/chibi/drone_mask.0.bin
+
+build/chibi/drone.1.bin : build_tools/bmp_to_raw.rb \
+	                    resources/chibi/drone.1.bmp
+	build_tools/bmp_to_raw.rb resources/chibi/drone.1.bmp build/chibi/drone.1.bin
+
+build/chibi/drone_mask.1.bin : build_tools/bmp_to_raw.rb \
+	                       resources/chibi/drone_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/chibi/drone_mask.1.bmp build/chibi/drone_mask.1.bin
+# chibi_lr.spr --------------------------------------------------------------}}}
+
 resources/chibi_lr.spr : build_tools/spr_cpc_to_uknc.rb \
 			 resources/chibi_lr.cpc.spr
-	build_tools/spr_cpc_to_uknc.rb resources/chibi_lr.cpc.spr -o resources/chibi_lr.spr
+	build_tools/spr_cpc_to_uknc.rb resources/chibi/chibi_lr.cpc.spr -o resources/chibi_lr.spr
 
 clean :
 	rm -rf build/*

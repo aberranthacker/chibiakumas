@@ -177,8 +177,14 @@
 .equiv brYellow,  0xEE
 .equiv White,     0xFF
 
+.equiv setOffscreenColors, 2
+
 .equiv untilLine, -1 << 8
 .equiv untilEndOfScreen, 201
 .equiv endOfScreen, 201
 #-------------------------------------------------------------------------------
 .equiv COIN_COST, 4
+
+.equiv SPR_PSET, 1<<7
+.equiv SPR_DOUBLE, 1<<6
+.equiv SPR_HAS_MASK, 1<<5
