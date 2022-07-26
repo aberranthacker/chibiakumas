@@ -15,10 +15,10 @@
 start:
         JMP  @$LevelInit
 
-       .incbin "resources/level01_00.spr"
+       .incbin "resources/level_01a.spr"
    .ifdef ExtMemCore
 LevelSprites2:
-       .incbin "resources/level01_01.spr"
+       .incbin "resources/level_01b.spr"
    .endif
 ChibiSprites:
        .incbin "resources/chibi_lr.spr"
