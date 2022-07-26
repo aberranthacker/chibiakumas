@@ -1,4 +1,4 @@
-               .list
+               .nolist
 
                .title Chibi Akumas PPU module
 
@@ -173,6 +173,7 @@ SLTABInit:
         ADD  $8,R1           #  calculate address to next record
         MOV  R1,(R0)+        #--pointer to record 19
 
+        MOV  R0,@$TopAreaColors # store the address for future use
         MOV  $0xBA90,(R0)+   # colors  011  010  001  000 (YRGB)
         MOV  $0xFEDC,(R0)+   # colors  111  110  101  100 (YRGB)
         CLR  (R0)+           #--address of line 19
@@ -224,6 +225,7 @@ SLTABInit:
 
         SOB  R3,3$           #
 #------------------------------------- bottom region, footer
+        MOV  R0,@$BottomAreaColors # store the address for future use
         MOV  $0xBA90,(R0)+   # colors  011  010  001  000 (YRGB)
         MOV  $0xFEDC,(R0)+   # colors  111  110  101  100 (YRGB)
         MOV  $OffscreenAreaAddr+03340+40,R2  #
@@ -387,14 +389,16 @@ SetPalette: #----------------------------------------------------------------{{{
         CLR  R3
         BISB @$PBP1DT,R3  # get line number
         MOV  R3,R4
-    next_record$:
+SetPalette_NextRecord:
         MOV  R4,R3        # R3 = previous iteration's next line
         MOV  R3,R5        # prepare to calculate address of SLTAB section to modify
         ASH  $3,R5        # calculate offset by multiplying by 8 (by shifting R5 left by 3 bits)
-        ADD  @$FBSLTAB,R5 # and add address of SLTAB section we modify
+       .equiv FBSLTAB, .+2
+        ADD  $0,R5        # and add address of SLTAB section we modify
 
-        MOVB @$PBP2DT,R2     # get display/color parameters flag
-        BMI  palette_is_set$ # negative value - terminator
+        MOVB @$PBP2DT,R2         # get display/color parameters flag
+        BMI  SetPalette_Finalize # negative value - terminator
+
         INC  @$PBPADR
         MOV  @$PBP12D,R0     # get first data word
         INC  @$PBPADR
@@ -402,11 +406,15 @@ SetPalette: #----------------------------------------------------------------{{{
         INC  @$PBPADR
         CLR  R4
         BISB @$PBP1DT,R4     # get next line idx
+
+        CMP  R2,$2
+        BEQ  SetPalette_OffscreenColors
     set_params$:
         TSTB R2
         BNZ  set_colors$     # 1 - set colors
         BIC  $0b100,(R5)+    # 0 - set data
         BR   set_data$
+
     set_colors$:
         BIS  $0b100,(R5)+
     set_data$:
@@ -420,11 +428,49 @@ SetPalette: #----------------------------------------------------------------{{{
         BLO  set_params$  # branch if lower
 
         CMP  R4,$201
-        BNE  next_record$
+        BNE  SetPalette_NextRecord
+        BR   SetPalette_Finalize
 
-    palette_is_set$:
+SetPalette_OffscreenColors:
+       .equiv TopAreaColors, .+2
+        MOV  $0,R2
+        MOV  R0,(R2)+
+        MOV  R1,(R2)
+       .equiv BottomAreaColors, .+2
+        MOV  $0,R2
+        MOV  R0,(R2)+
+        MOV  R1,(R2)
+        BR   SetPalette_NextRecord
+
+SetPalette_Finalize:
         POP  @$PASWCR
 
+        RETURN
+#----------------------------------------------------------------------------}}}
+SetOffscreenAreaColors: # ---------------------------------------------------{{{
+        PUSH @$PASWCR
+        MOV  $0x010,@$PASWCR
+
+       #CLC
+       #ROR  R0
+       #MOV  R0,@$PBPADR # palette address
+       #MOV  $PBPADR,R5
+       #MOV  $PBP12D,R4
+       #MOV  R0,(R5)
+
+       #MOV  (R4),R1
+       #INC  (R5)
+       #MOV  (R4),R2
+       #equiv TopAreaColors, .+2
+       #MOV  $0,R3
+       #MOV  R1,(R3)+
+       #MOV  R2,(R3)
+       #equiv BottomAreaColors, .+2
+       #MOV  $0,R3
+       #MOV  R1,(R3)+
+       #MOV  R2,(R3)
+
+        POP  @$PASWCR
         RETURN
 #----------------------------------------------------------------------------}}}
 PrintAt: #-------------------------------------------------------------------{{{
@@ -1010,7 +1056,6 @@ Player_DrawLivesIcons:
         CLR  R1
         MOV  $CPU_P1_P09,(R5) # lives
         MOV  $PBP2DT,R4
-        #:bpt
         MOVB (R4),R0
         BZE  Player_RemoveHitpointIcon
 
@@ -1069,12 +1114,12 @@ DrawIcon:
        .rept 16
         MOV  (R3)+,(R4)+ 
         MOV  (R3)+,(R4)
-        TST  -(R4) # decrese R4 by 2
+        TST  -(R4) # decrease R4 by 2
         INC  (R5)
 
         MOV  (R3)+,(R4)+ 
         MOV  (R3)+,(R4)
-        TST  -(R4) # decrese R4 by 2
+        TST  -(R4) # decrease R4 by 2
         ADD  R2,(R5)
        .endr
         RETURN
@@ -1082,12 +1127,12 @@ DrawIcon:
 ClearIcon:
         CLR  (R4)+ 
         CLR  (R4)
-        TST  -(R4) # decrese R4 by 2
+        TST  -(R4) # decrease R4 by 2
         INC  (R5)
 
         CLR  (R4)+ 
         CLR  (R4)
-        TST  -(R4) # decrese R4 by 2
+        TST  -(R4) # decrease R4 by 2
         ADD  R2,(R5)
 
         SOB  R3,ClearIcon
@@ -1097,6 +1142,7 @@ ClearIcon:
 .equiv HitpointIconPosition, OffscreenAreaAddr + 40 * 29
 .equiv SmartbombIconPosition, OffscreenAreaAddr + 40 * 29 + 38
 #----------------------------------------------------------------------------}}}
+
        .include "ppu/interrupts_handlers.s"
        .include "music/ep1_title_music_playerconfig.s"
        .include "music/ep1_intro_music_playerconfig.s"
@@ -1121,8 +1167,6 @@ SmartbombIcon: .incbin "build/smartbomb_icon.bin"
 PPU_Player_ScoreBytes: .space 8
 PPU_Player_ScoreBytesEnd:
 
-FBSLTAB: .word 0          # adrress of main screen SLTAB
-FirstMainScreenLinePointer: .word 0 #
 DummyPSG: .word 0
 
 CommandsQueue_Top:

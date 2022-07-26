@@ -154,7 +154,7 @@
 .equiv chrHeart, 0x7F # 0177
 #-------------------------------------------------------------------------------
 .equiv setCursorScalePalette, 0
-.equiv cursorGraphic, 0x10 # dummy parameter
+.equiv cursorGraphic, 0x10 # 020 dummy parameter
 .equiv scale640, 0x00
 .equiv scale320, 0x10
 .equiv scale160, 0x20

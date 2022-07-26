@@ -267,7 +267,8 @@ ShowFB0: #-------------------------------------------------------------------{{{
         MOV  $0x2000,R0
         MOV  $8,R1 # length of the screenlines table record
         MOV  $200>>3,R2
-        MOV  @$FirstMainScreenLinePointer,R5
+       .equiv FirstMainScreenLinePointer, .+2
+        MOV  $0,R5
 
 100$:  .rept 1<<3
         BIC  R0,(R5)
