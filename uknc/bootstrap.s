@@ -38,7 +38,7 @@ Bootstrap_Launch: # used by bootsector linker script
                 .endr
             SOB  R0,100$
         CALL Bootstrap_LoadDiskFile_WaitForFinish
-
+      #-------------------------------------------------------------------------
       # PPU will clear the value when finishes initializiton
         MOV  $-1,@$PPUCommandArg
 
@@ -61,15 +61,20 @@ Bootstrap_Launch: # used by bootsector linker script
         Bootstrap_Launch_WaitForPPUInit:
             TST  @$PPUCommandArg
         BNZ  Bootstrap_Launch_WaitForPPUInit
-        #-----------------------------------------------------------------------
+      #-------------------------------------------------------------------------
      .ifdef ShowLoadingScreen
         MOV  $loading_screen.bin,R0
         CALL Bootstrap_LoadDiskFile_Start
            .ppudo_ensure $PPU_SetPalette, $TitleScreenPalette
         CALL Bootstrap_LoadDiskFile_WaitForFinish
      .endif
-        #-----------------------------------------------------------------------
-        # Load the game core - this is always in memory
+      #-------------------------------------------------------------------------
+        MOV  $saved_settings.bin,R0
+        CALL Bootstrap_LoadDiskFile_Start
+        CALL Bootstrap_LoadDiskFile_WaitForFinish
+       .check_for_loading_error "save_settings.bin"
+      #-------------------------------------------------------------------------
+      # Load the game core - this is always in memory
         MOV  $core.bin,R0
         CALL Bootstrap_LoadDiskFile_Start
        .ifndef ShowLoadingScreen
@@ -86,7 +91,7 @@ Bootstrap_Launch: # used by bootsector linker script
         CALL Bootstrap_LoadDiskFile_WaitForFinish
        .check_for_loading_error "core.bin"
 
-       .ifdef ExtMemCore # copy core to extended memory
+       .ifdef ExtMemCore # copy the core to the extended memory
             MOV  $GameVarsEnd,R4
             MOV  $CoreStart,R5
             MOV  $ExtMemSizeBytes>>2 - 2,R1 # -2 to preserve stack
@@ -96,8 +101,8 @@ Bootstrap_Launch: # used by bootsector linker script
             SOB R1,200$
        .endif
 
-        # TODO: Load saved settings
-        # TODO: player sprites load
+      # TODO: Load saved settings
+      # TODO: player sprites load
 #----------------------------------------------------------------------------}}}
 
         MOV  $StartOnLevel,R5
@@ -367,8 +372,7 @@ StartANewGamePlayer: # ../Aku/BootStrap.asm:2256 ;player fire directions ----{{{
 #----------------------------------------------------------------------------}}}
 
 ClearR1Words:
-      # we have to deal with odd number of iterations before entering the
-      # cycle
+      # we have to deal with odd number of iterations before entering the cycle
         INC  R1
         ASR  R1
         BCC  2$ # number of iterations is odd, skipping first command
@@ -515,6 +519,7 @@ Bootstrap_LoadDiskFile_WaitForFinish: #--------------------------------------{{{
 
 .global ppu_module.bin
 .global loading_screen.bin
+.global saved_settings.bin
 .global core.bin
 .global ep1_intro.bin
 .global ep1_intro_slides.bin
@@ -531,6 +536,10 @@ ppu_module.bin:
     .word 0
 loading_screen.bin:
     .word FB1
+    .word 0
+    .word 0
+saved_settings.bin:
+    .word SavedSettingsStart
     .word 0
     .word 0
 core.bin:

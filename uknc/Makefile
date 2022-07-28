@@ -18,6 +18,7 @@ all : pre-build build/chibiakumas.dsk
 
 # chibiakumas.dsk -----------------------------------------------------------{{{
 build/chibiakumas.dsk : build_tools/build_dsk.rb \
+                        build_tools/dsk_image_constants.rb \
                         build/bootsector.bin \
                         build/bootstrap.bin \
                         build/ppu_module.bin \
@@ -27,7 +28,8 @@ build/chibiakumas.dsk : build_tools/build_dsk.rb \
                         build/ep1_intro_slides.bin \
                         build/level_00.bin \
                         build/level_01.bin \
-                        build/level_02.bin
+                        build/level_02.bin \
+                        build/saved_settings.bin
 	build_tools/build_dsk.rb
 # chibiakumas.dsk -----------------------------------------------------------}}}
 
@@ -51,6 +53,7 @@ build/bootstrap.bin : build/bootstrap.o \
                       build/ep1_intro_slides.o \
                       build/level_01.o \
                       build/level_02.o \
+                      build/saved_settings.o \
                       build/high_score.bin \
                       build/continue.bin \
                       build/level_01_loading.bin \
@@ -65,7 +68,8 @@ build/bootstrap.bin : build/bootstrap.o \
 	      -R build/level_00_menu.o \
 	      -R build/level_01.o \
 	      -R build/level_02.o \
-	      -R build/ppu.o > build/bootstrap.map.txt
+	      -R build/ppu.o \
+	      -R build/saved_settings.o > build/bootstrap.map.txt
 	ruby build_tools/aout2sav.rb build/bootstrap.out -b -s -o build/bootstrap.bin
 	build_tools/update_bootstrap_disk_map.rb
 
@@ -98,6 +102,15 @@ build/level_07_loading.bin : build_tools/bmp_to_raw.rb \
 	build_tools/lzsa -f 1 -r build/level_07_loading.bin build/level_07_loading.bin.lzsa1
 # bootsrap.bin --------------------------------------------------------------}}}
 
+# saved_settings.bin --------------------------------------------------------{{{
+build/saved_settings.bin : build/saved_settings.o
+	$(LD) $(LDFLAGS) build/saved_settings.o -o build/saved_settings.out
+	ruby build_tools/aout2sav.rb build/saved_settings.out -b -s -o build/saved_settings.bin
+
+build/saved_settings.o : saved_settings.s
+	$(AS) -al saved_settings.s -o build/saved_settings.o
+# saved_settings.bin --------------------------------------------------------}}}
+
 # loading_screen.bin --------------------------------------------------------{{{
 build/loading_screen.bin : ../ResCPC/Old/T38-SC1.D01
 	ruby build_tools/convert_bitmap.rb
@@ -105,8 +118,9 @@ build/loading_screen.bin : ../ResCPC/Old/T38-SC1.D01
 
 # ppu_module.bin ------------------------------------------------------------{{{
 build/ppu_module.bin : build/ppu.o \
-                       build/core.o
-	$(LD) $(LDFLAGS) -T linker_scripts/ppu.cmd -R build/core.o
+                       build/core.o \
+                       build/saved_settings.o
+	$(LD) $(LDFLAGS) -T linker_scripts/ppu.cmd -R build/core.o -R build/saved_settings.o
 	ruby build_tools/aout2sav.rb build/ppu.out -b -s -o build/ppu_module.bin
 build/ppu.o : $(common) \
               ppu.s \
@@ -159,8 +173,9 @@ build/ep1_boss_music.formatted.s : build_tools/format_song.rb \
 
 # core.bin ------------------------------------------------------------------{{{
 build/core.bin : build/core.o \
+	         build/saved_settings.o \
                  build/bootstrap.o
-	$(LD) $(LDFLAGS) build/core.o -o build/core.out -R build/bootstrap.o
+	$(LD) $(LDFLAGS) build/core.o -o build/core.out -R build/bootstrap.o -R build/saved_settings.o
 	ruby build_tools/aout2sav.rb build/core.out -b -s -o build/core.bin
 build/core.o : $(common) \
                core.s \
@@ -188,8 +203,12 @@ build/core.o : $(common) \
 
 # level_00_menu.bin ---------------------------------------------------------{{{
 build/level_00.bin : build/core.o \
-                     build/level_00_menu.o
-	$(LD) $(LDFLAGS) build/level_00_menu.o -R build/core.o -o build/level_00_menu.out
+                     build/level_00_menu.o \
+                     build/saved_settings.o
+	$(LD) $(LDFLAGS) build/level_00_menu.o \
+		         -R build/core.o \
+		         -R build/saved_settings.o \
+		         -o build/level_00_menu.out
 	ruby build_tools/aout2sav.rb build/level_00_menu.out -b -s -o build/level_00.bin
 build/level_00_menu.o : $(common) \
                         level_00_menu.s \
@@ -282,8 +301,13 @@ build/ep1-intro/ep1-intro-slide15.raw.lzsa1: resources/ep1-intro-slides-2.raw
 
 # level_01.bin --------------------------------------------------------------{{{
 build/level_01.bin : build/core.o \
-                     build/level_01.o
-	$(LD) $(LDFLAGS) build/level_01.o -R build/core.o -o build/level_01.out
+                     build/level_01.o \
+                     build/saved_settings.o
+	$(LD) $(LDFLAGS) build/level_01.o \
+		         -R build/core.o \
+		         -R build/saved_settings.o \
+		         -o build/level_01.out
+
 	ruby build_tools/aout2sav.rb build/level_01.out -b -s -o build/level_01.bin
 
 build/level_01.o : $(common) \
