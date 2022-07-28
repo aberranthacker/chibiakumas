@@ -166,13 +166,11 @@ Objectloop_SpriteBankSet:
       # B=hurt by bullets,
       # P=hurts player,
       # xxxxxx = hit points (if not B then ages over time)
-        BIT  $0x40,R3 # R3 Life=LSB, Program=MSB # ld a,ixl
-                                                 # bit 6,a
-        BZE  ObjectLoopBothPlayerSkip            # jr z,ObjectLoopBothPlayerSkip ; Doesn't hurt player
+        BIT  $0x40,R3 # R3 Life=LSB, Program=MSB
+        BZE  ObjectLoopBothPlayerSkip # Doesn't hurt player
 
 # used to modify this, but now we assume the player is alway vunurable
 # we check anyway before deducting a life
-# ;Jp Objectloop_PlayerVunrable ;Objectloop_DoPlayerCollisions_Plus2
 # Objectloop_PlayerVunrable:
 #  Player collisions --------------------------------------------------------{{{
       # R0 use at will
@@ -181,33 +179,34 @@ Objectloop_SpriteBankSet:
       # R3 LSB ixl = Life, R3 MSB iyl = Program Code
       # R4 use at will
       # R5 ObjectArray current object last element pointer
-        MOV  R1,R0                  # ld a,b
+        MOV  R1,R0
        .equiv PlayerX1, .+2
-        CMPB R0,$20                 # cp 0 :PlayerX1_Plus1
-        BLO  ObjectLoopP1Skip       # jr c,ObjectLoopP1Skip
+        CMPB R0,$20
+        BLO  ObjectLoopP1Skip
+
        .equiv PlayerX2, .+2
-        CMPB R0,$32                 # cp 0 :PlayerX2_Plus1
-        BHIS ObjectLoopP1Skip       # jr nc,ObjectLoopP1Skip
-        SWAB R0                     # ld a,c
+        CMPB R0,$32
+        BHIS ObjectLoopP1Skip
+
+        SWAB R0
        .equiv PlayerY1, .+2
-        CMPB R0,$76                 # cp 0 :PlayerY1_Plus1
-        BLO  ObjectLoopP1Skip       # jr c,ObjectLoopP1Skip
+        CMPB R0,$76
+        BLO  ObjectLoopP1Skip
+
        .equiv PlayerY2, .+2
-        CMPB R0,$100                # cp 0 :PlayerY2_Plus1
-        BHIS ObjectLoopP1Skip       # jr nc,ObjectLoopP1Skip
-                                    #
-        TSTB @$P1_P09               # ld a,(P1_P09)
-                                    # or a
-        BZE  ObjectLoopP1Skip       # jr z,ObjectLoopP1Skip
-                                    #
-        PUSH R5                     # push hl
-        MOV  $Player_Array,R5       #     ld hl,Player_Array
-        CALL Player_Hit             #     call Player_Hit
-        POP  R5                     # pop hl
-                                    #
-                                    # ld a,b
-        TST  R1                     # or a
-        BZE  ObjectLoop_SaveChanges # jp z,ObjectLoop_SaveChanges
+        CMPB R0,$100
+        BHIS ObjectLoopP1Skip
+
+        TSTB @$P1_P09
+        BZE  ObjectLoopP1Skip
+
+        PUSH R5
+        MOV  $Player_Array,R5
+        CALL Player_Hit
+        POP  R5
+
+        TST  R1
+        BZE  ObjectLoop_SaveChanges
 
 ObjectLoopP1Skip:
        # uncomment for player 2                             # ;assume we're playing 1 player!
@@ -243,74 +242,70 @@ ObjectLoopBothPlayerSkip:                                   # ObjectLoopBothPlay
       # when the object is dead, there is no point checking if its shot
       # Life BPxxxxx B=hurt by bullets, P=hurts player,
       #        xxxxx = hit points (if not B then ages over time)
-        TSTB R3                                  # ld a,ixl
-                                                 # or a
-        BZE  ObjectLoop_NotShot                  # jr z,ObjectLoopP1StarSkip ; immortal object (background)
-        BIT  $0x80,R3                            # bit 7,a
-        BNZ  ObjectLoop_AgelessIXLCheck          # jr nz,ObjectLoop_AgelessIXLCheck ; If it can be shot, it doesn't auto age
-                                                 #
-                                                 # ld a,(Timer_TicksOccured) ; see if its time to age the sprite
-        BIT  $0b00001000,@$Timer_TicksOccured    # and %00001000
-        BZE  ObjectLoop_Ageless                  # jr z,ObjectLoop_Ageless
-                                                 #
-        CALL Object_DecreaseLife                 # call Object_DecreaseLife
-                                                 # ld a,c
-        TST  R1                                  # or a
-        BZE  ObjectLoop_SaveChanges              # jr z,ObjectLoop_SaveChanges
+        TSTB R3
+        BZE  ObjectLoop_NotShot # immortal object (background)
+
+        BIT  $0x80,R3
+        BNZ  ObjectLoop_AgelessIXLCheck # If it can be shot, it doesn't auto age
+
+        BIT  $0b00001000,@$Timer_TicksOccured # see if its time to age the sprite
+        BZE  ObjectLoop_Ageless
+
+        CALL Object_DecreaseLife
+
+        TST  R1
+        BZE  ObjectLoop_SaveChanges
 ObjectLoop_Ageless:
-                                                 # ld a,ixl
-        BIT  $0x80,R3                            # bit 7,a
-        BZE  ObjectLoop_NotShot                  # jr z,ObjectLoop_NotShot ; cant be shot
+        BIT  $0x80,R3
+        BZE  ObjectLoop_NotShot # cant be shot
 ObjectLoop_AgelessIXLCheck:
 #-----------------------------------player bullet collisions---------------------------------
       # R1 LSB b = X, R1 MSB c = Y
-                                                            # push bc
-        PUSH R1                                             # push de
-                                                            # push hl
-        MOVB R1,R0                                          # ld a,b
-        MOVB R0,@$ObjectHitXA                               # ld (ObjectHitXA_Plus1 - 1),a
+        PUSH R1
+        MOVB R1,R0
+        MOVB R0,@$ObjectHitXA
        .equiv SpriteSizeShiftHalfH, .+2
-        ADD  $12,R0                                         # add 12  :SpriteSizeShiftHalfH_Plus1
-        MOVB R0,@$ObjectHitXB                               # ld (ObjectHitXB_Plus1 - 1),a
+        ADD  $12,R0
+        MOVB R0,@$ObjectHitXB
         SWAB R1
-        MOVB R1,R0                                          # ld a,c
-        MOVB R0,@$ObjectHitYA                               # ld (ObjectHitYA_Plus1 - 1),a
+        MOVB R1,R0
+        MOVB R0,@$ObjectHitYA
        .equiv SpriteSizeShiftFullC, .+2
-        ADD  $24,R0                                         # add 24  :SpriteSizeShiftFullC_Plus1
-        MOVB R0,@$ObjectHitYB                               # ld (ObjectHitYB_Plus1 - 1),a
-                                                            #
+        ADD  $24,R0
+        MOVB R0,@$ObjectHitYB
+
 # ObjectLoop_HeightNZ:
-        MOV  $PlayerStarArraySize,R1    # ld b ,PlayerStarArraySize    ;36 StarArraySize_PlayerB_Plus1
-        MOV  $PlayerStarArrayPointer,R4 # ld hl,PlayerStarArrayPointer ;&0000 StarArrayMemloc_Player_Plus2
+        MOV  $PlayerStarArraySize,R1
+        MOV  $PlayerStarArrayPointer,R4
 
         ObjectLoop_PlayerStarNext:
             MOVB (R4)+,R0
-           .equiv ObjectHitYA, .+2                  # ld a,(hl)   ;check Y of star
-            CMPB R0,$0x00                           # cp 00 :ObjectHitYA_Plus1
-            BHIS ObjectLoop_PlayerStarScanContinue  # jr nc,ObjectLoop_PlayerStarScanContinue
+           .equiv ObjectHitYA, .+2
+            CMPB R0,$0x00
+            BHIS ObjectLoop_PlayerStarScanContinue
 
         ObjectLoop_PlayerStarSkip:
-            INC  R4                                 # inc l
             INC  R4
-        SOB  R1,ObjectLoop_PlayerStarNext           # djnz ObjectLoop_PlayerStarNext
-        BR   ObjectLoop_PlayerStarEnd               # jr ObjectLoop_PlayerStarEnd
-                                                    #
+            INC  R4
+        SOB  R1,ObjectLoop_PlayerStarNext
+        BR   ObjectLoop_PlayerStarEnd
+
     ObjectLoop_PlayerStarScanContinue:
        .equiv ObjectHitYB, .+2
-        CMPB R0,$0x00                               # cp 00 :ObjectHitYB_Plus1
-        BHIS ObjectLoop_PlayerStarSkip              # jr nc,ObjectLoop_PlayerStarSkip
-                                                    # inc h
-        MOVB (R4),R0                                # ld a,(hl)
-       .equiv ObjectHitXA, .+2                      # dec h
-        CMPB R0,$0x00                               # cp 00 :ObjectHitXA_Plus1
-        BLO  ObjectLoop_PlayerStarSkip              # jr c,ObjectLoop_PlayerStarSkip
+        CMPB R0,$0x00
+        BHIS ObjectLoop_PlayerStarSkip
+
+        MOVB (R4),R0
+       .equiv ObjectHitXA, .+2
+        CMPB R0,$0x00
+        BLO  ObjectLoop_PlayerStarSkip
 
        .equiv ObjectHitXB, .+2
-        CMPB R0,$0x00                               # cp 00 :ObjectHitXB_Plus1
-        BHIS ObjectLoop_PlayerStarSkip              # jr nc,ObjectLoop_PlayerStarSkip
-                                                    # inc h
-        INC  R4                                     # inc h
-        MOVB (R4),R0                                # ld a,(hl)
+        CMPB R0,$0x00
+        BHIS ObjectLoop_PlayerStarSkip
+
+        INC  R4
+        MOVB (R4),R0
       # TODO: uncomment for two players
        #BIC  $0xFF7F,R0                             # and %10000000   ; CHeck if this is player 1's bullet or not
        #                                            # dec h
@@ -320,7 +315,7 @@ ObjectLoop_AgelessIXLCheck:
                                                     # xor a
         CLRB @$ObjectLoop_IFShot # BR .+2           # ld (ObjectLoop_IFShot_Plus1 - 1),a
         DEC  R4
-        CLRB -(R4)                                  # ld (hl),0 ; star hit so lets remove it
+        CLRB -(R4) # star hit so lets remove it
 
     ObjectLoop_PlayerStarEnd:
                                                     # pop hl
@@ -330,7 +325,7 @@ ObjectLoop_AgelessIXLCheck:
 ObjectLoopP1StarSkip:
        .equiv ObjectLoop_IFShot, .
         BR   ObjectLoop_NotShot          # jr $+10 :ObjectLoop_IFShot_Plus1 ; 18 08 = JR 8
-       .equiv  dstObjectShotOverride, .+2
+       .equiv dstObjectShotOverride, .+2
         CALL @$Object_DecreaseLifeShot    # call Object_DecreaseLifeShot :ObjectShotOverride_Plus2 ;3 bytes
                                           # ld a,8                             ;2 bytes
         MOVB $5,@$ObjectLoop_IFShot # BR ObjectLoop_NotShot # ld (ObjectLoop_IFShot_Plus1 -1 ),a ;3 bytes
@@ -338,10 +333,9 @@ ObjectLoopP1StarSkip:
 ObjectLoop_NotShot:
         SWAB R2 # SWAB back, DoMoves expects Move to be in R2 LSB
       # R2 LSB ixh = Move, R2 MSB iyh = Sprite
-                                             # ld d,ixh
        .equiv dstObjectDoMovesOverride, .+2
-        CALL @$DoMoves                       # call DoMoves :ObjectDoMovesOverride_Plus2
-                                             # ld ixh,d
+        CALL @$DoMoves
+
 ObjectLoop_SaveChanges:
         # Animator and SpriteSize never changes
         MOV  R3,-(R5) # R3 LSB ixl = Life, R3 MSB iyl = Program code
@@ -349,25 +343,17 @@ ObjectLoop_SaveChanges:
         MOVB R4,-(R5) # R4 b = X
         MOVB R1,-(R5) # R1 c = Y
 
-        CLRB R3                       # ld a,iyl
-        SWAB R3                       # or a
-        BZE  ObjectLoop_ShowSprite    # call nz, ObjectProgram
+        CLRB R3
+        SWAB R3
+        BZE  ObjectLoop_ShowSprite
 
         CALL ObjectProgram
 ObjectLoop_ShowSprite:
-                                      # ld b,Akuyou_LevelStart_Bank;&C0
-                                      # ld hl,Akuyou_LevelStart;&4000   ;ObjectSpritePointer_Plus2
-                                      # ObjectLoop_ShowSprite_BankSet:
-                                      #         ld a,b
-                                      # ObjectLoop_ShowSprite_BankSetA:
-                                      #         call BankSwitch_C0_SetCurrent
-                                      #         ld (SprShow_BankAddr),hl
-        CALL @$ShowSprite             #         call ShowSprite
-                                      #         call BankSwitch_C0_SetCurrentToC0
-        POP  R5                       #     pop hl
-        POP  R4                       #     pop bc
-                                      #     xor a ; Zero
-        JMP  @$ObjectArray_NextObject #     jp ObjectArray_Turbo
+        CALL @$ShowSprite
+        POP  R5
+        POP  R4
+
+        JMP  @$ObjectArray_NextObject
 
 # ObjectAnimator not implemented --------------------------------------------{{{
 #Animator_VectorArray:
@@ -583,7 +569,7 @@ ObjectAnimator:
                                         # ld hl,(Objects_LastAdded_Plus2-2)
                                         # ret
 # ObjectAnimator end --------------------------------------------------------}}}
-ObjectProgram:                            # ret z       ; return if zero
+ObjectProgram:                          # ret z       ; return if zero
       # R3 LSB iyl = Program code, MSB = 0, ixl = Life
         MOV  R3,R0
         CMP  R0,$0b00000001         # Used by background, sprite bank based on X co-ord
@@ -776,8 +762,8 @@ Object_DecreaseShotToDeathB:
       # create a coin
        .equiv PointsSpriteC, .+2
         MOV (PC)+,R2
-       .byte 128+16     # ld iyh,128+16 :PointsSpriteC_Plus1 ; Sprite
-       .byte 0b10000111 # ld ixh,%10000111 ; Seaker Fast 1000001XX XX=Speed
+       .byte 128+16     # Sprite
+       .byte 0b10000111 # Seaker Fast 1000001XX XX=Speed
 
                         # ld a,(ObjectShotShooter_Plus1-1) ;1=Player 1, 129 = player 2
                         # dec a
