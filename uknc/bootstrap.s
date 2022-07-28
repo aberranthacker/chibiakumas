@@ -777,6 +777,13 @@ TitleScreenPalette: #--------------------------------------------------------{{{
     .byte 196, setColors, Black, Green, brRed, White
     .word untilEndOfScreen
 #----------------------------------------------------------------------------}}}
+    .incbin "build/continue.bin.lzsa1"
+    .incbin "build/high_score.bin.lzsa1"
+    .incbin "build/level_01_loading.bin.lzsa1"
+    .incbin "build/level_03_loading.bin.lzsa1"
+    .incbin "build/level_05_loading.bin.lzsa1"
+    .incbin "build/level_07_loading.bin.lzsa1"
+    .even
 #0         1         2         3         4         5         6         7
 #01234567890123456789012345678901234567890123456789012345678901234567890123456789
        .even # PPU reads strings word by word, so align

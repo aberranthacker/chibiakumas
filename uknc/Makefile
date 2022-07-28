@@ -53,13 +53,7 @@ build/bootstrap.bin : build/bootstrap.o \
                       build/ep1_intro_slides.o \
                       build/level_01.o \
                       build/level_02.o \
-                      build/saved_settings.o \
-                      build/high_score.bin \
-                      build/continue.bin \
-                      build/level_01_loading.bin \
-                      build/level_03_loading.bin \
-                      build/level_05_loading.bin \
-                      build/level_07_loading.bin
+                      build/saved_settings.o
 	$(LD) $(LDFLAGS) -M \
 	      -T linker_scripts/bootstrap.cmd \
 	      -R build/core.o \
@@ -75,30 +69,43 @@ build/bootstrap.bin : build/bootstrap.o \
 
 build/bootstrap.o : $(common) \
                     bootstrap.s \
-                    ppucmd.s
+                    ppucmd.s \
+                    build/high_score.bin.lzsa1 \
+                    build/continue.bin.lzsa1 \
+                    build/level_01_loading.bin.lzsa1 \
+                    build/level_03_loading.bin.lzsa1 \
+                    build/level_05_loading.bin.lzsa1 \
+                    build/level_07_loading.bin.lzsa1
 	$(AS) -al bootstrap.s -o build/bootstrap.o | build_tools/format_list.rb
 
-build/high_score.bin : build_tools/bmp_to_raw.rb \
-                       resources/high_score.bmp
-	build_tools/bmp_to_raw.rb resources/high_score.bmp build/high_score.bin
-build/continue.bin : build_tools/spr_cpc_to_uknc.rb \
-                     resources/continue.bmp
-	build_tools/bmp_to_raw.rb resources/continue.bmp build/continue.bin
-build/level_01_loading.bin : build_tools/bmp_to_raw.rb \
-                             resources/level_01-loading.bmp
-	build_tools/bmp_to_raw.rb resources/level_01-loading.bmp build/level_01_loading.bin
+build/high_score.bin.lzsa1 : build_tools/bmp_to_raw.rb \
+                             resources/bootstrap/high_score.bmp
+	build_tools/bmp_to_raw.rb resources/bootstrap/high_score.bmp build/high_score.bin
+	build_tools/lzsa -f 1 -r build/high_score.bin build/high_score.bin.lzsa1
+
+build/continue.bin.lzsa1 : build_tools/bmp_to_raw.rb \
+                           resources/bootstrap/continue.bmp
+	build_tools/bmp_to_raw.rb resources/bootstrap/continue.bmp build/continue.bin
+	build_tools/lzsa -f 1 -r build/continue.bin build/continue.bin.lzsa1
+
+build/level_01_loading.bin.lzsa1 : build_tools/bmp_to_raw.rb \
+                                   resources/bootstrap/level_01-loading.bmp
+	build_tools/bmp_to_raw.rb resources/bootstrap/level_01-loading.bmp build/level_01_loading.bin
 	build_tools/lzsa -f 1 -r build/level_01_loading.bin build/level_01_loading.bin.lzsa1
-build/level_03_loading.bin : build_tools/bmp_to_raw.rb \
-                             resources/level_03-loading.bmp
-	build_tools/bmp_to_raw.rb resources/level_03-loading.bmp build/level_03_loading.bin
+
+build/level_03_loading.bin.lzsa1 : build_tools/bmp_to_raw.rb \
+                                   resources/bootstrap/level_03-loading.bmp
+	build_tools/bmp_to_raw.rb resources/bootstrap/level_03-loading.bmp build/level_03_loading.bin
 	build_tools/lzsa -f 1 -r build/level_03_loading.bin build/level_03_loading.bin.lzsa1
-build/level_05_loading.bin : build_tools/bmp_to_raw.rb \
-                             resources/level_05-loading.bmp
-	build_tools/bmp_to_raw.rb resources/level_05-loading.bmp build/level_05_loading.bin
+
+build/level_05_loading.bin.lzsa1 : build_tools/bmp_to_raw.rb \
+                                   resources/bootstrap/level_05-loading.bmp
+	build_tools/bmp_to_raw.rb resources/bootstrap/level_05-loading.bmp build/level_05_loading.bin
 	build_tools/lzsa -f 1 -r build/level_05_loading.bin build/level_05_loading.bin.lzsa1
-build/level_07_loading.bin : build_tools/bmp_to_raw.rb \
-                             resources/level_07-loading.bmp
-	build_tools/bmp_to_raw.rb resources/level_07-loading.bmp build/level_07_loading.bin
+
+build/level_07_loading.bin.lzsa1 : build_tools/bmp_to_raw.rb \
+                                   resources/bootstrap/level_07-loading.bmp
+	build_tools/bmp_to_raw.rb resources/bootstrap/level_07-loading.bmp build/level_07_loading.bin
 	build_tools/lzsa -f 1 -r build/level_07_loading.bin build/level_07_loading.bin.lzsa1
 # bootsrap.bin --------------------------------------------------------------}}}
 

@@ -211,7 +211,7 @@ Event_CoreReprogram_PowerupSprites:
         MOV  (R5)+,R0                 # rst 6
         MOVB R0,@$ShootPowerSprite    # ld (ShootPowerSprite_Plus1-1),a
         SWAB R0                       # rst 6
-        MOVB R0,@$PointsSprite        # ld (PointsSprite_Plus1-1),a
+        MOVB R0,@$PointsSpriteA       # ld (PointsSprite_Plus1-1),a
         MOVB R0,@$PointsSpriteB       # ld (PointsSpriteB_Plus1-1),a
         MOVB R0,@$PointsSpriteC       # ld (PointsSpriteC_Plus1-1),a
 
