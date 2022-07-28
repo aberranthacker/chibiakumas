@@ -665,9 +665,9 @@ ObjectProgram_FrameAnimate: # Used To animate spider legs in 1st boss
 # Every other X column uses an alternate sprite - for background anim ----------
 ObjectProgram_BitShiftSprite:
       # R4 b = X
-        MOV  R4,@$SprShow_X # Makesure sprite pos is updated for Domoves
+       #MOV  R4,@$SprShow_X # Makesure sprite pos is updated for Domoves
         BIT  $2,R4          # 4 pixel
-        BZE  1237$
+        BNZ  1237$
 
         MOV  @$SpriteBanksVectors+4,@$SprShow_BankAddr
 1237$:  RETURN

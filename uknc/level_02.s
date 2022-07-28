@@ -23,7 +23,9 @@ LevelTiles:
        .incbin "build/level_02_tiles.spr"
 
 EventStreamArray:
-# defb 0,evtReprogram_PowerupSprites,128+99,128+99,128+99, 21+128+10  ; Define powerup sprites
+.word 0, evtReprogram_PowerupSprites
+.byte      128+DummySprite, 128+DummySprite, 128+DummySprite, 128+31 # Define powerup sprites
+
 
 # ;We will use 4 Paralax layers
 # ; ---------()- (sky)        %11001000
@@ -126,7 +128,7 @@ EventStreamArray:
 .word FadeStartPoint + 3, evtSetPalette, RealPalette
 # Start of fade in block -------------------------------------------------------
     #----------
-   #.word 3, evtChangeStreamTime, 20, DebugStartPoint
+#   .word 3, evtChangeStreamTime, 60, HandAttack1
     #----------
 
 .equiv DummySprite, 31
@@ -301,7 +303,7 @@ HandAttack1:
    .word     evtSingleSprite, sprTwoFrame | 22, (24+ 12* 7)<<X | (160)<<Y
    .word     evtSingleSprite, sprTwoFrame | 22, (24+ 12* 9)<<X | (160)<<Y
    .word     evtSingleSprite, sprTwoFrame | 22, (24+ 12*11)<<X | (160)<<Y
-   
+
    .word 77, evtMultipleCommands | 8
    .word     evtLoadObjSettings | 4
    .word     evtSingleSprite, sprTwoFrame | 22+7, (24+ 12* 0)<<X | (24)<<Y
@@ -384,15 +386,11 @@ LevelLoop:
         CALL @$ObjectArray_Redraw
 
         MOV  $ChibiSprites,@$SprShow_BankAddr
-       #CALL @$PlayerHandler
+        CALL @$PlayerHandler
 
-       #CALL @$Player_StarArray_Redraw
+        CALL @$Player_StarArray_Redraw
 
         CALL @$StarArray_Redraw
-
-       #CALL @$Player_DrawUI
-
-       #CALL @$PlaySfx
 
         CALL @$ScreenBuffer_Flip
 

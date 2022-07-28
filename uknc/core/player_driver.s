@@ -637,7 +637,7 @@ Player_Hit: #-------------------------------------------------------------------
         CMPB R0,$16+2
         BNZ  Player_Hit_SkipCustomPlayerHitter
 
-       .equiv  dstCustomPlayerHitter, .+2
+       .equiv dstCustomPlayerHitter, .+2
         CALL @$null
 
 Player_Hit_SkipCustomPlayerHitter:
@@ -658,7 +658,7 @@ Player_Hit_SkipCustomPlayerHitter:
         CMPB R2, $128+40
         BEQ  Player_Hit_PowerupShootPower
 
-       .equiv PointsSprite, .+2
+       .equiv PointsSpriteA, .+2
         CMPB R2, $128+16
         BEQ  Player_Hit_Points
 
@@ -719,7 +719,8 @@ Player_Hit_Injure_1:
 
 Player_Hit_Process:
         TSTB 7(R0) # invincible?
-        BNZ  1237$
+        #:bpt
+        BR  1237$
 
         DECB 9(R0) # lives
         BMI  1237$ # player already dead if below zero
