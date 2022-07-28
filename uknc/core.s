@@ -81,7 +81,7 @@ Event_VectorArray:
        .word not_implemented_check_R0           # 0x23 0x46  defw Event_CoreReprogram_ShotToDeath
        .word Event_CoreReprogram_CustomMove1    # 0x24 0x48  mveCustom1
        .word Event_CoreReprogram_CustomMove2    # 0x25 0x4A  mveCustom2
-       .word not_implemented_check_R0           # 0x26 0x4C  defw Event_CoreReprogram_PowerupSprites
+       .word Event_CoreReprogram_PowerupSprites # 0x26 0x4C  defw Event_CoreReprogram_PowerupSprites
        .word Event_CoreReprogram_CustomMove3    # 0x27 0x4E  mveCustom3
        .word Event_CoreReprogram_CustomMove4    # 0x28 0x50  mveCustom4
        .word not_implemented_check_R0           # 0x29 0x52  defw Event_CustomProgram1
@@ -214,7 +214,7 @@ not_implemented_check_R0:
        .global GetSpriteMempos
 
        .even
-      #.space 2
+       .space 2
 end: FileEndCore:
 
 LevelStart:

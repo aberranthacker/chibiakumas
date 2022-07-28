@@ -32,9 +32,8 @@ EventStreamArray_Ep1: #---------------------------------------------------------
    # -----X---X-- (mid)        %11000010   Bank 1
    # []=====[]=== (foreground) %11000001   Bank 0
 
-#   .word 0 # Time
-#   .word evtReprogram_PowerupSprites # Event_CoreReprogram_PowerupSprites
-#   .byte 128+38, 128+39, 128+40, 128+16 # Define powerup sprites
+    .word 0, evtReprogram_PowerupSprites # Event_CoreReprogram_PowerupSprites
+    .byte      128+38, 128+39, 128+40, 128+16 # Define powerup sprites
 
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
