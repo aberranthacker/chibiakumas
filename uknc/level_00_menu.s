@@ -17,7 +17,7 @@
 start:
         JMP  @$LevelInit
 
-TITLETEX: .incbin "resources/titletex.spr"
+       .incbin "build/menu.spr"
 
 EventStreamArray_Ep1: #------------------------------------------------------{{{
     .word 0, evtSetPalette, TitleScreenPalette
@@ -486,7 +486,7 @@ MenuText:
 
     .even
 
-CursorSpr: .incbin "resources/menu_cursor.spr"
+CursorSpr: .incbin "build/menu_cursor.spr"
 
     .even
 end:

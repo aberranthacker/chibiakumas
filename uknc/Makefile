@@ -212,17 +212,17 @@ build/level_00.bin : build/core.o \
 	ruby build_tools/aout2sav.rb build/level_00_menu.out -b -s -o build/level_00.bin
 build/level_00_menu.o : $(common) \
                         level_00_menu.s \
-                        resources/titletex.spr \
-                        resources/menu_cursor.spr
+                        build/menu.spr \
+                        build/menu_cursor.spr
 	$(AS) -al level_00_menu.s -o build/level_00_menu.o | build_tools/format_list.rb
 
-resources/titletex.spr : build_tools/spr_cpc_to_uknc.rb \
-	                 ../Aku/Sprites/TITLETEX.SPR
-	build_tools/spr_cpc_to_uknc.rb ../Aku/Sprites/TITLETEX.SPR -o resources/titletex.spr
+build/menu.spr : build_tools/spr_cpc_to_uknc.rb \
+	         resources/menu/TITLETEX.SPR
+	build_tools/spr_cpc_to_uknc.rb resources/menu/TITLETEX.SPR -o build/menu.spr
 
-resources/menu_cursor.spr : build_tools/bmp_to_raw.rb \
-                            resources/menu_cursor-Sheet.bmp
-	build_tools/bmp_to_raw.rb resources/menu_cursor-Sheet.bmp resources/menu_cursor.spr
+build/menu_cursor.spr : build_tools/bmp_to_raw.rb \
+                        resources/menu/cursor-Sheet.bmp
+	build_tools/bmp_to_raw.rb resources/menu/cursor-Sheet.bmp build/menu_cursor.spr
 # level_00_menu.o -----------------------------------------------------------}}}
 
 # ep1_intro.bin -------------------------------------------------------------{{{
