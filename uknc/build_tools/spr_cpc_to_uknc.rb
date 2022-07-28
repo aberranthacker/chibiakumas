@@ -74,7 +74,8 @@ sprites_metadata = []
     width: file[i + 1].ord,
     y_offset: file[i + 2].ord,
     settings: file[i + 3].ord >> 5 & 0b110, # transparency data not used
-    offset: file[i + 4, 2].unpack1('v')
+    offset: file[i + 4, 2].unpack1('v'),
+    mask_offset: 0
   }
   rec[:y_offset] = 7 if rec[:y_offset] == 255
 
@@ -105,10 +106,10 @@ diff = data_offset - (sprites_metadata.size * 8)
 new_file = ''
 
 sprites_metadata.each do |rec|
-  values = rec.values_at(:offset, :height, :y_offset, :width, :settings)
+  values = rec.values_at(:offset, :mask_offset, :height, :y_offset, :width, :settings)
   values[0] = values[0] - diff
 
-  new_file << values.pack('vvvCC')
+  new_file << values.pack('vvCCCC')
 end
 
 new_file = '' if options.font
