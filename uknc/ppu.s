@@ -3,7 +3,6 @@
                .title Chibi Akumas PPU module
 
                .global start # make the entry point available to a linker
-               .global StrBuffer
                .global PPU_ModuleSize
                .global PPU_ModuleSizeWords
 

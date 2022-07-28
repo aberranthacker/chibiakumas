@@ -27,7 +27,7 @@
 require 'optparse'
 require_relative 'reverse_tables'
 
-options = Struct.new(:in_filename, :out_filename, :font).new
+options = Struct.new(:in_filename, :out_filename, :font, :verbose).new
 
 OptionParser.new do |opts|
   opts.banner = 'Usage: cpc_to_uknc_sprites.rb FILENAME'
@@ -40,9 +40,13 @@ OptionParser.new do |opts|
   opts.on('--font', 'Font conversion. No header, all sprites 8 lines high.') do
     options.font = true
   end
+
+  opts.on('-v', '--verbose') do |v|
+    options.verbose = true
+  end
 end.parse!
 
-puts options.in_filename
+puts options.in_filename if options.verbose
 
 def transform(sprite_words)
   [].tap do |words|
@@ -110,12 +114,14 @@ end
 new_file = '' if options.font
 
 sprites_metadata.each do |md|
-  print "i: #{md[:idx].to_s.rjust(3, ' ')} "
-  print "h: #{md[:height].to_s.rjust(3, ' ')} "
-  print "w: #{md[:width].to_s.rjust(2, ' ')} "
-  print "y_offset: #{md[:y_offset].to_s.rjust(2, ' ')} "
-  print "attrs: #{md[:settings].to_s.rjust(3, ' ')} "
-  puts  "offset: #{(md[:offset] - diff).to_s.rjust(5, ' ')}"
+  if options.verbose
+    print "i: #{md[:idx].to_s.rjust(3, ' ')} "
+    print "h: #{md[:height].to_s.rjust(3, ' ')} "
+    print "w: #{md[:width].to_s.rjust(2, ' ')} "
+    print "y_offset: #{md[:y_offset].to_s.rjust(2, ' ')} "
+    print "attrs: #{md[:settings].to_s.rjust(3, ' ')} "
+    puts  "offset: #{(md[:offset] - diff).to_s.rjust(5, ' ')}"
+  end
 
   sprite = file[md[:offset], md[:height] * md[:width]].unpack('v*')
   uknc_sprite = []

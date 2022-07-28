@@ -81,12 +81,16 @@
 # CPU memory map ---------------------------------------------------------------
 # 040 dummy interrupt handler, see bootsector
 .equiv KeyboardScanner_P1, 042 # 34 0x22
+.equiv CPU_KeyboardScanner_P1, KeyboardScanner_P1 >> 1 # 34 0x22
 .equiv KeyboardScanner_P2, 044 # 36 0x24
+.equiv CPU_KeyboardScanner_P2, KeyboardScanner_P2 >> 1 # 34 0x22
 .equiv PPUCommandArg, 046 # 38 0x26 command for PPU argument
 # 050, 052, 054, 056 four words are available
+# 070, 072, 074, 076 another four available words
+.equiv SavedSettingsStart, 0104 # 68
 
     .ifndef ExtMemCore
-.equiv SP_RESET, 0600 # 3384 0x0180 Initial stack pointer
+.equiv SP_RESET, 0600 # 384 0x0180 Initial stack pointer
     .else
 .equiv SP_RESET, 0176000 # 64512 0xFC00 Initial stack pointer
     .endif
@@ -112,7 +116,7 @@
     .endif
 
     .ifndef ExtMemCore
-.equiv Akuyou_LevelStart, 0x9E46 # 40518 0117106 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9E74 # 40564 0117164 # auto-generated during a build
     .else
 .equiv Akuyou_LevelStart, GameVarsEnd
     .endif
