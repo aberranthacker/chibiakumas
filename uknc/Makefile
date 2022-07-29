@@ -325,17 +325,458 @@ build/level_01.o : $(common) \
 		   build/chibi_lr.spr
 	$(AS) -al level_01.s -o build/level_01.o | build_tools/format_list.rb
 
-build/level_01.0.spr : build_tools/spr_cpc_to_uknc.rb \
-                       resources/level_01a.CPC.SPR
-	build_tools/spr_cpc_to_uknc.rb resources/level_01a.CPC.SPR -o build/level_01.0.spr
-build/level_01.1.spr : build_tools/spr_cpc_to_uknc.rb \
-                           resources/level_01b.CPC.SPR
-	build_tools/spr_cpc_to_uknc.rb resources/level_01b.CPC.SPR -o build/level_01.1.spr
+#build/level_01.0.spr : build_tools/spr_cpc_to_uknc.rb \
+#                       resources/level_01a.CPC.SPR
+#	build_tools/spr_cpc_to_uknc.rb resources/level_01a.CPC.SPR -o build/level_01.0.spr
+#build/level_01.1.spr : build_tools/spr_cpc_to_uknc.rb \
+#                           resources/level_01b.CPC.SPR
+#	build_tools/spr_cpc_to_uknc.rb resources/level_01b.CPC.SPR -o build/level_01.1.spr
 
 build/level_01_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
 	                       ../ResCPC/Level01-Tiles.SPR
 	build_tools/spr_cpc_to_uknc.rb ../ResCPC/Level01-Tiles.SPR -o build/level_01_tiles.spr
+
 # level_01.bin --------------------------------------------------------------}}}
+
+# level_01.0.spr ------------------------------------------------------------{{{
+build/level_01.0.spr : build/level_01/level_01.0.o \
+		       linker_scripts/sprites.cmd
+	$(LD) $(LDFLAGS) build/level_01/level_01.0.o -T linker_scripts/sprites.cmd \
+		         -o build/level_01.0.spr
+
+build/level_01/level_01.0.o : level_01.0.s \
+			      build/level_01/coin.0.bin \
+			      build/level_01/powerup_drone.0.bin \
+			      build/level_01/powerup_rate.0.bin \
+			      build/level_01/powerup_power.0.bin \
+			      build/level_01/boulder.0.bin \
+			      build/level_01/boulder_small.0.bin \
+			      build/level_01/burning_bloke.0.bin \
+			      build/level_01/castle.0.bin \
+			      build/level_01/cloud_a.0.bin \
+			      build/level_01/cloud_b.0.bin \
+			      build/level_01/cloud_c.0.bin \
+			      build/level_01/cross.0.bin \
+			      build/level_01/cross_crucified_bloke.0.bin \
+			      build/level_01/cross_impaled_bloke.0.bin \
+			      build/level_01/gravecross.0.bin \
+			      build/level_01/gravestone.0.bin \
+			      build/level_01/gravestone_mask.0.bin \
+			      build/level_01/moon.0.bin \
+			      build/level_01/moon_mask.0.bin \
+			      build/level_01/rock_pt1.0.bin \
+			      build/level_01/rock_pt2.0.bin \
+			      build/level_01/rock_pt3.0.bin \
+			      build/level_01/spikey_rock_a.0.bin \
+			      build/level_01/spikey_rock_b.0.bin \
+			      build/level_01/spikey_rock_c.0.bin \
+			      build/level_01/ant_attacker.0.bin \
+			      build/level_01/boni_burd.0.bin \
+			      build/level_01/boni_burd_mask.0.bin \
+			      build/level_01/eye_clopse.0.bin \
+			      build/level_01/eye_clopse_mask.0.bin \
+			      build/level_01/rock_chick.0.bin \
+			      build/level_01/skeleton_crawler.0.bin \
+			      build/level_01/skull_bomber.0.bin \
+			      build/level_01/skull_gang.0.bin \
+			      build/level_01/splice_face.0.bin
+	$(AS) -al level_01.0.s -o build/level_01/level_01.0.o
+
+build/level_01/coin.0.bin : build_tools/bmp_to_raw.rb \
+	                    resources/level_01/coin.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/coin.0.bmp \
+		                  build/level_01/coin.0.bin
+
+build/level_01/powerup_drone.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/powerup_drone.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/powerup_drone.0.bmp \
+		                  build/level_01/powerup_drone.0.bin
+
+build/level_01/powerup_rate.0.bin : build_tools/bmp_to_raw.rb \
+				    resources/level_01/powerup_rate.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/powerup_rate.0.bmp \
+		                  build/level_01/powerup_rate.0.bin
+
+build/level_01/powerup_power.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/powerup_power.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/powerup_power.0.bmp \
+		                  build/level_01/powerup_power.0.bin
+
+build/level_01/boulder.0.bin : build_tools/bmp_to_raw.rb \
+			       resources/level_01/boulder.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/boulder.0.bmp \
+		                  build/level_01/boulder.0.bin
+
+build/level_01/boulder_small.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/boulder_small.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/boulder_small.0.bmp \
+		                  build/level_01/boulder_small.0.bin
+
+build/level_01/burning_bloke.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/burning_bloke.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/burning_bloke.0.bmp \
+		                  build/level_01/burning_bloke.0.bin
+
+build/level_01/castle.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/castle.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/castle.0.bmp \
+		                  build/level_01/castle.0.bin
+
+build/level_01/cloud_a.0.bin : build_tools/bmp_to_raw.rb \
+			       resources/level_01/cloud_a.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/cloud_a.0.bmp \
+		                  build/level_01/cloud_a.0.bin
+
+build/level_01/cloud_b.0.bin : build_tools/bmp_to_raw.rb \
+			       resources/level_01/cloud_b.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/cloud_b.0.bmp \
+		                  build/level_01/cloud_b.0.bin
+
+build/level_01/cloud_c.0.bin : build_tools/bmp_to_raw.rb \
+			       resources/level_01/cloud_c.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/cloud_c.0.bmp \
+		                  build/level_01/cloud_c.0.bin
+
+build/level_01/cross.0.bin : build_tools/bmp_to_raw.rb \
+			     resources/level_01/cross.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/cross.0.bmp \
+		                  build/level_01/cross.0.bin
+
+build/level_01/cross_crucified_bloke.0.bin : build_tools/bmp_to_raw.rb \
+			     	             resources/level_01/cross_crucified_bloke.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/cross_crucified_bloke.0.bmp \
+		                  build/level_01/cross_crucified_bloke.0.bin
+
+build/level_01/cross_impaled_bloke.0.bin : build_tools/bmp_to_raw.rb \
+				           resources/level_01/cross_impaled_bloke.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/cross_impaled_bloke.0.bmp \
+		                  build/level_01/cross_impaled_bloke.0.bin
+
+build/level_01/gravecross.0.bin : build_tools/bmp_to_raw.rb \
+				  resources/level_01/gravecross.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/gravecross.0.bmp \
+		                  build/level_01/gravecross.0.bin
+
+build/level_01/gravestone.0.bin : build_tools/bmp_to_raw.rb \
+				  resources/level_01/gravestone.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/gravestone.0.bmp \
+		                  build/level_01/gravestone.0.bin
+
+build/level_01/gravestone_mask.0.bin : build_tools/bmp_to_raw.rb \
+				       resources/level_01/gravestone_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/gravestone_mask.0.bmp \
+		                       build/level_01/gravestone_mask.0.bin
+
+build/level_01/moon.0.bin : build_tools/bmp_to_raw.rb \
+			    resources/level_01/moon.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/moon.0.bmp \
+		                  build/level_01/moon.0.bin
+
+build/level_01/moon_mask.0.bin : build_tools/bmp_to_raw.rb \
+				 resources/level_01/moon_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/moon_mask.0.bmp \
+		                       build/level_01/moon_mask.0.bin
+
+build/level_01/rock_pt1.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/rock_pt1.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/rock_pt1.0.bmp \
+		                  build/level_01/rock_pt1.0.bin
+
+build/level_01/rock_pt2.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/rock_pt2.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/rock_pt2.0.bmp \
+		                  build/level_01/rock_pt2.0.bin
+
+build/level_01/rock_pt3.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/rock_pt3.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/rock_pt3.0.bmp \
+		                  build/level_01/rock_pt3.0.bin
+
+build/level_01/spikey_rock_a.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/spikey_rock_a.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/spikey_rock_a.0.bmp \
+		                  build/level_01/spikey_rock_a.0.bin
+
+build/level_01/spikey_rock_b.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/spikey_rock_b.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/spikey_rock_b.0.bmp \
+		                  build/level_01/spikey_rock_b.0.bin
+
+build/level_01/spikey_rock_c.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/spikey_rock_c.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/spikey_rock_c.0.bmp \
+		                  build/level_01/spikey_rock_c.0.bin
+
+build/level_01/ant_attacker.0.bin : build_tools/bmp_to_raw.rb \
+	                            resources/level_01/ant_attacker.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/ant_attacker.0.bmp \
+		                  build/level_01/ant_attacker.0.bin
+
+build/level_01/boni_burd.0.bin : build_tools/bmp_to_raw.rb \
+	                         resources/level_01/boni_burd.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/boni_burd.0.bmp \
+		                  build/level_01/boni_burd.0.bin
+
+build/level_01/boni_burd_mask.0.bin : build_tools/bmp_to_raw.rb \
+	                              resources/level_01/boni_burd_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/boni_burd_mask.0.bmp \
+		                       build/level_01/boni_burd_mask.0.bin
+
+build/level_01/eye_clopse.0.bin : build_tools/bmp_to_raw.rb \
+	                          resources/level_01/eye_clopse.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/eye_clopse.0.bmp \
+		                  build/level_01/eye_clopse.0.bin
+
+build/level_01/eye_clopse_mask.0.bin : build_tools/bmp_to_raw.rb \
+	                               resources/level_01/eye_clopse_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/eye_clopse_mask.0.bmp \
+		                       build/level_01/eye_clopse_mask.0.bin
+
+build/level_01/rock_chick.0.bin : build_tools/bmp_to_raw.rb \
+	                          resources/level_01/rock_chick.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/rock_chick.0.bmp \
+		                  build/level_01/rock_chick.0.bin
+
+build/level_01/skeleton_crawler.0.bin : build_tools/bmp_to_raw.rb \
+	                                resources/level_01/skeleton_crawler.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/skeleton_crawler.0.bmp \
+		                  build/level_01/skeleton_crawler.0.bin
+
+build/level_01/skull_bomber.0.bin : build_tools/bmp_to_raw.rb \
+	                            resources/level_01/skull_bomber.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/skull_bomber.0.bmp \
+		                  build/level_01/skull_bomber.0.bin
+
+build/level_01/skull_gang.0.bin : build_tools/bmp_to_raw.rb \
+	                          resources/level_01/skull_gang.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/skull_gang.0.bmp \
+		                  build/level_01/skull_gang.0.bin
+
+build/level_01/splice_face.0.bin : build_tools/bmp_to_raw.rb \
+				   resources/level_01/splice_face.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/splice_face.0.bmp \
+		                  build/level_01/splice_face.0.bin
+# level_01.0.spr ------------------------------------------------------------}}}
+
+# level_01.1.spr ------------------------------------------------------------{{{
+build/level_01.1.spr : build/level_01/level_01.1.o \
+		       linker_scripts/sprites.cmd
+	$(LD) $(LDFLAGS) build/level_01/level_01.1.o -T linker_scripts/sprites.cmd \
+		         -o build/level_01.1.spr
+
+build/level_01/level_01.1.o : level_01.1.s \
+			      build/level_01/coin.1.bin \
+			      build/level_01/powerup_drone.1.bin \
+			      build/level_01/powerup_rate.1.bin \
+			      build/level_01/powerup_power.1.bin \
+			      build/level_01/boulder.1.bin \
+			      build/level_01/boulder_small.1.bin \
+			      build/level_01/burning_bloke.1.bin \
+			      build/level_01/castle.1.bin \
+			      build/level_01/cloud_a.1.bin \
+			      build/level_01/cloud_b.1.bin \
+			      build/level_01/cloud_c.1.bin \
+			      build/level_01/cross.1.bin \
+			      build/level_01/cross_crucified_bloke.1.bin \
+			      build/level_01/cross_impaled_bloke.1.bin \
+			      build/level_01/gravecross.1.bin \
+			      build/level_01/gravestone.1.bin \
+			      build/level_01/gravestone_mask.1.bin \
+			      build/level_01/moon.1.bin \
+			      build/level_01/moon_mask.1.bin \
+			      build/level_01/rock_pt1.1.bin \
+			      build/level_01/rock_pt2.1.bin \
+			      build/level_01/rock_pt3.1.bin \
+			      build/level_01/spikey_rock_a.1.bin \
+			      build/level_01/spikey_rock_b.1.bin \
+			      build/level_01/spikey_rock_c.1.bin \
+			      build/level_01/ant_attacker.1.bin \
+			      build/level_01/boni_burd.1.bin \
+			      build/level_01/boni_burd_mask.1.bin \
+			      build/level_01/eye_clopse.1.bin \
+			      build/level_01/eye_clopse_mask.1.bin \
+			      build/level_01/rock_chick.1.bin \
+			      build/level_01/skeleton_crawler.1.bin \
+			      build/level_01/skull_bomber.1.bin \
+			      build/level_01/skull_gang.1.bin \
+			      build/level_01/splice_face.1.bin
+	$(AS) -al level_01.1.s -o build/level_01/level_01.1.o
+
+build/level_01/coin.1.bin : build_tools/bmp_to_raw.rb \
+	                    resources/level_01/coin.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/coin.1.bmp \
+		                  build/level_01/coin.1.bin
+
+build/level_01/powerup_drone.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/powerup_drone.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/powerup_drone.1.bmp \
+		                  build/level_01/powerup_drone.1.bin
+
+build/level_01/powerup_rate.1.bin : build_tools/bmp_to_raw.rb \
+				    resources/level_01/powerup_rate.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/powerup_rate.1.bmp \
+		                  build/level_01/powerup_rate.1.bin
+
+build/level_01/powerup_power.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/powerup_power.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/powerup_power.1.bmp \
+		                  build/level_01/powerup_power.1.bin
+
+build/level_01/boulder.1.bin : build_tools/bmp_to_raw.rb \
+			       resources/level_01/boulder.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/boulder.1.bmp \
+		                  build/level_01/boulder.1.bin
+
+build/level_01/boulder_small.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/boulder_small.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/boulder_small.1.bmp \
+		                  build/level_01/boulder_small.1.bin
+
+build/level_01/burning_bloke.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/burning_bloke.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/burning_bloke.1.bmp \
+		                  build/level_01/burning_bloke.1.bin
+
+build/level_01/castle.1.bin : build_tools/bmp_to_raw.rb \
+			      resources/level_01/castle.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/castle.1.bmp \
+		                  build/level_01/castle.1.bin
+
+build/level_01/cloud_a.1.bin : build_tools/bmp_to_raw.rb \
+			       resources/level_01/cloud_a.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/cloud_a.1.bmp \
+		                  build/level_01/cloud_a.1.bin
+
+build/level_01/cloud_b.1.bin : build_tools/bmp_to_raw.rb \
+			       resources/level_01/cloud_b.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/cloud_b.1.bmp \
+		                  build/level_01/cloud_b.1.bin
+
+build/level_01/cloud_c.1.bin : build_tools/bmp_to_raw.rb \
+			       resources/level_01/cloud_c.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/cloud_c.1.bmp \
+		                  build/level_01/cloud_c.1.bin
+
+build/level_01/cross.1.bin : build_tools/bmp_to_raw.rb \
+			     resources/level_01/cross.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/cross.1.bmp \
+		                  build/level_01/cross.1.bin
+
+build/level_01/cross_crucified_bloke.1.bin : build_tools/bmp_to_raw.rb \
+				             resources/level_01/cross_crucified_bloke.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/cross_crucified_bloke.1.bmp \
+		                  build/level_01/cross_crucified_bloke.1.bin
+
+build/level_01/cross_impaled_bloke.1.bin : build_tools/bmp_to_raw.rb \
+				           resources/level_01/cross_impaled_bloke.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/cross_impaled_bloke.1.bmp \
+		                  build/level_01/cross_impaled_bloke.1.bin
+
+build/level_01/gravecross.1.bin : build_tools/bmp_to_raw.rb \
+				  resources/level_01/gravecross.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/gravecross.1.bmp \
+		                  build/level_01/gravecross.1.bin
+
+build/level_01/gravestone.1.bin : build_tools/bmp_to_raw.rb \
+				  resources/level_01/gravestone.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/gravestone.1.bmp \
+		                  build/level_01/gravestone.1.bin
+
+build/level_01/gravestone_mask.1.bin : build_tools/bmp_to_raw.rb \
+				       resources/level_01/gravestone_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/gravestone_mask.1.bmp \
+		                       build/level_01/gravestone_mask.1.bin
+
+build/level_01/moon.1.bin : build_tools/bmp_to_raw.rb \
+			    resources/level_01/moon.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/moon.1.bmp \
+		                  build/level_01/moon.1.bin
+
+build/level_01/moon_mask.1.bin : build_tools/bmp_to_raw.rb \
+				 resources/level_01/moon_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/moon_mask.1.bmp \
+		                       build/level_01/moon_mask.1.bin
+
+build/level_01/rock_pt1.1.bin : build_tools/bmp_to_raw.rb \
+				resources/level_01/rock_pt1.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/rock_pt1.1.bmp \
+		                  build/level_01/rock_pt1.1.bin
+
+build/level_01/rock_pt2.1.bin : build_tools/bmp_to_raw.rb \
+				resources/level_01/rock_pt2.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/rock_pt2.1.bmp \
+		                  build/level_01/rock_pt2.1.bin
+
+build/level_01/rock_pt3.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/rock_pt3.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/rock_pt3.1.bmp \
+		                  build/level_01/rock_pt3.1.bin
+
+build/level_01/spikey_rock_a.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/spikey_rock_a.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/spikey_rock_a.1.bmp \
+		                  build/level_01/spikey_rock_a.1.bin
+
+build/level_01/spikey_rock_b.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/spikey_rock_b.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/spikey_rock_b.1.bmp \
+		                  build/level_01/spikey_rock_b.1.bin
+
+build/level_01/spikey_rock_c.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/spikey_rock_c.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/spikey_rock_c.1.bmp \
+		                  build/level_01/spikey_rock_c.1.bin
+
+build/level_01/ant_attacker.1.bin : build_tools/bmp_to_raw.rb \
+	                            resources/level_01/ant_attacker.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/ant_attacker.1.bmp \
+		                  build/level_01/ant_attacker.1.bin
+
+build/level_01/boni_burd.1.bin : build_tools/bmp_to_raw.rb \
+	                         resources/level_01/boni_burd.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/boni_burd.1.bmp \
+		                  build/level_01/boni_burd.1.bin
+
+build/level_01/boni_burd_mask.1.bin : build_tools/bmp_to_raw.rb \
+	                              resources/level_01/boni_burd_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/boni_burd_mask.1.bmp \
+		                       build/level_01/boni_burd_mask.1.bin
+
+build/level_01/eye_clopse.1.bin : build_tools/bmp_to_raw.rb \
+	                          resources/level_01/eye_clopse.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/eye_clopse.1.bmp \
+		                  build/level_01/eye_clopse.1.bin
+
+build/level_01/eye_clopse_mask.1.bin : build_tools/bmp_to_raw.rb \
+	                               resources/level_01/eye_clopse_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/eye_clopse_mask.1.bmp \
+		                       build/level_01/eye_clopse_mask.1.bin
+
+build/level_01/rock_chick.1.bin : build_tools/bmp_to_raw.rb \
+	                          resources/level_01/rock_chick.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/rock_chick.1.bmp \
+		                  build/level_01/rock_chick.1.bin
+
+build/level_01/skeleton_crawler.1.bin : build_tools/bmp_to_raw.rb \
+	                                resources/level_01/skeleton_crawler.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/skeleton_crawler.1.bmp \
+		                  build/level_01/skeleton_crawler.1.bin
+
+build/level_01/skull_bomber.1.bin : build_tools/bmp_to_raw.rb \
+	                            resources/level_01/skull_bomber.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/skull_bomber.1.bmp \
+		                  build/level_01/skull_bomber.1.bin
+
+build/level_01/skull_gang.1.bin : build_tools/bmp_to_raw.rb \
+	                          resources/level_01/skull_gang.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/skull_gang.1.bmp \
+		                  build/level_01/skull_gang.1.bin
+
+build/level_01/splice_face.1.bin : build_tools/bmp_to_raw.rb \
+				   resources/level_01/splice_face.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_01/splice_face.1.bmp \
+		                  build/level_01/splice_face.1.bin
+# level_01.1.spr ------------------------------------------------------------}}}
 
 # level_02.bin --------------------------------------------------------------{{{
 build/level_02.bin : build/core.o \
@@ -432,6 +873,7 @@ build/chibi/drone_mask.1.bin : build_tools/bmp_to_raw.rb \
 
 pre-build :
 	mkdir -p build/chibi
+	mkdir -p build/level_01
 
 clean :
 	rm -rf build/*
