@@ -15,9 +15,10 @@
 start:
         JMP  @$LevelInit
 
+LevelSprites.0:
        .incbin "build/level_01.0.spr"
    .ifdef ExtMemCore
-LevelSprites2:
+LevelSprites.1:
        .incbin "build/level_01.1.spr"
    .endif
 ChibiSprites:
@@ -32,8 +33,47 @@ EventStreamArray_Ep1: #---------------------------------------------------------
    # -----X---X-- (mid)        %11000010   Bank 1
    # []=====[]=== (foreground) %11000001   Bank 0
 
-    .word 0, evtReprogram_PowerupSprites # Event_CoreReprogram_PowerupSprites
-    .byte      128+38, 128+39, 128+40, 128+16 # Define powerup sprites
+.equiv DUMMY_SPRITE, 5
+
+.equiv COIN, 16
+.equiv POWERUP_DRONE, 38
+.equiv POWERUP_RATE, 39
+.equiv POWERUP_POWER, 40 # not used on this level
+
+.equiv BOULDER, 13
+.equiv BOULDER_SMALL, 14
+.equiv BURNING_BLOKE, 11
+.equiv CASTLE, 4
+.equiv CLOUD_A, 41
+.equiv CLOUD_B, 42
+.equiv CLOUD_C, 43
+.equiv CROSS, 19
+.equiv CROSS_CRUCIFIED_BLOKE, 18
+.equiv CROSS_IMPALED_BLOKE, 17
+.equiv GRAVECROSS, 21
+.equiv GRAVESTONE, 20
+.equiv MOON, 3
+.equiv ROCK_PT1, 22
+.equiv ROCK_PT2, 23
+.equiv ROCK_PT3, 24
+.equiv SPIKEY_ROCK_A, 8
+.equiv SPIKEY_ROCK_B, 9
+.equiv SPIKEY_ROCK_C, 10
+
+.equiv ANT_ATTACKER, 0
+.equiv BONI_BURD, 2
+.equiv EYE_CLOPSE, 7
+.equiv ROCK_CHICK, 1
+.equiv SKELETON_CRAWLER, 36
+.equiv SKULL_BOMBER, 37
+.equiv SKULL_GANG, 35
+.equiv SPLICE_FACE, 34
+
+    .word 0, evtReprogram_PowerupSprites  # Define powerup sprites
+    .byte      sprTwoFrame | POWERUP_DRONE
+    .byte      sprTwoFrame | POWERUP_RATE
+    .byte      sprTwoFrame | POWERUP_POWER
+    .byte      sprTwoFrame | COIN
 
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
@@ -61,7 +101,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word        prgFireSlow | fireLeftWide
     .word        mvRegular | spdNormal | 0x22 # move - direction left, slow
     .word        lifeEnemy | 1
-    .word    evtSetSprite | sprTwoFrame | 1   # 2
+    .word    evtSetSprite | sprTwoFrame | ROCK_CHICK   # 2
     .word    evtSetAnimator | anmNone         # 3
     .word    evtAddToForeground               # 4
     .word    evtSaveObjSettings | 2           # 5
@@ -72,7 +112,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word         prgFireFast | fireSingleSouth
     .word         mvRegular | spdNormal | 0x23 # move - direction left, slow
     .word         lifeEnemy | 4
-    .word     evtSetSprite | sprTwoFrame | 37  # 2
+    .word     evtSetSprite | sprTwoFrame | SKULL_BOMBER  # 2
     .word     evtSetAnimator | anmNone         # 3
     .word     evtAddToForeground               # 4
     .word     evtSaveObjSettings | 3           # 5
@@ -83,7 +123,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word         prgFireSlow | fireTopLeft
     .word         mvRegular | spdNormal | 0x23 # move - direction left, slow
     .word         lifeEnemy | 4
-    .word     evtSetSprite | sprTwoFrame | 0   # 2
+    .word     evtSetSprite | sprTwoFrame | ANT_ATTACKER   # 2
     .word     evtSetAnimator | anmNone         # 3
     .word     evtAddToForeground               # 4
     .word     evtSaveObjSettings | 4           # 5
@@ -94,7 +134,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word         prgFireSnail | fireLeftWide
     .word         mvRegular | spdNormal | 0x22 # move - direction left, slow
     .word         lifeEnemy | 3
-    .word     evtSetSprite | sprTwoFrame | 36  # 2
+    .word     evtSetSprite | sprTwoFrame | SKELETON_CRAWLER  # 2
     .word     evtSetAnimator | anmNone         # 3
     .word     evtAddToForeground               # 4
     .word     evtSaveObjSettings | 5           # 5
@@ -105,7 +145,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word         prgFireSnail | fireBurst
     .word         mvRegular | spdNormal | 0x25 # move - direction right, slow
     .word         lifeEnemy | 4
-    .word     evtSetSprite | sprTwoFrame | 34  # 2
+    .word     evtSetSprite | sprTwoFrame | SPLICE_FACE  # 2
     .word     evtSetAnimator | anmNone         # 3
     .word     evtAddToForeground               # 4
     .word     evtSaveObjSettings | 6           # 5
@@ -116,7 +156,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word         prgFireSnail | fireBottomLeft
     .word         mvRegular | spdNormal | 0x22 # move - direction left, slow
     .word         lifeEnemy | 3
-    .word     evtSetSprite | sprTwoFrame | 2   # 2
+    .word     evtSetSprite | sprTwoFrame | BONI_BURD   # 2
     .word     evtSetAnimator | anmNone         # 3
     .word     evtAddToForeground               # 4
     .word     evtSaveObjSettings | 7           # 5
@@ -127,7 +167,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word         prgFireFast | fireSingleWest
     .word         mveWave | 0b0001
     .word         lifeEnemy | 3
-    .word     evtSetSprite | sprTwoFrame | 35  # 2
+    .word     evtSetSprite | sprTwoFrame | SKULL_GANG  # 2
     .word     evtSetAnimator | anmNone         # 3
     .word     evtAddToForeground               # 4
     .word     evtSaveObjSettings | 8           # 5
@@ -138,7 +178,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word         prgFireSlow | fireLeftWide
     .word         mveWave | 0b1100
     .word         lifeEnemy | 3
-    .word     evtSetSprite | sprTwoFrame | 7   # 2
+    .word     evtSetSprite | sprTwoFrame | EYE_CLOPSE   # 2
     .word     evtSetAnimator | anmNone         # 3
     .word     evtAddToForeground               # 4
     .word     evtSaveObjSettings | 9           # 5
@@ -150,44 +190,44 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word 0, evtMultipleCommands | 3
     .word    evtLoadObjSettings | 0
     .word    evtSetMove, mveBackground | 0b1000
-    .word    evtSingleSprite, sprSingleFrame | 3
+    .word    evtSingleSprite, sprSingleFrame | MOON
     .byte        24+ 8, 24+ 160 -16 # Y, X :  32, 172 : 8, 288
 
    # Castle
     .word 0, evtSetMove, mveBackground | 0b0010
-    .word 0, evtSingleSprite, sprSingleFrame | 4
+    .word 0, evtSingleSprite, sprSingleFrame | CASTLE
     .byte        24+ 50,    24+ 120  # Y, X :  74, 144 :  50, 240
    # some boulders
-    .word 0, evtSingleSprite, sprSingleFrame | 14
+    .word 0, evtSingleSprite, sprSingleFrame | BOULDER_SMALL
     .byte        24+ 40+90, 24+ 100  # Y, X : 154, 124 : 130, 200
-    .word 0, evtSingleSprite, sprSingleFrame | 13
+    .word 0, evtSingleSprite, sprSingleFrame | BOULDER
     .byte        24+ 40+100, 24+ 90  # Y, X : 164, 114 : 140, 180
-    .word 0, evtSingleSprite, sprSingleFrame | 13
+    .word 0, evtSingleSprite, sprSingleFrame | BOULDER
     .byte        24+ 40+100, 24+ 162 # Y, X : 164, 184 : 140, 324
 
    # Burning bloke
     .word 0, evtMultipleCommands | 2
     .word    evtSetProgMoveLife, prgNone, mveBackground | 0b0010, lifeImmortal
-    .word    evtSingleSprite, sprTwoFrame | 11
+    .word    evtSingleSprite, sprTwoFrame | BURNING_BLOKE
     .byte        24+ 90, 24+ 50 # Y, X : 114, 74 : 90, 100
 
    # Clouds (3 wide)
     .word 0, evtMultipleCommands | 3
     .word    evtSetMove, mveBackground | 0b0100
-    .word    evtSingleSprite, sprSingleFrame | 41
+    .word    evtSingleSprite, sprSingleFrame | CLOUD_A
     .byte        24+ 14, 24+ 159
-    .word    evtSingleSprite, sprSingleFrame | 42
+    .word    evtSingleSprite, sprSingleFrame | CLOUD_B
     .byte        24+ 14, 24+ 159+12
-#   .word    evtSingleSprite, sprSingleFrame | 43
+#   .word    evtSingleSprite, sprSingleFrame | CLOUD_C
 #   .byte        24+ 14, 24+ 159+24
 
    # Spikeyrock
     .word 0, evtMultipleCommands | 3
     .word    evtSetMove, mveBackground | 0b0001
 # defb    48+2, 24+100, 24+24+128, 24, 8, 9 ; Two sprites,
-    .word    evtSingleSprite, sprSingleFrame | 8
+    .word    evtSingleSprite, sprSingleFrame | SPIKEY_ROCK_A
     .byte        24+ 24+128, 24+ 100
-    .word    evtSingleSprite, sprSingleFrame | 9
+    .word    evtSingleSprite, sprSingleFrame | SPIKEY_ROCK_B
     .byte        24+ 48+128, 24+ 100
 
 # Start of fade in block -------------------------------------------------------
@@ -209,13 +249,13 @@ EventStreamArray_Ep1: #---------------------------------------------------------
    # Rock Pt 1
     .word 10, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 0
-    .word     evtSingleSprite, sprSingleFrame | 22
+    .word     evtSingleSprite, sprSingleFrame | ROCK_PT1
     .byte         24+ 176, 24+ 160
 
-   # Cross
+   # Cross, impaled bloke
     .word 13, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 1
-    .word     evtSingleSprite, sprSingleFrame | 17
+    .word     evtSingleSprite, sprSingleFrame | CROSS_IMPALED_BLOKE
     .byte         24+ 110, 24+ 160
 
    # rock chick enemy
@@ -227,19 +267,19 @@ EventStreamArray_Ep1: #---------------------------------------------------------
    # Rock Pt 2
     .word 16, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 0
-    .word     evtSingleSprite, sprSingleFrame | 23
+    .word     evtSingleSprite, sprSingleFrame | ROCK_PT2
     .byte         24+ 176, 24+ 160
 
    # Powerup Rate
     .word 17, evtMultipleCommands | 2
     .word     evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 0x22), 64+63
-    .word     evtSingleSprite, sprTwoFrame | 39
+    .word     evtSingleSprite, sprTwoFrame | POWERUP_RATE
     .byte         24+ 50, 24+ 160
 
    # Rock Pt 3
     .word 22, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 0
-    .word     evtSingleSprite, sprSingleFrame | 24
+    .word     evtSingleSprite, sprSingleFrame | ROCK_PT3
     .byte         24+ 176, 24+ 160
 
    # rock chick enemy
@@ -258,10 +298,10 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtLoadObjSettings | 2
     .word     evtSingleSprite | 8  # Row 15, last Column, Last Sprite
 
-   # Cross
+   # Cross, crucifix
     .word 40, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 1
-    .word     evtSingleSprite, sprSingleFrame | 18
+    .word     evtSingleSprite, sprSingleFrame | CROSS_CRUCIFIED_BLOKE
     .byte         24+ 85, 24+ 160
 
    # Skull Bomber
@@ -277,24 +317,24 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word 55, evtMultipleCommands | 3
     .word     evtLoadObjSettings | 1
     .word     evtSetProg, prgNone
-    .word     evtSingleSprite, sprTwoFrame | 11
+    .word     evtSingleSprite, sprTwoFrame | BURNING_BLOKE
     .byte         24+ 85, 24+ 160
 
    # Boniburd
     .word 65, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 7
-    .word     evtSingleSprite, sprTwoFrame | 2
+    .word     evtSingleSprite, sprTwoFrame | BONI_BURD
     .byte         24+ 16, 24+ 160-24
 
    # Spikeyrock
     .word 67, evtMultipleCommands | 4
     .word     evtLoadObjSettings | 0
 # defb    48+   3   ,160+24,24+ 128,24,       8,9,10 ; Three sprites,
-    .word     evtSingleSprite, sprSingleFrame | 8
+    .word     evtSingleSprite, sprSingleFrame | SPIKEY_ROCK_A
     .byte         24+ 128, 24+ 160
-    .word     evtSingleSprite, sprSingleFrame | 9
+    .word     evtSingleSprite, sprSingleFrame | SPIKEY_ROCK_B
     .byte         24+ 24+128, 24+ 160
-    .word     evtSingleSprite, sprSingleFrame | 10
+    .word     evtSingleSprite, sprSingleFrame | SPIKEY_ROCK_C
     .byte         24+ 48+128, 24+ 160
 
    # rock chick enemy
@@ -319,28 +359,28 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtLoadObjSettings | 5
     .word     evtSingleSprite | 13  # Row 25, last Column, Last Sprite
 
-   # Cross
+   # Cross, crucifix
     .word 88, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 1
-    .word     evtSingleSprite, sprSingleFrame | 18
+    .word     evtSingleSprite, sprSingleFrame | CROSS_CRUCIFIED_BLOKE
     .byte         24+ 85, 24+ 160
 
    # Powerup Drone
     .word 90, evtMultipleCommands | 2
     .word     evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 0x22), 64+63
-    .word     evtSingleSprite, sprTwoFrame | 38
+    .word     evtSingleSprite, sprTwoFrame | POWERUP_DRONE
     .byte         24+ 150, 24+ 160
 
    # Grave
     .word 95, evtMultipleCommands | 2
     .word     evtLoadObjSettings | 0
-    .word     evtSingleSprite, sprSingleFrame | 21
+    .word     evtSingleSprite, sprSingleFrame | GRAVECROSS
     .byte         24+ 170, 24+ 160
 
    # SpliceFace
     .word 100, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 6
-    .word      evtSingleSprite, sprTwoFrame | 34
+    .word      evtSingleSprite, sprTwoFrame | SPLICE_FACE
     .byte          24+ 100, 24
 
    # rock chick enemy
@@ -357,11 +397,11 @@ EventStreamArray_Ep1: #---------------------------------------------------------
    # Clouds (3 wide)
     .word 120, evtMultipleCommands | 3
     .word      evtSetProgMoveLife, prgNone, mveBackground | 0b0100, lifeImmortal
-    .word      evtSingleSprite, sprSingleFrame | 41
+    .word      evtSingleSprite, sprSingleFrame | CLOUD_A
     .byte          24+ 14, 24+ 159
-    .word      evtSingleSprite, sprSingleFrame | 42
+    .word      evtSingleSprite, sprSingleFrame | CLOUD_B
     .byte          24+ 14, 24+ 159+12
-   #.word      evtSingleSprite, sprSingleFrame | 43
+   #.word      evtSingleSprite, sprSingleFrame | CLOUD_C
    #.byte          24+ 14, 24+ 159+24
 
    # rock chick enemy
@@ -373,7 +413,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
    # Grave
     .word 122, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 0
-    .word      evtSingleSprite, sprSingleFrame | 21
+    .word      evtSingleSprite, sprSingleFrame | GRAVECROSS
     .byte         24+ 170, 24+ 160
 
    # rock chick enemy
@@ -390,7 +430,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word 129, evtMultipleCommands | 3
     .word      evtLoadObjSettings | 1
     .word      evtSetProg, prgNone
-    .word      evtSingleSprite, sprTwoFrame | 11
+    .word      evtSingleSprite, sprTwoFrame | BURNING_BLOKE
     .byte          24+ 90, 24+ 160
 
    # rock chick enemy
@@ -404,22 +444,22 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word      evtLoadObjSettings | 2
     .word      evtSingleSprite | 8  # Row 15, last Column, Last Sprite
 
-   # Cross
+   # Cross, just a cross
     .word 140, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 1
-    .word      evtSingleSprite, sprSingleFrame | 19
+    .word      evtSingleSprite, sprSingleFrame | CROSS
     .byte          24+ 103, 24+ 160
 
    # SpliceFace
     .word 150, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 6
-    .word      evtSingleSprite, sprSingleFrame | 34
+    .word      evtSingleSprite, sprSingleFrame | SPLICE_FACE
     .byte          24+ 100, 24
 
    # Powerup Drone
     .word 150, evtMultipleCommands | 2
     .word      evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 0x22), 64+63
-    .word      evtSingleSprite, sprTwoFrame | 38
+    .word      evtSingleSprite, sprTwoFrame | POWERUP_DRONE
     .byte          24+ 150, 24+ 160
 
    # Eyeclopse s
@@ -435,10 +475,10 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word      evtSingleSprite | 6  # Row 11, last Column, Last Sprite
     .word      evtSingleSprite | 10 # Row 19, last Column, Last Sprite
 
-   # Grave
+   # Gravestone
     .word 167, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 0
-    .word      evtSingleSprite, sprSingleFrame | 20
+    .word      evtSingleSprite, sprSingleFrame | GRAVESTONE
     .byte          24+ 173, 24+ 160
 
    # rock chick enemy
@@ -453,10 +493,10 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word      evtSetMove, mveWave | 0b1111
     .word      evtSingleSprite | 12  # Row 23, last Column, Last Sprite
 
-   # Cross
+   # Cross, just a cross
     .word 185, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 1
-    .word      evtSingleSprite, sprSingleFrame | 19
+    .word      evtSingleSprite, sprSingleFrame | CROSS
     .byte          24+ 107, 24+ 160
 
    # Skull Gang
@@ -467,11 +507,11 @@ EventStreamArray_Ep1: #---------------------------------------------------------
    # Clouds (3 wide)
     .word 200, evtMultipleCommands | 3
     .word      evtSetProgMoveLife, prgNone, mveBackground | 0b0100, lifeImmortal
-    .word      evtSingleSprite, sprSingleFrame | 41
+    .word      evtSingleSprite, sprSingleFrame | CLOUD_A
     .byte          24+ 14, 24+ 159
-    .word      evtSingleSprite, sprSingleFrame | 42
+    .word      evtSingleSprite, sprSingleFrame | CLOUD_B
     .byte          24+ 14, 24+ 159+12
-   #.word      evtSingleSprite, sprSingleFrame | 43
+   #.word      evtSingleSprite, sprSingleFrame | CLOUD_C
    #.byte          24+ 14, 24+ 159+24
 
    # rock chick enemy
@@ -491,10 +531,10 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word      evtLoadObjSettings | 5
     .word      evtSingleSprite | 13  # Row 25, last Column, Last Sprite
 
-   # Grave
+   # Gravestone
     .word 221, evtMultipleCommands | 2
     .word      evtLoadObjSettings | 0
-    .word      evtSingleSprite, sprSingleFrame | 20
+    .word      evtSingleSprite, sprSingleFrame | GRAVESTONE
     .byte         24+ 176, 24+ 160
 
    # Skull Bomber
@@ -511,17 +551,17 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word 230, evtMultipleCommands | 4
     .word      evtLoadObjSettings | 6
     .word      evtSetMove, mvRegular | spdNormal | 0x23
-    .word      evtSingleSprite, sprTwoFrame | 34
+    .word      evtSingleSprite, sprTwoFrame | SPLICE_FACE
     .byte          24+ 50, 24+ 138
-    .word      evtSingleSprite, sprTwoFrame | 34
+    .word      evtSingleSprite, sprTwoFrame | SPLICE_FACE
     .byte          24+ 150, 24+ 138
 
    # SpliceFace
     .word 232, evtMultipleCommands | 3
     .word      evtLoadObjSettings | 6
-    .word      evtSingleSprite, sprTwoFrame | 34
+    .word      evtSingleSprite, sprTwoFrame | SPLICE_FACE
     .byte          24+ 50, 24+ 138
-    .word      evtSingleSprite, sprTwoFrame | 34
+    .word      evtSingleSprite, sprTwoFrame | SPLICE_FACE
     .byte          24+ 150, 24+ 138
 
    # Skull Bomber
@@ -547,7 +587,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
    # cloud
     .word 250, evtMultipleCommands | 2
     .word      evtSetProgMoveLife, prgNone, mveBackground | 0b0100, lifeImmortal
-    .word      evtSingleSprite, sprSingleFrame | 43
+    .word      evtSingleSprite, sprSingleFrame | CLOUD_C
     .byte          24+ 14, 24+ 160
 
     .word 256+ 5, evtCallAddress, Player_Handler_DoSmartBomb
@@ -558,7 +598,7 @@ LevelEndAnim:
 # defb    0,128+  47,140+24,100+24    ;   ; Single Object sprite 11 (animated)
     .word 256+ 5, evtMultipleCommands | 2
     .word         evtSetProgMoveLife, prgMovePlayer, mvStatic, 10
-    .word         evtSingleSprite, sprTwoFrame | 5
+    .word         evtSingleSprite, sprTwoFrame | DUMMY_SPRITE
     .byte             24+ 100, 24+ 140
 
 # Start of fade out block ------------------------------------------------------
@@ -579,12 +619,12 @@ LevelInit:
 
        .ppudo_ensure $PPU_LevelMusicRestart
 
-        MOV  $LevelSprites,R0
+        MOV  $LevelSprites.0,R0
         MOV  $SpriteBanksVectors,R1
         MOV  R0,(R1)+
         MOV  R0,(R1)+
    .ifdef ExtMemCore
-        MOV  $LevelSprites2,(R1)+
+        MOV  $LevelSprites.1,(R1)+
    .else
         MOV  R0,(R1)+
    .endif
