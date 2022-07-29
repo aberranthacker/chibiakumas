@@ -63,7 +63,7 @@ bitmap.each.with_index do |byte_pixel, idx|
   if options.bpp == 1
     dst_bitmap.push(bp0_byte) # bp0_byte contains a word in this case
   elsif options.bpp == 2
-    dst_bitmap.push(bp0_byte << 8 | bp1_byte)
+    dst_bitmap.push(bp1_byte << 8 | bp0_byte)
   elsif options.bpp == 3
     dst_bitmap.push(bp0_byte)
     dst_bitmap.push(bp2_byte << 8 | bp1_byte)

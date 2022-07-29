@@ -214,57 +214,69 @@ Event_CoreReprogram_PowerupSprites:
         MOVB R0,@$PointsSpriteA       # ld (PointsSprite_Plus1-1),a
         MOVB R0,@$PointsSpriteB       # ld (PointsSpriteB_Plus1-1),a
         MOVB R0,@$PointsSpriteC       # ld (PointsSpriteC_Plus1-1),a
-
         RETURN                        # ret
 
 Event_ReprogramObjectBurstPosition:
         MOV  (R5)+,@$BurstPosition # # Y: LSB, X: MSB
-        RETURN # JMP @$Event_LoadNextEvt
+        RETURN # to Event_LoadNextEvt
+
 Event_CoreReprogram_CustomMove1:
         MOV  (R5)+,@$jmpLevelSpecificMoveA
-        RETURN # JMP @$Event_LoadNextEvt
+        RETURN # to Event_LoadNextEvt
+
 Event_CoreReprogram_CustomMove2:
         MOV  (R5)+,@$jmpLevelSpecificMoveB
-        RETURN # JMP @$Event_LoadNextEvt
+        RETURN # to Event_LoadNextEvt
+
 Event_CoreReprogram_CustomMove3:
         MOV  (R5)+,@$jmpLevelSpecificMoveC
-        RETURN # JMP @$Event_LoadNextEvt
+        RETURN # to Event_LoadNextEvt
+
 Event_CoreReprogram_CustomMove4:
         MOV  (R5)+,@$jmpLevelSpecificMoveD
-        RETURN # JMP @$Event_LoadNextEvt
+        RETURN # to Event_LoadNextEvt
+
 Event_SmartBombSpecial:
       # Custom smartbomb handler - needed to wipe Omega array during final boss
        #MOV  (R5)+,@$SmartBombSpecial_Plus2 - 2
-        RETURN # JMP @$Event_LoadNextEvt
+        RETURN # to Event_LoadNextEvt
+
 Event_ObjectFullCustomMoves: # Override whole move handler
        #MOV  (R5)+,@$ObjectDoMovesOverride_Plus2 - 2
-        RETURN # JMP @$Event_LoadNextEvt
+        RETURN # to Event_LoadNextEvt
+
 Event_CoreReprogram_AnimatorPointer:
         MOV  (R5)+,@$ObjectAnimator_AnimatorPointers
-        RETURN # JMP @$Event_LoadNextEvt
+        RETURN # to Event_LoadNextEvt
+
 Event_CustomProgram1:
-       #MOV  (R5)+,@$CustomProgram1_Plus2 - 2
+        MOV  (R5)+,@$ObjectProgram_Custom1
         RETURN # JMP @$Event_LoadNextEvt
+
 Event_CustomProgram2:
-       #MOV  (R5)+,@$CustomProgram2_Plus2 - 2
-        RETURN # JMP @$Event_LoadNextEvt
+        MOV  (R5)+,@$ObjectProgram_Custom2
+        RETURN # to Event_LoadNextEvt
+
 Event_CustomPlayerHitter:
        #MOV  (R5)+,@$customPlayerHitter_Plus2 - 2
-        RETURN # JMP @$Event_LoadNextEvt
+        RETURN # to Event_LoadNextEvt
+
 Event_CustomSmartBomb:
        #MOV  (R5)+,@$CustomSmartBombEnemy_Plus2 - 2
-        RETURN # JMP @$Event_LoadNextEvt
+        RETURN # to Event_LoadNextEvt
+
 Event_CoreReprogram_ShotToDeath:
        #MOV  (R5)+,@$CustomShotToDeathCall_Plus2 - 2
-        RETURN # JMP @$Event_LoadNextEvt
+        RETURN # to Event_LoadNextEvt
+
 Event_CoreReprogram_ObjectHitHandler:
        #MOV  (R5)+,@$ObjectShotOverride_Plus2 - 2
-        RETURN # JMP @$Event_LoadNextEvt
+        RETURN # to Event_LoadNextEvt
 
 Event_CoreReprogram_Palette:
         MOV  (R5)+,@$PPUCommandArg
        .ppudo_ensure $PPU_SetPalette
-        RETURN # JMP @$Event_LoadNextEvt
+        RETURN # to Event_LoadNextEvt
 
       # reads in Offset then Bytecount from (HL) and dumps to destination DE
                                                             # Event_CoreReprogram_DataCopy:
