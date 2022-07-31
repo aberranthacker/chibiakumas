@@ -75,27 +75,27 @@
 
    # sprite 9 Cloud first part
     .word CloudA # sprite offset
-    .word 0  # bit-mask offset
+    .word CloudAMask # bit-mask offset
     .byte 12 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_HAS_MASK | SPR_DOUBLE # attributes
 
    # sprite 10 Cloud second part
     .word CloudB # sprite offset
-    .word 0  # bit-mask offset
+    .word CloudAMask # bit-mask offset
     .byte 12 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_HAS_MASK | SPR_DOUBLE # attributes
 
    # sprite 11 Cloud third part
     .word CloudC # sprite offset
-    .word 0  # bit-mask offset
+    .word CloudAMask # bit-mask offset
     .byte 11 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_HAS_MASK | SPR_DOUBLE # attributes
 
    # sprite 12 Cross
     .word Cross # sprite offset
@@ -103,7 +103,7 @@
     .byte 19 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte 0 # attributes
 
    # sprite 13 Cross Crucified Bloke
     .word CrossCrucifiedBloke # sprite offset
@@ -123,11 +123,11 @@
 
    # sprite 15 Gravecross
     .word Gravecross # sprite offset
-    .word 0  # bit-mask offset
+    .word GravecrossMask # bit-mask offset
     .byte 22 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 16 Gravestone
     .word Gravestone # sprite offset
@@ -147,27 +147,27 @@
 
    # sprite 18 Rock Pt.1
     .word RockPT1 # sprite offset
-    .word 0  # bit-mask offset
+    .word RockPT1Mask # bit-mask offset
     .byte 24 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte 0 # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 19 Rock Pt.2
     .word RockPT2 # sprite offset
-    .word 0  # bit-mask offset
+    .word RockPT2Mask # bit-mask offset
     .byte 24 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte 0 # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 20 Rock Pt.3
     .word RockPT3 # sprite offset
-    .word 0  # bit-mask offset
+    .word RockPT3Mask # bit-mask offset
     .byte 24 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte 0 # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 21 Spikey Rock top part
     .word SpikeyRockA # sprite offset
@@ -227,11 +227,11 @@
 
    # sprite 28 Skeleton Crawler
     .word SkeletonCrawler # sprite offset
-    .word 0  # bit-mask offset
+    .word SkeletonCrawlerMask  # bit-mask offset
     .byte 24 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 29 Skull Bomber
     .word SkullBomber # sprite offset
@@ -279,6 +279,12 @@ CloudB:
     .incbin "build/level_01/cloud_b.1.bin"
 CloudC:
     .incbin "build/level_01/cloud_c.1.bin"
+CloudAMask:
+    .incbin "build/level_01/cloud_a_mask.1.bin"
+CloudBMask:
+    .incbin "build/level_01/cloud_b_mask.1.bin"
+CloudCMask:
+    .incbin "build/level_01/cloud_c_mask.1.bin"
 Cross:
     .incbin "build/level_01/cross.1.bin"
 CrossCrucifiedBloke:
@@ -287,6 +293,8 @@ CrossImpaledBloke:
     .incbin "build/level_01/cross_impaled_bloke.1.bin"
 Gravecross:
     .incbin "build/level_01/gravecross.1.bin"
+GravecrossMask:
+    .incbin "build/level_01/gravecross_mask.1.bin"
 Gravestone:
     .incbin "build/level_01/gravestone.1.bin"
 GravestoneMask:
@@ -301,6 +309,12 @@ RockPT2:
     .incbin "build/level_01/rock_pt2.1.bin"
 RockPT3:
     .incbin "build/level_01/rock_pt3.1.bin"
+RockPT1Mask:
+    .incbin "build/level_01/rock_pt1_mask.1.bin"
+RockPT2Mask:
+    .incbin "build/level_01/rock_pt2_mask.1.bin"
+RockPT3Mask:
+    .incbin "build/level_01/rock_pt3_mask.1.bin"
 SpikeyRockA:
     .incbin "build/level_01/spikey_rock_a.1.bin"
 SpikeyRockB:
@@ -321,6 +335,8 @@ RockChick:
     .incbin "build/level_01/rock_chick.1.bin"
 SkeletonCrawler:
     .incbin "build/level_01/skeleton_crawler.1.bin"
+SkeletonCrawlerMask:
+    .incbin "build/level_01/skeleton_crawler_mask.1.bin"
 SkullBomber:
     .incbin "build/level_01/skull_bomber.1.bin"
 SkullGang:

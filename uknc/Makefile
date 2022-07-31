@@ -356,10 +356,14 @@ build/level_01/level_01.0.o : level_01.0.s \
 			      build/level_01/cloud_a.0.bin \
 			      build/level_01/cloud_b.0.bin \
 			      build/level_01/cloud_c.0.bin \
+			      build/level_01/cloud_a_mask.0.bin \
+			      build/level_01/cloud_b_mask.0.bin \
+			      build/level_01/cloud_c_mask.0.bin \
 			      build/level_01/cross.0.bin \
 			      build/level_01/cross_crucified_bloke.0.bin \
 			      build/level_01/cross_impaled_bloke.0.bin \
 			      build/level_01/gravecross.0.bin \
+			      build/level_01/gravecross_mask.0.bin \
 			      build/level_01/gravestone.0.bin \
 			      build/level_01/gravestone_mask.0.bin \
 			      build/level_01/moon.0.bin \
@@ -367,6 +371,9 @@ build/level_01/level_01.0.o : level_01.0.s \
 			      build/level_01/rock_pt1.0.bin \
 			      build/level_01/rock_pt2.0.bin \
 			      build/level_01/rock_pt3.0.bin \
+			      build/level_01/rock_pt1_mask.0.bin \
+			      build/level_01/rock_pt2_mask.0.bin \
+			      build/level_01/rock_pt3_mask.0.bin \
 			      build/level_01/spikey_rock_a.0.bin \
 			      build/level_01/spikey_rock_b.0.bin \
 			      build/level_01/spikey_rock_c.0.bin \
@@ -377,6 +384,7 @@ build/level_01/level_01.0.o : level_01.0.s \
 			      build/level_01/eye_clopse_mask.0.bin \
 			      build/level_01/rock_chick.0.bin \
 			      build/level_01/skeleton_crawler.0.bin \
+			      build/level_01/skeleton_crawler_mask.0.bin \
 			      build/level_01/skull_bomber.0.bin \
 			      build/level_01/skull_gang.0.bin \
 			      build/level_01/splice_face.0.bin
@@ -437,6 +445,21 @@ build/level_01/cloud_c.0.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/level_01/cloud_c.0.bmp \
 		                  build/level_01/cloud_c.0.bin
 
+build/level_01/cloud_a_mask.0.bin : build_tools/bmp_to_raw.rb \
+			            resources/level_01/cloud_a.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/cloud_a.0.bmp \
+		                       build/level_01/cloud_a_mask.0.bin
+
+build/level_01/cloud_b_mask.0.bin : build_tools/bmp_to_raw.rb \
+			            resources/level_01/cloud_b.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/cloud_b.0.bmp \
+		                       build/level_01/cloud_b_mask.0.bin
+
+build/level_01/cloud_c_mask.0.bin : build_tools/bmp_to_raw.rb \
+			            resources/level_01/cloud_c.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/cloud_c.0.bmp \
+		                       build/level_01/cloud_c_mask.0.bin
+
 build/level_01/cross.0.bin : build_tools/bmp_to_raw.rb \
 			     resources/level_01/cross.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_01/cross.0.bmp \
@@ -456,6 +479,11 @@ build/level_01/gravecross.0.bin : build_tools/bmp_to_raw.rb \
 				  resources/level_01/gravecross.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_01/gravecross.0.bmp \
 		                  build/level_01/gravecross.0.bin
+
+build/level_01/gravecross_mask.0.bin : build_tools/bmp_to_raw.rb \
+				       resources/level_01/gravecross_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/gravecross_mask.0.bmp \
+		                       build/level_01/gravecross_mask.0.bin
 
 build/level_01/gravestone.0.bin : build_tools/bmp_to_raw.rb \
 				  resources/level_01/gravestone.0.bmp
@@ -478,19 +506,34 @@ build/level_01/moon_mask.0.bin : build_tools/bmp_to_raw.rb \
 		                       build/level_01/moon_mask.0.bin
 
 build/level_01/rock_pt1.0.bin : build_tools/bmp_to_raw.rb \
-				     resources/level_01/rock_pt1.0.bmp
+				resources/level_01/rock_pt1.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_01/rock_pt1.0.bmp \
 		                  build/level_01/rock_pt1.0.bin
 
 build/level_01/rock_pt2.0.bin : build_tools/bmp_to_raw.rb \
-				     resources/level_01/rock_pt2.0.bmp
+				resources/level_01/rock_pt2.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_01/rock_pt2.0.bmp \
 		                  build/level_01/rock_pt2.0.bin
 
 build/level_01/rock_pt3.0.bin : build_tools/bmp_to_raw.rb \
-				     resources/level_01/rock_pt3.0.bmp
+				resources/level_01/rock_pt3.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_01/rock_pt3.0.bmp \
 		                  build/level_01/rock_pt3.0.bin
+
+build/level_01/rock_pt1_mask.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/rock_pt1_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/rock_pt1_mask.0.bmp \
+		                       build/level_01/rock_pt1_mask.0.bin
+
+build/level_01/rock_pt2_mask.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/rock_pt2_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/rock_pt2_mask.0.bmp \
+		                       build/level_01/rock_pt2_mask.0.bin
+
+build/level_01/rock_pt3_mask.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/rock_pt3_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/rock_pt3_mask.0.bmp \
+		                       build/level_01/rock_pt3_mask.0.bin
 
 build/level_01/spikey_rock_a.0.bin : build_tools/bmp_to_raw.rb \
 				     resources/level_01/spikey_rock_a.0.bmp
@@ -542,6 +585,11 @@ build/level_01/skeleton_crawler.0.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/level_01/skeleton_crawler.0.bmp \
 		                  build/level_01/skeleton_crawler.0.bin
 
+build/level_01/skeleton_crawler_mask.0.bin : build_tools/bmp_to_raw.rb \
+	                                     resources/level_01/skeleton_crawler_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/skeleton_crawler_mask.0.bmp \
+		                       build/level_01/skeleton_crawler_mask.0.bin
+
 build/level_01/skull_bomber.0.bin : build_tools/bmp_to_raw.rb \
 	                            resources/level_01/skull_bomber.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_01/skull_bomber.0.bmp \
@@ -576,10 +624,14 @@ build/level_01/level_01.1.o : level_01.1.s \
 			      build/level_01/cloud_a.1.bin \
 			      build/level_01/cloud_b.1.bin \
 			      build/level_01/cloud_c.1.bin \
+			      build/level_01/cloud_a_mask.1.bin \
+			      build/level_01/cloud_b_mask.1.bin \
+			      build/level_01/cloud_c_mask.1.bin \
 			      build/level_01/cross.1.bin \
 			      build/level_01/cross_crucified_bloke.1.bin \
 			      build/level_01/cross_impaled_bloke.1.bin \
 			      build/level_01/gravecross.1.bin \
+			      build/level_01/gravecross_mask.1.bin \
 			      build/level_01/gravestone.1.bin \
 			      build/level_01/gravestone_mask.1.bin \
 			      build/level_01/moon.1.bin \
@@ -587,6 +639,9 @@ build/level_01/level_01.1.o : level_01.1.s \
 			      build/level_01/rock_pt1.1.bin \
 			      build/level_01/rock_pt2.1.bin \
 			      build/level_01/rock_pt3.1.bin \
+			      build/level_01/rock_pt1_mask.1.bin \
+			      build/level_01/rock_pt2_mask.1.bin \
+			      build/level_01/rock_pt3_mask.1.bin \
 			      build/level_01/spikey_rock_a.1.bin \
 			      build/level_01/spikey_rock_b.1.bin \
 			      build/level_01/spikey_rock_c.1.bin \
@@ -597,6 +652,7 @@ build/level_01/level_01.1.o : level_01.1.s \
 			      build/level_01/eye_clopse_mask.1.bin \
 			      build/level_01/rock_chick.1.bin \
 			      build/level_01/skeleton_crawler.1.bin \
+			      build/level_01/skeleton_crawler_mask.1.bin \
 			      build/level_01/skull_bomber.1.bin \
 			      build/level_01/skull_gang.1.bin \
 			      build/level_01/splice_face.1.bin
@@ -657,6 +713,21 @@ build/level_01/cloud_c.1.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/level_01/cloud_c.1.bmp \
 		                  build/level_01/cloud_c.1.bin
 
+build/level_01/cloud_a_mask.1.bin : build_tools/bmp_to_raw.rb \
+			            resources/level_01/cloud_a.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/cloud_a.1.bmp \
+		                       build/level_01/cloud_a_mask.1.bin
+
+build/level_01/cloud_b_mask.1.bin : build_tools/bmp_to_raw.rb \
+			            resources/level_01/cloud_b.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/cloud_b.1.bmp \
+		                       build/level_01/cloud_b_mask.1.bin
+
+build/level_01/cloud_c_mask.1.bin : build_tools/bmp_to_raw.rb \
+			            resources/level_01/cloud_c.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/cloud_c.1.bmp \
+		                       build/level_01/cloud_c_mask.1.bin
+
 build/level_01/cross.1.bin : build_tools/bmp_to_raw.rb \
 			     resources/level_01/cross.1.bmp
 	build_tools/bmp_to_raw.rb resources/level_01/cross.1.bmp \
@@ -676,6 +747,11 @@ build/level_01/gravecross.1.bin : build_tools/bmp_to_raw.rb \
 				  resources/level_01/gravecross.1.bmp
 	build_tools/bmp_to_raw.rb resources/level_01/gravecross.1.bmp \
 		                  build/level_01/gravecross.1.bin
+
+build/level_01/gravecross_mask.1.bin : build_tools/bmp_to_raw.rb \
+				       resources/level_01/gravecross_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/gravecross_mask.1.bmp \
+		                       build/level_01/gravecross_mask.1.bin
 
 build/level_01/gravestone.1.bin : build_tools/bmp_to_raw.rb \
 				  resources/level_01/gravestone.1.bmp
@@ -711,6 +787,21 @@ build/level_01/rock_pt3.1.bin : build_tools/bmp_to_raw.rb \
 				     resources/level_01/rock_pt3.1.bmp
 	build_tools/bmp_to_raw.rb resources/level_01/rock_pt3.1.bmp \
 		                  build/level_01/rock_pt3.1.bin
+
+build/level_01/rock_pt1_mask.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/rock_pt1_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/rock_pt1_mask.1.bmp \
+		                       build/level_01/rock_pt1_mask.1.bin
+
+build/level_01/rock_pt2_mask.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/rock_pt2_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/rock_pt2_mask.1.bmp \
+		                       build/level_01/rock_pt2_mask.1.bin
+
+build/level_01/rock_pt3_mask.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_01/rock_pt3_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/rock_pt3_mask.1.bmp \
+		                       build/level_01/rock_pt3_mask.1.bin
 
 build/level_01/spikey_rock_a.1.bin : build_tools/bmp_to_raw.rb \
 				     resources/level_01/spikey_rock_a.1.bmp
@@ -761,6 +852,11 @@ build/level_01/skeleton_crawler.1.bin : build_tools/bmp_to_raw.rb \
 	                                resources/level_01/skeleton_crawler.1.bmp
 	build_tools/bmp_to_raw.rb resources/level_01/skeleton_crawler.1.bmp \
 		                  build/level_01/skeleton_crawler.1.bin
+
+build/level_01/skeleton_crawler_mask.1.bin : build_tools/bmp_to_raw.rb \
+	                                     resources/level_01/skeleton_crawler_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/skeleton_crawler_mask.1.bmp \
+		                       build/level_01/skeleton_crawler_mask.1.bin
 
 build/level_01/skull_bomber.1.bin : build_tools/bmp_to_raw.rb \
 	                            resources/level_01/skull_bomber.1.bmp
