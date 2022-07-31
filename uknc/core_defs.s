@@ -116,7 +116,7 @@
     .endif
 
     .ifndef ExtMemCore
-.equiv Akuyou_LevelStart, 0x9E96 # 40598 0117226 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9ECE # 40654 0117316 # auto-generated during a build
     .else
 .equiv Akuyou_LevelStart, GameVarsEnd
     .endif

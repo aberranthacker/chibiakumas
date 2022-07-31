@@ -211,13 +211,13 @@ EventStreamArray_Ep1: #---------------------------------------------------------
 
    # Clouds (3 wide)
     .word 0, evtMultipleCommands | 4
-    .word    evtSetMove, mveBackground | 0b0100
+    .word      evtSetProgMoveLife, prgBitShift, mveBackground | 0b0100, lifeImmortal
     .word    evtSingleSprite, sprSingleFrame | CLOUD_A
-    .byte        24+ 14, 24+ 159
+    .byte        24+ 21, 24+ 159
     .word    evtSingleSprite, sprSingleFrame | CLOUD_B
-    .byte        24+ 14, 24+ 159+12
+    .byte        24+ 21, 24+ 159+12
     .word    evtSingleSprite, sprSingleFrame | CLOUD_C
-    .byte        24+ 14, 24+ 159+24
+    .byte        24+ 21, 24+ 159+24
 
    # Spikeyrock
     .word 0, evtMultipleCommands | 3
@@ -394,13 +394,13 @@ EventStreamArray_Ep1: #---------------------------------------------------------
 
    # Clouds (3 wide)
     .word 120, evtMultipleCommands | 4
-    .word      evtSetProgMoveLife, prgNone, mveBackground | 0b0100, lifeImmortal
+    .word      evtSetProgMoveLife, prgBitShift, mveBackground | 0b0100, lifeImmortal
     .word      evtSingleSprite, sprSingleFrame | CLOUD_A
-    .byte          24+ 14, 24+ 159
+    .byte          24+ 21, 24+ 159
     .word      evtSingleSprite, sprSingleFrame | CLOUD_B
-    .byte          24+ 14, 24+ 159+12
+    .byte          24+ 21, 24+ 159+12
     .word      evtSingleSprite, sprSingleFrame | CLOUD_C
-    .byte          24+ 14, 24+ 159+24
+    .byte          24+ 21, 24+ 159+24
 
    # rock chick enemy
     .word 120, evtMultipleCommands | 3
@@ -504,13 +504,13 @@ EventStreamArray_Ep1: #---------------------------------------------------------
 
    # Clouds (3 wide)
     .word 200, evtMultipleCommands | 4
-    .word      evtSetProgMoveLife, prgNone, mveBackground | 0b0100, lifeImmortal
+    .word      evtSetProgMoveLife, prgBitShift, mveBackground | 0b0100, lifeImmortal
     .word      evtSingleSprite, sprSingleFrame | CLOUD_A
-    .byte          24+ 14, 24+ 159
+    .byte          24+ 21, 24+ 159
     .word      evtSingleSprite, sprSingleFrame | CLOUD_B
-    .byte          24+ 14, 24+ 159+12
+    .byte          24+ 21, 24+ 159+12
     .word      evtSingleSprite, sprSingleFrame | CLOUD_C
-    .byte          24+ 14, 24+ 159+24
+    .byte          24+ 21, 24+ 159+24
 
    # rock chick enemy
     .word 200, evtMultipleCommands | 3
@@ -584,9 +584,9 @@ EventStreamArray_Ep1: #---------------------------------------------------------
 
    # cloud
     .word 250, evtMultipleCommands | 2
-    .word      evtSetProgMoveLife, prgNone, mveBackground | 0b0100, lifeImmortal
+    .word      evtSetProgMoveLife, prgBitShift, mveBackground | 0b0100, lifeImmortal
     .word      evtSingleSprite, sprSingleFrame | CLOUD_C
-    .byte          24+ 14, 24+ 160
+    .byte          24+ 21, 24+ 160
 
     .word 256+ 5, evtCallAddress, Player_Handler_DoSmartBomb
 
