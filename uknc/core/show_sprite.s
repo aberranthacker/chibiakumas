@@ -52,11 +52,12 @@ ShowSprite_ReadInfo: # ---------------------------------------------------------
         RETURN
 #-------------------------------------------------------------------------------
 SpriteRenderersVectors:
-       .word SprDraw_TurboRenderer             # 0b0000
-       .word SprDraw_TurboRenderer_LineDoubler # 0b0010  2
-       .word SprDraw_PsetRenderer              # 0b0100  4
-       .word SprDraw_PsetRenderer_LineDoubler  # 0b0110  6
-       .word SprDraw_WithMaskRenderer          # 0b1000  8
+       .word SprDraw_TurboRenderer                # 0b0000  0
+       .word SprDraw_TurboRenderer_LineDoubler    # 0b0010  2
+       .word SprDraw_PsetRenderer                 # 0b0100  4
+       .word SprDraw_PsetRenderer_LineDoubler     # 0b0110  6
+       .word SprDraw_WithMaskRenderer             # 0b1000  8
+       .word SprDraw_WithMaskRenderer_LineDoubler # 0b1010 10
 #-------------------------------------------------------------------------------
 ShowSprite: # ShowSprite is the main routine of our program!
         CALL @$ShowSprite_ReadInfo # Get Sprite Details
@@ -172,14 +173,11 @@ SprDrawLn_LineLoop:
    .endif
 
 SprDrawLn_PixelLoop:
-      # TODO: implement transparency
         MOV  (R3)+, R0
-      #.equiv TranspBitB, .+2
-      # CMP  R0,$0x0000
         BZE  SprDrawLn_NextWord
 
    .ifdef DebugSprite
-        # test code, marks slow sprites so we can see they will be slow
+      # test code, marks slow sprites so we can see they will be slow
         BIS  $0b1000000110000001,R0
    .endif
         MOV  R0,(R5)
@@ -468,16 +466,7 @@ SprDraw_PsetRenderer:
 #----------------------------------------------------------------------------}}}
 # Version that uses mask to clear background -----------------------------------
 # SprDraw_WithMaskRenderer --------------------------------------------------{{{
-SprDraw_WithMaskRenderer:
-       .equiv SprShow_MaskAddr, .+2
-        MOV  $0x0000,R0
-        MOV  @$SprShow_DrawWidth,R1
-        MOV  R5,R3
-        PUSH R2
-
-    SprDraw_WithMaskRenderer_Jump:
-        JMP  @SprDraw_WithMaskRenderer_Vectors-2(R1)
-    SprDraw_WithMaskRenderer_Vectors:
+SprDraw_WithMaskRenderer_Vectors:
        .word SprDraw_WithMaskRenderer_8pxInit   #  2  8
        .word SprDraw_WithMaskRenderer_16pxInit  #  4 16
        .word SprDraw_WithMaskRenderer_24pxInit  #  6 24
@@ -491,48 +480,68 @@ SprDraw_WithMaskRenderer:
        .word SprDraw_WidthNotSupported          # 22 88
        .word SprDraw_WithMaskRenderer_96pxInit  # 24 96
 
+SprDraw_WithMaskRenderer_LineDoubler:
+        #:bpt
+        MOV  $80-6,R1
+        ASL  R2
+        PUSH R2
+        MOV  $opcSOBToEndOfWithMaskBICBChain +24+6,@$SprDraw_WithMaskRenderer_BICB_SOB #
+        MOV  $opcSOBToEndOfWithMaskBISChain +12+6,@$SprDraw_WithMaskRenderer_BIS_SOB #  2/2=1
+        CLRB @$SprDraw_BR_to_BIS
+        BR   SprDraw_WithMaskRenderer_Double_BICB
+
+SprDraw_WithMaskRenderer:
+       .equiv SprShow_MaskAddr, .+2
+        MOV  $0x0000,R0
+        MOV  @$SprShow_DrawWidth,R1
+        MOV  R5,R3
+        PUSH R2
+
+    SprDraw_WithMaskRenderer_Jump:
+        JMP  @SprDraw_WithMaskRenderer_Vectors-2(R1)
+
     SprDraw_WithMaskRenderer_8pxInit: #--------------------------------------{{{
         MOV  $80-2,R1
         MOV  $opcSOBToEndOfWithMaskBICBChain+ 2,@$SprDraw_WithMaskRenderer_BICB_SOB #
         MOV  $opcSOBToEndOfWithMaskBISChain+ 1,@$SprDraw_WithMaskRenderer_BIS_SOB #  2/2=1
-        MOVB $11,@$SprDraw_BR_to_BIS
+        MOVB $11+6,@$SprDraw_BR_to_BIS
         BR   SprDraw_WithMaskRenderer_8pxBICB
     SprDraw_WithMaskRenderer_16pxInit:
         MOV  $80-4,R1
         MOV  $opcSOBToEndOfWithMaskBICBChain+ 4,@$SprDraw_WithMaskRenderer_BICB_SOB #
         MOV  $opcSOBToEndOfWithMaskBISChain+ 2,@$SprDraw_WithMaskRenderer_BIS_SOB #  4/2=2
-        MOVB $10,@$SprDraw_BR_to_BIS
+        MOVB $10+6,@$SprDraw_BR_to_BIS
         BR   SprDraw_WithMaskRenderer_16pxBICB
     SprDraw_WithMaskRenderer_24pxInit:
         MOV  $80-6,R1
         MOV  $opcSOBToEndOfWithMaskBICBChain+ 6,@$SprDraw_WithMaskRenderer_BICB_SOB #
         MOV  $opcSOBToEndOfWithMaskBISChain+ 3,@$SprDraw_WithMaskRenderer_BIS_SOB #  6/2=3
-        MOVB $9,@$SprDraw_BR_to_BIS
+        MOVB $9+6,@$SprDraw_BR_to_BIS
         BR   SprDraw_WithMaskRenderer_24pxBICB
     SprDraw_WithMaskRenderer_32pxInit:
         MOV  $80-8,R1
         MOV  $opcSOBToEndOfWithMaskBICBChain+ 8,@$SprDraw_WithMaskRenderer_BICB_SOB #
         MOV  $opcSOBToEndOfWithMaskBISChain+ 4,@$SprDraw_WithMaskRenderer_BIS_SOB #  8/2=4
-        MOVB $8,@$SprDraw_BR_to_BIS
+        MOVB $8+6,@$SprDraw_BR_to_BIS
         BR   SprDraw_WithMaskRenderer_32pxBICB
     SprDraw_WithMaskRenderer_48pxInit:
         MOV  $80-12,R1
         MOV  $opcSOBToEndOfWithMaskBICBChain+12,@$SprDraw_WithMaskRenderer_BICB_SOB #
         MOV  $opcSOBToEndOfWithMaskBISChain+ 6,@$SprDraw_WithMaskRenderer_BIS_SOB # 12/2=6
-        MOVB $6,@$SprDraw_BR_to_BIS
+        MOVB $6+6,@$SprDraw_BR_to_BIS
         BR   SprDraw_WithMaskRenderer_48pxBICB
     SprDraw_WithMaskRenderer_96pxInit:
         MOV  $80-24,R1
         MOV  $opcSOBToEndOfWithMaskBICBChain+24,@$SprDraw_WithMaskRenderer_BICB_SOB #
         MOV  $opcSOBToEndOfWithMaskBISChain+12,@$SprDraw_WithMaskRenderer_BIS_SOB # 24/2=12
-        CLRB @$SprDraw_BR_to_BIS
+        MOV  $0+6, @$SprDraw_BR_to_BIS
         BR   SprDraw_WithMaskRenderer_96pxBICB
 #----------------------------------------------------------------------------}}}
-    SprDraw_WithMaskRenderer_Double:
-        BIT  $1,R2
+    SprDraw_WithMaskRenderer_Double_BICB:
+        BIT  $0b0001,R2
         BZE  SprDraw_WithMaskRenderer_24pxBICB
         ADD  $6,R3
-        BR   SprDraw_WithMaskRenderer_LineSkip
+        BR   SprDraw_WithMaskRenderer_BICB_LineSkip
 
     SprDraw_WithMaskRenderer_96pxBICB:
         BICB (R0) ,(R3)+
@@ -573,14 +582,21 @@ SprDraw_WithMaskRenderer:
     #---------------------------------------------------------------------------
        .equiv opcSOBToEndOfWithMaskBICBChain, 0077202
 
-    SprDraw_WithMaskRenderer_LineSkip:
+    SprDraw_WithMaskRenderer_BICB_LineSkip:
         ADD  R1,R3
     SprDraw_WithMaskRenderer_BICB_SOB:
         SOB  R2,SprDraw_WithMaskRenderer_24pxBICB
 
         POP  R2
+
     SprDraw_BR_to_BIS:
         BR   SprDraw_WithMaskRenderer_24pxBIS
+
+    SprDraw_WithMaskRenderer_Double_BIS:
+        BIT  $1,R2
+        BZE  SprDraw_WithMaskRenderer_24pxBIS
+        ADD  $6,R5
+        BR   SprDraw_WithMaskRenderer_BIS_LineSkip
 
     SprDraw_WithMaskRenderer_96pxBIS:
         BIS  (R4)+,(R5)+

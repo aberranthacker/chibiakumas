@@ -150,7 +150,7 @@ DoMoves_Wave_Continue:              # DoMoves_WaveContinue:
                                     #
 DoMoves_Wave_SlowSpeed:             # DoMoves_WaveSlowSpeed
         ASLB R1                     #     sll a
-                                    #     sll a ; rem to reduce wave depth
+        ASLB R1                     #     sll a ; rem to reduce wave depth
                                     #
                                     #     ld C,a
         MOV  R2,R0                  #     ld a,d
