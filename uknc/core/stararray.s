@@ -137,8 +137,8 @@ StarArray_FoundOne:
         ASR  R0
         ASR  R0
         SUB  $8,R0
-        BIT  $spdFast,R4
-        BZE  DoMovesStars_spdNormalY
+        TSTB R4 # fast move? (bit 7)
+        BPL  DoMovesStars_spdNormalY
         ASL  R0
     DoMovesStars_spdNormalY:
        .equiv opcStarSlowdownA, .
@@ -153,8 +153,8 @@ StarArray_FoundOne:
         MOV  R4,R0
         BIC  $0177770,R0 # 0b11111000
         SUB  $4,R0
-        BIT  $spdFast,R4
-        BZE  DoMovesStars_spdNormalX
+        TSTB R4 # fast move? (bit 7)
+        BPL  DoMovesStars_spdNormalX
 
         ASL  R0
     DoMovesStars_spdNormalX:
@@ -172,40 +172,40 @@ StarArray_FoundOne:
       # check for collisions with player 1
        .equiv Player1LocX, .+2
         CMP  R3,$30
-        BLO  StarLoopP1Skip
+        BLO  Starloop_P1_NoCollision
        .equiv Player1LocXB, .+2
         CMP  R3,$34
-        BHIS StarLoopP1Skip
+        BHIS Starloop_P1_NoCollision
        .equiv Player1LocY, .+2
         CMP  R2,$98
-        BLO  StarLoopP1Skip
+        BLO  Starloop_P1_NoCollision
        .equiv Player1LocYB, .+2
         CMP  R2,$102
-        BHIS StarLoopP1Skip
+        BHIS Starloop_P1_NoCollision
 
        .equiv dstCurrentStarArrayCollisionsB2, .+2
         CALL @$null # or Player_Hit_Injure_1
 
-StarLoopP1Skip:
+Starloop_P1_NoCollision:
         # check for collisions with player 2 (commented out) ----------------{{{
       #.equiv Player2LocX, .+2
       # CMP  R3,$30
-      # BLO  StarCollisionsDone
+      # BLO  Starloop_DrawTheStar
       #.equiv Player2LocXB, .+2
       # CMP  R3,$34
-      # BHIS StarCollisionsDone
+      # BHIS Starloop_DrawTheStar
       #.equiv Player2LocY, .+2
       # CMP  R2,$148
-      # BLO  StarCollisionsDone
+      # BLO  Starloop_DrawTheStar
       #.equiv Player2LocYB, .+2
       # CMP  R2,$152
-      # BHIS StarCollisionsDone
+      # BHIS Starloop_DrawTheStar
 
       #.equiv dstCurrentStarArrayCollisions2B2, .+2
       # CALL @$null # or Player_Hit_Injure_2
         #--------------------------------------------------------------------}}}
 
-StarCollisionsDone:
+Starloop_DrawTheStar:
         MOVB R3,-(R5) # X
         MOVB R2,-(R5) # Y
 
@@ -216,10 +216,10 @@ StarCollisionsDone:
         MOV  R3,R4
         ASR  R3    # X: calculate word offset
    .ifdef DebugMode
-        PUSH R3
+        MOV  R3,R0
         MUL  $80,R2
         ADD  $384,R3
-        ADD  (SP)+,R3
+        ADD  R0,R3
    .else
         ASL  R2
         ADD  scr_addr_table(R2),R3 # Y: add line offset from the table
