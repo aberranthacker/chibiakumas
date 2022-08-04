@@ -771,6 +771,7 @@ RealPalette: #---------------------------------------------------------------{{{
     .byte  40, setColors, Black, brBlue, Magenta, White
     .word  64, cursorGraphic, scale320 | 0b111
     .byte  65, setColors, Black, Magenta, Blue, White
+    .byte 122, setColors, Black, Magenta, Cyan, White
     .word 142, cursorGraphic, scale320 | 0b011
     .byte 143, setColors, Black, brRed, brCyan, White
     .word 178, cursorGraphic, scale320 | 0b111

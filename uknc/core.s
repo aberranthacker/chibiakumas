@@ -166,7 +166,6 @@ not_implemented_check_R0:
        .global ShowContinueCounter
 
        .include "core/screen_memory.s"
-       .global GetMemPos
        .global ScreenBuffer_ActiveScreen
        .global ScreenBuffer_Flip
        .global ScreenBuffer_Init

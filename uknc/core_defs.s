@@ -1,10 +1,10 @@
 #-------------------------------------------------------------------------------
 # Note that the PRESENCE of those variables is tested, NOT their values. -------
-#.equiv DebugMode, 1
+ .equiv DebugMode, 1
 #.equiv DebugSprite, 1
 #.equiv ExtMemCore, 1
 #.equiv TwoPlayersGame, 1
-#.equiv PlayerInvincible, 1
+ .equiv PlayerInvincible, 1
 #-------------------------------------------------------------------------------
 .equiv MainMenu, 0x8000
 .equiv Episode1_Intro, 0x0000
@@ -53,6 +53,9 @@
 .equiv PPU_DrawPlayerUI,      56
 
 .equiv PPU_LastJMPTableIndex, 56
+
+.equiv PPU_SET_FB0_VISIBLE, 0
+.equiv PPU_SET_FB1_VISIBLE, 1
 #-------------------------------------------------------------------------------
 .equiv ExtMemSizeBytes, 7168
 
@@ -117,7 +120,7 @@
     .endif
 
     .ifndef ExtMemCore
-.equiv Akuyou_LevelStart, 0x9ECE # 40654 0117316 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9E72 # 40562 0117162 # auto-generated during a build
     .else
 .equiv Akuyou_LevelStart, GameVarsEnd
     .endif
