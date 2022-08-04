@@ -763,7 +763,7 @@ Object_DecreaseShotToDeathB:
        .equiv PointsSpriteC, .+2
         MOV (PC)+,R2
        .byte 128+16     # Sprite
-       .byte 0b10000111 # Seaker Fast 1000001XX XX=Speed
+       .byte mveSeaker_P1 | 0b11 # Seaker Fast 1000001XX XX=Speed
 
                         # ld a,(ObjectShotShooter_Plus1-1) ;1=Player 1, 129 = player 2
                         # dec a

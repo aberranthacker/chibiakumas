@@ -97,7 +97,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word 0, evtMultipleCommands | 5
     .word    evtSetProgMoveLife               # 1
     .word        prgFireSlow | fireLeftWide
-    .word        mvRegular | spdNormal | 0x22 # move - direction left, slow
+    .word        mvRegular | spdNormal | 042 # move - direction left, slow
     .word        lifeEnemy | 1
     .word    evtSetSprite | sprTwoFrame | ROCK_CHICK   # 2
     .word    evtSetAnimator | anmNone         # 3
@@ -108,7 +108,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
     .word         prgFireFast | fireSingleSouth
-    .word         mvRegular | spdNormal | 0x23 # move - direction left, slow
+    .word         mvRegular | spdNormal | 043 # move - direction left, slow
     .word         lifeEnemy | 4
     .word     evtSetSprite | sprTwoFrame | SKULL_BOMBER  # 2
     .word     evtSetAnimator | anmNone         # 3
@@ -119,7 +119,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
     .word         prgFireSlow | fireTopLeft
-    .word         mvRegular | spdNormal | 0x23 # move - direction left, slow
+    .word         mvRegular | spdNormal | 043 # move - direction left, slow
     .word         lifeEnemy | 4
     .word     evtSetSprite | sprTwoFrame | ANT_ATTACKER   # 2
     .word     evtSetAnimator | anmNone         # 3
@@ -130,7 +130,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
     .word         prgFireSnail | fireLeftWide
-    .word         mvRegular | spdNormal | 0x22 # move - direction left, slow
+    .word         mvRegular | spdNormal | 042 # move - direction left, slow
     .word         lifeEnemy | 3
     .word     evtSetSprite | sprTwoFrame | SKELETON_CRAWLER  # 2
     .word     evtSetAnimator | anmNone         # 3
@@ -141,7 +141,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
     .word         prgFireSnail | fireBurst
-    .word         mvRegular | spdNormal | 0x25 # move - direction right, slow
+    .word         mvRegular | spdNormal | 045 # move - direction right, slow
     .word         lifeEnemy | 4
     .word     evtSetSprite | sprTwoFrame | SPLICE_FACE  # 2
     .word     evtSetAnimator | anmNone         # 3
@@ -152,7 +152,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
     .word         prgFireSnail | fireBottomLeft
-    .word         mvRegular | spdNormal | 0x22 # move - direction left, slow
+    .word         mvRegular | spdNormal | 042 # move - direction left, slow
     .word         lifeEnemy | 3
     .word     evtSetSprite | sprTwoFrame | BONI_BURD   # 2
     .word     evtSetAnimator | anmNone         # 3
@@ -270,7 +270,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
 
    # Powerup Rate
     .word 17, evtMultipleCommands | 2
-    .word     evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 0x22), 64+63
+    .word     evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 042), 64+63
     .word     evtSingleSprite, sprTwoFrame | POWERUP_RATE
     .byte         24+ 50, 24+ 160
 
@@ -365,7 +365,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
 
    # Powerup Drone
     .word 90, evtMultipleCommands | 2
-    .word     evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 0x22), 64+63
+    .word     evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 042), 64+63
     .word     evtSingleSprite, sprTwoFrame | POWERUP_DRONE
     .byte         24+ 150, 24+ 160
 
@@ -456,7 +456,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
 
    # Powerup Drone
     .word 150, evtMultipleCommands | 2
-    .word      evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 0x22), 64+63
+    .word      evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 042), 64+63
     .word      evtSingleSprite, sprTwoFrame | POWERUP_DRONE
     .byte          24+ 150, 24+ 160
 
@@ -548,7 +548,7 @@ EventStreamArray_Ep1: #---------------------------------------------------------
    # SpliceFace
     .word 230, evtMultipleCommands | 4
     .word      evtLoadObjSettings | 6
-    .word      evtSetMove, mvRegular | spdNormal | 0x23
+    .word      evtSetMove, mvRegular | spdNormal | 043
     .word      evtSingleSprite, sprTwoFrame | SPLICE_FACE
     .byte          24+ 50, 24+ 138
     .word      evtSingleSprite, sprTwoFrame | SPLICE_FACE

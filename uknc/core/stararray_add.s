@@ -226,6 +226,20 @@ Stars_AddObjectBatch2:
         BR   Stars_AddObjectFromR3
 
 StarsOneByteDirs:
-       .byte 0x21,0x09,0x0C,0x0F,0x27,0x3F,0x3C,0x39,0x61,0x49,0x4c,0x4f,0x67,0x7f,0x7c,0x79
-       #       16   17   18   19   20   21   22   23   24   25   26   27   28   29   30   31
+       .byte spdNormal | 041 # 16
+       .byte spdNormal | 011 # 17
+       .byte spdNormal | 014 # 18
+       .byte spdNormal | 017 # 19
+       .byte spdNormal | 047 # 20
+       .byte spdNormal | 077 # 21
+       .byte spdNormal | 074 # 22
+       .byte spdNormal | 071 # 23
+       .byte spdFast | 041   # 24
+       .byte spdFast | 011   # 25
+       .byte spdFast | 014   # 26
+       .byte spdFast | 017   # 27
+       .byte spdFast | 047   # 28
+       .byte spdFast | 077   # 29
+       .byte spdFast | 074   # 30
+       .byte spdFast | 071   # 31
        .even

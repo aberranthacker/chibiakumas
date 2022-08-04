@@ -609,7 +609,7 @@ Player_Handler_SmartBomb_Kill:
         INC  R4
        .equiv PointsSpriteB, .+3
         MOV  (PC)+,(R4)+
-       .byte 0b10000111  # Seaker Fast 1000001XX XX=Speed
+       .byte mveSeaker_P1 | 0b11 # Seaker Fast 1000001XX XX=Speed
        .byte 128+16      # Sprite
         MOV  (PC)+,(R4)+
        .byte 64+63       # Life, must "hurt" player for hit to be detected

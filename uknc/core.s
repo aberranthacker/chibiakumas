@@ -14,6 +14,7 @@
        .include "./hwdefs.s"
        .include "./macros.s"
        .include "./core_defs.s"
+       .include "./event_stream_definitions.s"
 
 #******************************************************************************#
 #*                             Main Project Code                              *#

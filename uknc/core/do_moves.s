@@ -32,7 +32,7 @@ DoMoves:
         ASR  R0
         ASR  R0
         SUB  $8,R0
-        BIT  $0x40,R2 # fast move?
+        BIT  $spdFast,R2 # fast move?
         BZE  DoMoves_NoMultY
 
         ASL  R0
@@ -45,7 +45,7 @@ DoMoves:
         MOV  R2,R0
         BIC  $0177770,R0
         SUB  $4,R0
-        BIT  $0x40,R2 # fast move?
+        BIT  $spdFast,R2 # fast move?
         BZE  DoMoves_NoMultX
 
         ASL  R0
@@ -84,29 +84,29 @@ DoMoves_Spec: # Special moves - various kinds
     1$: # R2 - LSB=Move, MSB=Sprite
         MOV  R2,R0
         BICB $0b00001111,R0
-        CMPB R0,$0b11000000 # 1100xxxx Background
+        CMPB R0,$mveBackground # 1100xxxx Background
         BEQ  DoMoves_Background
 
-        CMPB R0,$0b10100000 # 1010xxxx Wave
+        CMPB R0,$mveWave # 1010xxxx Wave
         BEQ  DoMoves_Wave # Wave pattern - pretty naff, but it seemed a good idea at the time
 
         # Level specifics are overriden by the code in the level
-        CMPB R0,$0b10110000 # 1011xxxx Custom4
+        CMPB R0,$mveCustom4 # 1011xxxx Custom4
         BNE  2$
        .equiv jmpLevelSpecificMoveD, .+2
         JMP  @$null
     2$: 
-        CMPB R0,$0b11010000 # 1101xxxx Custom3
+        CMPB R0,$mveCustom3 # 1101xxxx Custom3
         BNE  3$
        .equiv jmpLevelSpecificMoveC, .+2
         JMP  @$null
     3$: 
-        CMPB R0,$0b11100000 # 1110xxxx Custom2
+        CMPB R0,$mveCustom2 # 1110xxxx Custom2
         BNE  4$
        .equiv jmpLevelSpecificMoveB, .+2
         JMP  @$null
     4$: 
-        CMPB R0,$0b11110000 # 1111xxxx Custom 1
+        CMPB R0,$mveCustom1 # 1111xxxx Custom 1
         BNE  5$
        .equiv jmpLevelSpecificMoveA, .+2
         JMP  @$null
@@ -115,13 +115,13 @@ DoMoves_Spec: # Special moves - various kinds
         BICB $0b00000011,R0 # 101111xx
 
    .ifdef TwoPlayersGame
-        CMPB R0,$0b10010000
+        CMPB R0,$mveSeaker_P2
         BEQ  DoMoves_SeekerP2   # Used by 'Chu attack' - and also coins!
    .endif
-        CMPB R0,$0b10000100
+        CMPB R0,$mveSeaker_P1
         BEQ  DoMoves_SeekerP1   # Used by 'Chu attack' - and also coins!
 
-        CMPB R0,$0b10001000
+        CMPB R0,$mveSeaker
         BEQ  DoMoves_SeekerAuto # Pick a live player to target!
 
         RETURN
