@@ -23,7 +23,7 @@ DoMoves:
         SWAB R1    # R1 = Y
 
       # Check if we are using a SPECIAL move pattern
-        BIT  $0x80,R2
+        BIT  $mvSpecial,R2
         BNZ  DoMoves_Spec
 
       # Y move -----------------------------------------------------------------
@@ -32,8 +32,8 @@ DoMoves:
         ASR  R0
         ASR  R0
         SUB  $8,R0
-        BIT  $spdFast,R2 # fast move?
-        BZE  DoMoves_NoMultY
+        TSTB R2 # fast move? (bit 7)
+        BPL  DoMoves_NoMultY
 
         ASL  R0
     DoMoves_NoMultY:
@@ -45,8 +45,8 @@ DoMoves:
         MOV  R2,R0
         BIC  $0177770,R0
         SUB  $4,R0
-        BIT  $spdFast,R2 # fast move?
-        BZE  DoMoves_NoMultX
+        TSTB R2 # fast move? (bit 7)
+        BPL  DoMoves_NoMultX
 
         ASL  R0
     DoMoves_NoMultX:

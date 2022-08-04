@@ -271,11 +271,12 @@
 # 11ddXXXX   ; Background (Slow) move
 # 100001XX   ; Seek player 1 speed -----XX1
 # 1010DSPP   D = Depth bit, S= Speed, PP Position
-
-.equiv mvRegular, 0    # 0xxxxxxx
-.equiv mvSpecial, 0x80 # 1xxxxxxx
+# WARNING: comments display values used in the original version
+.equiv mvRegular, 0    # x0xxxxxx
+.equiv mvSpecial, 0x40 # 1xxxxxxx
 .equiv spdNormal, 0    # x0xxxxxx
-.equiv spdFast,   0x40 # x1xxxxxx
+# DoMoves and StarArray user TSTB/BPL to check this bit
+.equiv spdFast,   0x80 # x1xxxxxx
 .equiv mvStatic,  0x24 # 00100100
 # Moves octal
 #           |  0   1   2   3   4   5   6   7
@@ -305,16 +306,17 @@
 #  2  6       30  31  32  33  34  35  36  37
 #  3  7       38  39  3A  3B  3C  3D  3E  3F
 
+# WARNING: comments display values used in the original version
                                  # mveMisc       equ 0 ;used for visual clarity!
 .equiv mveBackground, 0b11000000 # 1100xxxx, ----xxxx tick point
-.equiv mveSeaker_P1,  0b10000100 # 100001xx
-.equiv mveSeaker_P2,  0b10010000 # 100100xx
-.equiv mveSeaker,     0b10001000 # 100010xx seek! I can't spel!
-.equiv mveWave,       0b10100000 # 1010xxxx Wave pattern
+.equiv mveSeaker_P1,  0b01000100 # 100001xx
+.equiv mveSeaker_P2,  0b01010000 # 100100xx
+.equiv mveSeaker,     0b01001000 # 100010xx seek! I can't spel!
+.equiv mveWave,       0b01100000 # 1010xxxx Wave pattern
 .equiv mveCustom1,    0b11110000 # 1111xxxx Level specific 1
 .equiv mveCustom2,    0b11100000 # 1110xxxx Level specific 2
 .equiv mveCustom3,    0b11010000 # 1101xxxx Level specific 3
-.equiv mveCustom4,    0b10110000 # 1011xxxx Level specific 4
+.equiv mveCustom4,    0b01110000 # 1011xxxx Level specific 4
 
                              # lifCustom   equ 255       ; We use 63 as a marker for custom code's INIT -
                              #                           ; a real life will be set by the custom code
