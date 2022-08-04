@@ -2,20 +2,37 @@
 
 require 'optparse'
 
-options = Struct.new(:src_filename, :dst_filename, :bpp).new
+options = Struct.new(:bpp, :verbose, :src_filename, :dst_filename)
+                .new(2, false, nil, nil)
 
 OptionParser.new do |opts|
   opts.banner = 'Converts 8bpp .bmp file to MS0511 raw bitplanes data'
   opts.banner = 'only first 1, 2 or 3 bits of color will be used'
   opts.banner = 'Usage: bmp_to_raw.rb [--bpp=n] SRC DST'
 
-  opts.on('-b n', '--bpp=n', 'resulting number of bits per pixel') do |n|
+  opts.on('-b n', '--bpp=n', 'resulting number of bits per pixel, default is 2') do |n|
     options.bpp = n.to_i
   end
+
+  opts.on('-v', '--verbose', 'verbose mode') do |n|
+    options.verbose = n
+  end
+
+  opts.on('-h', '--help') do |_n|
+    puts opts
+    exit
+  end
 end.parse!
-raise "Need to specify a file to process" unless options.src_filename = ARGV[0]
-raise "Need to specify an output file" unless options.dst_filename = ARGV[1]
-options.bpp = 2 if options.bpp.nil?
+
+unless (options.src_filename = ARGV[0])
+  puts "ERROR: Need to specify a file to process. Use -h for help"
+  exit
+end
+
+unless (options.dst_filename = ARGV[1])
+  puts "ERROR: Need to specify an output file. Use -h for help"
+  exit
+end
 
 # https://github.com/bordeeinc/bmp-ruby
 bmp = File.binread(options.src_filename)
@@ -74,4 +91,6 @@ end
 
 File.binwrite(options.dst_filename, dst_bitmap.pack('v*'))
 
-puts "#{options.src_filename} #{image_width}x#{image_height} #{options.bpp}bpp converted"
+if options.verbose
+  puts "#{options.src_filename} #{image_width}x#{image_height} #{options.bpp}bpp converted"
+end

@@ -719,8 +719,11 @@ Player_Hit_Injure_1:
 
 Player_Hit_Process:
         TSTB 7(R0) # invincible?
-        #:bpt
-        BR  1237$
+   .ifdef PlayerInvincible
+        BR   1237$
+   .else
+        BNZ  1237$
+   .endif
 
         DECB 9(R0) # lives
         BMI  1237$ # player already dead if below zero
