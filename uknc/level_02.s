@@ -382,14 +382,12 @@ LevelLoop:
         CALL @$Background_Draw
 
         CALL @$EventStream_Process
-
         CALL @$ObjectArray_Redraw
 
         MOV  $ChibiSprites,@$SprShow_BankAddr
         CALL @$PlayerHandler
 
         CALL @$Player_StarArray_Redraw
-
         CALL @$StarArray_Redraw
 
         CALL @$ScreenBuffer_Flip

@@ -377,6 +377,9 @@ build/level_01/level_01.0.o : level_01.0.s \
 			      build/level_01/spikey_rock_a.0.bin \
 			      build/level_01/spikey_rock_b.0.bin \
 			      build/level_01/spikey_rock_c.0.bin \
+			      build/level_01/spikey_rock_a_mask.0.bin \
+			      build/level_01/spikey_rock_b_mask.0.bin \
+			      build/level_01/spikey_rock_c_mask.0.bin \
 			      build/level_01/ant_attacker.0.bin \
 			      build/level_01/boni_burd.0.bin \
 			      build/level_01/boni_burd_mask.0.bin \
@@ -550,6 +553,21 @@ build/level_01/spikey_rock_c.0.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/level_01/spikey_rock_c.0.bmp \
 		                  build/level_01/spikey_rock_c.0.bin
 
+build/level_01/spikey_rock_a_mask.0.bin : build_tools/bmp_to_raw.rb \
+				          resources/level_01/spikey_rock_a_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/spikey_rock_a_mask.0.bmp \
+		                       build/level_01/spikey_rock_a_mask.0.bin
+
+build/level_01/spikey_rock_b_mask.0.bin : build_tools/bmp_to_raw.rb \
+				          resources/level_01/spikey_rock_b_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/spikey_rock_b_mask.0.bmp \
+		                       build/level_01/spikey_rock_b_mask.0.bin
+
+build/level_01/spikey_rock_c_mask.0.bin : build_tools/bmp_to_raw.rb \
+				          resources/level_01/spikey_rock_c_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/spikey_rock_c_mask.0.bmp \
+		                       build/level_01/spikey_rock_c_mask.0.bin
+
 build/level_01/ant_attacker.0.bin : build_tools/bmp_to_raw.rb \
 	                            resources/level_01/ant_attacker.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_01/ant_attacker.0.bmp \
@@ -645,6 +663,9 @@ build/level_01/level_01.1.o : level_01.1.s \
 			      build/level_01/spikey_rock_a.1.bin \
 			      build/level_01/spikey_rock_b.1.bin \
 			      build/level_01/spikey_rock_c.1.bin \
+			      build/level_01/spikey_rock_a_mask.1.bin \
+			      build/level_01/spikey_rock_b_mask.1.bin \
+			      build/level_01/spikey_rock_c_mask.1.bin \
 			      build/level_01/ant_attacker.1.bin \
 			      build/level_01/boni_burd.1.bin \
 			      build/level_01/boni_burd_mask.1.bin \
@@ -817,6 +838,21 @@ build/level_01/spikey_rock_c.1.bin : build_tools/bmp_to_raw.rb \
 				     resources/level_01/spikey_rock_c.1.bmp
 	build_tools/bmp_to_raw.rb resources/level_01/spikey_rock_c.1.bmp \
 		                  build/level_01/spikey_rock_c.1.bin
+
+build/level_01/spikey_rock_a_mask.1.bin : build_tools/bmp_to_raw.rb \
+				          resources/level_01/spikey_rock_a_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/spikey_rock_a_mask.1.bmp \
+		                       build/level_01/spikey_rock_a_mask.1.bin
+
+build/level_01/spikey_rock_b_mask.1.bin : build_tools/bmp_to_raw.rb \
+				          resources/level_01/spikey_rock_b_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/spikey_rock_b_mask.1.bmp \
+		                       build/level_01/spikey_rock_b_mask.1.bin
+
+build/level_01/spikey_rock_c_mask.1.bin : build_tools/bmp_to_raw.rb \
+				          resources/level_01/spikey_rock_c_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_01/spikey_rock_c_mask.1.bmp \
+		                       build/level_01/spikey_rock_c_mask.1.bin
 
 build/level_01/ant_attacker.1.bin : build_tools/bmp_to_raw.rb \
 	                            resources/level_01/ant_attacker.1.bmp

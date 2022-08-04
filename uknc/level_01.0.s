@@ -131,7 +131,7 @@
 
    # sprite 16 Gravestone
     .word Gravestone # sprite offset
-    .word GravestoneMask  # bit-mask offset
+    .word GravestoneMask # bit-mask offset
     .byte 22 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
@@ -171,27 +171,27 @@
 
    # sprite 21 Spikey Rock top part
     .word SpikeyRockA # sprite offset
-    .word 0  # bit-mask offset
+    .word SpikeyRockAMask # bit-mask offset
     .byte 24 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 22 Spikey Rock middle part
     .word SpikeyRockB # sprite offset
-    .word 0  # bit-mask offset
+    .word SpikeyRockBMask # bit-mask offset
     .byte 24 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 23 Spikey Rock bottom part
     .word SpikeyRockC # sprite offset
-    .word 0  # bit-mask offset
+    .word SpikeyRockCMask # bit-mask offset
     .byte 24 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 24 Ant Attacker
     .word AntAttacker # sprite offset
@@ -203,7 +203,7 @@
 
    # sprite 25 Boni Burd
     .word BoniBurd # sprite offset
-    .word BoniBurdMask  # bit-mask offset
+    .word BoniBurdMask # bit-mask offset
     .byte 24 # height of the sprite
     .byte 0  # Y offset
     .byte 8  # width
@@ -211,7 +211,7 @@
 
    # sprite 26 Eyeclopse
     .word EyeClopse # sprite offset
-    .word EyeClopseMask  # bit-mask offset
+    .word EyeClopseMask # bit-mask offset
     .byte 31 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
@@ -227,7 +227,7 @@
 
    # sprite 28 Skeleton Crawler
     .word SkeletonCrawler # sprite offset
-    .word SkeletonCrawlerMask  # bit-mask offset
+    .word SkeletonCrawlerMask # bit-mask offset
     .byte 24 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
@@ -321,6 +321,12 @@ SpikeyRockB:
     .incbin "build/level_01/spikey_rock_b.0.bin"
 SpikeyRockC:
     .incbin "build/level_01/spikey_rock_c.0.bin"
+SpikeyRockAMask:
+    .incbin "build/level_01/spikey_rock_a_mask.0.bin"
+SpikeyRockBMask:
+    .incbin "build/level_01/spikey_rock_b_mask.0.bin"
+SpikeyRockCMask:
+    .incbin "build/level_01/spikey_rock_c_mask.0.bin"
 AntAttacker:
     .incbin "build/level_01/ant_attacker.0.bin"
 BoniBurd:
