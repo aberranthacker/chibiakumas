@@ -119,11 +119,16 @@ ShowSprite_SizeNotChanged:
       # SprShow_ScrLine = Y - lines to skip
        .equiv SprShow_ScrLine, .+2
         MOV  $0x00,R5
+   .ifdef DebugMode
+        MUL  $80,R5
+        ADD  $384,R5
+   .else
         ASL  R5 # calculate the table entry offset
         MOV  scr_addr_table(R5),R5
-        ADD  (PC)+,R5 # add X position and the frame buffer MSB
-        SprShow_ScrWord: .byte 0x00
-        FB_MSB:          .byte 0x40 # FB1, 0x00 FB0
+   .endif
+       .equiv ShowSprite_ActiveScreenBit14, .+2
+       .equiv SprShow_ScrWord, .+2
+        ADD  $0x4000,R5 # add X position and the frame buffer MSB
 
       # SprShow_TempH = (H - lines to remove) or (H - lines to skip)
        .equiv SprShow_TempH, .+2

@@ -1,69 +1,51 @@
-
-      # input R3 = X char column
-      #       R4 = Y char row
-      # output R5 = screen mem pos
-GetMemPos:
-        MOV  R4,R5
-        ASL  R5 # 4x ASL 29% faster than ASH $4,R5
-        ASL  R5
-        ASL  R5
-        ASL  R5
-        MOV  scr_addr_table(R5),R5
-
-        MOV  R3,R0
-        ASL  R0
-       .equiv ScreenBuffer_ActiveScreenDirect, .+2
-        BIS  $0x4000,R0
-        ADD  R0,R5
-        RETURN
-
 ScreenBuffer_Reset:
-        MOV  $0x4000, @$ScreenBuffer_ActiveScreenDirect
-        MOV  $0x4000, @$StarArray_ActiveScreen
-        MOVB $0x40, @$FB_MSB
-        MOV  $FB1, @$ScreenBuffer_ActiveScreen
-        MOV  $1,@$CCH1OD
+        MOV  $0x4000,R0
+        BIS  R0,@$StarArray_ActiveScreenBit14
+        BIS  R0,@$ShowSprite_ActiveScreenBit14
+        MOV  $FB1,@$ScreenBuffer_ActiveScreen
         CALL CLS
+
+        TSTB @$CCH1OS
+        BPL  .-4
+
+        MOV  $PPU_SET_FB1_VISIBLE,@$CCH1OD
         RETURN
 
 ScreenBuffer_Init:
-        MOV  $0x4000, @$ScreenBuffer_ActiveScreenDirect
-        MOV  $0x4000, @$StarArray_ActiveScreen
-        MOVB $0x40, @$FB_MSB
-        MOV  $FB0, @$ScreenBuffer_ActiveScreen
+        MOV  $0x4000,R0
+        BIS  R0,@$StarArray_ActiveScreenBit14
+        BIS  R0,@$ShowSprite_ActiveScreenBit14
+        MOV  $FB0,@$ScreenBuffer_ActiveScreen
         CALL CLS
-        MOV  $FB1, @$ScreenBuffer_ActiveScreen
+        MOV  $FB1,@$ScreenBuffer_ActiveScreen
         CALL CLS
-        MOV  $0,@$CCH1OD
+        MOV  $PPU_SET_FB0_VISIBLE,@$CCH1OD
         RETURN
 
 ScreenBuffer_Flip:
-        TST  @$ScreenBuffer_ActiveScreenDirect
+        MOV  $0x4000,R0
+        BIT  R0,@$StarArray_ActiveScreenBit14
         BZE  ScreenBuffer_SetFB1Active
 
       # FB1 active, switch to FB0
-ScreenBuffer_SetFB0Active:
-        MOV  $1,@$CCH1OD
-        CLR  @$ScreenBuffer_ActiveScreenDirect
-        CLR  @$StarArray_ActiveScreen
-        CLRB @$FB_MSB
-        MOV  $FB0,R5
-        MOV  R5, @$ScreenBuffer_ActiveScreen
+        MOV  $PPU_SET_FB1_VISIBLE,@$CCH1OD
+
+        BIC  R0,@$StarArray_ActiveScreenBit14
+        BIC  R0,@$ShowSprite_ActiveScreenBit14
+        MOV  $FB0,@$ScreenBuffer_ActiveScreen
         RETURN
 
       # FB0 active, switch to FB1
-ScreenBuffer_SetFB1Active:
-        MOV  $0,@$CCH1OD
-        MOV  $0x4000,R5
-        MOV  R5, @$ScreenBuffer_ActiveScreenDirect
-        MOV  R5, @$StarArray_ActiveScreen
-        SWAB R5
-        MOVB R5, @$FB_MSB
-        MOV  $FB1,R5
-        MOV  R5, @$ScreenBuffer_ActiveScreen
+    ScreenBuffer_SetFB1Active:
+        MOV  $PPU_SET_FB0_VISIBLE,@$CCH1OD
+
+        BIS  R0,@$StarArray_ActiveScreenBit14
+        BIS  R0,@$ShowSprite_ActiveScreenBit14
+        MOV  $FB1,@$ScreenBuffer_ActiveScreen
         RETURN
 
 scr_addr_table:
+   .ifndef DebugMode
   .word 0x0180, 0x01D0, 0x0220, 0x0270, 0x02C0, 0x0310, 0x0360, 0x03B0 #  0
   .word 0x0400, 0x0450, 0x04A0, 0x04F0, 0x0540, 0x0590, 0x05E0, 0x0630 #  1
   .word 0x0680, 0x06D0, 0x0720, 0x0770, 0x07C0, 0x0810, 0x0860, 0x08B0 #  2
@@ -89,3 +71,4 @@ scr_addr_table:
   .word 0x3880, 0x38D0, 0x3920, 0x3970, 0x39C0, 0x3A10, 0x3A60, 0x3AB0 # 22
   .word 0x3B00, 0x3B50, 0x3BA0, 0x3BF0, 0x3C40, 0x3C90, 0x3CE0, 0x3D30 # 23
   .word 0x3D80, 0x3DD0, 0x3E20, 0x3E70, 0x3EC0, 0x3F10, 0x3F60, 0x3FB0 # 24
+   .endif

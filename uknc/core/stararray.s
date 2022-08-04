@@ -213,59 +213,62 @@ StarCollisionsDone:
 
       # calculating screen memory address
         MOV  R3,R4
-        ASR  R4    # X: calculate word offset
+        ASR  R3    # X: calculate word offset
+   .ifdef DebugMode
+        PUSH R3
+        MUL  $80,R2
+        ADD  $384,R3
+        ADD  (SP)+,R3
+   .else
         ASL  R2
-        ADD  scr_addr_table(R2),R4 # Y: add line offset from the table
-       .equiv StarArray_ActiveScreen, .+2
-        ADD  $0x0000,R4
+        ADD  scr_addr_table(R2),R3 # Y: add line offset from the table
+   .endif
+       .equiv StarArray_ActiveScreenBit14, .+2
+        BIS  $0x4000,R3
 
-        BIC  $0xFFFC,R3 # 0b11111100
-        ASL  R3
-      # Draw the star, finally!
-        JMP  @DotOffsetTable(R3)
-DotOffsetTable:
-       .word DotOffset0
-       .word DotOffset1
-       .word DotOffset2
-       .word DotOffset3
-
-DotOffset0:
-        MOV  $0x0303,R2
-       .equiv StarColor0, .+2
-        MOV  $0x0303,R3
-        BIC  R2,(R4)
-        BIS  R3,(R4)
-        ADD  $80,R4
-        BIC  R2,(R4)
-        BIS  R3,(R4)
-        BR   StarArray_Loop_AfterDraw
-DotOffset1:
-        MOV  $0x0C0C,R2
-       .equiv StarColor1, .+2
-        MOV  $0x0C0C,R3
-        BIC  R2,(R4)
-        BIS  R3,(R4)
-        ADD  $80,R4
-        BIC  R2,(R4)
-        BIS  R3,(R4)
+        BIC  $0xFFFC,R4 # 0b11111100
+        BZE  DotOffset0
+        DEC  R4
+        BZE  DotOffset1
+        DEC  R4
+        BZE  DotOffset2
+DotOffset3:
+        MOV  $0xC0C0,R2
+       .equiv StarColor3, .+2
+        MOV  $0xC0C0,R4
+        BIC  R2,(R3)
+        BIS  R4,(R3)
+        ADD  $80,R3
+        BIC  R2,(R3)
+        BIS  R4,(R3)
         BR   StarArray_Loop_AfterDraw
 DotOffset2:
         MOV  $0x3030,R2
        .equiv StarColor2, .+2
-        MOV  $0x3030,R3
-        BIC  R2,(R4)
-        BIS  R3,(R4)
-        ADD  $80,R4
-        BIC  R2,(R4)
-        BIS  R3,(R4)
+        MOV  $0x3030,R4
+        BIC  R2,(R3)
+        BIS  R4,(R3)
+        ADD  $80,R3
+        BIC  R2,(R3)
+        BIS  R4,(R3)
         BR   StarArray_Loop_AfterDraw
-DotOffset3:
-        MOV  $0xC0C0,R2
-       .equiv StarColor3, .+2
-        MOV  $0xC0C0,R3
-        BIC  R2,(R4)
-        BIS  R3,(R4)
-        ADD  $80,R4
-        BIC  R2,(R4)
-        BIS  R3,(R4)
+DotOffset1:
+        MOV  $0x0C0C,R2
+       .equiv StarColor1, .+2
+        MOV  $0x0C0C,R4
+        BIC  R2,(R3)
+        BIS  R4,(R3)
+        ADD  $80,R3
+        BIC  R2,(R3)
+        BIS  R4,(R3)
+        BR   StarArray_Loop_AfterDraw
+DotOffset0:
+        MOV  $0x0303,R2
+       .equiv StarColor0, .+2
+        MOV  $0x0303,R4
+        BIC  R2,(R3)
+        BIS  R4,(R3)
+        ADD  $80,R3
+        BIC  R2,(R3)
+        BIS  R4,(R3)
         BR   StarArray_Loop_AfterDraw

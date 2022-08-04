@@ -318,6 +318,18 @@ ClearChar: #-----------------------------------------------------------------{{{
         SOB  R0,100$
 RETURN
 #----------------------------------------------------------------------------}}}
+GetMemPos:
+      # input R3 = X char column
+      #       R4 = Y char row
+      # output R5 = screen mem pos
+        MOV  R4,R5
+        MUL  $80*8,R5
+        ADD  @$ScreenBuffer_ActiveScreen,R5
+        MOV  R3,R0
+        ASL  R0
+        ADD  R0,R5
+        RETURN
+        
 
 Fader: #---------------------------------------------------------------------{{{
         MOV  R0,-(SP)
