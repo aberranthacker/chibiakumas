@@ -128,7 +128,7 @@ DoMovesStars_Kill:
 StarArray_FoundOne:
         CLR  R3
         BISB (R5)+,R3 # X
-        MOVB (R5),R4  # M
+        MOVB (R5),R4  # Move
 
       # DoMovesStars moves for stars
       # C=R2=Y; B=R3=X; D=R4=Move
@@ -137,7 +137,7 @@ StarArray_FoundOne:
         ASR  R0
         ASR  R0
         SUB  $8,R0
-        BIT  $0x40,R4
+        BIT  $spdFast,R4
         BZE  DoMovesStars_spdNormalY
         ASL  R0
     DoMovesStars_spdNormalY:
@@ -153,8 +153,9 @@ StarArray_FoundOne:
         MOV  R4,R0
         BIC  $0177770,R0 # 0b11111000
         SUB  $4,R0
-        BIT  $0x40,R4
+        BIT  $spdFast,R4
         BZE  DoMovesStars_spdNormalX
+
         ASL  R0
     DoMovesStars_spdNormalX:
        .equiv opcStarSlowdownB, .

@@ -33,7 +33,7 @@ EventStreamArray:
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
     .word         prgBitShift
-    .word         mveBackground | 0x01
+    .word         mveBackground | 0b0001
     .word         lifeImmortal
     .word     evtSetObjectSize | 0             # 2
     .word     evtSetAnimator | anmNone         # 3
@@ -43,7 +43,7 @@ EventStreamArray:
     .word 0, evtMultipleCommands | 5
     .word     evtSetProgMoveLife               # 1
     .word         prgBitShift
-    .word         mveBackground | 0x10
+    .word         mveBackground | 0b0010
     .word         lifeImmortal
     .word     evtSetObjectSize | 0             # 2
     .word     evtSetAnimator | anmNone         # 3
@@ -60,14 +60,14 @@ EventStreamArray:
     .word 0, evtMultipleCommands | 2
     .word     evtSetProgMoveLife               # 1
     .word         prgNone
-    .word         mvRegular | spdFast | 0x20
+    .word         mvRegular | spdFast | 040
     .word         lifeImmortal
     .word     evtSaveObjSettings | 3           # 2
 
     .word 0, evtMultipleCommands | 2
     .word     evtSetProgMoveLife               # 1
     .word         prgNone
-    .word         mvRegular | spdNormal | 0x32
+    .word         mvRegular | spdNormal | 062
     .word         lifeImmortal
     .word     evtSaveObjSettings | 4           # 2
     # charnikohime
