@@ -103,6 +103,7 @@ ShowTitlePic_Loop: #---------------------------------------------------------{{{
     glow_delay_and_wait_key$:
         MOV  $5,R0
     100$:
+        CALL TRandW
         WAIT
         BITB $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
         BNZ  finalize_title_pic_loop$
@@ -129,6 +130,7 @@ ShowMenu:
         # TODO: show hiscore value
         CALL @$Timer_UpdateTimer # Aku/Level00-Menu.asm:1180
         CALL @$EventStream_Process
+        CALL TRandW
         WAIT
 
        .ppudo_ensure $PPU_PrintAt,$MenuText

@@ -15,18 +15,18 @@
 Background_FloodFillQuadSprite:
         MOV  R1,@$Background_FloodFillQuadSprite_LinesCount
 
-Background_FloodFillQuadSprite_Loop:
-        MOV  (R4)+,R0
-        MOV  (R4)+,R1
-        MOV  (R4)+,R2
-        MOV  (R4)+,R3
+        Background_FloodFillQuadSprite_Loop:
+            MOV  (R4)+,R0
+            MOV  (R4)+,R1
+            MOV  (R4)+,R2
+            MOV  (R4)+,R3
 
-       .rept 10
-        MOV  R0,(R5)+
-        MOV  R1,(R5)+
-        MOV  R2,(R5)+
-        MOV  R3,(R5)+
-       .endr
+           .rept 10
+            MOV  R0,(R5)+
+            MOV  R1,(R5)+
+            MOV  R2,(R5)+
+            MOV  R3,(R5)+
+           .endr
 
        .equiv Background_FloodFillQuadSprite_LinesCount, .+2
         DEC  $0x00

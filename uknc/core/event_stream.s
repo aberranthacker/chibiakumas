@@ -156,38 +156,38 @@ Event_StarBust:
 # By default each time can only have ONE event, but we can use this commend to declare
 # XX events will occur at this time to save memory!
 Event_CoreMultipleEventsAtOneTime:
-        # uknc/event_stream.s:485            #     ld a,b
-        MOV  R1,@$Event_MultipleEventCount   #     ld (Event_MultipleEventCount_Plus1 - 1),a
-        RETURN # JMP Event_LoadNextEvt       #     ret
-                                             #
-Event_SetSprite: # Set the next sprite       # Event_SpriteSwitch_0101:          ;Set the next sprite
-        MOV  R1,@$EventObjectSpriteToAdd     #     ld de,EventObjectSpriteToAdd_Plus1-1
-        RETURN                               #     jr Event_CoreReprogram_ByteCopy
-                                             #
-Event_SetProgram: # Set the next program     # Event_ProgramSwitch_0001:
-        MOV  (R5)+,@$EventObjectProgramToAdd #     ld de,EventObjectProgramToAdd_Plus1 - 1
-        RETURN                               #     jr Event_CoreReprogram_ByteCopy
-                                             #
-Event_SetAnimator:                           # Event_AnimatorSwitch_1110:
-        MOV  R1,@$EventObjectAnimatorToAdd   #     ld de,EventObjectAnimatorToAdd_Plus1-1
-        RETURN                               #     jr Event_CoreReprogram_ByteCopy
-                                             #
-Event_SetSpriteSize:                         # Event_SpriteSizeSwitch_1101:
-        MOV  R1,@$EventObjectSpriteSizeToAdd #     ld de,EventObjectSpriteSizeToAdd_Plus1-1
-        RETURN                               #     jr Event_CoreReprogram_ByteCopy
-                                             #
-Event_SetMove: # Set the next move           # Event_MoveSwitch_0011:
-        MOV  (R5)+,@$EventObjectMoveToAdd    #     ld de,EventObjectMoveToAdd_Plus1-1
-        RETURN                               #     jr Event_CoreReprogram_ByteCopy
-                                             #
-Event_SetProgMoveLife: # Set Prog,MoveLife   # Event_ProgramMoveLifeSwitch_0100:
-        MOV  (R5)+,@$EventObjectProgramToAdd #     rst 6
-                                             #     ld (EventObjectProgramToAdd_Plus1 - 1),a
-Event_SetMoveLife:                           # Event_MoveLifeSwitch_0000:
-        MOV  (R5)+,@$EventObjectMoveToAdd    #     rst 6
-                                             #     ld (EventObjectMoveToAdd_Plus1 - 1),a
-Event_SetLife:                               # Event_LifeSwitch_0010:
-        MOV  (R5)+,@$EventObjectLifeToAdd    #     ld de,EventObjectLifeToAdd_Plus1 - 1
+        # uknc/event_stream.s:485
+        MOV  R1,@$Event_MultipleEventCount
+        RETURN # JMP Event_LoadNextEvt
+
+Event_SetSprite: # Set the next sprite
+        MOV  R1,@$EventObjectSpriteToAdd
+        RETURN
+
+Event_SetProgram: # Set the next program
+        MOV  (R5)+,@$EventObjectProgramToAdd
+        RETURN
+
+Event_SetAnimator:
+        MOV  R1,@$EventObjectAnimatorToAdd
+        RETURN
+
+Event_SetSpriteSize:
+        MOV  R1,@$EventObjectSpriteSizeToAdd
+        RETURN
+
+Event_SetMove: # Set the next move
+        MOV  (R5)+,@$EventObjectMoveToAdd
+        RETURN
+
+Event_SetProgMoveLife:
+        MOV  (R5)+,@$EventObjectProgramToAdd
+
+Event_SetMoveLife:
+        MOV  (R5)+,@$EventObjectMoveToAdd
+
+Event_SetLife:
+        MOV  (R5)+,@$EventObjectLifeToAdd
         RETURN
                                                             # Event_CoreReprogram_ByteCopy:
                                                             #     rst 6
@@ -204,17 +204,15 @@ Event_SetLife:                               # Event_LifeSwitch_0010:
 # Powerup objects are defined by their sprite, which changes each level
 # OK so I didn't think this through very well!
 Event_CoreReprogram_PowerupSprites:
-                                      # rst 6
-        MOVB (R5)+,@$DroneSprite      # ld (DroneSprite_Plus1-1),a
-                                      # rst 6
-        MOVB (R5)+,@$ShootSpeedSprite # ld (ShootSpeedSprite_Plus1-1),a
-        MOV  (R5)+,R0                 # rst 6
-        MOVB R0,@$ShootPowerSprite    # ld (ShootPowerSprite_Plus1-1),a
-        SWAB R0                       # rst 6
-        MOVB R0,@$PointsSpriteA       # ld (PointsSprite_Plus1-1),a
-        MOVB R0,@$PointsSpriteB       # ld (PointsSpriteB_Plus1-1),a
-        MOVB R0,@$PointsSpriteC       # ld (PointsSpriteC_Plus1-1),a
-        RETURN                        # ret
+        MOVB (R5)+,@$DroneSprite
+        MOVB (R5)+,@$ShootSpeedSprite
+        MOV  (R5)+,R0
+        MOVB R0,@$ShootPowerSprite
+        SWAB R0
+        MOVB R0,@$PointsSpriteA
+        MOVB R0,@$PointsSpriteB
+        MOVB R0,@$PointsSpriteC
+        RETURN
 
 Event_ReprogramObjectBurstPosition:
         MOV  (R5)+,@$BurstPosition # # Y: LSB, X: MSB
@@ -324,7 +322,7 @@ Event_ChangeStreamTime: # Event_ChangeStreamTime_1000:
         CALL SetLevelTime
 
         TST  (SP)+ # we didn't use up the Event_LoadNextEvt on the stack
-        JMP  Event_MoreEvents # uknc/event_stream.s:124     #     jp Event_MoreEvents
+        JMP  Event_MoreEvents # uknc/event_stream.s:124
 
 # Add to the foreground (top of the object array)
 Event_AddToForeground: # Event_AddFront_0110:
@@ -515,23 +513,20 @@ Event_AddObject: # called by object_driver as well
                                                       #     pop af
                                                       # AddObjectTwoPlayer:
         MOVB R0,(R3)+    # LifeToAdd                  #     ld (hl),a
-
-       .equiv EventObjectProgramToAdd, .+2            #     dec h
-        MOVB $0x00,(R3)+ # Program code               #     ld (hl),&0 :EventObjectProgramToAdd_Plus1    ; Program code
-
+       .equiv EventObjectProgramToAdd, .+2
+        MOVB $0x00,(R3)+ # Program code
        .equiv EventObjectSpriteSizeToAdd, .+2
-        MOVB $0x00,(R3)+ # Sprite size for collisions #     ld (hl),&0 :EventObjectSpriteSizeToAdd_Plus1 ; Sprite size for collisions
-
+        MOVB $0x00,(R3)+ # Sprite size for collisions
        .equiv EventObjectAnimatorToAdd, .+2
-        MOVB $0x00,(R3)+ # Animator                   #     ld (hl),&0 :EventObjectAnimatorToAdd_Plus1   ; Animator
+        MOVB $0x00,(R3)+ # Animator
 
-        RETURN                                        #     ret
+        RETURN
 
-    Event_ObjectLoopNext:                             # Event_ObjectLoopNext:
+    Event_ObjectLoopNext:
         opcAddObject_MoveDirection:
-        ADD  $8,R3                                    #     inc hl      :Event_AddObject_MoveDirection_Plus1
-        SOB  R4,Event_Objectloop                      #     djnz,Event_Objectloop
-        RETURN                                        #     ret
+        ADD  $8,R3
+        SOB  R4,Event_Objectloop
+        RETURN
 
 Event_SaveObjSettings:
         ASL  R1

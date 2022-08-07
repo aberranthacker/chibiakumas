@@ -191,7 +191,6 @@ build/core.o : $(common) \
                core/background_get_sprite_mem_pos.s \
                core/background_quad_sprite.s \
                core/background_solid_fill.s \
-               core/compiled_sprite_viewer.s \
                core/do_moves.s \
                core/event_stream.s \
                core/execute_bootstrap.s \
