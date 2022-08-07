@@ -8,6 +8,7 @@
        .global FileEndCore
        .global LevelStart
        .global SpriteBanksVectors
+       .global TRandW
        .global null
 #----------------------------------------------------------------------------}}}
 
@@ -22,6 +23,31 @@
        .=CoreStart
 
 start: FileBeginCore:
+
+# Generates a next 16-bit pseudorandom number
+# generator period is 0xfffe0000 (4294836224)
+#
+# Inputs:
+#       None
+# Outputs:
+#       R0 - next pseudorandom number
+# Corrupts:
+#       None
+#
+# Author: Alexander "Sandro" Tishin
+#
+TRandW:
+       .equiv rseed1, .+2
+        MOV $0, R0
+        ADD R0, R0
+        BHI 1$
+        ADD $39, R0
+    1$:
+        MOV R0, @$rseed1
+       .equiv rseed2, .+2
+        ADD $0, R0
+        MOV R0, @$rseed2
+        RETURN
 
 SpriteBanksVectors:
        .word LevelSprites
@@ -102,9 +128,6 @@ not_implemented_check_R0:
         BR   null
     .endif
 
-       .include "core/compiled_sprite_viewer.s"
-       .global CLS
-
        .include "core/do_moves.s"
        .global DoMoves
        .global Object_DecreaseLifeShot
@@ -167,6 +190,7 @@ not_implemented_check_R0:
        .global ShowContinueCounter
 
        .include "core/screen_memory.s"
+       .global CLS
        .global ScreenBuffer_ActiveScreen
        .global ScreenBuffer_Flip
        .global ScreenBuffer_Init

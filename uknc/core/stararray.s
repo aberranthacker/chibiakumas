@@ -98,7 +98,7 @@ StarArray_Redraw:
 
 Starloop_Start:
        .equiv PlayerFireSpeed, .+2
-        MOV  $0000240,R3
+        MOV  $0000240,R3 # NOP
 
 Starloop_Start2:
         MOV  R3,@$opcStarSlowdownB
@@ -139,6 +139,7 @@ StarArray_FoundOne:
         SUB  $8,R0
         TSTB R4 # fast move? (bit 7)
         BPL  DoMovesStars_spdNormalY
+
         ASL  R0
     DoMovesStars_spdNormalY:
        .equiv opcStarSlowdownA, .
@@ -233,6 +234,7 @@ Starloop_DrawTheStar:
         BZE  DotOffset1
         DEC  R4
         BZE  DotOffset2
+
 DotOffset3:
         MOV  $0xC0C0,R2
        .equiv StarColor3, .+2

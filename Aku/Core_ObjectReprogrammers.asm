@@ -10,7 +10,7 @@ SetObjectcheck:
 SetObjectProgram:
     call SetObjectcheck
     push hl
-    set 6,l;inc h;  add hl,de   ;spr
+    set 6,l ; inc h ; add hl,de ; spr
     jr SetObjectH2
 
 ;ret

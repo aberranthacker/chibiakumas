@@ -95,22 +95,22 @@ DoMoves_Spec: # Special moves - various kinds
         BNE  2$
        .equiv jmpLevelSpecificMoveD, .+2
         JMP  @$null
-    2$: 
+    2$:
         CMPB R0,$mveCustom3 # 1101xxxx Custom3
         BNE  3$
        .equiv jmpLevelSpecificMoveC, .+2
         JMP  @$null
-    3$: 
+    3$:
         CMPB R0,$mveCustom2 # 1110xxxx Custom2
         BNE  4$
        .equiv jmpLevelSpecificMoveB, .+2
         JMP  @$null
-    4$: 
+    4$:
         CMPB R0,$mveCustom1 # 1111xxxx Custom 1
         BNE  5$
        .equiv jmpLevelSpecificMoveA, .+2
         JMP  @$null
-    5$: 
+    5$:
         MOV  R2,R0          # 1000xxxx
         BICB $0b00000011,R0 # 101111xx
 
@@ -213,41 +213,38 @@ DoMoves_SeekerP1: # Home in on player 1
 DoMoves_Seeker:
       # R1 c = Y, R4 b = X
       # R2 LSB d = Move, R2 MSB=anything
-        PUSH R3                     # push de
-        MOV  R2,R3                  # ld a,d
-        BIC  $0xFFFC,R3             # and %00000011 ; Speed
-        ASL  R3                     # sll a
-        INC  R3                     # inc a
-                                    # ld d,a
-                                    # ld a,r ; Crude randomizer, as we move so fast the object may never hit the player otherwise
-                                    # bit 0,a
-                                    # jr z,DoMoves_SeekerS
-        INC  R3                     # inc d
-DoMoves_SeekerS:
-        MOVB @$P1_P00,R0            # ld a,(iy) ; Y
-        SUB  $8,R0                  # sub 8
-        CMPB R0,R1                  # cp C
-        BHIS DoMoves_Seeker_Ylower  # jr NC,DoMoves_Seeker_Ylower
-                                    # ld a,C
-        SUB  R3,R1                  # sub d
-        BR   DoMoves_Seeker_CheckX  # jr DoMoves_Seeker_CheckX
+        PUSH R3
+        MOV  R2,R3
+        BIC  $0xFFFC,R3 # 0b00000011 Speed
+        ASL  R3
+        INC  R3
+      # Use randomizer, as we move so fast the object may never hit the player
+      # otherwise
+        CALL TRandW
+        ROR  R0
+        ADC  R3
+
+        MOVB @$P1_P00,R0 # Y
+        SUB  $8,R0
+        CMPB R0,R1
+        BHIS DoMoves_Seeker_Ylower
+
+        SUB  R3,R1
+        BR   DoMoves_Seeker_CheckX
 DoMoves_Seeker_Ylower:
-                                    # ld a,C
-        ADD  R3,R1                  # add d
+        ADD  R3,R1
+
 DoMoves_Seeker_CheckX:
-                                    # ld C,a
-        MOVB  @$P1_P01,R0           # ld a,(iy+1) ;X
-        SUB   $3,R0                 # sub 3
-        CMPB  R0,R4                 # cp B
-        BHIS  DoMoves_Seeker_Xlower # jr NC,DoMoves_Seeker_Xlower
-                                    # ld a,B
-        SUB  R3,R4                  # sub d
-        BR   DoMoves_Seeker_Done    # jr DoMoves_Seeker_Done
+        MOVB  @$P1_P01,R0 # X
+        SUB   $3,R0
+        CMPB  R0,R4
+        BHIS  DoMoves_Seeker_Xlower
+
+        SUB  R3,R4
+        BR   DoMoves_Seeker_Done
+
 DoMoves_Seeker_Xlower:
-                                    # ld a,B
-        ADD  R3,R4                  # add d
+        ADD  R3,R4
 DoMoves_Seeker_Done:
-                                    # ld B,a
-        POP  R3                     # pop de
-                                    # pop iy
-        RETURN                      # ret
+        POP  R3
+        RETURN
