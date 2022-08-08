@@ -15,8 +15,9 @@
 start:
         JMP  @$LevelInit
 
-LevelSprites2:
        .incbin "build/level_02.0.spr"
+LevelSprites2:
+       .incbin "build/level_02.1.spr"
 ChibiSprites:
        .incbin "build/chibi_lr.spr"
 LevelTiles:
@@ -24,9 +25,44 @@ LevelTiles:
 
 EventStreamArray:
 .word 0, evtReprogram_PowerupSprites
-.byte      128+DummySprite, 128+DummySprite, 128+DummySprite, 128+31 # Define powerup sprites
+.byte      sprTwoFrame | DUMMY_SPRITE
+.byte      sprTwoFrame | DUMMY_SPRITE
+.byte      sprTwoFrame | DUMMY_SPRITE
+.byte      sprTwoFrame | COIN
 
+.equiv DUMMY_SPRITE, 0
+.equiv COIN, 1
 
+.equiv SKULL_100_A, 2
+.equiv SKULL_100_B, 3
+
+.equiv LEGS_LEFT_A,  4
+.equiv LEGS_LEFT_B,  5
+.equiv LEGS_LEFT_C,  6
+                    
+.equiv LEGS_RIGHT_A, 7
+.equiv LEGS_RIGHT_B, 8
+.equiv LEGS_RIGHT_C, 9
+                   
+.equiv HAND_UP,     10
+.equiv HAND_DOWN,   11
+.equiv HAND_LEFT,   12
+.equiv HAND_RIGHT,  13
+
+.equiv SKULL_80_A, 14
+.equiv SKULL_80_B, 15
+.equiv SKULL_60_B, 16
+.equiv SKULL_40_B, 17
+.equiv SKULL_20_B, 18
+.equiv SKULL_0_A,  19
+.equiv SKULL_0_B,  20
+
+.equiv SKULL_100_C, 21
+.equiv SKULL_80_C,  22
+.equiv SKULL_60_C,  23
+.equiv SKULL_40_C,  24
+.equiv SKULL_20_C,  25
+.equiv SKULL_0_C,   26
 # ;We will use 4 Paralax layers
 # ; ---------()- (sky)        %11001000
 # ; ------------ (Far)        %11000100
@@ -118,7 +154,7 @@ EventStreamArray:
 .word    evtSetProg, prgFrameAnimate | 0b101
 .word    evtSetLife, lifeImmortal
 .word    evtAddToBackground
-.word    evtSingleSprite, sprSingleFrame | 18, (24+160)<<X | (24+90+48+8)<<Y
+.word    evtSingleSprite, sprSingleFrame | LEGS_LEFT_A, (24+160)<<X | (24+90+48+8)<<Y
 .word    evtSaveObjPointer, HandObject1
 
 # Start of fade in block -------------------------------------------------------
@@ -130,8 +166,6 @@ EventStreamArray:
     #----------
 #   .word 3, evtChangeStreamTime, 60, HandAttack1
     #----------
-
-.equiv DummySprite, 31
 
 # ;HandLeft2
 # defb 1+12,%01110000+5            ; 3 commands at the same timepoint
@@ -145,52 +179,52 @@ EventStreamArray:
 .word     evtLoadObjSettings | 1
 .word     evtAddToBackground
 .word     evtSetProg, prgFrameAnimate | 0b011
-.word     evtSingleSprite, sprSingleFrame | 19, (24+160)<<X | (24+90+48+8)<<Y
+.word     evtSingleSprite, sprSingleFrame | LEGS_LEFT_B, (24+160)<<X | (24+90+48+8)<<Y
 .word     evtSaveObjPointer, HandObject2
 
 # ; hit target
 # defb 20,%01110000+3                    ; 2 commands at the same timepoint;
 # defb    128+4,2,%11000010,%11000000+40 ; Program - Starburst ... Move - dir Left Slow ... Hurt by bullets, hurts player, life 4;
-# defb    0,DummySprite,160+27,90+24+24  ; Single Object sprite 11 (animated)
+# defb    0,DUMMY_SPRITE,160+27,90+24+24  ; Single Object sprite 11 (animated)
 # defb    138                            ; save Object pointer
 # defw        SkullTarget                ; save Object pointer
 .word 20, evtMultipleCommands | 3
 .word     evtSetProgMoveLife, prgSpecial, mvSpecial | spdFast | 002, lifeEnemy | 40
-.word     evtSingleSprite, DummySprite, (24+160+3)<<X | (24+90+24)<<Y
+.word     evtSingleSprite, DUMMY_SPRITE, (24+160+3)<<X | (24+90+24)<<Y
 .word     evtSaveObjPointer, SkullTarget
 
 DebugStartPoint:
 # ; Fire target 1
 # defb 20,%01110000+3                   ; 2 commands at the same timepoint;
 # defb    128+4,%01100000+7,%11000010,0 ; Program - Starburst ... Move - dir Left Slow ... Hurt by bullets, hurts player, life 4;
-# defb    0,DummySprite,160+27,90+24+48 ; Single Object sprite 11 (animated)
+# defb    0,DUMMY_SPRITE,160+27,90+24+48 ; Single Object sprite 11 (animated)
 # defb    138                           ; save Object pointer
 # defw        FireTarget1               ; save Object pointer
 .word 20, evtMultipleCommands | 3
 .word     evtSetProgMoveLife, prgFireSlow | fireLeft, mvSpecial | spdFast | 002, lifeImmortal
-.word     evtSingleSprite, DummySprite, (24+160+3)<<X | (24+90+48)<<Y
+.word     evtSingleSprite, DUMMY_SPRITE, (24+160+3)<<X | (24+90+48)<<Y
 .word     evtSaveObjPointer, FireTarget1
 
 # ; Fire target 2
 # defb 20,%01110000+3                    ; 2 commands at the same timepoint;
 # defb    128+4,%10000000+13,%11000010,0 ; Program - Starburst ... Move - dir Left Slow ... Hurt by bullets, hurts player, life 4;
-# defb    0,DummySprite,160+27,90+24+48  ; Single Object sprite 11 (animated)
+# defb    0,DUMMY_SPRITE,160+27,90+24+48  ; Single Object sprite 11 (animated)
 # defb    138                            ; save Object pointer
 # defw        FireTarget2                ; save Object pointer
 .word 20, evtMultipleCommands | 3
 .word     evtSetProgMoveLife, prgFireSnail | fireBurst, mvSpecial | spdFast | 002, lifeImmortal
-.word     evtSingleSprite, DummySprite, (24+160+3)<<X | (24+90+48)<<Y
+.word     evtSingleSprite, DUMMY_SPRITE, (24+160+3)<<X | (24+90+48)<<Y
 .word     evtSaveObjPointer, FireTarget2
 
 # ; Fire target 3
 # defb 20,%01110000+3                   ; 2 commands at the same timepoint;
 # defb    128+4,%01100000+7,%11000010,0 ; Program - Starburst ... Move - dir Left Slow ... Hurt by bullets, hurts player, life 4;
-# defb    0,DummySprite,160+27,90+24    ; Single Object sprite 11 (animated)
+# defb    0,DUMMY_SPRITE,160+27,90+24    ; Single Object sprite 11 (animated)
 # defb    138                           ; save Object pointer
 # defw        FireTarget3               ; save Object pointer
 .word 20, evtMultipleCommands | 3
 .word     evtSetProgMoveLife, prgFireSnail | fireBurst, mvSpecial | spdFast | 002, lifeImmortal
-.word     evtSingleSprite, DummySprite, (24+160+3)<<X | (24+90)<<Y
+.word     evtSingleSprite, DUMMY_SPRITE, (24+160+3)<<X | (24+90)<<Y
 .word     evtSaveObjPointer, FireTarget3
 
 # ;Skull1
@@ -205,7 +239,7 @@ DebugStartPoint:
 .word     evtLoadObjSettings | 1
 .word     evtAddToForeground
 .word     evtSetProg, prgNone
-.word     evtSingleSprite, sprTwoFrame | 0, (24+160)<<X | (24+90)<<Y
+.word     evtSingleSprite, sprTwoFrame | SKULL_100_A, (24+160)<<X | (24+90)<<Y
 .word     evtSaveObjPointer, SkullObject1
 
 # ;HandLeft3
@@ -220,7 +254,7 @@ DebugStartPoint:
 .word     evtLoadObjSettings | 1
 .word     evtAddToBackground
 .word     evtSetProg, prgFrameAnimate | 0b100
-.word     evtSingleSprite, sprSingleFrame | 20, (24+160)<<X | (24+90+48+8)<<Y
+.word     evtSingleSprite, sprSingleFrame | LEGS_LEFT_C, (24+160)<<X | (24+90+48+8)<<Y
 .word     evtSaveObjPointer, HandObject3
 
 # ;Skull2
@@ -235,7 +269,7 @@ DebugStartPoint:
 .word     evtLoadObjSettings | 1
 .word     evtAddToForeground
 .word     evtSetProg, prgNone
-.word     evtSingleSprite, sprTwoFrame | 1, (24+160)<<X | (24+90)<<Y
+.word     evtSingleSprite, sprTwoFrame | SKULL_100_B, (24+160)<<X | (24+90)<<Y
 .word     evtSaveObjPointer, SkullObject2
 # ;HandRight1
 # defb 20+18,%01110000+5         ; 3 commands at the same timepoint
@@ -249,7 +283,7 @@ DebugStartPoint:
 .word     evtLoadObjSettings | 1
 .word     evtAddToBackground
 .word     evtSetProg, prgFrameAnimate | 0b011
-.word     evtSingleSprite, sprSingleFrame | 15, (24+160)<<X | (24+90+48)<<Y
+.word     evtSingleSprite, sprSingleFrame | LEGS_RIGHT_A, (24+160)<<X | (24+90+48)<<Y
 .word     evtSaveObjPointer, HandObject4
 # ;Skull3
 # defb 20+24,%01110000+5         ; 3 commands at the same timepoint
@@ -263,7 +297,7 @@ DebugStartPoint:
 .word     evtLoadObjSettings | 1
 .word     evtAddToForeground
 .word     evtSetProg, prgNone
-.word     evtSingleSprite, sprSingleFrame | 2, (24+160)<<X | (24+90)<<Y
+.word     evtSingleSprite, sprSingleFrame | SKULL_100_C, (24+160)<<X | (24+90)<<Y
 .word     evtSaveObjPointer, SkullObject3
 # ;HandRight2
 # defb 20+18+12,%01110000+5      ; 3 commands at the same timepoint
@@ -277,7 +311,7 @@ DebugStartPoint:
 .word     evtLoadObjSettings | 1
 .word     evtAddToBackground
 .word     evtSetProg, prgFrameAnimate | 0b100
-.word     evtSingleSprite, sprSingleFrame | 16, (24+160)<<X | (24+90+48)<<Y
+.word     evtSingleSprite, sprSingleFrame | LEGS_RIGHT_B, (24+160)<<X | (24+90+48)<<Y
 .word     evtSaveObjPointer, HandObject5
 # ;HandRight3
 # defb 20+18+24,%01110000+4      ; 3 commands at the same timepoint
@@ -289,7 +323,7 @@ DebugStartPoint:
 .word 62, evtMultipleCommands | 4
 .word     evtLoadObjSettings | 1
 .word     evtSetProg, prgFrameAnimate | 0b101
-.word     evtSingleSprite, sprSingleFrame | 17, (24+160)<<X | (24+90+48)<<Y
+.word     evtSingleSprite, sprSingleFrame | LEGS_RIGHT_C, (24+160)<<X | (24+90+48)<<Y
 .word     evtSaveObjPointer, HandObject6
 
 .word 70, evtCallAddress, StopBossMovement
@@ -297,38 +331,38 @@ DebugStartPoint:
 HandAttack1:
    .word 75, evtMultipleCommands | 7
    .word     evtLoadObjSettings | 3
-   .word     evtSingleSprite, sprTwoFrame | 22, (24+ 12* 1)<<X | (160)<<Y
-   .word     evtSingleSprite, sprTwoFrame | 22, (24+ 12* 3)<<X | (160)<<Y
-   .word     evtSingleSprite, sprTwoFrame | 22, (24+ 12* 5)<<X | (160)<<Y
-   .word     evtSingleSprite, sprTwoFrame | 22, (24+ 12* 7)<<X | (160)<<Y
-   .word     evtSingleSprite, sprTwoFrame | 22, (24+ 12* 9)<<X | (160)<<Y
-   .word     evtSingleSprite, sprTwoFrame | 22, (24+ 12*11)<<X | (160)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_UP, (24+ 12* 1)<<X | (160)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_UP, (24+ 12* 3)<<X | (160)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_UP, (24+ 12* 5)<<X | (160)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_UP, (24+ 12* 7)<<X | (160)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_UP, (24+ 12* 9)<<X | (160)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_UP, (24+ 12*11)<<X | (160)<<Y
 
    .word 77, evtMultipleCommands | 8
    .word     evtLoadObjSettings | 4
-   .word     evtSingleSprite, sprTwoFrame | 22+7, (24+ 12* 0)<<X | (24)<<Y
-   .word     evtSingleSprite, sprTwoFrame | 22+7, (24+ 12* 2)<<X | (24)<<Y
-   .word     evtSingleSprite, sprTwoFrame | 22+7, (24+ 12* 4)<<X | (24)<<Y
-   .word     evtSingleSprite, sprTwoFrame | 22+7, (24+ 12* 6)<<X | (24)<<Y
-   .word     evtSingleSprite, sprTwoFrame | 22+7, (24+ 12* 8)<<X | (24)<<Y
-   .word     evtSingleSprite, sprTwoFrame | 22+7, (24+ 12*10)<<X | (24)<<Y
-   .word     evtSingleSprite, sprTwoFrame | 22+7, (24+ 12*12)<<X | (24)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_DOWN, (24+ 12* 0)<<X | (24)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_DOWN, (24+ 12* 2)<<X | (24)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_DOWN, (24+ 12* 4)<<X | (24)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_DOWN, (24+ 12* 6)<<X | (24)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_DOWN, (24+ 12* 8)<<X | (24)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_DOWN, (24+ 12*10)<<X | (24)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_DOWN, (24+ 12*12)<<X | (24)<<Y
 
    .word 79, evtMultipleCommands | 6
    .word     evtLoadObjSettings | 6
-   .word     evtSingleSprite, sprTwoFrame | 21+9, (24)<<X | (24+ 24*0)<<Y
-   .word     evtSingleSprite, sprTwoFrame | 21+9, (24)<<X | (24+ 24*2)<<Y
-   .word     evtSingleSprite, sprTwoFrame | 21+9, (24)<<X | (24+ 24*4)<<Y
-   .word     evtSingleSprite, sprTwoFrame | 21+9, (24)<<X | (24+ 24*6)<<Y
-   .word     evtSingleSprite, sprTwoFrame | 21+9, (24)<<X | (24+ 24*8)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_RIGHT, (24)<<X | (24+ 24*0)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_RIGHT, (24)<<X | (24+ 24*2)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_RIGHT, (24)<<X | (24+ 24*4)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_RIGHT, (24)<<X | (24+ 24*6)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_RIGHT, (24)<<X | (24+ 24*8)<<Y
 
    .word 81, evtMultipleCommands | 6
    .word     evtLoadObjSettings | 5
-   .word     evtSingleSprite, sprTwoFrame | 21, (160)<<X | (24+ 24*1)<<Y
-   .word     evtSingleSprite, sprTwoFrame | 21, (160)<<X | (24+ 24*3)<<Y
-   .word     evtSingleSprite, sprTwoFrame | 21, (160)<<X | (24+ 24*5)<<Y
-   .word     evtSingleSprite, sprTwoFrame | 21, (160)<<X | (24+ 24*7)<<Y
-   .word     evtSingleSprite, sprTwoFrame | 21, (160)<<X | (24+ 24*9)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_LEFT, (160)<<X | (24+ 24*1)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_LEFT, (160)<<X | (24+ 24*3)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_LEFT, (160)<<X | (24+ 24*5)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_LEFT, (160)<<X | (24+ 24*7)<<Y
+   .word     evtSingleSprite, sprTwoFrame | HAND_LEFT, (160)<<X | (24+ 24*9)<<Y
 
    .word 82, evtChangeStreamTime, 60, HandAttack1
 
@@ -338,7 +372,7 @@ LevelEndAnim:
 # defb    0,21+128+11,140+24,100+24 ; Single Object sprite 11 (animated)
     .word 253, evtMultipleCommands | 2
     .word      evtSetProgMoveLife, prgMovePlayer, mvStatic, 10
-    .word      evtSingleSprite, sprTwoFrame | DummySprite, (24+140)<<X | (24+100)<<Y
+    .word      evtSingleSprite, sprTwoFrame | DUMMY_SPRITE, (24+140)<<X | (24+100)<<Y
 #
 # ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 # FadeOutStartPoint equ 254
@@ -363,11 +397,7 @@ LevelInit:                                  # read "..\SrcALL\Akuyou_Multiplatfo
         MOV  $SpriteBanksVectors,R1
         MOV  R0,(R1)+
         MOV  R0,(R1)+
-   .ifdef ExtMemCore
         MOV  $LevelSprites2,(R1)+
-   .else
-        MOV  R0,(R1)+
-   .endif
         MOV  R0,(R1)+
 
         MOV  $EventStreamArray,R5     # Event Stream

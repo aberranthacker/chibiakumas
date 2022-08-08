@@ -923,17 +923,342 @@ build/level_02.o : $(common) \
 		   build/chibi_lr.spr
 	$(AS) -al level_02.s -o build/level_02.o | build_tools/format_list.rb
 
-build/level_02.0.spr : build_tools/spr_cpc_to_uknc.rb \
-                           resources/level_02a.CPC.SPR
-	build_tools/spr_cpc_to_uknc.rb resources/level_02a.CPC.SPR -o build/level_02.0.spr
-build/level_02.1.spr : build_tools/spr_cpc_to_uknc.rb \
-                           resources/level_02b.CPC.SPR
-	build_tools/spr_cpc_to_uknc.rb resources/level_02b.CPC.SPR -o build/level_02.1.spr
-
 build/level_02_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
 	                      ../ResCPC/Level2-Tiles-CPC.SPR
 	build_tools/spr_cpc_to_uknc.rb ../ResCPC/Level2-Tiles-CPC.SPR -o build/level_02_tiles.spr
 # level_02.bin --------------------------------------------------------------}}}
+
+# level_02.0.spr ------------------------------------------------------------{{{
+build/level_02.0.spr : build/level_02/level_02.0.o \
+		       linker_scripts/sprites.cmd
+	$(LD) $(LDFLAGS) build/level_02/level_02.0.o -T linker_scripts/sprites.cmd \
+		         -o build/level_02.0.spr
+
+build/level_02/level_02.0.o : level_02.0.s \
+			      build/level_02/coin.0.bin \
+			      build/level_02/skull_100_a.0.bin \
+			      build/level_02/skull_100_b.0.bin \
+			      build/level_02/skull_100_c.0.bin \
+			      build/level_02/skull_80_a.0.bin \
+			      build/level_02/skull_80_b.0.bin \
+			      build/level_02/skull_80_c.0.bin \
+			      build/level_02/skull_60_b.0.bin \
+			      build/level_02/skull_60_c.0.bin \
+			      build/level_02/skull_40_b.0.bin \
+			      build/level_02/skull_40_c.0.bin \
+			      build/level_02/skull_20_b.0.bin \
+			      build/level_02/skull_20_c.0.bin \
+			      build/level_02/skull_0_a.0.bin \
+			      build/level_02/skull_0_b.0.bin \
+			      build/level_02/skull_0_c.0.bin \
+			      build/level_02/legs_left_a.0.bin \
+			      build/level_02/legs_left_b.0.bin \
+			      build/level_02/legs_left_c.0.bin \
+			      build/level_02/legs_right_a.0.bin \
+			      build/level_02/legs_right_b.0.bin \
+			      build/level_02/legs_right_c.0.bin \
+			      build/level_02/hand_up.0.bin \
+			      build/level_02/hand_down.0.bin \
+			      build/level_02/hand_left.0.bin \
+			      build/level_02/hand_right.0.bin
+	$(AS) -al level_02.0.s -o build/level_02/level_02.0.o
+
+build/level_02/coin.0.bin : build_tools/bmp_to_raw.rb \
+	                    resources/level_02/coin.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/coin.0.bmp \
+		                  build/level_02/coin.0.bin
+
+build/level_02/skull_100_a.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_100_a.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_100_a.0.bmp \
+		                  build/level_02/skull_100_a.0.bin
+
+build/level_02/skull_100_b.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_100_b.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_100_b.0.bmp \
+		                  build/level_02/skull_100_b.0.bin
+
+build/level_02/skull_100_c.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_100_c.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_100_c.0.bmp \
+		                  build/level_02/skull_100_c.0.bin
+
+build/level_02/skull_80_a.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_80_a.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_80_a.0.bmp \
+		                  build/level_02/skull_80_a.0.bin
+
+build/level_02/skull_80_b.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_80_b.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_80_b.0.bmp \
+		                  build/level_02/skull_80_b.0.bin
+
+build/level_02/skull_80_c.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_80_c.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_80_c.0.bmp \
+		                  build/level_02/skull_80_c.0.bin
+
+build/level_02/skull_60_b.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_60_b.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_60_b.0.bmp \
+		                  build/level_02/skull_60_b.0.bin
+
+build/level_02/skull_60_c.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_60_c.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_60_c.0.bmp \
+		                  build/level_02/skull_60_c.0.bin
+
+build/level_02/skull_40_b.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_40_b.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_40_b.0.bmp \
+		                  build/level_02/skull_40_b.0.bin
+
+build/level_02/skull_40_c.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_40_c.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_40_c.0.bmp \
+		                  build/level_02/skull_40_c.0.bin
+
+build/level_02/skull_20_b.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_20_b.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_20_b.0.bmp \
+		                  build/level_02/skull_20_b.0.bin
+
+build/level_02/skull_20_c.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_20_c.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_20_c.0.bmp \
+		                  build/level_02/skull_20_c.0.bin
+
+build/level_02/skull_0_a.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_0_a.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_0_a.0.bmp \
+		                  build/level_02/skull_0_a.0.bin
+
+build/level_02/skull_0_b.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_0_b.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_0_b.0.bmp \
+		                  build/level_02/skull_0_b.0.bin
+
+build/level_02/skull_0_c.0.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_0_c.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_0_c.0.bmp \
+		                  build/level_02/skull_0_c.0.bin
+
+build/level_02/legs_left_a.0.bin : build_tools/bmp_to_raw.rb \
+				            resources/level_02/legs_left_a.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/legs_left_a.0.bmp \
+		                  build/level_02/legs_left_a.0.bin
+
+build/level_02/legs_left_b.0.bin : build_tools/bmp_to_raw.rb \
+				            resources/level_02/legs_left_b.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/legs_left_b.0.bmp \
+		                  build/level_02/legs_left_b.0.bin
+
+build/level_02/legs_left_c.0.bin : build_tools/bmp_to_raw.rb \
+				            resources/level_02/legs_left_c.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/legs_left_c.0.bmp \
+		                  build/level_02/legs_left_c.0.bin
+
+build/level_02/legs_right_a.0.bin : build_tools/bmp_to_raw.rb \
+				            resources/level_02/legs_right_a.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/legs_right_a.0.bmp \
+		                  build/level_02/legs_right_a.0.bin
+
+build/level_02/legs_right_b.0.bin : build_tools/bmp_to_raw.rb \
+				            resources/level_02/legs_right_b.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/legs_right_b.0.bmp \
+		                  build/level_02/legs_right_b.0.bin
+
+build/level_02/legs_right_c.0.bin : build_tools/bmp_to_raw.rb \
+				            resources/level_02/legs_right_c.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/legs_right_c.0.bmp \
+		                  build/level_02/legs_right_c.0.bin
+
+build/level_02/hand_up.0.bin : build_tools/bmp_to_raw.rb \
+			       resources/level_02/hand_up.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/hand_up.0.bmp \
+		                  build/level_02/hand_up.0.bin
+
+build/level_02/hand_down.0.bin : build_tools/bmp_to_raw.rb \
+			         resources/level_02/hand_down.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/hand_down.0.bmp \
+		                  build/level_02/hand_down.0.bin
+
+build/level_02/hand_left.0.bin : build_tools/bmp_to_raw.rb \
+			         resources/level_02/hand_left.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/hand_left.0.bmp \
+		                  build/level_02/hand_left.0.bin
+
+build/level_02/hand_right.0.bin : build_tools/bmp_to_raw.rb \
+			          resources/level_02/hand_right.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/hand_right.0.bmp \
+		                  build/level_02/hand_right.0.bin
+# level_02.0.spr ------------------------------------------------------------}}}
+
+# level_02.1.spr ------------------------------------------------------------{{{
+build/level_02.1.spr : build/level_02/level_02.1.o \
+		       linker_scripts/sprites.cmd
+	$(LD) $(LDFLAGS) build/level_02/level_02.1.o -T linker_scripts/sprites.cmd \
+		         -o build/level_02.1.spr
+
+build/level_02/level_02.1.o : level_02.1.s \
+			      build/level_02/coin.1.bin \
+			      build/level_02/skull_100_a.1.bin \
+			      build/level_02/skull_100_b.1.bin \
+			      build/level_02/skull_100_c.1.bin \
+			      build/level_02/skull_80_a.1.bin \
+			      build/level_02/skull_80_b.1.bin \
+			      build/level_02/skull_80_c.1.bin \
+			      build/level_02/skull_60_b.1.bin \
+			      build/level_02/skull_60_c.1.bin \
+			      build/level_02/skull_40_b.1.bin \
+			      build/level_02/skull_40_c.1.bin \
+			      build/level_02/skull_20_b.1.bin \
+			      build/level_02/skull_20_c.1.bin \
+			      build/level_02/skull_0_a.1.bin \
+			      build/level_02/skull_0_b.1.bin \
+			      build/level_02/skull_0_c.1.bin \
+			      build/level_02/legs_left_a.1.bin \
+			      build/level_02/legs_left_b.1.bin \
+			      build/level_02/legs_left_c.1.bin \
+			      build/level_02/legs_right_a.1.bin \
+			      build/level_02/legs_right_b.1.bin \
+			      build/level_02/legs_right_c.1.bin \
+			      build/level_02/hand_up.1.bin \
+			      build/level_02/hand_down.1.bin \
+			      build/level_02/hand_left.1.bin \
+			      build/level_02/hand_right.1.bin
+	$(AS) -al level_02.1.s -o build/level_02/level_02.1.o
+
+build/level_02/coin.1.bin : build_tools/bmp_to_raw.rb \
+	                    resources/level_02/coin.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/coin.1.bmp \
+		                  build/level_02/coin.1.bin
+
+build/level_02/skull_100_a.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_100_a.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_100_a.1.bmp \
+		                  build/level_02/skull_100_a.1.bin
+
+build/level_02/skull_100_b.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_100_b.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_100_b.1.bmp \
+		                  build/level_02/skull_100_b.1.bin
+
+build/level_02/skull_100_c.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_100_c.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_100_c.1.bmp \
+		                  build/level_02/skull_100_c.1.bin
+
+build/level_02/skull_80_a.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_80_a.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_80_a.1.bmp \
+		                  build/level_02/skull_80_a.1.bin
+
+build/level_02/skull_80_b.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_80_b.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_80_b.1.bmp \
+		                  build/level_02/skull_80_b.1.bin
+
+build/level_02/skull_80_c.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_80_c.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_80_c.1.bmp \
+		                  build/level_02/skull_80_c.1.bin
+
+build/level_02/skull_60_b.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_60_b.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_60_b.1.bmp \
+		                  build/level_02/skull_60_b.1.bin
+
+build/level_02/skull_60_c.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_60_c.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_60_c.1.bmp \
+		                  build/level_02/skull_60_c.1.bin
+
+build/level_02/skull_40_b.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_40_b.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_40_b.1.bmp \
+		                  build/level_02/skull_40_b.1.bin
+
+build/level_02/skull_40_c.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_40_c.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_40_c.1.bmp \
+		                  build/level_02/skull_40_c.1.bin
+
+build/level_02/skull_20_b.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_20_b.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_20_b.1.bmp \
+		                  build/level_02/skull_20_b.1.bin
+
+build/level_02/skull_20_c.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_20_c.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_20_c.1.bmp \
+		                  build/level_02/skull_20_c.1.bin
+
+build/level_02/skull_0_a.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_0_a.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_0_a.1.bmp \
+		                  build/level_02/skull_0_a.1.bin
+
+build/level_02/skull_0_b.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_0_b.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_0_b.1.bmp \
+		                  build/level_02/skull_0_b.1.bin
+
+build/level_02/skull_0_c.1.bin : build_tools/bmp_to_raw.rb \
+				     resources/level_02/skull_0_c.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/skull_0_c.1.bmp \
+		                  build/level_02/skull_0_c.1.bin
+
+build/level_02/legs_left_a.1.bin : build_tools/bmp_to_raw.rb \
+				            resources/level_02/legs_left_a.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/legs_left_a.1.bmp \
+		                  build/level_02/legs_left_a.1.bin
+
+build/level_02/legs_left_b.1.bin : build_tools/bmp_to_raw.rb \
+				            resources/level_02/legs_left_b.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/legs_left_b.1.bmp \
+		                  build/level_02/legs_left_b.1.bin
+
+build/level_02/legs_left_c.1.bin : build_tools/bmp_to_raw.rb \
+				            resources/level_02/legs_left_c.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/legs_left_c.1.bmp \
+		                  build/level_02/legs_left_c.1.bin
+
+build/level_02/legs_right_a.1.bin : build_tools/bmp_to_raw.rb \
+				            resources/level_02/legs_right_a.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/legs_right_a.1.bmp \
+		                  build/level_02/legs_right_a.1.bin
+
+build/level_02/legs_right_b.1.bin : build_tools/bmp_to_raw.rb \
+				            resources/level_02/legs_right_b.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/legs_right_b.1.bmp \
+		                  build/level_02/legs_right_b.1.bin
+
+build/level_02/legs_right_c.1.bin : build_tools/bmp_to_raw.rb \
+				            resources/level_02/legs_right_c.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/legs_right_c.1.bmp \
+		                  build/level_02/legs_right_c.1.bin
+
+build/level_02/hand_up.1.bin : build_tools/bmp_to_raw.rb \
+			       resources/level_02/hand_up.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/hand_up.1.bmp \
+		                  build/level_02/hand_up.1.bin
+
+build/level_02/hand_down.1.bin : build_tools/bmp_to_raw.rb \
+			         resources/level_02/hand_down.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/hand_down.1.bmp \
+		                  build/level_02/hand_down.1.bin
+
+build/level_02/hand_left.1.bin : build_tools/bmp_to_raw.rb \
+			         resources/level_02/hand_left.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/hand_left.1.bmp \
+		                  build/level_02/hand_left.1.bin
+
+build/level_02/hand_right.1.bin : build_tools/bmp_to_raw.rb \
+			          resources/level_02/hand_right.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_02/hand_right.1.bmp \
+		                  build/level_02/hand_right.1.bin
+# level_02.1.spr ------------------------------------------------------------}}}
 
 # chibi_lr.spr --------------------------------------------------------------{{{
 build/chibi_lr.spr : build_tools/bmp_to_raw.rb \
@@ -1005,6 +1330,7 @@ build/chibi/drone_mask.1.bin : build_tools/bmp_to_raw.rb \
 pre-build :
 	mkdir -p build/chibi
 	mkdir -p build/level_01
+	mkdir -p build/level_02
 
 clean :
 	rm -rf build/*
