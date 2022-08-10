@@ -106,29 +106,24 @@ ShowSpriteReconfigureEnableDisableB:
         BR   ShowSpriteReconfigure_24px
 
 ShowSpriteReconfigure:
-        MOV  R2,@$SpriteSizeConfig6
       # Akuyou was designed for 24x24 sprites, but this module can
       # 'reconfigure' it for other sizes
-        CMP  R2,$6
-        BEQ  ShowSpriteReconfigure_24px
-        CMP  R2,$8
-        BEQ  ShowSpriteReconfigure_32px
-        CMP  R2,$12
-        BEQ  ShowSpriteReconfigure_48px
-       #CMP  R2,$16
-       #BEQ  ShowSpriteReconfigure_64px
-       #CMP  R2,$20
-       #BEQ  ShowSpriteReconfigure_80px
-        CMP  R2,$24
-        BEQ  ShowSpriteReconfigure_96px
-       #CMP  R2,$32
-       #BEQ  ShowSpriteReconfigure_128px
-        CMP  R2,$2
-        BEQ  ShowSpriteReconfigure_8px
-        CMP  R2,$4
-        BEQ  ShowSpriteReconfigure_16px
+        MOV  R2,@$SpriteSizeConfig6
+        JMP  @ShowSpriteReconfigureVectors-2(R2)
 
-        RETURN
+ShowSpriteReconfigureVectors:
+       .word ShowSpriteReconfigure_8px  #  2 bytes wide
+       .word ShowSpriteReconfigure_16px #  4 bytes wide
+       .word ShowSpriteReconfigure_24px #  6 bytes wide
+       .word ShowSpriteReconfigure_32px #  8 bytes wide
+       .word null                       # 10 bytes wide
+       .word ShowSpriteReconfigure_48px # 12 bytes wide
+       .word null                       # 14 bytes wide
+       .word null                       # 16 bytes wide
+       .word null                       # 18 bytes wide
+       .word null                       # 20 bytes wide
+       .word null                       # 22 bytes wide
+       .word ShowSpriteReconfigure_96px # 24 bytes wide
 
 ShowSpriteReconfigure_128px: # Not actually used!
        #MOV  $184-64,R2
