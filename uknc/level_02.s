@@ -570,27 +570,26 @@ GradientBottom:                                                 # GradientBottom
    .word 0xFFFF                                                 # defb 255
 #---------------------------------------------------------------#
 BluePalette: #---------------------------------------------------------------{{{
-    .word 0, cursorGraphic, scale320 | 0b000
+    .word 0, cursorGraphic, scale320 | rgb
     .byte 1, setColors, Black, Blue, Blue, Magenta
     .word endOfScreen
 #----------------------------------------------------------------------------}}}
-DarkRealPalette: #---- ------------------------------------------------------{{{
-    .word   0, cursorGraphic, scale320 | 0b000
-    .byte   1, setColors, Black, brBlue, brYellow, White
-    .byte  49, setColors, Black, Magenta, Blue, White
-    .byte 129, setColors, Black, brRed, brCyan, White
+DarkRealPalette: #-----------------------------------------------------------{{{
+    .word   0, cursorGraphic, scale320 | rgb
+    .byte   1, setColors, Black, brBlue,  Gray, White
+    .byte  65, setColors, Black, Magenta, Gray, White
+    .byte 160, setColors, Black, Red,     Gray, White
     .word endOfScreen
 #----------------------------------------------------------------------------}}}
 RealPalette: #---------------------------------------------------------------{{{
-    .word   0, cursorGraphic, scale320 | 0b111
-    .byte   1, setColors, Black, brBlue, brYellow, White
-    .word  32, cursorGraphic, scale320 | 0b110
-    .byte  40, setColors, Black, brBlue, Magenta, White
-    .word  64, cursorGraphic, scale320 | 0b111
-    .byte  65, setColors, Black, Magenta, Blue, White
-    .word 142, cursorGraphic, scale320 | 0b011
-    .byte 143, setColors, Black, brRed, brCyan, White
-    .word 178, cursorGraphic, scale320 | 0b111
+    .byte   0, setOffscreenColors
+    .word      BLACK  | BR_BLUE    << 4 | BR_GREEN  << 8 | BR_CYAN << 12
+    .word      BR_RED | BR_MAGENTA << 4 | BR_YELLOW << 8 | WHITE   << 12
+
+    .word   0, cursorGraphic, scale320 | RGB
+    .byte   1, setColors, Black, brBlue,  Gray, White
+    .byte  65, setColors, Black, Magenta, Gray, White
+    .byte 160, setColors, Black, Red,     Gray, White
     .word endOfScreen
 #----------------------------------------------------------------------------}}}
                                             # SmartBombColorMap:      ;Smartbomb colors (all white)
