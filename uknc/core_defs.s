@@ -167,23 +167,69 @@
 .equiv scale320, 0x10
 .equiv scale160, 0x20
 .equiv scale80,  0x30
+    .ifdef RGBpalette
+.equiv rgb, 0b000
+.equiv rgB, 0b001
+.equiv rGb, 0b010
+.equiv rGB, 0b011
+.equiv Rgb, 0b100
+.equiv RgB, 0b101
+.equiv RGb, 0b110
+.equiv RGB, 0b111
+    .else
+.equiv rgb, 0b000
+.equiv rgB, 0b001
+.equiv rGb, 0b100
+.equiv rGB, 0b101
+.equiv Rgb, 0b010
+.equiv RgB, 0b011
+.equiv RGb, 0b110
+.equiv RGB, 0b111
+    .endif
 #-------------------------------------------------------------------------------
 .equiv setColors, 1
-.equiv Black,     0x00
-.equiv Blue,      0x11
-.equiv Green,     0x22
-.equiv Cyan,      0x33
-.equiv Red,       0x44
-.equiv Magenta,   0x55
-.equiv Yellow,    0x66
-.equiv Gray,      0x77
-.equiv brBlue,    0x99
-.equiv brGreen,   0xAA
-.equiv brCyan,    0xBB
-.equiv brRed,     0xCC
-.equiv brMagenta, 0xDD
-.equiv brYellow,  0xEE
-.equiv White,     0xFF
+    .ifdef RGBpalette
+.equiv BLACK,   0b000 # 0x0
+.equiv BLUE,    0b001 # 0x1
+.equiv GREEN,   0b010 # 0x2
+.equiv CYAN,    0b011 # 0x3
+.equiv RED,     0b100 # 0x4
+.equiv MAGENTA, 0b101 # 0x5
+.equiv YELLOW,  0b110 # 0x6
+.equiv GRAY,    0b111 # 0x7
+    .else
+.equiv BLACK,   0b000 # 0x0
+.equiv BLUE,    0b001 # 0x1
+.equiv RED,     0b010 # 0x2
+.equiv MAGENTA, 0b011 # 0x3
+.equiv GREEN,   0b100 # 0x4
+.equiv CYAN,    0b101 # 0x5
+.equiv YELLOW,  0b110 # 0x6
+.equiv GRAY,    0b111 # 0x7
+    .endif
+.equiv BR_BLUE,    010 | BLUE    # 0x9
+.equiv BR_RED,     010 | RED     # 0xC
+.equiv BR_MAGENTA, 010 | MAGENTA # 0xD
+.equiv BR_GREEN,   010 | GREEN   # 0xA
+.equiv BR_CYAN,    010 | CYAN    # 0xB
+.equiv BR_YELLOW,  010 | YELLOW  # 0xE
+.equiv WHITE,      010 | GRAY    # 0xF
+
+.equiv Black,     BLACK      << 4 | BLACK
+.equiv Blue,      BLUE       << 4 | BLUE
+.equiv Green,     GREEN      << 4 | GREEN
+.equiv Cyan,      CYAN       << 4 | CYAN
+.equiv Red,       RED        << 4 | RED
+.equiv Magenta,   MAGENTA    << 4 | MAGENTA
+.equiv Yellow,    YELLOW     << 4 | YELLOW
+.equiv Gray,      GRAY       << 4 | GRAY
+.equiv brBlue,    BR_BLUE    << 4 | BR_BLUE
+.equiv brGreen,   BR_GREEN   << 4 | BR_GREEN
+.equiv brCyan,    BR_CYAN    << 4 | BR_CYAN
+.equiv brRed,     BR_RED     << 4 | BR_RED
+.equiv brMagenta, BR_MAGENTA << 4 | BR_MAGENTA
+.equiv brYellow,  BR_YELLOW  << 4 | BR_YELLOW
+.equiv White,     WHITE      << 4 | WHITE
 
 .equiv setOffscreenColors, 2
 

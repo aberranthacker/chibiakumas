@@ -92,14 +92,13 @@ EventStreamArray:
     .word evtSetPalette, RealPalette
 
     #----------
-   #.word 3, evtChangeStreamTime, 49, StartPoint
+    .word 3, evtChangeStreamTime, 256+245+15, DebugStartPoint
     #----------
 
     .word 10, evtCallAddress, ShowText1Init
 
     .word 49, evtCallAddress, ShowText0Init
 
-StartPoint:
     .word 50, evtSetPalette, ChibikoAttacksPalette
     # flying Chibiko
     .word 50, evtMultipleCommands | 4
@@ -166,6 +165,7 @@ StartIntroProper:
     .word 256+155+15, evtCallAddress, ShowText15Init # lightning1
     .word 256+185+15, evtCallAddress, ShowText16Init # lightning2
     .word 256+215+15, evtCallAddress, ShowText17Init # heaven
+DebugStartPoint:
     .word 256+245+15, evtCallAddress, ShowText18Init # hell
     .word 512+ 20+15, evtCallAddress, ShowText19Init # chibiko
     .word 512+ 50+15, evtCallAddress, ShowText20Init # chibiko nosferatu
@@ -546,405 +546,143 @@ Clear4000: #-----------------------------------------------------------------{{{
         MOV  (SP)+,R0
 
         RETURN
-#-----------------------------------------------------------------------------}}}
-
-BlackPalette: #---------------------------------------------------------------{{{
-    .byte 1, 1    # line number,  set colors
-    .byte 0x00, 0x00, 0x00, 0x00
-    .byte 201     #--line number, 201 - end of the main screen params
-    .even
 #----------------------------------------------------------------------------}}}
-BluePalette: #---------------------------------------------------------------{{{
-    .byte 0, 0    # line number, set cursor/scale/palette
-    .word 0b10000 #  graphical cursor
-    .word 0b10000 #  320 dots per line, pallete 0
 
-    .byte 1, 1    # line number, set colors
-    .byte 0x00, 0x11, 0x11, 0x55
-    .byte 201     #--line number, 201 - end of the main screen params
-    .even
-#----------------------------------------------------------------------------}}}
-DarkRealPalette: #-----------------------------------------------------------{{{
-    .byte 0, 0    #  line number, 0 - set cursor/scale/palette
-    .word 0b10000 #  graphical cursor
-    .word 0b10000 #  320 dots per line, pallete 0
-
-    .byte 1, 1    # line number, set colors
-    .byte 0x00, 0xDD, 0xAA, 0xFF
-    .byte 201     #--line number, 201 - end of the main screen params
-    .even
-#----------------------------------------------------------------------------}}}
-RealPalette: #---------------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10    #  graphical cursor, YRGB color
-    .word 0b10100 #  320 dots per line, pallete 4
-
-    .byte 1, 1    # line number, set colors
-    .byte 0x00, 0xEE, 0xDD, 0xFF
-
-    .byte 0121,1  #--line number, set colors
-    .byte 0x00, 0xDD, 0xAA, 0xFF
-
-    .byte 201     #--line number, 201 - end of the main screen params
-    .even
-#----------------------------------------------------------------------------}}}
-ChibikoAttacksPalette: #-----------------------------------------------------{{{
-    .byte 1, 1
-    .byte 0x00, 0x55, 0x99, 0xFF
-
-    .byte 88,-1   #line number, leave palette unchanged starting the line
-    .even
-#----------------------------------------------------------------------------}}}
-ChibikoAttacksPalette2: #----------------------------------------------------{{{
-    .byte 88, 1
-    .byte 0x00, 0xCC, 0xAA, 0x77
-
-    .byte 180, 1
-    .byte 0x00, 0x44, 0xCC, 0x77
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-WhenYouDiePalette: #---------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10    #  graphical cursor, YRGB color
-    .word 0b10000 #  320 dots per line, pallete 3
-
-    .byte 1, 1
-    .byte 0x00, 0x55, 0xFF, 0xFF
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-IfYoureGoodPalette: #--------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10    #  graphical cursor, YRGB color
-    .word 0b10010 #  320 dots per line, pallete 1
-
-    .byte 1, 1
-    .byte 0x00, 0x33, 0xBB, 0xFF
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-IfYoureBadPalette: #---------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10    #  graphical cursor, YRGB color
-    .word 0b10100 #  320 dots per line, pallete 1
-
-    .byte 1, 1
-    .byte 0x00, 0x44, 0xCC, 0xFF
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-OtherOptionPalette: #--------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10    #  graphical cursor, YRGB color
-    .word 0b10011 #  320 dots per line, pallete 1
-
-    .byte 1, 1
-    .byte 0x00, 0x55, 0xDD, 0xFF
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-PhotoChibiko1Palette: #------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10    #  graphical cursor, YRGB color
-    .word 0x10 | 0b101  #  320 dots per line, pallete RGB components
-
-    .byte 1, 1
-    .byte 0x00, 0x55, 0xBB, 0xFF
-
-    .byte 99, 0   # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, cursor color YRGB
-    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
-
-    .byte 100, 1
-    .byte 0x00, 0xEE, 0xBB, 0xFF
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-FishingPalette: #------------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
-
-    .byte 1, 1
-    .byte 0x00, 0x11, 0xBB, 0xFF
-    .byte 52, 1
-    .byte 0x00, 0x55, 0xBB, 0xFF
-    .byte 78, 1
-    .byte 0x00, 0x22, 0xBB, 0xFF
-
-    .byte 99, 0   # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, cursor color YRGB
-    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
-
-    .byte 100, 1
-    .byte 0x00, 0xEE, 0xBB, 0xFF
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-CampingPalette: #------------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b100  #  320 dots per line, pallete RGB components
-
-    .byte 1, 1
-    .byte 0x00, 0xCC, 0xEE, 0xFF # 000 F00 F90 FFB
-
-    .byte 99, 0   # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, cursor color YRGB
-    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
-
-    .byte 100, 1
-    .byte 0x00, 0xEE, 0xBB, 0xFF
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-PrankPalette: #--------------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b101  #  320 dots per line, pallete RGB components
-
-    .byte 1, 1
-    .byte 0x00, 0x55, 0xBB, 0xFF
-    .byte 38, 1
-    .byte 0x00, 0xAA, 0xBB, 0xFF
-
-    .byte 70, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
-
-    .byte 73, 1
-    .byte 0x00, 0x22, 0x33, 0xFF
-
-    .byte 100, 1
-    .byte 0x00, 0xEE, 0xBB, 0xFF
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-School1Palette: #------------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b001  #  320 dots per line, pallete RGB components
-
-    .byte 1, 1
-    .byte 0x00, 0x99, 0xDD, 0xFF
-
-    .byte 99, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
-
-    .byte 100, 1
-    .byte 0x00, 0xEE, 0xBB, 0xFF
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-BulbsPalette: #--------------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b101  #  320 dots per line, pallete RGB components
-
-    .byte 1, 1
-    .byte 0x00, 0x77, 0x22, 0xFF
-    .byte 30, 1
-    .byte 0x00, 0x55, 0xBB, 0xFF
-    .byte 70, 1
-    .byte 0x00, 0x22, 0x22, 0xFF
-
-    .byte 99, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
-
-    .byte 100, 1
-    .byte 0x00, 0xEE, 0xBB, 0xFF
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-PlanePalette: #--------------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
-
-    .byte 1, 1
-    .byte 0x00, 0xCC, 0xAA, 0xFF
-
-    .byte 100, 1
-    .byte 0x00, 0xEE, 0xBB, 0xFF
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-School2Palette: #------------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b100  #  320 dots per line, pallete RGB components
-
-    .byte 1, 1
-    .byte 0x00, 0xCC, 0xEE, 0xFF
-
-    .byte 99, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
-
-    .byte 100, 1
-    .byte 0x00, 0xEE, 0xBB, 0xFF
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-Lightning1Palette: #---------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
-
-    .byte 1, 1
-    .byte 0x00, 0x77, 0x22, 0xFF
-    .byte 30, 1
-    .byte 0x00, 0x55, 0x33, 0xFF
-    .byte 85, 1
-    .byte 0x00, 0x22, 0x22, 0xFF
-
-    .byte 99, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
-
-    .byte 100, 1
-    .byte 0x00, 0xEE, 0xBB, 0xFF
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-Lightning2Palette: #---------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
-
-    .byte 1, 1
-    .byte 0x00, 0x77, 0xEE, 0xFF
-    .byte 85, 1
-    .byte 0x00, 0x22, 0x22, 0xFF
-
-    .byte 99, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
-
-    .byte 100, 1
-    .byte 0x00, 0xEE, 0xBB, 0xFF
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-HeavenPalette: #-------------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
-
-    .byte 1, 1
-    .byte 0x00, 0x55, 0xBB, 0xFF
-
-    .byte 99, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
-
-    .byte 100, 1
-    .byte 0x00, 0x55, 0xBB, 0xFF
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-HellPalette: #---------------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b101  #  320 dots per line, pallete RGB components
-
-    .byte 1, 1
-    .byte 0x00, 0x55, 0xCC, 0xEE
-
-    .byte 99, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
-
-    .byte 100, 1
-    .byte 0x00, 0x55, 0xDD, 0xFF
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-PhotoChibiko2Palette: #------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b101  #  320 dots per line, pallete RGB components
-
-    .byte 1, 1
-    .byte 0x00, 0x55, 0xBB, 0xFF
-
-    .byte 99, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
-
-    .byte 100, 1
-    .byte 0x00, 0x55, 0xDD, 0xFF
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-PhotoChibiko3Palette: #------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
-
-    .byte 1, 1
-    .byte 0x00, 0x55, 0xBB, 0xFF
-    .byte 40, 1
-    .byte 0x00, 0x55, 0xCC, 0xFF
-    .byte 57, 1
-    .byte 0x00, 0x55, 0xBB, 0xFF
-
-    .byte 99, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b111  #  320 dots per line, pallete RGB components
-
-    .byte 100, 1
-    .byte 0x00, 0x55, 0xDD, 0xFF
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-HauntingPalette: #-----------------------------------------------------------{{{
-    .byte 0, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b101  #  320 dots per line, pallete RGB components
-
-    .byte 1, 1
-    .byte 0x00, 0x55, 0xBB, 0xFF
-    .byte 47, 1
-    .byte 0x00, 0xCC, 0xBB, 0xFF
-
-    .byte 99, 0    # line number, 0 - set cursor/scale/palette
-    .word 0x10 | 0b0000 #  graphical cursor, YRGB color
-    .word 0x10 | 0b011  #  320 dots per line, pallete RGB components
-
-    .byte 100, 1
-    .byte 0x00, 0x55, 0xDD, 0xFF
-
-    .byte 201
-    .even
-#----------------------------------------------------------------------------}}}
-# 9 br.     # A br.     # B br.     # C br.     # D br.     # E br.     # F white
-# 1 blue    # 2 green   # 3 cyan    # 4 red     # 5 magenta # 6 yellow  # 7 gray
-#
-# 54=000, 5D=80F, 40=888, 4B=FFF
-# 54=000, 53=0FF, 5B=8FF, 4B=FFF
-
+BlackPalette: #-----------------------------------------------------------------
+    .byte   1, setColors, Black, Black, Black, Black
+    .word endOfScreen
+BluePalette: #------------------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | rgb
+    .byte   1, setColors, Black, Blue, Blue, Magenta
+    .word endOfScreen
+DarkRealPalette: #--------------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | Rgb
+    .byte   1, setColors, Black, Magenta, Green, Gray
+    .word endOfScreen
+RealPalette: #------------------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | Rgb
+    .byte   1, setColors, Black, brYellow,  brMagenta, White
+    .byte 110, setColors, Black, brMagenta, brGreen,   White
+    .byte 131, setColors, Black, brRed,     brMagenta, White
+    .word endOfScreen
+ChibikoAttacksPalette: #--------------------------------------------------------
+    .byte   1, setColors, Black, Magenta, brBlue, White
+    .word untilLine | 88 # leave palette unchanged starting the line
+ChibikoAttacksPalette2: #-------------------------------------------------------
+    .byte  88, setColors, Black, brRed, brGreen, Gray
+    .byte 180, setColors, Black, Red, brRed, Gray
+    .word endOfScreen
+WhenYouDiePalette: #------------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | rgb
+    .byte   1, setColors, Black, Magenta, White, White
+    .word endOfScreen
+IfYoureGoodPalette: #-----------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | rGb
+    .byte   1, setColors, Black, Cyan, brCyan, White
+    .word endOfScreen
+IfYoureBadPalette: #------------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | Rgb
+    .byte   1, setColors, Black, Red, brRed, White
+    .word endOfScreen
+OtherOptionPalette: #-----------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | rGB
+    .byte   1, setColors, Black, Magenta, brMagenta, White
+    .word endOfScreen
+PhotoChibiko1Palette: #---------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | RgB
+    .byte   1, setColors, Black, Magenta,  brCyan, White
+    .word  99, cursorGraphic, scale320 | RGB
+    .byte 100, setColors, Black, brYellow, brCyan, White
+    .word endOfScreen
+FishingPalette: #---------------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | RGB
+    .byte   1, setColors, Black, Blue,     brCyan, White
+    .byte  52, setColors, Black, Magenta,  brCyan, White
+    .byte  78, setColors, Black, Green,    brCyan, White
+    .byte 100, setColors, Black, brYellow, brCyan, White
+    .word endOfScreen
+CampingPalette: #---------------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | Rgb
+    .byte   1, setColors, Black, brRed, brYellow, White
+    .word  99, cursorGraphic, scale320 | RGB
+    .byte 100, setColors, Black, brYellow, brCyan, White
+    .word endOfScreen
+PrankPalette: #-----------------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | RgB
+    .byte   1, setColors, Black, Magenta,  brCyan, White
+    .byte  38, setColors, Black, brGreen,  brCyan, White
+    .word  70, cursorGraphic, scale320 | RGB
+    .byte  73, setColors, Black, Green,    brCyan, White
+    .byte 100, setColors, Black, brYellow, brCyan, White
+    .word endOfScreen
+School1Palette: #---------------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | rgB
+    .byte   1, setColors, Black, brBlue, brMagenta, White
+    .word  99, cursorGraphic, scale320 | RGB
+    .byte 100, setColors, Black, brYellow, brCyan, White
+    .word endOfScreen
+BulbsPalette: #-----------------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | RgB
+    .byte   1, setColors, Black, Gray, Green, White
+    .byte  30, setColors, Black, Magenta, brCyan, White
+    .byte  70, setColors, Black, Green, Green, White
+    .word  99, cursorGraphic, scale320 | RGB
+    .byte 100, setColors, Black, brYellow, brCyan, White
+    .word endOfScreen
+PlanePalette: #-----------------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | RGB
+    .byte   1, setColors, Black, brRed, brGreen, White
+    .byte 100, setColors, Black, brYellow, brCyan, White
+    .word endOfScreen
+School2Palette: #---------------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | Rgb
+    .byte   1, setColors, Black, brRed, brYellow, White
+    .word  99, cursorGraphic, scale320 | RGB
+    .byte 100, setColors, Black, brYellow, brCyan, White
+    .word endOfScreen
+Lightning1Palette: #------------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | RGB
+    .byte   1, setColors, Black, Gray,     Green,  White
+    .byte  30, setColors, Black, Magenta,  Cyan,   White
+    .byte  85, setColors, Black, Green,    Green,  White
+    .byte 100, setColors, Black, brYellow, brCyan, White
+    .word endOfScreen
+Lightning2Palette: #------------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | RGB
+    .byte   1, setColors, Black, Gray,     brYellow, White
+    .byte  85, setColors, Black, Green,    Green,    White
+    .byte 100, setColors, Black, brYellow, brCyan,   White
+    .word endOfScreen
+HeavenPalette: #----------------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | RGB
+    .byte   1, setColors, Black, Magenta, brCyan, White
+    .word endOfScreen
+HellPalette: #------------------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | RgB
+    .byte   1, setColors, Black, Magenta, brRed,     brYellow
+    .word  99, cursorGraphic, scale320 | RGB
+    .byte 100, setColors, Black, Magenta, brMagenta, White
+    .word endOfScreen
+PhotoChibiko2Palette: #---------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | RgB
+    .byte   1, setColors, Black, Magenta, brCyan, White
+    .word  99, cursorGraphic, scale320 | RGB
+    .byte 100, setColors, Black, Magenta, brMagenta, White
+    .word endOfScreen
+PhotoChibiko3Palette: #---------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | RGB
+    .byte   1, setColors, Black, Magenta, brCyan,    White
+    .byte  40, setColors, Black, Magenta, brRed,     White
+    .byte  57, setColors, Black, Magenta, brCyan,    White
+    .byte 100, setColors, Black, Magenta, brMagenta, White
+    .word endOfScreen
+HauntingPalette: #--------------------------------------------------------------
+    .word   0, cursorGraphic, scale320 | RgB
+    .byte   1, setColors, Black, Magenta, brCyan,    White
+    .byte  47, setColors, Black, brRed,   brCyan,    White
+    .word  99, cursorGraphic, scale320 | rGB
+    .byte 100, setColors, Black, Magenta, brMagenta, White
+    .word endOfScreen
+#-------------------------------------------------------------------------------
     .even
 end:

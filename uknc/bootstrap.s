@@ -762,19 +762,21 @@ BulletConfigHell_End:
 #----------------------------------------------------------------------------}}}
 
 BlackPalette: #------------------------------------------------------{{{
-    .word 1 | setOffscreenColors << 8, 0x0010, 0x0000
+    .byte 1, setOffscreenColors
+    .word    BLACK | BLUE  << 4 | BLACK << 8 | BLACK << 12
+    .word    BLACK | BLACK << 4 | BLACK << 8 | BLACK << 12
     .byte 1, setColors, Black, Black, Black, Black
     .word untilEndOfScreen
 #----------------------------------------------------------------------------}}}
 TitleScreenPalette: #--------------------------------------------------------{{{
-    .word   0, cursorGraphic, scale320 | 0b101
-    .byte   1, setColors, Black, brBlue, brRed, White
-    .byte  49, setColors, Black, Magenta, Blue, White
+    .word   0, cursorGraphic, scale320 | RgB
+    .byte   1, setColors, Black, brBlue,  brRed,     White
+    .byte  49, setColors, Black, Magenta, Blue,      White
     .byte  63, setColors, Black, Magenta, brMagenta, White
-    .byte  95, setColors, Black, Green, brCyan, White
-    .byte 185, setColors, Black, Green, Black, White
-    .byte 192, setColors, Black, Green, brCyan, White
-    .byte 196, setColors, Black, Green, brRed, White
+    .byte  95, setColors, Black, Green,   brCyan,    White
+    .byte 185, setColors, Black, Green,   Black,     White
+    .byte 192, setColors, Black, Green,   brCyan,    White
+    .byte 196, setColors, Black, Green,   brRed,     White
     .word untilEndOfScreen
 #----------------------------------------------------------------------------}}}
     .incbin "build/continue.bin.lzsa1"

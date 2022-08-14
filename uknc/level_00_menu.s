@@ -431,33 +431,33 @@ WaitKey: #-------------------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 
 TitleScreenPalette: #--------------------------------------------------------{{{
-    .word   0, cursorGraphic, scale320 | 0b101
-    .byte   1, setColors, Black, brBlue, brRed, White
-    .byte  49, setColors, Black, Magenta, Blue, White
+    .word   0, cursorGraphic, scale320 | RgB
+    .byte   1, setColors, Black, brBlue,  brRed,     White
+    .byte  49, setColors, Black, Magenta, Blue,      White
     .byte  63, setColors, Black, Magenta, brMagenta, White
-    .byte  95, setColors, Black, Green, brCyan, White
-    .byte 185, setColors, Black, Green, Black, White
-    .byte 192, setColors, Black, Green, brCyan, White
-    .byte 196, setColors, Black, Green, brRed, White
+    .byte  95, setColors, Black, Green,   brCyan,    White
+    .byte 185, setColors, Black, Green,   Black,     White
+    .byte 192, setColors, Black, Green,   brCyan,    White
+    .byte 196, setColors, Black, Green,   brRed,     White
     .word endOfScreen
 #----------------------------------------------------------------------------}}}
 MenuPalette: #---------------------------------------------------------------{{{
-    .word   0, cursorGraphic, scale320 | 0b111
+    .word   0, cursorGraphic, scale320 | RGB
     .byte   1, setColors, Black, brMagenta, brYellow, White
-    .byte  40, setColors, Black, brRed, brCyan, White
-    .byte  60, setColors, Black, Red, brCyan, White
-    .byte  67, setColors, Black, Magenta, brRed, White
-    .byte  88, setColors, Black, Magenta, brCyan, White
-    .byte 105, setColors, Black, Magenta, Cyan, White
-    .byte 117, setColors, Black, Gray, Cyan, White
-    .word 120, cursorGraphic, scale320 | 0b011
-    .byte 121, setColors, Black, Gray, brMagenta, White
-    .byte 129, setColors, Black, Gray, Magenta, White
-    .word 137, cursorGraphic, scale320 | 0b111
-    .byte 138, setColors, Black, Gray, Red, brGreen
-    .byte 145, setColors, Black, Gray, brRed, brGreen
-    .word 190, cursorGraphic, scale320 | 0b101
-    .byte 191, setColors, Black, Yellow, brYellow, White
+    .byte  40, setColors, Black, brRed,     brCyan, White
+    .byte  60, setColors, Black, Red,       brCyan, White
+    .byte  67, setColors, Black, Magenta,   brRed, White
+    .byte  88, setColors, Black, Magenta,   brCyan, White
+    .byte 105, setColors, Black, Magenta,   Cyan, White
+    .byte 117, setColors, Black, Gray,      Cyan, White
+    .word 120, cursorGraphic, scale320 | rGB
+    .byte 121, setColors, Black, Gray,      brMagenta, White
+    .byte 129, setColors, Black, Gray,      Magenta, White
+    .word 137, cursorGraphic, scale320 | RGB
+    .byte 138, setColors, Black, Gray,      Red, brGreen
+    .byte 145, setColors, Black, Gray,      brRed, brGreen
+    .word 190, cursorGraphic, scale320 | RgB
+    .byte 191, setColors, Black, Yellow,    brYellow, White
     .word endOfScreen
 #----------------------------------------------------------------------------}}}
 FireKeyBrightPalette: #------------------------------------------------------{{{
