@@ -76,8 +76,9 @@
 .equiv evtSetPalette, (0x20 * 2) << 8 # 64
                                         # evtReprogramPlusPalette equ %11110001 ; Reprogram the CPC PLUS palette
                                         #
-                                        # evtReprogramHitHandler  equ %11110010 ; Define Custom hit handler as call to w1,
-                                        #                                       ; used for boss battles
+# evtReprogramHitHandler  equ %11110010 ; Define Custom hit handler as call to w1,
+#                                       ; used for boss battles
+.equiv evtReprogramHitHandler, (0x22 * 2) << 8 # 66
                                         # evtReprogramShotToDeath equ %11110011 ; Define Custom destroy object event as call
                                         #                                       ; to w1, used for nuke satellite, and lasers
                                         #                                       ; in Ep2 Tech Noir level

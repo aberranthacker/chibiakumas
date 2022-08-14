@@ -325,7 +325,7 @@ ObjectLoop_AgelessIXLCheck:
 ObjectLoopP1StarSkip:
        .equiv ObjectLoop_IFShot, .
         BR   ObjectLoop_NotShot          # jr $+10 :ObjectLoop_IFShot_Plus1 ; 18 08 = JR 8
-       .equiv dstObjectShotOverride, .+2
+       .equiv dstObjectShotOverride, .+2  # resets by bootstrap
         CALL @$Object_DecreaseLifeShot    # call Object_DecreaseLifeShot :ObjectShotOverride_Plus2 ;3 bytes
                                           # ld a,8                             ;2 bytes
         MOVB $5,@$ObjectLoop_IFShot # BR ObjectLoop_NotShot # ld (ObjectLoop_IFShot_Plus1 -1 ),a ;3 bytes

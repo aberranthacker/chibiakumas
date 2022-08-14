@@ -268,7 +268,7 @@ Event_CoreReprogram_ShotToDeath:
         RETURN # to Event_LoadNextEvt
 
 Event_CoreReprogram_ObjectHitHandler:
-       #MOV  (R5)+,@$ObjectShotOverride_Plus2 - 2
+        MOV  (R5)+,@$dstObjectShotOverride
         RETURN # to Event_LoadNextEvt
 
 Event_CoreReprogram_Palette:

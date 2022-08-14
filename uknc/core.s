@@ -102,22 +102,22 @@ Event_VectorArray:
        .word Event_SetAnimator                   # 0x1E 0x3C  evtSetAnimator
        .word Event_CoreReprogram_AnimatorPointer # 0x1F 0x3E    defw Event_CoreReprogram_AnimatorPointer
 # Event_ReprogramVector:
-       .word Event_CoreReprogram_Palette        # 0x20 0x40
-       .word null                               # 0x21 0x42  Obsolete - Reserver for Plus Palette
-       .word not_implemented_check_R0           # 0x22 0x44  defw Event_CoreReprogram_ObjectHitHandler
-       .word not_implemented_check_R0           # 0x23 0x46  defw Event_CoreReprogram_ShotToDeath
-       .word Event_CoreReprogram_CustomMove1    # 0x24 0x48  mveCustom1
-       .word Event_CoreReprogram_CustomMove2    # 0x25 0x4A  mveCustom2
-       .word Event_CoreReprogram_PowerupSprites # 0x26 0x4C  defw Event_CoreReprogram_PowerupSprites
-       .word Event_CoreReprogram_CustomMove3    # 0x27 0x4E  mveCustom3
-       .word Event_CoreReprogram_CustomMove4    # 0x28 0x50  mveCustom4
-       .word not_implemented_check_R0           # 0x29 0x52  defw Event_CustomProgram1
-       .word not_implemented_check_R0           # 0x2A 0x54  defw Event_CustomProgram2
-       .word not_implemented_check_R0           # 0x2B 0x56  defw Event_CustomPlayerHitter
-       .word not_implemented_check_R0           # 0x2C 0x58  defw Event_CustomSmartBomb
-       .word not_implemented_check_R0           # 0x2D 0x5A  defw Event_ReprogramObjectBurstPosition
-       .word not_implemented_check_R0           # 0x2E 0x5C  defw Event_ObjectFullCustomMoves
-       .word not_implemented_check_R0           # 0x2F 0x5E  defw Event_SmartBombSpecial
+       .word Event_CoreReprogram_Palette          # 0x20 0x40
+       .word null                                 # 0x21 0x42  Obsolete - Reserver for Plus Palette
+       .word Event_CoreReprogram_ObjectHitHandler # 0x22 0x44  defw Event_CoreReprogram_ObjectHitHandler
+       .word not_implemented_check_R0             # 0x23 0x46  defw Event_CoreReprogram_ShotToDeath
+       .word Event_CoreReprogram_CustomMove1      # 0x24 0x48  mveCustom1
+       .word Event_CoreReprogram_CustomMove2      # 0x25 0x4A  mveCustom2
+       .word Event_CoreReprogram_PowerupSprites   # 0x26 0x4C  defw Event_CoreReprogram_PowerupSprites
+       .word Event_CoreReprogram_CustomMove3      # 0x27 0x4E  mveCustom3
+       .word Event_CoreReprogram_CustomMove4      # 0x28 0x50  mveCustom4
+       .word not_implemented_check_R0             # 0x29 0x52  defw Event_CustomProgram1
+       .word not_implemented_check_R0             # 0x2A 0x54  defw Event_CustomProgram2
+       .word not_implemented_check_R0             # 0x2B 0x56  defw Event_CustomPlayerHitter
+       .word not_implemented_check_R0             # 0x2C 0x58  defw Event_CustomSmartBomb
+       .word not_implemented_check_R0             # 0x2D 0x5A  defw Event_ReprogramObjectBurstPosition
+       .word not_implemented_check_R0             # 0x2E 0x5C  defw Event_ObjectFullCustomMoves
+       .word not_implemented_check_R0             # 0x2F 0x5E  defw Event_SmartBombSpecial
 
 null:   RETURN
 
@@ -148,6 +148,7 @@ not_implemented_check_R0:
        .global EventObjectProgramToAdd
        .global EventObjectSpriteSizeToAdd
        .global Event_LevelTime
+       .global SetLevelTime
 
        .include "core/execute_bootstrap.s"
        .global ExecuteBootstrap
@@ -238,7 +239,7 @@ not_implemented_check_R0:
        .global GetSpriteMempos
 
        .even
-       .space 2
+      #.space 2
 end: FileEndCore:
 
 LevelStart:

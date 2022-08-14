@@ -7,7 +7,7 @@
     .byte 0  # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET  # attributes
+    .byte SPR_TURBO  # attributes
 
    # sprite 1 Coin
     .word Coin # sprite offset
@@ -15,7 +15,7 @@
     .byte 16 # height of the sprite
     .byte 0  # Y offset
     .byte 4  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
    # sprite 2 Skull healthy
     .word Skull100A # sprite offset
@@ -23,7 +23,7 @@
     .byte 64 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
    # sprite 3 Skull healthy
     .word Skull100B # sprite offset
@@ -31,7 +31,7 @@
     .byte 64 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
    # sprite 4
     .word LegsLeftA # sprite offset
@@ -39,7 +39,7 @@
     .byte 40 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
    # sprite 5
     .word LegsLeftB # sprite offset
@@ -47,7 +47,7 @@
     .byte 40 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
    # sprite 6
     .word LegsLeftC # sprite offset
@@ -55,7 +55,7 @@
     .byte 40 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
    # sprite 7
     .word LegsRightA # sprite offset
@@ -63,7 +63,7 @@
     .byte 40 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
    # sprite 8
     .word LegsRightB # sprite offset
@@ -71,7 +71,7 @@
     .byte 40 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
    # sprite 9
     .word LegsRightC # sprite offset
@@ -79,7 +79,7 @@
     .byte 40 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
    # sprite 10
     .word HandUp # sprite offset
@@ -87,7 +87,7 @@
     .byte 19 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
    # sprite 11
     .word HandDown # sprite offset
@@ -95,7 +95,7 @@
     .byte 19 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
    # sprite 12
     .word HandLeft # sprite offset
@@ -103,7 +103,7 @@
     .byte 19 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
    # sprite 13
     .word HandRight # sprite offset
@@ -111,7 +111,7 @@
     .byte 19 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
    # sprite 14
     .word Skull80A # sprite offset
@@ -119,15 +119,15 @@
     .byte 64 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
    # sprite 15
-    .word Skull80B # sprite offset
+    .word Skull100B # sprite offset
     .word 0  # bit-mask offset
     .byte 64 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
    # sprite 16
     .word Skull60B # sprite offset
@@ -135,7 +135,7 @@
     .byte 64 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
    # sprite 17
     .word Skull40B # sprite offset
@@ -143,7 +143,7 @@
     .byte 64 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
    # sprite 18
     .word Skull20B # sprite offset
@@ -151,15 +151,15 @@
     .byte 64 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
-   # sprite 19
-    .word Skull0A # sprite offset
+   # sprite 19 not used
+    .word Skull0B # sprite offset
     .word 0  # bit-mask offset
     .byte 64 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
    # sprite 20
     .word Skull0B # sprite offset
@@ -167,55 +167,55 @@
     .byte 64 # height of the sprite
     .byte 0  # Y offset
     .byte 6  # width
-    .byte SPR_PSET # attributes
+    .byte SPR_TURBO # attributes
 
-#   # sprite 21
-#    .word Skull100C # sprite offset
-#    .word 0  # bit-mask offset
-#    .byte 51 # height of the sprite
-#    .byte 0  # Y offset
-#    .byte 6  # width
-#    .byte SPR_PSET # attributes
-#
-#   # sprite 22
-#    .word Skull80C # sprite offset
-#    .word 0  # bit-mask offset
-#    .byte 51 # height of the sprite
-#    .byte 0  # Y offset
-#    .byte 6  # width
-#    .byte SPR_PSET # attributes
-#
-#   # sprite 23
-#    .word Skull60C # sprite offset
-#    .word 0  # bit-mask offset
-#    .byte 51 # height of the sprite
-#    .byte 0  # Y offset
-#    .byte 6  # width
-#    .byte SPR_PSET # attributes
-#
-#   # sprite 24
-#    .word Skull40C # sprite offset
-#    .word 0  # bit-mask offset
-#    .byte 51 # height of the sprite
-#    .byte 0  # Y offset
-#    .byte 6  # width
-#    .byte SPR_PSET # attributes
-#
-#   # sprite 25
-#    .word Skull20C # sprite offset
-#    .word 0  # bit-mask offset
-#    .byte 51 # height of the sprite
-#    .byte 0  # Y offset
-#    .byte 6  # width
-#    .byte SPR_PSET # attributes
-#
-#   # sprite 26
-#    .word Skull0C # sprite offset
-#    .word 0  # bit-mask offset
-#    .byte 51 # height of the sprite
-#    .byte 0  # Y offset
-#    .byte 6  # width
-#    .byte SPR_PSET # attributes
+   # sprite 21 not used
+    .word Coin # sprite offset
+    .word 0  # bit-mask offset
+    .byte 51 # height of the sprite
+    .byte 0  # Y offset
+    .byte 6  # width
+    .byte SPR_TURBO # attributes
+
+   # sprite 22 not used
+    .word Coin # sprite offset
+    .word 0  # bit-mask offset
+    .byte 51 # height of the sprite
+    .byte 0  # Y offset
+    .byte 6  # width
+    .byte SPR_TURBO # attributes
+
+   # sprite 23 not used
+    .word Coin # sprite offset
+    .word 0  # bit-mask offset
+    .byte 51 # height of the sprite
+    .byte 0  # Y offset
+    .byte 6  # width
+    .byte SPR_TURBO # attributes
+
+   # sprite 24 not used
+    .word Coin # sprite offset
+    .word 0  # bit-mask offset
+    .byte 51 # height of the sprite
+    .byte 0  # Y offset
+    .byte 6  # width
+    .byte SPR_TURBO # attributes
+
+   # sprite 25 not used
+    .word Coin # sprite offset
+    .word 0  # bit-mask offset
+    .byte 51 # height of the sprite
+    .byte 0  # Y offset
+    .byte 6  # width
+    .byte SPR_TURBO # attributes
+
+   # sprite 26
+    .word Coin # sprite offset
+    .word 0  # bit-mask offset
+    .byte 51 # height of the sprite
+    .byte 0  # Y offset
+    .byte 6  # width
+    .byte SPR_TURBO # attributes
 
 Coin:
     .incbin "build/level_02/coin.1.bin"
@@ -250,8 +250,8 @@ Skull100B:
 
 Skull80A:
     .incbin "build/level_02/skull_80_a.1.bin"
-Skull80B:
-    .incbin "build/level_02/skull_80_b.1.bin"
+#Skull80B:
+#    .incbin "build/level_02/skull_80_b.1.bin"
 
 Skull60B:
     .incbin "build/level_02/skull_60_b.1.bin"
@@ -262,8 +262,8 @@ Skull40B:
 Skull20B:
     .incbin "build/level_02/skull_20_b.1.bin"
 
-Skull0A:
-    .incbin "build/level_02/skull_0_a.1.bin"
+#Skull0A:
+#    .incbin "build/level_02/skull_0_a.1.bin"
 Skull0B:
     .incbin "build/level_02/skull_0_b.1.bin"
 
