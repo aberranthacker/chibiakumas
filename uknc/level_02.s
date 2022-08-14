@@ -24,12 +24,6 @@ LevelTiles:
        .incbin "build/level_02_tiles.spr"
 
 EventStreamArray:
-.word 0, evtReprogram_PowerupSprites
-.byte      sprTwoFrame | DUMMY_SPRITE
-.byte      sprTwoFrame | DUMMY_SPRITE
-.byte      sprTwoFrame | DUMMY_SPRITE
-.byte      sprTwoFrame | COIN
-
 .equiv DUMMY_SPRITE, 0
 .equiv COIN, 1
 
@@ -39,11 +33,11 @@ EventStreamArray:
 .equiv LEGS_LEFT_A,  4
 .equiv LEGS_LEFT_B,  5
 .equiv LEGS_LEFT_C,  6
-                    
+
 .equiv LEGS_RIGHT_A, 7
 .equiv LEGS_RIGHT_B, 8
 .equiv LEGS_RIGHT_C, 9
-                   
+
 .equiv HAND_UP,     10
 .equiv HAND_DOWN,   11
 .equiv HAND_LEFT,   12
@@ -63,23 +57,23 @@ EventStreamArray:
 .equiv SKULL_40_C,  24
 .equiv SKULL_20_C,  25
 .equiv SKULL_0_C,   26
+
+.word 0, evtReprogram_PowerupSprites
+.byte      sprTwoFrame | DUMMY_SPRITE
+.byte      sprTwoFrame | DUMMY_SPRITE
+.byte      sprTwoFrame | DUMMY_SPRITE
+.byte      sprTwoFrame | COIN
+
 # ;We will use 4 Paralax layers
 # ; ---------()- (sky)        %11001000
 # ; ------------ (Far)        %11000100
 # ; -----X---X-- (mid)        %11000010   Bank 1
 # ; []=====[]=== (foreground)     %11000001   Bank 0
 #
-# defb 0,%11110010                ;Install a custom hit handler
-# defw CustomObjectHitHandler
+ .word 0, evtReprogramHitHandler, CustomObjectHitHandler
 
 # Background L
 
-# defb 0,evtMultipleCommands+5
-# defb evtSetProgMoveLife,PrgBitShift,mveBackground+%00000001,0 ; Program - Bitshift Sprite... Move - dir Left Slow ... Life - immortal
-# defb evtSetObjectSize,0
-# defb evtSetAnimator,0
-# defb evtAddToBackground
-# defb evtSettingsBank_Save,0
 .word 0, evtMultipleCommands | 5
 .word    evtSetProgMoveLife, prgBitShift, mveBackground | 0b0001, lifeImmortal
 .word    evtSetObjectSize | 0
@@ -87,12 +81,6 @@ EventStreamArray:
 .word    evtAddToBackground
 .word    evtSaveObjSettings | 0
 
-# defb 0,evtMultipleCommands+5
-# defb evtSetProgMoveLife,PrgBitShift,mveBackground+%00000009,0 ; Program - Bitshift Sprite... Move - dir Left Slow ... Life - immortal
-# defb evtSetObjectSize,0
-# defb evtSetAnimator,0
-# defb evtAddToBackground
-# defb evtSettingsBank_Save,1 ; Save Object settings to Bank 1
 .word 0, evtMultipleCommands | 5
 .word    evtSetProgMoveLife, prgBitShift, mveBackground | 0b0010, lifeImmortal
 .word    evtSetObjectSize | 0
@@ -100,55 +88,31 @@ EventStreamArray:
 .word    evtAddToBackground
 .word    evtSaveObjSettings | 1
 
-# ; Hand Up
-# defb 0,%01110000+3              ; 3 commands at the same timepoint
-# defb    128+4,0,&4C,%11000000+6 ; Program -None... Move - wave 10101100 ... Hurt by bullets, hurts player, life 4
-# defb evtSetObjectSize,24
-# defb    %10010000+15,3
+# Hand Up
 .word 0, evtMultipleCommands | 3
 .word    evtSetProgMoveLife, prgNone, mvRegular | spdFast | 014, lifeEnemy | 6
 .word    evtSetObjectSize | 24
 .word    evtSaveObjSettings | 3
 
-# ; Hand Down
-# defb 0,%01110000+3              ; 3 commands at the same timepoint
-# defb    128+4,0,&7C,%11000000+6 ; Program -None... Move - wave 10101100 ... Hurt by bullets, hurts player, life 4
-# defb evtSetObjectSize,24
-# defb    %10010000+15,4
+# Hand Down
 .word 0, evtMultipleCommands | 3
 .word    evtSetProgMoveLife, prgNone, mvRegular | spdFast | 074, lifeEnemy | 6
 .word    evtSetObjectSize | 24
 .word    evtSaveObjSettings | 4
 
-# ; Hand left
-# defb 0,%01110000+3              ; 3 commands at the same timepoint
-# defb    128+4,0,&61,%11000000+6 ; Program -None... Move - wave 10101100 ... Hurt by bullets, hurts player, life 4
-# defb evtSetObjectSize,24
-# defb    %10010000+15,5
+# Hand left
 .word 0, evtMultipleCommands | 3
 .word    evtSetProgMoveLife, prgNone, mvRegular | spdFast | 041, lifeEnemy | 6
 .word    evtSetObjectSize | 24
 .word    evtSaveObjSettings | 5
 
-# ; Hand right
-# defb 0,%01110000+3              ; 3 commands at the same timepoint
-# defb    128+4,0,&67,%11000000+6 ; Program -None... Move - wave 10101100 ... Hurt by bullets, hurts player, life 4
-# defb evtSetObjectSize,24
-# defb    %10010000+15,6
+# Hand right
 .word 0, evtMultipleCommands | 3
 .word    evtSetProgMoveLife, prgNone, mvRegular | spdFast | 047, lifeEnemy | 6
 .word    evtSetObjectSize | 24
 .word    evtSaveObjSettings | 6
 
-# ;HandLeft1
-# defb 0,evtMultipleCommands+6     ; 3 commands at the same timepoint
-# defb    evtSettingsBank_Load+1   ; Load Settings from bank 1
-# defb    129,%11110101            ; Program
-# defb    evtSetLife,0
-# defb evtAddToBackground          ; Add To Background
-# defb    0,  18,160+24,90+24+48+8 ; Single Object sprite 11 (animated)
-# defb    138                      ; save Object pointer
-# defw        HandObject1          ; save Object pointer
+# HandLeft1
 .word 0, evtMultipleCommands | 6
 .word    evtLoadObjSettings | 1
 .word    evtSetProg, prgFrameAnimate | 0b101
@@ -167,14 +131,7 @@ EventStreamArray:
 #   .word 3, evtChangeStreamTime, 60, HandAttack1
     #----------
 
-# ;HandLeft2
-# defb 1+12,%01110000+5            ; 3 commands at the same timepoint
-# defb    %10010000+0+1            ; Load Settings from bank 1
-# defb evtAddToBackground          ; Add To Background
-# defb    129,%11110011            ; Program
-# defb    0,  19,160+24,90+24+48+8 ; Single Object sprite 11 (animated)
-# defb    138                      ; save Object pointer
-# defw        HandObject2          ; save Object pointer
+# HandLeft2
 .word 13, evtMultipleCommands | 5
 .word     evtLoadObjSettings | 1
 .word     evtAddToBackground
@@ -182,59 +139,32 @@ EventStreamArray:
 .word     evtSingleSprite, sprSingleFrame | LEGS_LEFT_B, (24+160)<<X | (24+90+48+8)<<Y
 .word     evtSaveObjPointer, HandObject2
 
-# ; hit target
-# defb 20,%01110000+3                    ; 2 commands at the same timepoint;
-# defb    128+4,2,%11000010,%11000000+40 ; Program - Starburst ... Move - dir Left Slow ... Hurt by bullets, hurts player, life 4;
-# defb    0,DUMMY_SPRITE,160+27,90+24+24  ; Single Object sprite 11 (animated)
-# defb    138                            ; save Object pointer
-# defw        SkullTarget                ; save Object pointer
+# hit target
 .word 20, evtMultipleCommands | 3
 .word     evtSetProgMoveLife, prgSpecial, mvSpecial | spdFast | 002, lifeEnemy | 40
-.word     evtSingleSprite, DUMMY_SPRITE, (24+160+3)<<X | (24+90+24)<<Y
+.word     evtSingleSprite, DUMMY_SPRITE, (24+160+3)<<X | (24+90+16)<<Y
 .word     evtSaveObjPointer, SkullTarget
 
 DebugStartPoint:
-# ; Fire target 1
-# defb 20,%01110000+3                   ; 2 commands at the same timepoint;
-# defb    128+4,%01100000+7,%11000010,0 ; Program - Starburst ... Move - dir Left Slow ... Hurt by bullets, hurts player, life 4;
-# defb    0,DUMMY_SPRITE,160+27,90+24+48 ; Single Object sprite 11 (animated)
-# defb    138                           ; save Object pointer
-# defw        FireTarget1               ; save Object pointer
+# Fire target 1
 .word 20, evtMultipleCommands | 3
 .word     evtSetProgMoveLife, prgFireSlow | fireLeft, mvSpecial | spdFast | 002, lifeImmortal
 .word     evtSingleSprite, DUMMY_SPRITE, (24+160+3)<<X | (24+90+48)<<Y
 .word     evtSaveObjPointer, FireTarget1
 
-# ; Fire target 2
-# defb 20,%01110000+3                    ; 2 commands at the same timepoint;
-# defb    128+4,%10000000+13,%11000010,0 ; Program - Starburst ... Move - dir Left Slow ... Hurt by bullets, hurts player, life 4;
-# defb    0,DUMMY_SPRITE,160+27,90+24+48  ; Single Object sprite 11 (animated)
-# defb    138                            ; save Object pointer
-# defw        FireTarget2                ; save Object pointer
+# Fire target 2
 .word 20, evtMultipleCommands | 3
 .word     evtSetProgMoveLife, prgFireSnail | fireBurst, mvSpecial | spdFast | 002, lifeImmortal
 .word     evtSingleSprite, DUMMY_SPRITE, (24+160+3)<<X | (24+90+48)<<Y
 .word     evtSaveObjPointer, FireTarget2
 
-# ; Fire target 3
-# defb 20,%01110000+3                   ; 2 commands at the same timepoint;
-# defb    128+4,%01100000+7,%11000010,0 ; Program - Starburst ... Move - dir Left Slow ... Hurt by bullets, hurts player, life 4;
-# defb    0,DUMMY_SPRITE,160+27,90+24    ; Single Object sprite 11 (animated)
-# defb    138                           ; save Object pointer
-# defw        FireTarget3               ; save Object pointer
+# Fire target 3
 .word 20, evtMultipleCommands | 3
 .word     evtSetProgMoveLife, prgFireSnail | fireBurst, mvSpecial | spdFast | 002, lifeImmortal
 .word     evtSingleSprite, DUMMY_SPRITE, (24+160+3)<<X | (24+90)<<Y
 .word     evtSaveObjPointer, FireTarget3
 
-# ;Skull1
-# defb 20,%01110000+5                 ; 3 commands at the same timepoint
-# defb    %10010000+0+1               ; Load Settings from bank 1
-# defb evtAddToForeground             ; Add To Foreground
-# defb    129,0                       ; Change to program 0 (normal)
-# defb    0,128+  0,160+24,90+24      ; Single Object sprite 11 (animated)
-# defb    138                         ; save Object pointer
-# defw        SkullObject1            ; save Object pointer
+# Skull1
 .word 20, evtMultipleCommands | 5
 .word     evtLoadObjSettings | 1
 .word     evtAddToForeground
@@ -242,14 +172,7 @@ DebugStartPoint:
 .word     evtSingleSprite, sprTwoFrame | SKULL_100_A, (24+160)<<X | (24+90)<<Y
 .word     evtSaveObjPointer, SkullObject1
 
-# ;HandLeft3
-# defb 1+24,%01110000+5            ; 3 commands at the same timepoint
-# defb    %10010000+0+1            ; Load Settings from bank 1
-# defb evtAddToBackground          ; Add To Background
-# defb    129,%11110100            ; Program
-# defb    0,  20,160+24,90+24+48+8 ; Single Object sprite 11 (animated)
-# defb    138                      ; save Object pointer
-# defw        HandObject3          ; save Object pointer
+# HandLeft3
 .word 25, evtMultipleCommands | 5
 .word     evtLoadObjSettings | 1
 .word     evtAddToBackground
@@ -257,69 +180,39 @@ DebugStartPoint:
 .word     evtSingleSprite, sprSingleFrame | LEGS_LEFT_C, (24+160)<<X | (24+90+48+8)<<Y
 .word     evtSaveObjPointer, HandObject3
 
-# ;Skull2
-# defb 20+12,%01110000+5         ; 3 commands at the same timepoint
-# defb    %10010000+0+1          ; Load Settings from bank 1
-# defb evtAddToForeground        ; Add To Foreground
-# defb    129,0                  ; Change to program 0 (normal)
-# defb    0,128+  1,160+24,90+24 ; Single Object sprite 11 (animated)
-# defb    138                    ; save Object pointer
-# defw        SkullObject2       ; save Object pointer
+# Skull2
 .word 32, evtMultipleCommands | 5
 .word     evtLoadObjSettings | 1
 .word     evtAddToForeground
 .word     evtSetProg, prgNone
 .word     evtSingleSprite, sprTwoFrame | SKULL_100_B, (24+160)<<X | (24+90)<<Y
 .word     evtSaveObjPointer, SkullObject2
-# ;HandRight1
-# defb 20+18,%01110000+5         ; 3 commands at the same timepoint
-# defb    %10010000+0+1          ; Load Settings from bank 1
-# defb evtAddToBackground        ; Add To Background
-# defb    129,%11110011          ; Program
-# defb    0,  15,160+24,90+24+48 ; Single Object sprite 11 (animated)
-# defb    138                    ; save Object pointer
-# defw        HandObject4        ; save Object pointer
+
+# HandRight1
 .word 38, evtMultipleCommands | 5
 .word     evtLoadObjSettings | 1
 .word     evtAddToBackground
 .word     evtSetProg, prgFrameAnimate | 0b011
 .word     evtSingleSprite, sprSingleFrame | LEGS_RIGHT_A, (24+160)<<X | (24+90+48)<<Y
 .word     evtSaveObjPointer, HandObject4
-# ;Skull3
-# defb 20+24,%01110000+5         ; 3 commands at the same timepoint
-# defb    %10010000+0+1          ; Load Settings from bank 1
-# defb evtAddToForeground        ; Add To Foreground
-# defb    129,0                  ; Change to program 0 (normal)
-# defb    0,  2,160+24,90+24     ; Single Object sprite 11 (animated)
-# defb    138                    ; save Object pointer
-# defw        SkullObject3       ; save Object pointer
+
+# Skull3
 .word 44, evtMultipleCommands | 5
 .word     evtLoadObjSettings | 1
 .word     evtAddToForeground
 .word     evtSetProg, prgNone
 .word     evtSingleSprite, sprSingleFrame | SKULL_100_C, (24+160)<<X | (24+90)<<Y
 .word     evtSaveObjPointer, SkullObject3
-# ;HandRight2
-# defb 20+18+12,%01110000+5      ; 3 commands at the same timepoint
-# defb    %10010000+0+1          ; Load Settings from bank 1
-# defb evtAddToBackground        ; Add To Background
-# defb    129,%11110100          ; Program
-# defb    0,  16,160+24,90+24+48 ; Single Object sprite 11 (animated)
-# defb    138                    ; save Object pointer
-# defw        HandObject5        ; save Object pointer
+
+# HandRight2
 .word 50, evtMultipleCommands | 5
 .word     evtLoadObjSettings | 1
 .word     evtAddToBackground
 .word     evtSetProg, prgFrameAnimate | 0b100
 .word     evtSingleSprite, sprSingleFrame | LEGS_RIGHT_B, (24+160)<<X | (24+90+48)<<Y
 .word     evtSaveObjPointer, HandObject5
-# ;HandRight3
-# defb 20+18+24,%01110000+4      ; 3 commands at the same timepoint
-# defb    %10010000+0+1          ; Load Settings from bank 1
-# defb    129,%11110101          ; Program
-# defb    0,  17,160+24,90+24+48 ; Single Object sprite 11 (animated)
-# defb    138                    ; save Object pointer
-# defw        HandObject6        ; save Object pointer
+
+# HandRight3
 .word 62, evtMultipleCommands | 4
 .word     evtLoadObjSettings | 1
 .word     evtSetProg, prgFrameAnimate | 0b101
@@ -367,30 +260,21 @@ HandAttack1:
    .word 82, evtChangeStreamTime, 60, HandAttack1
 
 LevelEndAnim:
-# defb 253,%01110000+2              ; 3 commands at the same timepoint
-# defb evtSetProgMoveLife,prgMovePlayer,&24,10
-# defb    0,21+128+11,140+24,100+24 ; Single Object sprite 11 (animated)
     .word 253, evtMultipleCommands | 2
     .word      evtSetProgMoveLife, prgMovePlayer, mvStatic, 10
     .word      evtSingleSprite, sprTwoFrame | DUMMY_SPRITE, (24+140)<<X | (24+100)<<Y
-#
-# ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-# FadeOutStartPoint equ 254
-# ;               Start of fade out block
-# ;               Fade out ends at FadeutStart+2, eg if FadeOut=5 then ends at 7
-# ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#     defb FadeOutStartPoint+1,evtMultipleCommands+4          ; 4 Commands
-# ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-# ;               End of fade out block
-# ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-# defb 2,evtCallAddress           ;Call a memory location
-# defw    EndLevel
+
+    .equiv FadeOutStartPoint, 254
+    .word FadeOutStartPoint, evtSetPalette, DarkRealPalette
+    .word FadeOutStartPoint + 1, evtSetPalette, BluePalette
+
+    .word 256, evtCallAddress, EndLevel
 
 EndLevel:
-        MOV  $3,R5
+        MOV  $0x8000,R5
         JMP  ExecuteBootstrap # Start the game, no return
 
-LevelInit:                                  # read "..\SrcALL\Akuyou_Multiplatform_Level_GenericInit.asm"
+LevelInit: # read "..\SrcALL\Akuyou_Multiplatform_Level_GenericInit.asm"
        .ppudo_ensure $PPU_BossMusicRestart
 
         MOV  $LevelSprites,R0
@@ -425,36 +309,29 @@ LevelLoop:
        .equiv FadeCommandCall, .+2
         CALL @$null
 
-                                            #     ld a,r
-                                            #     xor 0 :Randomizer_Plus1
-                                            #     ld (Randomizer_Plus1-1),a
-                                            #     and %00001100;%00001110
-                                            #     call z,StarArrayWarp ; welcome to hell!
-                                            #
-                                            #     ld a,(BossHurt)
-                                            #     cp 0
-                                            #     jp z,DontReset
-                                            #     dec a
-                                            #     ld (BossHurt),a
-                                            #
-                                            #     jp nz,DontReset
-                                            #     ld a,128+0
-                                            #     ld hl,(SkullObject1)
-                                            #     call SetObjectSprite
-                                            # DontReset:
+                                            # ld a,r
+                                            # xor 0 :Randomizer_Plus1
+                                            # ld (Randomizer_Plus1-1),a
+                                            # and %00001100
+                                            # call z,StarArrayWarp ; welcome to hell!
+        TST  @$BossHurt
+        BZE  DontReset
+
+        DEC  @$BossHurt
+        BNZ  DontReset
+
+        MOV  @$SkullObject1,R5
+        MOVB $(sprTwoFrame | SKULL_100_A),3(R5)
+DontReset:
                                             #
                                             #     call ShowBossText
                                             #
       #.include "level_levelloop_flip.s"    # read "..\SrcALL\Akuyou_Multiplatform_Level_Levelloop_Flip.asm"
                                             #
         BR   LevelLoop                      #     jp LevelLoop
-#
 # ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 # ;           Level specific code
 # ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-# ;Allow objects to be reprogrammed
-# read "Core_ObjectReprogrammers.asm"
-#
 # ;Warp the bullet array (for boss battles)
 # read "Core_StarArrayWarp.asm"
 
@@ -632,139 +509,121 @@ RealPalette: #---------------------------------------------------------------{{{
                                             # db &0
                                             # endif
 
-#BossLife:     .word 0x0000                  # BossLife: defb 100
-#BossHurt:     .word 0x0000                  # BossHurt: defb &0
+BossLife:     .word 100                     # BossLife: defb 100
+BossHurt:     .word 0                       # BossHurt: defb &0
 
 CustomObjectHitHandler:
-                                            # ld a,iyl
-                                            # cp 2
-                                            # jp nz,Akuyou_Object_DecreaseLifeShot    ; if this object isn't the boss target, just run the normal routine
-                                            #
-                                            # ld ixl,%11000000+40 ; Make object immortal
-                                            # push de
-                                            # push hl
-                                            #     ld a,128+3
-                                            #     ld hl,(SkullObject1)
-                                            #     call SetObjectSprite
-                                            #
-                                            #
-                                            #     ld a,r
-                                            #     srl a
-                                            #     srl a
-                                            #     add 120
-                                            #     ld hl,(FireTarget1)
-                                            #     call SetObjectY
-                                            #
-                                            #     ld a,r
-                                            #     srl a
-                                            #     srl a
-                                            #     add 120
-                                            #     ld hl,(FireTarget2)
-                                            #     call SetObjectY
-                                            #
-                                            #     ld a,r
-                                            #     srl a
-                                            #     srl a
-                                            #     add 120
-                                            #     ld hl,(FireTarget3)
-                                            #     call SetObjectY
-                                            #
-                                            #     ld a,2
-                                            #     ld (BossHurt),a
-                                            #
-                                            #     ld a,(BossLife)
-                                            #     dec a
-                                            #     cp 80
-                                            #     jp z,BossLife1
-                                            #     cp 60
-                                            #     jp z,BossLife2
-                                            #     cp 40
-                                            #     jp z,BossLife3
-                                            #     cp 20
-                                            #     jp z,BossLife4
-                                            #     cp 1
-                                            #     jp z,BossLife5
-                                            #     jp UpdateBossLife
-                                            # BossLife5:
-                                            #     push af
-                                            #         ld ixl,0    ; Make object immortal
-                                            #
-                                            #         ld a,0
-                                            #         ld (BossHurt),a
-                                            #
-                                            #         ld a,0
-                                            #         ld hl,(FireTarget1)
-                                            #         call SetObjectProgram
-                                            #         ld a,0
-                                            #         ld hl,(FireTarget2)
-                                            #         call SetObjectProgram
-                                            #         ld a,0
-                                            #         ld hl,(FireTarget3)
-                                            #         call SetObjectProgram
-                                            #
-                                            #         ld a,12
-                                            #         ld hl,(SkullObject1)
-                                            #         call SetObjectSprite
-                                            #         ld a,128+13
-                                            #         ld hl,(SkullObject2)
-                                            #         call SetObjectSprite
-                                            #         ld a,128+14
-                                            #         ld hl,(SkullObject3)
-                                            #         call SetObjectSprite
-                                            #         ld a,2
-                                            #         call Akuyou_DoSmartBombCall
-                                            #
-                                            #         ld hl,LevelEndAnim
-                                            #         ld a,249
-                                            #         call Akuyou_SetLevelTime
-                                            #     pop af
-                                            #     jp UpdateBossLife
-                                            # BossLife4:
-                                            # push af
-                                            #         ld a,128+10
-                                            #         ld hl,(SkullObject2)
-                                            #         call SetObjectSprite
-                                            #         ld a,128+11
-                                            #         ld hl,(SkullObject3)
-                                            #         call SetObjectSprite
-                                            #     pop af
-                                            #     jp UpdateBossLife
-                                            # BossLife3:
-                                            # push af
-                                            #         ld a,128+8
-                                            #         ld hl,(SkullObject2)
-                                            #         call SetObjectSprite
-                                            #         ld a,128+9
-                                            #         ld hl,(SkullObject3)
-                                            #         call SetObjectSprite
-                                            #     pop af
-                                            #     jp UpdateBossLife
-                                            # BossLife2:
-                                            #     push af
-                                            #         ld a,128+6
-                                            #         ld hl,(SkullObject2)
-                                            #         call SetObjectSprite
-                                            #         ld a,128+7
-                                            #         ld hl,(SkullObject3)
-                                            #         call SetObjectSprite
-                                            #     pop af
-                                            #     jp UpdateBossLife
-                                            # BossLife1:
-                                            #     push af
-                                            #         ld a,128+4
-                                            #         ld hl,(SkullObject2)
-                                            #         call SetObjectSprite
-                                            #         ld a,128+5
-                                            #         ld hl,(SkullObject3)
-                                            #         call SetObjectSprite
-                                            #     pop af
-                                            #     jp UpdateBossLife
-                                            # UpdateBossLife:
-                                            #     ld (BossLife),a
-                                            #
-                                            #     pop hl
-                                            #     pop de
-                                            # ret
+        MOV  R3,R0
+        SWAB R0
+        CMPB R0,$prgSpecial
+        BEQ  1$
+      # just run the normal routine, if this object isn't the boss target
+        JMP  @$Object_DecreaseLifeShot
+    1$:
+        CLRB R3
+        BISB $(lifeEnemy | 40),R3
+        PUSH R5
+
+        MOV  $(sprTwoFrame | SKULL_80_A),R0
+        MOV  @$SkullObject1,R5
+        MOVB R0,3(R5)
+
+        CALL TRandW                         # ld a,r
+        BIC  $0xFF00,R0
+        ASR  R0                             # srl a
+        ASR  R0                             # srl a
+        ADD  $120,R0                        # add 120
+        MOV  @$FireTarget1,R5               # ld hl,(FireTarget1)
+        MOVB R0,(R5)                        # call SetObjectY
+
+        CALL TRandW                         # ld a,r
+        BIC  $0xFF00,R0
+        ASR  R0                             # srl a
+        ASR  R0                             # srl a
+        ADD  $120,R0                        # add 120
+        MOV  @$FireTarget2,R5               # ld hl,(FireTarget2)
+        MOVB R0,(R5)                        # call SetObjectY
+
+        CALL TRandW                         # ld a,r
+        BIC  $0xFF00,R0
+        ASR  R0                             # srl a
+        ASR  R0                             # srl a
+        ADD  $120,R0                        # add 120
+        MOV  @$FireTarget3,R5               # ld hl,(FireTarget3)
+        MOVB R0,(R5)                        # call SetObjectY
+
+        MOV  $2,@$BossHurt
+
+        MOV  @$BossLife,R0
+        DEC  R0
+        CMP  R0,$80
+        BEQ  BossLife80
+        CMP  R0,$60
+        BEQ  BossLife60
+        CMP  R0,$40
+        BEQ  BossLife40
+        CMP  R0,$20
+        BEQ  BossLife20
+        CMP  R0,$1
+        BEQ  BossLife1
+        BR   UpdateBossLife
+
+BossLife80:
+        MOV  @$SkullObject2,R5
+        MOVB $(sprTwoFrame | SKULL_80_B),3(R5)
+        MOV  @$SkullObject3,R5
+        MOVB $(sprSingleFrame | SKULL_80_C),3(R5)
+        BR   UpdateBossLife
+
+BossLife60:
+        MOV  @$SkullObject2,R5
+        MOVB $(sprTwoFrame | SKULL_60_B),3(R5)
+        MOV  @$SkullObject3,R5
+        MOVB $(sprSingleFrame | SKULL_60_C),3(R5)
+        BR   UpdateBossLife
+
+BossLife40:
+        MOV  @$SkullObject2,R5
+        MOVB $(sprTwoFrame | SKULL_40_B),3(R5)
+        MOV  @$SkullObject3,R5
+        MOVB $(sprSingleFrame | SKULL_40_C),3(R5)
+        BR   UpdateBossLife
+
+BossLife20:
+        MOV  @$SkullObject2,R5
+        MOVB $(sprTwoFrame | SKULL_20_B),3(R5)
+        MOV  @$SkullObject3,R5
+        MOVB $(sprSingleFrame | SKULL_20_C),3(R5)
+        BR   UpdateBossLife
+
+BossLife1:
+        CLRB R3 # Make object immortal
+        CLR  @$BossHurt
+
+        MOV  @$FireTarget1,R5
+        CLRB 5(R5) # object program
+        MOV  @$FireTarget2,R5
+        CLRB 5(R5)
+        MOV  @$FireTarget3,R5
+        CLRB 5(R5)
+
+        MOV  @$SkullObject1,R5
+        MOVB $(sprSingleFrame | SKULL_0_A),3(R5)
+        MOV  @$SkullObject2,R5
+        MOVB $(sprSingleFrame | SKULL_0_B),3(R5)
+        MOV  @$SkullObject3,R5
+        MOVB $(sprSingleFrame | SKULL_0_C),3(R5)
+
+        PUSH R0
+        MOV  $249,R0
+        MOV  $LevelEndAnim,R5
+        CALL SetLevelTime
+        POP  R0
+
+UpdateBossLife:
+        MOV  R0,@$BossLife
+        POP  R5
+        RETURN
 
 StopBossMovement:
         MOV  $044,R0

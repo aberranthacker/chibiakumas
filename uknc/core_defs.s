@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Note that the PRESENCE of those variables is tested, NOT their values. -------
- .equiv DebugMode, 1
+#.equiv DebugMode, 1
 #.equiv DebugSprite, 1
 #.equiv ExtMemCore, 1
 #.equiv TwoPlayersGame, 1
@@ -120,7 +120,7 @@
     .endif
 
     .ifndef ExtMemCore
-.equiv Akuyou_LevelStart, 0x9E6A # 40554 0117152 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9EAC # 40620 0117254 # auto-generated during a build
     .else
 .equiv Akuyou_LevelStart, GameVarsEnd
     .endif
@@ -239,6 +239,7 @@
 #-------------------------------------------------------------------------------
 .equiv COIN_COST, 4
 
+.equiv SPR_TURBO,    0
 .equiv SPR_DOUBLE,   1<<1
 .equiv SPR_PSET,     1<<2
 .equiv SPR_HAS_MASK, 1<<3
