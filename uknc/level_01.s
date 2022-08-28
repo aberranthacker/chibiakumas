@@ -1,4 +1,4 @@
-               .list
+               .nolist
 
                .include "./hwdefs.s"
                .include "./macros.s"
@@ -588,23 +588,22 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word      evtSingleSprite, sprSingleFrame | CLOUD_C
     .byte          24+ 21, 24+ 160
 
-    .word 256+ 5, evtCallAddress, Player_Handler_DoSmartBomb
+    .word 255+ 5, evtCallAddress, Player_Handler_DoSmartBomb
 
 LevelEndAnim:
 # defb 5,evtMultipleCommands+2            ; 3 commands at the same timepoint
 # defb evtSetProgMoveLife,prgMovePlayer,&24,10
 # defb    0,128+  47,140+24,100+24    ;   ; Single Object sprite 11 (animated)
-    .word 256+ 5, evtMultipleCommands | 2
+    .word 255+ 5, evtMultipleCommands | 2
     .word         evtSetProgMoveLife, prgMovePlayer, mvStatic, 10
-    .word         evtSingleSprite, sprTwoFrame | DUMMY_SPRITE
-    .byte             24+ 100, 24+ 140
+    .word         evtSingleSprite, sprTwoFrame | DUMMY_SPRITE, (24+140)<<X | (24+100)<<Y
 
 # Start of fade out block ------------------------------------------------------
-    .equiv FadeOutStartPoint, 256+ 5
+    .equiv FadeOutStartPoint, 255+ 5
     .word FadeOutStartPoint + 1, evtSetPalette, DarkRealPalette
     .word FadeOutStartPoint + 2, evtSetPalette, BluePalette
 
-    .word 256+ 8, evtCallAddress, EndLevel
+    .word 255+ 8, evtCallAddress, EndLevel
 #----------------------------------------------------------------------------}}}
 
 EndLevel:

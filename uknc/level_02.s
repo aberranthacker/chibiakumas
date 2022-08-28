@@ -1,4 +1,4 @@
-               .list
+               .nolist
 
                .include "./hwdefs.s"
                .include "./macros.s"
@@ -260,6 +260,8 @@ HandAttack1:
    .word 82, evtChangeStreamTime, 60, HandAttack1
 
 LevelEndAnim:
+    .word 253, evtCallAddress, Player_Handler_DoSmartBomb
+
     .word 253, evtMultipleCommands | 2
     .word      evtSetProgMoveLife, prgMovePlayer, mvStatic, 10
     .word      evtSingleSprite, sprTwoFrame | DUMMY_SPRITE, (24+140)<<X | (24+100)<<Y
