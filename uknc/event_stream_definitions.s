@@ -78,7 +78,7 @@
                                         #
 # evtReprogramHitHandler  equ %11110010 ; Define Custom hit handler as call to w1,
 #                                       ; used for boss battles
-.equiv evtReprogramHitHandler, (0x22 * 2) << 8 # 66
+.equiv evtReprogramHitHandler, (0x22 * 2) << 8 # 68
                                         # evtReprogramShotToDeath equ %11110011 ; Define Custom destroy object event as call
                                         #                                       ; to w1, used for nuke satellite, and lasers
                                         #                                       ; in Ep2 Tech Noir level
@@ -87,9 +87,13 @@
                                         # evtReprogramCustomPlayerHitter equ %11111011 ; Define Custom hit handler for players as call to w1 - used for steaks in Alchemy level of ep2
                                         #
                                         # evtReprogramCustomMove1 equ %11110100 ; Define Custom Move handler1 to call w1 each object move
+.equiv evtReprogramCustomMove1, (0x24 * 2) << 8 # 72
                                         # evtReprogramCustomMove2 equ %11110101 ; Define Custom Move handler1 to call w2 each object move
+.equiv evtReprogramCustomMove2, (0x26 * 2) << 8 # 74
                                         # evtReprogramCustomMove3 equ %11110111 ; Define Custom Move handler1 to call w3 each object move
+.equiv evtReprogramCustomMove3, (0x28 * 2) << 8 # 76
                                         # evtReprogramCustomMove4 equ %11111000 ; Define Custom Move handler1 to call w4 each object move
+.equiv evtReprogramCustomMove4, (0x2A * 2) << 8 # 78
                                         #
                                         # evtReprogramCustomProg1 equ %11111001 ; Define Custom Programmer handler1 to call
                                         #                                       ; w1 each program tick (custom fire patterns)
@@ -206,7 +210,7 @@
 
                                    # ;All under 31 Do not get killed by smartbomb except 0
 .equiv prgFireFast,  0b00100000    # prgFireFast  equ %001xxxxx xxxxx is pattern number
-                                   # prgFireMid   equ %010xxxxx
+.equiv prgFireMid,   0b01000000    # prgFireMid   equ %010xxxxx
 .equiv prgFireSlow,  0b01100000    # prgFireSlow  equ %011xxxxx
 .equiv prgFireSnail, 0b10000000    # prgFireSnail equ %100xxxxx
                                    # prgFireHyper equ %101xxxxx
