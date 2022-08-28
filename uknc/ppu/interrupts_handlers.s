@@ -37,8 +37,8 @@ MusicPlayerCall:
         MOV  (SP)+,@$PBPADR
 
 SkipToFirmwareHandler:
-        # we do not need firmware interrupt handler except for this small
-        # procedure
+      # we do not need firmware interrupt handler except for this small
+      # procedure
         TST  @$07130 # is floppy drive spindle rotating?
         BZE  1237$   # no
         DEC  @$07130 # decrease spindle rotation counter
@@ -260,7 +260,7 @@ Channel1In_IntHandler: #-----------------------------------------------------{{{
         TSTB @$PCH1ID
         BZE  ShowFB0
         BR   ShowFB1
-ShowFB0: #-------------------------------------------------------------------{{{
+ShowFB0: #----------------------------------------------------------------------
         MOV  @$PASWCR,-(SP) # PPU address space window control register
         MOV  $0x010,@$PASWCR
 
@@ -278,8 +278,8 @@ ShowFB0: #-------------------------------------------------------------------{{{
 
         MOV  (SP)+,@$PASWCR
         BR   Channel1In_IntHandler_Finalize
-#----------------------------------------------------------------------------}}}
-ShowFB1: #-------------------------------------------------------------------{{{
+#-------------------------------------------------------------------------------
+ShowFB1: #----------------------------------------------------------------------
         MOV  @$PASWCR,-(SP) # PPU address space window control register
         MOV  $0x010,@$PASWCR
 
@@ -296,8 +296,7 @@ ShowFB1: #-------------------------------------------------------------------{{{
 
         MOV  (SP)+, @$PASWCR
         BR   Channel1In_IntHandler_Finalize
-#----------------------------------------------------------------------------}}}
-
+#-------------------------------------------------------------------------------
 Channel1In_IntHandler_Finalize:
         MOV  @$CommandsQueue_CurrentPosition,R5
    .ifdef DebugMode

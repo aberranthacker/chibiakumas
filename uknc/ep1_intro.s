@@ -26,7 +26,6 @@ slide05: .incbin "build/ep1-intro/ep1-intro-slide05.raw.lzsa1" # school1
 slide06: .incbin "build/ep1-intro/ep1-intro-slide06.raw.lzsa1" # bulbs
 slide07: .incbin "build/ep1-intro/ep1-intro-slide07.raw.lzsa1" # plane
 slide08: .incbin "build/ep1-intro/ep1-intro-slide08.raw.lzsa1" # school2
-
          .even
 
 EventStreamArray:
@@ -70,7 +69,8 @@ EventStreamArray:
     .word         mvRegular | spdNormal | 062
     .word         lifeImmortal
     .word     evtSaveObjSettings | 4           # 2
-    # charnikohime
+#-------------------------------------------------------------------------------
+   # charnikohime
     .word 0, evtMultipleCommands | 5
     .word     evtAddToForeground               # 1
     .word     evtLoadObjSettings | 2           # 2
@@ -79,28 +79,23 @@ EventStreamArray:
     .word     evtSaveObjPointer, charnikohime  # 4
     .word     evtAddToBackground               # 5
 
-    # Start of fade in block
+   # Start of fade in block
     .equiv FadeStartPoint, 0
-
-    .word FadeStartPoint + 1 # time
-    .word evtSetPalette, BluePalette
-
-    .word FadeStartPoint + 2 # time
-    .word evtSetPalette, DarkRealPalette
-
-    .word FadeStartPoint + 3 # time
-    .word evtSetPalette, RealPalette
+    .word FadeStartPoint + 1, evtSetPalette, BluePalette
+    .word FadeStartPoint + 2, evtSetPalette, DarkRealPalette
+    .word FadeStartPoint + 3, evtSetPalette, RealPalette
 
     #----------
-    .word 3, evtChangeStreamTime, 256+245+15, DebugStartPoint
+   #.word 3, evtChangeStreamTime, 256+245+15, DebugStartPoint
     #----------
+DebugStartPoint:
 
     .word 10, evtCallAddress, ShowText1Init
 
     .word 49, evtCallAddress, ShowText0Init
 
     .word 50, evtSetPalette, ChibikoAttacksPalette
-    # flying Chibiko
+   # flying Chibiko
     .word 50, evtMultipleCommands | 4
     .word     evtLoadObjSettings | 3           # 1
     .word     evtSingleSprite, sprTwoFrame | 0 # 2
@@ -109,7 +104,7 @@ EventStreamArray:
     .byte         24+40-10, 24+160-12 # Y, X : 30, 296
     .word     evtSingleSprite, sprTwoFrame | 2 # 4
     .byte         24+40-10, 24+160    # Y, X : 30, 320
-    # cleanup Chibiko sprite
+   # cleanup Chibiko sprite
     .word 51, evtMultipleCommands | 5
     .word     evtSingleSprite, sprTwoFrame | 6
     .byte         24+40-10,      24+160-12-6 # Y, X : 30, 284
@@ -123,7 +118,7 @@ EventStreamArray:
     .byte         24+40-10+8,    24+160-12   # Y, X : 22, 286
 
     .word 52, evtSetPalette, ChibikoAttacksPalette2
-    # flying head
+   # flying head
     .word 52, evtMultipleCommands | 7
     .word     evtLoadObjSettings | 4               # 1
     .word     evtAddToBackground                   # 2
@@ -165,16 +160,12 @@ StartIntroProper:
     .word 256+155+15, evtCallAddress, ShowText15Init # lightning1
     .word 256+185+15, evtCallAddress, ShowText16Init # lightning2
     .word 256+215+15, evtCallAddress, ShowText17Init # heaven
-DebugStartPoint:
     .word 256+245+15, evtCallAddress, ShowText18Init # hell
     .word 512+ 20+15, evtCallAddress, ShowText19Init # chibiko
     .word 512+ 50+15, evtCallAddress, ShowText20Init # chibiko nosferatu
     .word 512+ 90+15, evtCallAddress, ShowText21Init # haunting
 
     .word 768+64, evtCallAddress, EndLevel
-
-charnikohime: .word 0
-charnikohimehead: .word 0
 
 EndLevel:
         MOV  $0x8000,R5
@@ -509,24 +500,26 @@ Subtitles22:
 #----------------------------------------------------------------------------}}}
 
 Decapitate:
-        MOV  @$charnikohime,R0
+       .equiv charnikohime, .+2
+        MOV  $0,R0
         MOVB $sprTwoFrame | 4, 3(R0) # change sprite
-RETURN
+        RETURN
 
 Decapitateend:
-        MOV  @$charnikohimehead,R0
-        MOVB $0x24, 2(R0) # change move to static
-RETURN
+       .equiv charnikohimehead, .+2
+        MOV  $0,R0
+        MOVB $044, 2(R0) # change move to static
+        RETURN
 
 ClearObjects:
         MOV  @$charnikohime,R0
         CLR  (R0)
         MOV  @$charnikohimehead,R0
         CLR  (R0)
-RETURN
+        RETURN
 
 Clear4000: #-----------------------------------------------------------------{{{
-        # do note use the power more than 5, because of the SOB range
+      # do note use the power more than 5, because of the SOB range
        .equiv Clear4000_PowerOfTwo, 5
         MOV  R0,-(SP)
         MOV  R1,-(SP)

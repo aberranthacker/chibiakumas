@@ -3,7 +3,7 @@
 # so code like this must scroll the data for them
 
       # R0 shift on timer ticks
-      # R1 bytes
+      # R1 bytes per line
       # R2 lines
       # R5 pointer to next line of sprite, we will use -(R5) to read the line
 BitShifter:

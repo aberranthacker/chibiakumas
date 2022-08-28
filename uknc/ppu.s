@@ -263,7 +263,7 @@ SLTABInit:
       # read from the channel, just in case
         TST  @$PCH1ID
 
-     # Aberrant Sound Module detection
+      # Aberrant Sound Module detection
         MOV  $PSG0+16,R1
         MOV  $PSG1,R2
         MOV  $Trap4,@$4

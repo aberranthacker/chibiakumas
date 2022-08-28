@@ -119,4 +119,3 @@ no_loading_error\@:
     MOV  \addr,R0
     EMT  0351
 .endm
-
