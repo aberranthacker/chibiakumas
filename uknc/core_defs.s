@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Note that the PRESENCE of those variables is tested, NOT their values. -------
-#.equiv DebugMode, 1
+ .equiv DebugMode, 1
 #.equiv DebugSprite, 1
 #.equiv ExtMemCore, 1
 #.equiv TwoPlayersGame, 1
@@ -10,11 +10,13 @@
 .equiv Episode1_Intro, 0x0000
 .equiv Level1, 0x0001
 .equiv Level2, 0x0002
+.equiv Level3, 0x0003
 
- .equiv StartOnLevel, MainMenu
+#.equiv StartOnLevel, MainMenu
 #.equiv StartOnLevel, Episode1_Intro
 #.equiv StartOnLevel, Level1
 #.equiv StartOnLevel, Level2
+ .equiv StartOnLevel, Level3
 
 .if StartOnLevel == MainMenu
   .equiv ShowLoadingScreen, 1
@@ -120,7 +122,7 @@
     .endif
 
     .ifndef ExtMemCore
-.equiv Akuyou_LevelStart, 0x9EAC # 40620 0117254 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9E82 # 40578 0117202 # auto-generated during a build
     .else
 .equiv Akuyou_LevelStart, GameVarsEnd
     .endif

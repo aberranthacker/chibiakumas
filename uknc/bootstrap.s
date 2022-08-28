@@ -11,6 +11,17 @@
                 .global BootstrapSizeDWords
                 .global LoadingScreenPalette
 
+                .global ppu_module.bin
+                .global loading_screen.bin
+                .global saved_settings.bin
+                .global core.bin
+                .global ep1_intro.bin
+                .global ep1_intro_slides.bin
+                .global level_00.bin
+                .global level_01.bin
+                .global level_02.bin
+                .global level_03.bin
+
                 .include "./hwdefs.s"
                 .include "./macros.s"
                 .include "./core_defs.s"
@@ -134,7 +145,7 @@ Bootstrap_SystemEvent:
 
 Bootstrap_Level:
     .ifdef DebugMode
-        CMP  R5,$2
+        CMP  R5,$3
         BLOS 1$
        .inform_and_hang2 "bootstrap: no levels further than 2"
         1$:
@@ -145,6 +156,7 @@ Bootstrap_Level:
        .word Bootstrap_Level_Intro
        .word Bootstrap_Level_1
        .word Bootstrap_Level_2
+       .word Bootstrap_Level_3
 
 Bootstrap_StartGame:
 
@@ -199,6 +211,19 @@ Bootstrap_Level_2: # --------------------------------------------------------
            .ppudo_ensure $PPU_LevelStart
         CALL Bootstrap_LoadDiskFile_WaitForFinish
        .check_for_loading_error "level_02.bin"
+
+       .ppudo_ensure $PPU_SingleProcess
+        MOV  $SP_RESET,SP # we are not returning, so reset the stack
+        JMP  @$Akuyou_LevelStart
+#----------------------------------------------------------------------------
+Bootstrap_Level_3: # --------------------------------------------------------
+        MOV  $level_03.bin,R0
+        CALL Bootstrap_LoadDiskFile_Start
+           .ppudo_ensure $PPU_SetPalette, $BlackPalette
+            CALL LevelReset0000
+           .ppudo_ensure $PPU_LevelStart
+        CALL Bootstrap_LoadDiskFile_WaitForFinish
+       .check_for_loading_error "level_03.bin"
 
        .ppudo_ensure $PPU_SingleProcess
         MOV  $SP_RESET,SP # we are not returning, so reset the stack
@@ -437,7 +462,7 @@ ResetCore: # ../Aku/BootStrap.asm:2318
         MOV  R3,@$dstCustomShotToDeathCall
 
         CLR  R0
-        CALL DoMovesBackground_SetScroll # TODO: implement the subroutine
+        CALL @$DoMovesBackground_SetScroll # TODO: implement the subroutine
 
         RETURN
 # LevelReset0000 end --------------------------------------------------------}}}
@@ -475,6 +500,9 @@ Bootstrap_LoadDiskFile_Start: # ---------------------------------------------{{{
 
         RETURN
 # Bootstrap_LoadDiskFile_Start #---------------------------------------------}}}
+
+       .include "./ppucmd.s"
+
 ParamsAddr: .byte 0, 0, 0, 0xFF # init sequence (just in case)
             .word ParamsStruct
             .byte 0xFF, 0xFF    # two termination bytes 0xff, 0xff
@@ -516,16 +544,6 @@ Bootstrap_LoadDiskFile_WaitForFinish: #--------------------------------------{{{
 # Bootstrap_LoadDiskFile_WaitForFinish #-------------------------------------}}}
 
 # files related data --------------------------------------------------------{{{
-
-.global ppu_module.bin
-.global loading_screen.bin
-.global saved_settings.bin
-.global core.bin
-.global ep1_intro.bin
-.global ep1_intro_slides.bin
-.global level_00.bin
-.global level_01.bin
-.global level_02.bin
 # each record is 3 words:
 #   .word address for the data from a disk
 #   .word size in words
@@ -566,9 +584,11 @@ level_02.bin:
     .word Akuyou_LevelStart
     .word 0
     .word 0
+level_03.bin:
+    .word Akuyou_LevelStart
+    .word 0
+    .word 0
 #----------------------------------------------------------------------------}}}
-
-       .include "./ppucmd.s"
 
 BulletConfigHeaven: #--------------------------------------------------------{{{
    # Starbust code - we use RST 6 as an 'add command' to save memory - RST 6 calls IY

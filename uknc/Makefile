@@ -16,6 +16,15 @@ common = core_defs.s event_stream_definitions.s hwdefs.s macros.s
 
 all : pre-build build/chibiakumas.dsk
 
+pre-build :
+	mkdir -p build/chibi
+	mkdir -p build/level_01
+	mkdir -p build/level_02
+	mkdir -p build/level_03
+
+clean :
+	rm -rf build/*
+
 # chibiakumas.dsk -----------------------------------------------------------{{{
 build/chibiakumas.dsk : build_tools/build_dsk.rb \
                         build_tools/dsk_image_constants.rb \
@@ -29,6 +38,7 @@ build/chibiakumas.dsk : build_tools/build_dsk.rb \
                         build/level_00.bin \
                         build/level_01.bin \
                         build/level_02.bin \
+                        build/level_03.bin \
                         build/saved_settings.bin
 	build_tools/build_dsk.rb
 # chibiakumas.dsk -----------------------------------------------------------}}}
@@ -53,6 +63,7 @@ build/bootstrap.bin : build/bootstrap.o \
                       build/ep1_intro_slides.o \
                       build/level_01.o \
                       build/level_02.o \
+                      build/level_03.o \
                       build/saved_settings.o
 	$(LD) $(LDFLAGS) -M \
 	      -T linker_scripts/bootstrap.cmd \
@@ -62,6 +73,7 @@ build/bootstrap.bin : build/bootstrap.o \
 	      -R build/level_00_menu.o \
 	      -R build/level_01.o \
 	      -R build/level_02.o \
+	      -R build/level_03.o \
 	      -R build/ppu.o \
 	      -R build/saved_settings.o > build/bootstrap.map.txt
 	ruby build_tools/aout2sav.rb build/bootstrap.out -b -s -o build/bootstrap.bin
@@ -304,6 +316,73 @@ build/ep1-intro/ep1-intro-slide14.raw.lzsa1: resources/ep1-intro-slides-2.raw
 build/ep1-intro/ep1-intro-slide15.raw.lzsa1: resources/ep1-intro-slides-2.raw
 	ruby build_tools/build_intro_slides.rb
 # ep1_intro.bin -------------------------------------------------------------}}}
+
+# chibi_lr.spr --------------------------------------------------------------{{{
+build/chibi_lr.spr : build_tools/bmp_to_raw.rb \
+		     build/chibi/chibi_r.0.bin \
+		     build/chibi/chibi_r_mask.0.bin \
+		     build/chibi/chibi_r.1.bin \
+		     build/chibi/chibi_r_mask.1.bin \
+		     build/chibi/chibi_l.0.bin \
+		     build/chibi/chibi_l_mask.0.bin \
+		     build/chibi/chibi_l.1.bin \
+		     build/chibi/chibi_l_mask.1.bin \
+		     build/chibi/drone.0.bin \
+		     build/chibi/drone_mask.0.bin \
+		     build/chibi/drone.1.bin \
+		     build/chibi/drone_mask.1.bin \
+		     chibi_lr.s
+	$(AS) -al chibi_lr.s -o build/chibi_lr.o
+	$(LD) $(LDFLAGS) build/chibi_lr.o -T linker_scripts/sprites.cmd -o build/chibi_lr.spr
+
+build/chibi/chibi_r.0.bin : build_tools/bmp_to_raw.rb \
+	                    resources/chibi/chibi_r.0.bmp
+	build_tools/bmp_to_raw.rb resources/chibi/chibi_r.0.bmp build/chibi/chibi_r.0.bin
+
+build/chibi/chibi_r_mask.0.bin : build_tools/bmp_to_raw.rb \
+	                         resources/chibi/chibi_r_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/chibi/chibi_r_mask.0.bmp build/chibi/chibi_r_mask.0.bin
+
+build/chibi/chibi_r.1.bin : build_tools/bmp_to_raw.rb \
+	                    resources/chibi/chibi_r.1.bmp
+	build_tools/bmp_to_raw.rb resources/chibi/chibi_r.1.bmp build/chibi/chibi_r.1.bin
+
+build/chibi/chibi_r_mask.1.bin : build_tools/bmp_to_raw.rb \
+	                         resources/chibi/chibi_r_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/chibi/chibi_r_mask.1.bmp build/chibi/chibi_r_mask.1.bin
+
+build/chibi/chibi_l.0.bin : build_tools/bmp_to_raw.rb \
+	                    resources/chibi/chibi_l.0.bmp
+	build_tools/bmp_to_raw.rb resources/chibi/chibi_l.0.bmp build/chibi/chibi_l.0.bin
+
+build/chibi/chibi_l_mask.0.bin : build_tools/bmp_to_raw.rb \
+	                         resources/chibi/chibi_l_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/chibi/chibi_l_mask.0.bmp build/chibi/chibi_l_mask.0.bin
+
+build/chibi/chibi_l.1.bin : build_tools/bmp_to_raw.rb \
+	                    resources/chibi/chibi_l.1.bmp
+	build_tools/bmp_to_raw.rb resources/chibi/chibi_l.1.bmp build/chibi/chibi_l.1.bin
+
+build/chibi/chibi_l_mask.1.bin : build_tools/bmp_to_raw.rb \
+	                         resources/chibi/chibi_r_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/chibi/chibi_l_mask.1.bmp build/chibi/chibi_l_mask.1.bin
+
+build/chibi/drone.0.bin : build_tools/bmp_to_raw.rb \
+	                  resources/chibi/drone.0.bmp
+	build_tools/bmp_to_raw.rb resources/chibi/drone.0.bmp build/chibi/drone.0.bin
+
+build/chibi/drone_mask.0.bin : build_tools/bmp_to_raw.rb \
+	                       resources/chibi/drone_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/chibi/drone_mask.0.bmp build/chibi/drone_mask.0.bin
+
+build/chibi/drone.1.bin : build_tools/bmp_to_raw.rb \
+	                    resources/chibi/drone.1.bmp
+	build_tools/bmp_to_raw.rb resources/chibi/drone.1.bmp build/chibi/drone.1.bin
+
+build/chibi/drone_mask.1.bin : build_tools/bmp_to_raw.rb \
+	                       resources/chibi/drone_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/chibi/drone_mask.1.bmp build/chibi/drone_mask.1.bin
+# chibi_lr.spr --------------------------------------------------------------}}}
 
 # level_01.bin --------------------------------------------------------------{{{
 build/level_01.bin : build/core.o \
@@ -924,7 +1003,7 @@ build/level_02.o : $(common) \
 	$(AS) -al level_02.s -o build/level_02.o | build_tools/format_list.rb
 
 build/level_02_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
-	                      ../ResCPC/Level2-Tiles-CPC.SPR
+	                   ../ResCPC/Level2-Tiles-CPC.SPR
 	build_tools/spr_cpc_to_uknc.rb ../ResCPC/Level2-Tiles-CPC.SPR -o build/level_02_tiles.spr
 # level_02.bin --------------------------------------------------------------}}}
 
@@ -1260,77 +1339,293 @@ build/level_02/hand_right.1.bin : build_tools/bmp_to_raw.rb \
 		                  build/level_02/hand_right.1.bin
 # level_02.1.spr ------------------------------------------------------------}}}
 
-# chibi_lr.spr --------------------------------------------------------------{{{
-build/chibi_lr.spr : build_tools/bmp_to_raw.rb \
-		     build/chibi/chibi_r.0.bin \
-		     build/chibi/chibi_r_mask.0.bin \
-		     build/chibi/chibi_r.1.bin \
-		     build/chibi/chibi_r_mask.1.bin \
-		     build/chibi/chibi_l.0.bin \
-		     build/chibi/chibi_l_mask.0.bin \
-		     build/chibi/chibi_l.1.bin \
-		     build/chibi/chibi_l_mask.1.bin \
-		     build/chibi/drone.0.bin \
-		     build/chibi/drone_mask.0.bin \
-		     build/chibi/drone.1.bin \
-		     build/chibi/drone_mask.1.bin \
-		     chibi_lr.s
-	$(AS) -al chibi_lr.s -o build/chibi_lr.o
-	$(LD) $(LDFLAGS) build/chibi_lr.o -T linker_scripts/sprites.cmd -o build/chibi_lr.spr
+# level_03.bin --------------------------------------------------------------{{{
+build/level_03.bin : build/core.o \
+                     build/level_03.o
+	$(LD) $(LDFLAGS) build/level_03.o -R build/core.o -o build/level_03.out
+	ruby build_tools/aout2sav.rb build/level_03.out -b -s -o build/level_03.bin
 
-build/chibi/chibi_r.0.bin : build_tools/bmp_to_raw.rb \
-	                    resources/chibi/chibi_r.0.bmp
-	build_tools/bmp_to_raw.rb resources/chibi/chibi_r.0.bmp build/chibi/chibi_r.0.bin
+build/level_03.o : $(common) \
+                   level_03.s \
+		   build/level_03.0.spr \
+		   build/level_03.1.spr \
+		   build/level_03_tiles.spr \
+		   build/chibi_lr.spr
+	$(AS) -al level_03.s -o build/level_03.o | build_tools/format_list.rb
 
-build/chibi/chibi_r_mask.0.bin : build_tools/bmp_to_raw.rb \
-	                         resources/chibi/chibi_r_mask.0.bmp
-	build_tools/bmp_to_raw.rb -b 1 resources/chibi/chibi_r_mask.0.bmp build/chibi/chibi_r_mask.0.bin
+build/level_03_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
+	                   resources/level_03_tiles.cpc.spr
+	build_tools/spr_cpc_to_uknc.rb resources/level_03_tiles.cpc.spr -o build/level_03_tiles.spr
+# level_02.bin --------------------------------------------------------------}}}
 
-build/chibi/chibi_r.1.bin : build_tools/bmp_to_raw.rb \
-	                    resources/chibi/chibi_r.1.bmp
-	build_tools/bmp_to_raw.rb resources/chibi/chibi_r.1.bmp build/chibi/chibi_r.1.bin
+# level_03.0.spr ------------------------------------------------------------{{{
+build/level_03.0.spr : build/level_03.0.o \
+                       linker_scripts/sprites.cmd
+	$(LD) $(LDFLAGS) build/level_03.0.o -T linker_scripts/sprites.cmd \
+	                 -o build/level_03.0.spr
 
-build/chibi/chibi_r_mask.1.bin : build_tools/bmp_to_raw.rb \
-	                         resources/chibi/chibi_r_mask.1.bmp
-	build_tools/bmp_to_raw.rb -b 1 resources/chibi/chibi_r_mask.1.bmp build/chibi/chibi_r_mask.1.bin
+build/level_03.0.o : level_03.0.s \
+	             build/level_03/biterfly.0.bin \
+	             build/level_03/coin.0.bin \
+	             build/level_03/gnat_pack.0.bin \
+	             build/level_03/grass_tuft_a.0.bin \
+	             build/level_03/grass_tuft_b.0.bin \
+	             build/level_03/grass_tuft_big.0.bin \
+	             build/level_03/grass_tuft_c.0.bin \
+	             build/level_03/grass_tuft_d.0.bin \
+	             build/level_03/kamisagi.0.bin \
+	             build/level_03/mukade_bachi_1.0.bin \
+	             build/level_03/mukade_bachi_2.0.bin \
+	             build/level_03/mukade_bachi_3.0.bin \
+	             build/level_03/mukade_bachi_5.0.bin \
+	             build/level_03/powerup_drone.0.bin \
+	             build/level_03/powerup_drone_mask.0.bin \
+	             build/level_03/powerup_power.0.bin \
+	             build/level_03/powerup_rate.0.bin \
+	             build/level_03/shroom_bomber.0.bin \
+	             build/level_03/zombie_capybara.0.bin \
+	             build/level_03/zombie_salaryman.0.bin \
+	             build/level_03/zombie_salaryman_mask.0.bin
+	$(AS) -al level_03.0.s -o build/level_03.0.o
 
-build/chibi/chibi_l.0.bin : build_tools/bmp_to_raw.rb \
-	                    resources/chibi/chibi_l.0.bmp
-	build_tools/bmp_to_raw.rb resources/chibi/chibi_l.0.bmp build/chibi/chibi_l.0.bin
+build/level_03/biterfly.0.bin : build_tools/bmp_to_raw.rb \
+                                resources/level_03/biterfly.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/biterfly.0.bmp \
+	                          build/level_03/biterfly.0.bin
 
-build/chibi/chibi_l_mask.0.bin : build_tools/bmp_to_raw.rb \
-	                         resources/chibi/chibi_l_mask.0.bmp
-	build_tools/bmp_to_raw.rb -b 1 resources/chibi/chibi_l_mask.0.bmp build/chibi/chibi_l_mask.0.bin
+build/level_03/coin.0.bin : build_tools/bmp_to_raw.rb \
+                            resources/level_03/coin.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/coin.0.bmp \
+	                          build/level_03/coin.0.bin
 
-build/chibi/chibi_l.1.bin : build_tools/bmp_to_raw.rb \
-	                    resources/chibi/chibi_l.1.bmp
-	build_tools/bmp_to_raw.rb resources/chibi/chibi_l.1.bmp build/chibi/chibi_l.1.bin
+build/level_03/gnat_pack.0.bin : build_tools/bmp_to_raw.rb \
+                                 resources/level_03/gnat_pack.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/gnat_pack.0.bmp \
+	                          build/level_03/gnat_pack.0.bin
 
-build/chibi/chibi_l_mask.1.bin : build_tools/bmp_to_raw.rb \
-	                         resources/chibi/chibi_r_mask.1.bmp
-	build_tools/bmp_to_raw.rb -b 1 resources/chibi/chibi_l_mask.1.bmp build/chibi/chibi_l_mask.1.bin
+build/level_03/grass_tuft_a.0.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_03/grass_tuft_a.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_a.0.bmp \
+	                          build/level_03/grass_tuft_a.0.bin
 
-build/chibi/drone.0.bin : build_tools/bmp_to_raw.rb \
-	                  resources/chibi/drone.0.bmp
-	build_tools/bmp_to_raw.rb resources/chibi/drone.0.bmp build/chibi/drone.0.bin
+build/level_03/grass_tuft_b.0.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_03/grass_tuft_b.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_b.0.bmp \
+	                          build/level_03/grass_tuft_b.0.bin
 
-build/chibi/drone_mask.0.bin : build_tools/bmp_to_raw.rb \
-	                       resources/chibi/drone_mask.0.bmp
-	build_tools/bmp_to_raw.rb -b 1 resources/chibi/drone_mask.0.bmp build/chibi/drone_mask.0.bin
+build/level_03/grass_tuft_big.0.bin : build_tools/bmp_to_raw.rb \
+                                      resources/level_03/grass_tuft_big.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_big.0.bmp \
+	                          build/level_03/grass_tuft_big.0.bin
 
-build/chibi/drone.1.bin : build_tools/bmp_to_raw.rb \
-	                    resources/chibi/drone.1.bmp
-	build_tools/bmp_to_raw.rb resources/chibi/drone.1.bmp build/chibi/drone.1.bin
+build/level_03/grass_tuft_c.0.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_03/grass_tuft_c.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_c.0.bmp \
+	                          build/level_03/grass_tuft_c.0.bin
 
-build/chibi/drone_mask.1.bin : build_tools/bmp_to_raw.rb \
-	                       resources/chibi/drone_mask.1.bmp
-	build_tools/bmp_to_raw.rb -b 1 resources/chibi/drone_mask.1.bmp build/chibi/drone_mask.1.bin
-# chibi_lr.spr --------------------------------------------------------------}}}
+build/level_03/grass_tuft_d.0.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_03/grass_tuft_d.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_d.0.bmp \
+	                          build/level_03/grass_tuft_d.0.bin
 
-pre-build :
-	mkdir -p build/chibi
-	mkdir -p build/level_01
-	mkdir -p build/level_02
+build/level_03/kamisagi.0.bin : build_tools/bmp_to_raw.rb \
+                                resources/level_03/kamisagi.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/kamisagi.0.bmp \
+	                          build/level_03/kamisagi.0.bin
 
-clean :
-	rm -rf build/*
+build/level_03/mukade_bachi_1.0.bin : build_tools/bmp_to_raw.rb \
+                                      resources/level_03/mukade_bachi_1.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/mukade_bachi_1.0.bmp \
+	                          build/level_03/mukade_bachi_1.0.bin
+
+build/level_03/mukade_bachi_2.0.bin : build_tools/bmp_to_raw.rb \
+                                      resources/level_03/mukade_bachi_2.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/mukade_bachi_2.0.bmp \
+	                          build/level_03/mukade_bachi_2.0.bin
+
+build/level_03/mukade_bachi_3.0.bin : build_tools/bmp_to_raw.rb \
+                                      resources/level_03/mukade_bachi_3.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/mukade_bachi_3.0.bmp \
+	                          build/level_03/mukade_bachi_3.0.bin
+
+build/level_03/mukade_bachi_5.0.bin : build_tools/bmp_to_raw.rb \
+                                      resources/level_03/mukade_bachi_5.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/mukade_bachi_5.0.bmp \
+	                          build/level_03/mukade_bachi_5.0.bin
+
+build/level_03/powerup_drone.0.bin : build_tools/bmp_to_raw.rb \
+                                     resources/level_03/powerup_drone.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/powerup_drone.0.bmp \
+	                          build/level_03/powerup_drone.0.bin
+
+build/level_03/powerup_drone_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                          resources/level_03/powerup_drone_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/powerup_drone_mask.0.bmp \
+	                               build/level_03/powerup_drone_mask.0.bin
+
+build/level_03/powerup_power.0.bin : build_tools/bmp_to_raw.rb \
+                                     resources/level_03/powerup_power.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/powerup_power.0.bmp \
+	                          build/level_03/powerup_power.0.bin
+
+build/level_03/powerup_rate.0.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_03/powerup_rate.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/powerup_rate.0.bmp \
+	                          build/level_03/powerup_rate.0.bin
+
+build/level_03/shroom_bomber.0.bin : build_tools/bmp_to_raw.rb \
+                                     resources/level_03/shroom_bomber.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/shroom_bomber.0.bmp \
+	                          build/level_03/shroom_bomber.0.bin
+
+build/level_03/zombie_capybara.0.bin : build_tools/bmp_to_raw.rb \
+                                       resources/level_03/zombie_capybara.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/zombie_capybara.0.bmp \
+	                          build/level_03/zombie_capybara.0.bin
+
+build/level_03/zombie_salaryman.0.bin : build_tools/bmp_to_raw.rb \
+                                        resources/level_03/zombie_salaryman.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/zombie_salaryman.0.bmp \
+	                          build/level_03/zombie_salaryman.0.bin
+
+build/level_03/zombie_salaryman_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                             resources/level_03/zombie_salaryman_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/zombie_salaryman_mask.0.bmp \
+	                               build/level_03/zombie_salaryman_mask.0.bin
+# level_03.0.spr ------------------------------------------------------------}}}
+
+# level_03.1.spr ------------------------------------------------------------{{{
+build/level_03.1.spr : build/level_03.1.o \
+                       linker_scripts/sprites.cmd
+	$(LD) $(LDFLAGS) build/level_03.1.o -T linker_scripts/sprites.cmd \
+	                 -o build/level_03.1.spr
+
+build/level_03.1.o : level_03.1.s \
+	             build/level_03/biterfly.1.bin \
+	             build/level_03/coin.1.bin \
+	             build/level_03/gnat_pack.1.bin \
+	             build/level_03/grass_tuft_a.1.bin \
+	             build/level_03/grass_tuft_b.1.bin \
+	             build/level_03/grass_tuft_big.1.bin \
+	             build/level_03/grass_tuft_c.1.bin \
+	             build/level_03/grass_tuft_d.1.bin \
+	             build/level_03/kamisagi.1.bin \
+	             build/level_03/mukade_bachi_1.1.bin \
+	             build/level_03/mukade_bachi_2.1.bin \
+	             build/level_03/mukade_bachi_3.1.bin \
+	             build/level_03/mukade_bachi_5.1.bin \
+	             build/level_03/powerup_drone.1.bin \
+	             build/level_03/powerup_drone_mask.1.bin \
+	             build/level_03/powerup_power.1.bin \
+	             build/level_03/powerup_rate.1.bin \
+	             build/level_03/shroom_bomber.1.bin \
+	             build/level_03/zombie_capybara.1.bin \
+	             build/level_03/zombie_salaryman.1.bin \
+	             build/level_03/zombie_salaryman_mask.1.bin
+	$(AS) -al level_03.1.s -o build/level_03.1.o
+
+build/level_03/biterfly.1.bin : build_tools/bmp_to_raw.rb \
+                                resources/level_03/biterfly.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/biterfly.1.bmp \
+	                          build/level_03/biterfly.1.bin
+
+build/level_03/coin.1.bin : build_tools/bmp_to_raw.rb \
+                            resources/level_03/coin.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/coin.1.bmp \
+	                          build/level_03/coin.1.bin
+
+build/level_03/gnat_pack.1.bin : build_tools/bmp_to_raw.rb \
+                                 resources/level_03/gnat_pack.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/gnat_pack.1.bmp \
+	                          build/level_03/gnat_pack.1.bin
+
+build/level_03/grass_tuft_a.1.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_03/grass_tuft_a.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_a.1.bmp \
+	                          build/level_03/grass_tuft_a.1.bin
+
+build/level_03/grass_tuft_b.1.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_03/grass_tuft_b.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_b.1.bmp \
+	                          build/level_03/grass_tuft_b.1.bin
+
+build/level_03/grass_tuft_big.1.bin : build_tools/bmp_to_raw.rb \
+                                      resources/level_03/grass_tuft_big.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_big.1.bmp \
+	                          build/level_03/grass_tuft_big.1.bin
+
+build/level_03/grass_tuft_c.1.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_03/grass_tuft_c.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_c.1.bmp \
+	                          build/level_03/grass_tuft_c.1.bin
+
+build/level_03/grass_tuft_d.1.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_03/grass_tuft_d.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_d.1.bmp \
+	                          build/level_03/grass_tuft_d.1.bin
+
+build/level_03/kamisagi.1.bin : build_tools/bmp_to_raw.rb \
+                                resources/level_03/kamisagi.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/kamisagi.1.bmp \
+	                          build/level_03/kamisagi.1.bin
+
+build/level_03/mukade_bachi_1.1.bin : build_tools/bmp_to_raw.rb \
+                                      resources/level_03/mukade_bachi_1.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/mukade_bachi_1.1.bmp \
+	                          build/level_03/mukade_bachi_1.1.bin
+
+build/level_03/mukade_bachi_2.1.bin : build_tools/bmp_to_raw.rb \
+                                      resources/level_03/mukade_bachi_2.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/mukade_bachi_2.1.bmp \
+	                          build/level_03/mukade_bachi_2.1.bin
+
+build/level_03/mukade_bachi_3.1.bin : build_tools/bmp_to_raw.rb \
+                                      resources/level_03/mukade_bachi_3.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/mukade_bachi_3.1.bmp \
+	                          build/level_03/mukade_bachi_3.1.bin
+
+build/level_03/mukade_bachi_5.1.bin : build_tools/bmp_to_raw.rb \
+                                      resources/level_03/mukade_bachi_5.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/mukade_bachi_5.1.bmp \
+	                          build/level_03/mukade_bachi_5.1.bin
+
+build/level_03/powerup_drone.1.bin : build_tools/bmp_to_raw.rb \
+                                     resources/level_03/powerup_drone.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/powerup_drone.1.bmp \
+	                          build/level_03/powerup_drone.1.bin
+
+build/level_03/powerup_drone_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                          resources/level_03/powerup_drone_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/powerup_drone_mask.1.bmp \
+	                               build/level_03/powerup_drone_mask.1.bin
+
+build/level_03/powerup_power.1.bin : build_tools/bmp_to_raw.rb \
+                                     resources/level_03/powerup_power.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/powerup_power.1.bmp \
+	                          build/level_03/powerup_power.1.bin
+
+build/level_03/powerup_rate.1.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_03/powerup_rate.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/powerup_rate.1.bmp \
+	                          build/level_03/powerup_rate.1.bin
+
+build/level_03/shroom_bomber.1.bin : build_tools/bmp_to_raw.rb \
+                                     resources/level_03/shroom_bomber.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/shroom_bomber.1.bmp \
+	                          build/level_03/shroom_bomber.1.bin
+
+build/level_03/zombie_capybara.1.bin : build_tools/bmp_to_raw.rb \
+                                       resources/level_03/zombie_capybara.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/zombie_capybara.1.bmp \
+	                          build/level_03/zombie_capybara.1.bin
+
+build/level_03/zombie_salaryman.1.bin : build_tools/bmp_to_raw.rb \
+                                        resources/level_03/zombie_salaryman.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_03/zombie_salaryman.1.bmp \
+	                          build/level_03/zombie_salaryman.1.bin
+
+build/level_03/zombie_salaryman_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                             resources/level_03/zombie_salaryman_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/zombie_salaryman_mask.1.bmp \
+	                               build/level_03/zombie_salaryman_mask.1.bin
+# level_03.1.spr ------------------------------------------------------------}}}
