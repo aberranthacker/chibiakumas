@@ -43,7 +43,9 @@ SpendCredit:                         # SpendCredit:
 
 # Both players are dead, so pause the game and show the continue screen
 PlayersDead:                            # Players_Dead:
-        RETURN # TODO: implement PlayersDead
+     # TODO: implement PlayersDead
+        MOV  $0x8000,R5
+        JMP  ExecuteBootstrap
                                         # ld a,&3C
                                         # ld (PlayerCounter),a
                                         # ld hl,(&0039)
@@ -60,6 +62,7 @@ PlayerHandler:
 
 PlayerCounter:
         INC  R0 # or NOP if player 1 is dead # inc a
+                # bootstrap StartANewGame writes INC R0
    .ifdef TwoPlayersGame
         INC  R0 # or NOP if player 2 is dead # inc a
    .endif
@@ -68,7 +71,9 @@ PlayerCounter:
         BZE  PlayersDead                # jr z, Players_Dead
 
         MOV  $000240,@$PlayerCounter    # ld hl,&0000     ;nop,nop
-       #MOV  $000240,@$PlayerCounter+2  # ld (PlayerCounter),hl
+   .ifdef TwoPlayersGame
+        MOV  $000240,@$PlayerCounter+2  # ld (PlayerCounter),hl
+   .endif
                                         # call KeyboardScanner_Read
                                         # ; returns
                                         # ; ixl = Keypress bitmap Player
@@ -725,8 +730,11 @@ Player_Hit_Process:
         BNZ  1237$
    .endif
 
+      # number of lives can't be negative or PPUs Player_DrawUI will crash
+      # check if player already dead first
+        TSTB 9(R0) # lives
+        BZE  PlayerKilled # player already dead
         DECB 9(R0) # lives
-        BMI  1237$ # player already dead if below zero
         BZE  PlayerKilled
         MOVB $0x07,7(R0)
        .ppudo $PPU_PlaySoundEffect4

@@ -192,8 +192,9 @@ Bootstrap_Level_1: # --------------------------------------------------------
         MOV  $level_01.bin,R0
         CALL Bootstrap_LoadDiskFile_Start
            .ppudo_ensure $PPU_SetPalette, $BlackPalette
-           #CALL StartANewGame
+            CALL StartANewGame
             CALL LevelReset0000
+            MOVB $3,@$Player_Array + 9 # set number of lives for the first player
            .ppudo_ensure $PPU_LevelStart
         CALL Bootstrap_LoadDiskFile_WaitForFinish
        .check_for_loading_error "level_01.bin"
@@ -265,8 +266,9 @@ ContinueModeSet: # ../Aku/BootStrap.asm:2165
 NormalFireMode:
                                        # ld a,1
         MOVB $1,@$LivePlayers          # ld (iy-7),a ;live players
+        MOV  $0005200,@$PlayerCounter
                                        # ;multiplay support
-        MOV  $0x003E,R3                # ld hl,&003E
+       #MOV  $0x003E,R3                # ld hl,&003E
                                        # ld a,(MultiplayConfig)
         BITB $1,@$MultiplayConfig      # bit 0,a
         BZE  StartANewGame_NoMultiplay # jr z,StartANewGame_NoMultiplay
@@ -375,22 +377,22 @@ Difficulty_Generic:
         RETURN
 # StartANewGame -------------------------------------------------------------}}}
 StartANewGamePlayer: # ../Aku/BootStrap.asm:2256 ;player fire directions ----{{{
-        ADD  $2,R5
-        CLR  R0
-        MOVB R0,   (R5)+  #  2 Fire Delay
-        MOVB @$SmartBombsReset,(R5)+ # 3 smartbombs
-        MOVB R0,   (R5)+  #  4 drones
-        MOVB @$ContinuesReset, (R5)+ # 5 continues
-        MOVB $16,  (R5)+  #  6 drone pos
-        MOVB $7,   (R5)+  #  7 invincibility 0b00000111
-        MOVB R0,   (R5)+  #  8 spritenum
-        MOVB R0,   (R5)+  #  9 Player Lives (default both players to dead)
-        MOVB R0,   (R5)+  # 10 burst fire xfire
-        MOVB $4,   (R5)+  # 11 Fire Speed    0b00000100
         INC  R5
-        MOVB R0,   (R5)+  # 13 Points to add
-        MOVB R0,   (R5)+  # 14 player shoot power
-        MOVB $0x67,(R5)+  # 15 Fire dir
+        INC  R5
+        CLRB (R5)+                   #  2 Fire Delay
+        MOVB @$SmartBombsReset,(R5)+ #  3 smartbombs
+        CLRB (R5)+                   #  4 drones
+        MOVB @$ContinuesReset,(R5)+  #  5 continues
+        MOVB $16,(R5)+               #  6 drone pos
+        MOVB $7,(R5)+                #  7 invincibility 0b00000111
+        CLRB (R5)+                   #  8 spritenum
+        CLRB (R5)+                   #  9 Player Lives (default both players to dead)
+        CLRB (R5)+                   # 10 burst fire xfire
+        MOVB $4,(R5)+                # 11 Fire Speed    0b00000100
+        INC  R5
+        CLRB (R5)+                   # 13 Points to add
+        CLRB (R5)+                   # 14 player shoot power
+        MOVB $0x67,(R5)+             # 15 Fire dir
 
         RETURN
 #----------------------------------------------------------------------------}}}
@@ -436,17 +438,16 @@ ResetCore: # ../Aku/BootStrap.asm:2318
         MOV  R0,@$Timer_CurrentTick
         MOV  R0,@$DroneFlipCurrent
 
-        CLR  R0
-        MOV  R0,@$EventObjectAnimatorToAdd
-        MOV  R0,@$EventObjectSpriteSizeToAdd
-        MOV  R0,@$EventObjectProgramToAdd
-        MOV  R0,@$Timer_TicksOccured
+        CLR  @$EventObjectAnimatorToAdd
+        CLR  @$EventObjectSpriteSizeToAdd
+        CLR  @$EventObjectProgramToAdd
+        CLR  @$Timer_TicksOccured
 
         CALL DroneFlipFire
 
         MOV  $Object_DecreaseLifeShot, @$dstObjectShotOverride
 
-        # set stuff that happens every level
+      # set stuff that happens every level
         MOV  $0x2064,@$Player_Array  # X:0x20 Y:0x64
    .ifdef TwoPlayersGame
         MOV  $0x2096,@$Player_Array2 # X:0x20 Y:0x96
