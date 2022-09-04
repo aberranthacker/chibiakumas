@@ -11,27 +11,27 @@
 
    # sprite 1 Biterfly
     .word Biterfly # sprite offset
-    .word 0 # bit-mask offset
+    .word BiterflyMask # bit-mask offset
     .byte 24 # height of the sprite
     .byte 0 # Y offset
     .byte 6 # witdh
-    .byte SPR_PSET # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 2 Coin
     .word Coin # sprite offset
-    .word 0 # bit-mask offset
+    .word CoinMask # bit-mask offset
     .byte 16 # height of the sprite
     .byte 0 # Y offset
     .byte 4 # witdh
-    .byte SPR_PSET # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 3 GnatPack
     .word GnatPack # sprite offset
-    .word 0 # bit-mask offset
+    .word GnatPackMask # bit-mask offset
     .byte 24 # height of the sprite
     .byte 0 # Y offset
     .byte 6 # witdh
-    .byte SPR_PSET # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 4 GrassTuftA
     .word GrassTuftA # sprite offset
@@ -51,11 +51,11 @@
 
    # sprite 6 GrassTuftBig
     .word GrassTuftBig # sprite offset
-    .word 0 # bit-mask offset
+    .word GrassTuftBigMask # bit-mask offset
     .byte 16 # height of the sprite
     .byte 0 # Y offset
     .byte 6 # witdh
-    .byte SPR_PSET # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 7 GrassTuftC
     .word GrassTuftC # sprite offset
@@ -75,11 +75,11 @@
 
    # sprite 9 Kamisagi
     .word Kamisagi # sprite offset
-    .word 0 # bit-mask offset
+    .word KamisagiMask # bit-mask offset
     .byte 24 # height of the sprite
     .byte 0 # Y offset
     .byte 6 # witdh
-    .byte SPR_PSET # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 10 MukadeBachi1
     .word MukadeBachi1 # sprite offset
@@ -139,19 +139,19 @@
 
    # sprite 17 ShroomBomber
     .word ShroomBomber # sprite offset
-    .word 0 # bit-mask offset
+    .word ShroomBomberMask # bit-mask offset
     .byte 30 # height of the sprite
     .byte 0 # Y offset
     .byte 6 # witdh
-    .byte SPR_PSET # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 18 ZombieCapybara
     .word ZombieCapybara # sprite offset
-    .word 0 # bit-mask offset
+    .word ZombieCapybaraMask # bit-mask offset
     .byte 22 # height of the sprite
     .byte 0 # Y offset
     .byte 8 # witdh
-    .byte SPR_PSET # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 19 ZombieSalaryman
     .word ZombieSalaryman # sprite offset
@@ -163,12 +163,18 @@
 
 Biterfly:
     .incbin "build/level_03/biterfly.1.bin"
+BiterflyMask:
+    .incbin "build/level_03/biterfly_mask.1.bin"
 
 Coin:
     .incbin "build/level_03/coin.1.bin"
+CoinMask:
+    .incbin "build/level_03/coin_mask.1.bin"
 
 GnatPack:
     .incbin "build/level_03/gnat_pack.1.bin"
+GnatPackMask:
+    .incbin "build/level_03/gnat_pack_mask.1.bin"
 
 GrassTuftA:
     .incbin "build/level_03/grass_tuft_a.1.bin"
@@ -178,6 +184,8 @@ GrassTuftB:
 
 GrassTuftBig:
     .incbin "build/level_03/grass_tuft_big.1.bin"
+GrassTuftBigMask:
+    .incbin "build/level_03/grass_tuft_big_mask.1.bin"
 
 GrassTuftC:
     .incbin "build/level_03/grass_tuft_c.1.bin"
@@ -187,6 +195,8 @@ GrassTuftD:
 
 Kamisagi:
     .incbin "build/level_03/kamisagi.1.bin"
+KamisagiMask:
+    .incbin "build/level_03/kamisagi_mask.1.bin"
 
 MukadeBachi1:
     .incbin "build/level_03/mukade_bachi_1.1.bin"
@@ -213,9 +223,13 @@ PowerupRate:
 
 ShroomBomber:
     .incbin "build/level_03/shroom_bomber.1.bin"
+ShroomBomberMask:
+    .incbin "build/level_03/shroom_bomber_mask.1.bin"
 
 ZombieCapybara:
     .incbin "build/level_03/zombie_capybara.1.bin"
+ZombieCapybaraMask:
+    .incbin "build/level_03/zombie_capybara_mask.1.bin"
 
 ZombieSalaryman:
     .incbin "build/level_03/zombie_salaryman.1.bin"

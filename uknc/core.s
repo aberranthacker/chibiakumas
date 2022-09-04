@@ -228,6 +228,7 @@ not_implemented_check_R0:
 
        .include "core/background_quad_sprite.s"
        .global Background_FloodFillQuadSprite
+       .global Background_FloodFillQuadSpriteColumn
 
        .include "core/background_bit_shifter.s"
        .global BitShifter
@@ -240,7 +241,7 @@ not_implemented_check_R0:
        .global GetSpriteMempos
 
        .even
-      #.space 2
+       .space 2
 end: FileEndCore:
 
 LevelStart:

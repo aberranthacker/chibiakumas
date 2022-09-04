@@ -146,7 +146,7 @@ Bootstrap_Level:
     .ifdef DebugMode
         CMP  R5,$3
         BLOS 1$
-       .inform_and_hang2 "bootstrap: no levels further than 2"
+       .inform_and_hang2 "bootstrap: no levels further than 3"
         1$:
     .endif
         ASL  R5

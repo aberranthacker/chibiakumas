@@ -1366,14 +1366,19 @@ build/level_03.0.spr : build/level_03.0.o \
 
 build/level_03.0.o : level_03.0.s \
 	             build/level_03/biterfly.0.bin \
+	             build/level_03/biterfly_mask.0.bin \
 	             build/level_03/coin.0.bin \
+	             build/level_03/coin_mask.0.bin \
 	             build/level_03/gnat_pack.0.bin \
+	             build/level_03/gnat_pack_mask.0.bin \
 	             build/level_03/grass_tuft_a.0.bin \
 	             build/level_03/grass_tuft_b.0.bin \
 	             build/level_03/grass_tuft_big.0.bin \
+	             build/level_03/grass_tuft_big_mask.0.bin \
 	             build/level_03/grass_tuft_c.0.bin \
 	             build/level_03/grass_tuft_d.0.bin \
 	             build/level_03/kamisagi.0.bin \
+	             build/level_03/kamisagi_mask.0.bin \
 	             build/level_03/mukade_bachi_1.0.bin \
 	             build/level_03/mukade_bachi_2.0.bin \
 	             build/level_03/mukade_bachi_3.0.bin \
@@ -1383,7 +1388,9 @@ build/level_03.0.o : level_03.0.s \
 	             build/level_03/powerup_power.0.bin \
 	             build/level_03/powerup_rate.0.bin \
 	             build/level_03/shroom_bomber.0.bin \
+	             build/level_03/shroom_bomber_mask.0.bin \
 	             build/level_03/zombie_capybara.0.bin \
+	             build/level_03/zombie_capybara_mask.0.bin \
 	             build/level_03/zombie_salaryman.0.bin \
 	             build/level_03/zombie_salaryman_mask.0.bin
 	$(AS) -al level_03.0.s -o build/level_03.0.o
@@ -1393,15 +1400,30 @@ build/level_03/biterfly.0.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/level_03/biterfly.0.bmp \
 	                          build/level_03/biterfly.0.bin
 
+build/level_03/biterfly_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                     resources/level_03/biterfly_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/biterfly_mask.0.bmp \
+	                               build/level_03/biterfly_mask.0.bin
+
 build/level_03/coin.0.bin : build_tools/bmp_to_raw.rb \
                             resources/level_03/coin.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/coin.0.bmp \
 	                          build/level_03/coin.0.bin
 
+build/level_03/coin_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                 resources/level_03/coin_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/coin_mask.0.bmp \
+	                               build/level_03/coin_mask.0.bin
+
 build/level_03/gnat_pack.0.bin : build_tools/bmp_to_raw.rb \
                                  resources/level_03/gnat_pack.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/gnat_pack.0.bmp \
 	                          build/level_03/gnat_pack.0.bin
+
+build/level_03/gnat_pack_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                      resources/level_03/gnat_pack_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/gnat_pack_mask.0.bmp \
+	                               build/level_03/gnat_pack_mask.0.bin
 
 build/level_03/grass_tuft_a.0.bin : build_tools/bmp_to_raw.rb \
                                     resources/level_03/grass_tuft_a.0.bmp
@@ -1418,6 +1440,11 @@ build/level_03/grass_tuft_big.0.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_big.0.bmp \
 	                          build/level_03/grass_tuft_big.0.bin
 
+build/level_03/grass_tuft_big_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_03/grass_tuft_big_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/grass_tuft_big_mask.0.bmp \
+	                               build/level_03/grass_tuft_big_mask.0.bin
+
 build/level_03/grass_tuft_c.0.bin : build_tools/bmp_to_raw.rb \
                                     resources/level_03/grass_tuft_c.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_c.0.bmp \
@@ -1432,6 +1459,11 @@ build/level_03/kamisagi.0.bin : build_tools/bmp_to_raw.rb \
                                 resources/level_03/kamisagi.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/kamisagi.0.bmp \
 	                          build/level_03/kamisagi.0.bin
+
+build/level_03/kamisagi_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                     resources/level_03/kamisagi_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/kamisagi_mask.0.bmp \
+	                               build/level_03/kamisagi_mask.0.bin
 
 build/level_03/mukade_bachi_1.0.bin : build_tools/bmp_to_raw.rb \
                                       resources/level_03/mukade_bachi_1.0.bmp
@@ -1478,10 +1510,20 @@ build/level_03/shroom_bomber.0.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/level_03/shroom_bomber.0.bmp \
 	                          build/level_03/shroom_bomber.0.bin
 
+build/level_03/shroom_bomber_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                          resources/level_03/shroom_bomber_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/shroom_bomber_mask.0.bmp \
+	                               build/level_03/shroom_bomber_mask.0.bin
+
 build/level_03/zombie_capybara.0.bin : build_tools/bmp_to_raw.rb \
                                        resources/level_03/zombie_capybara.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/zombie_capybara.0.bmp \
 	                          build/level_03/zombie_capybara.0.bin
+
+build/level_03/zombie_capybara_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                            resources/level_03/zombie_capybara_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/zombie_capybara_mask.0.bmp \
+	                               build/level_03/zombie_capybara_mask.0.bin
 
 build/level_03/zombie_salaryman.0.bin : build_tools/bmp_to_raw.rb \
                                         resources/level_03/zombie_salaryman.0.bmp
@@ -1502,14 +1544,19 @@ build/level_03.1.spr : build/level_03.1.o \
 
 build/level_03.1.o : level_03.1.s \
 	             build/level_03/biterfly.1.bin \
+	             build/level_03/biterfly_mask.1.bin \
 	             build/level_03/coin.1.bin \
+	             build/level_03/coin_mask.1.bin \
 	             build/level_03/gnat_pack.1.bin \
+	             build/level_03/gnat_pack_mask.1.bin \
 	             build/level_03/grass_tuft_a.1.bin \
 	             build/level_03/grass_tuft_b.1.bin \
 	             build/level_03/grass_tuft_big.1.bin \
+	             build/level_03/grass_tuft_big_mask.1.bin \
 	             build/level_03/grass_tuft_c.1.bin \
 	             build/level_03/grass_tuft_d.1.bin \
 	             build/level_03/kamisagi.1.bin \
+	             build/level_03/kamisagi_mask.1.bin \
 	             build/level_03/mukade_bachi_1.1.bin \
 	             build/level_03/mukade_bachi_2.1.bin \
 	             build/level_03/mukade_bachi_3.1.bin \
@@ -1519,7 +1566,9 @@ build/level_03.1.o : level_03.1.s \
 	             build/level_03/powerup_power.1.bin \
 	             build/level_03/powerup_rate.1.bin \
 	             build/level_03/shroom_bomber.1.bin \
+	             build/level_03/shroom_bomber_mask.1.bin \
 	             build/level_03/zombie_capybara.1.bin \
+	             build/level_03/zombie_capybara_mask.1.bin \
 	             build/level_03/zombie_salaryman.1.bin \
 	             build/level_03/zombie_salaryman_mask.1.bin
 	$(AS) -al level_03.1.s -o build/level_03.1.o
@@ -1529,15 +1578,30 @@ build/level_03/biterfly.1.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/level_03/biterfly.1.bmp \
 	                          build/level_03/biterfly.1.bin
 
+build/level_03/biterfly_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                     resources/level_03/biterfly_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/biterfly_mask.1.bmp \
+	                               build/level_03/biterfly_mask.1.bin
+
 build/level_03/coin.1.bin : build_tools/bmp_to_raw.rb \
                             resources/level_03/coin.1.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/coin.1.bmp \
 	                          build/level_03/coin.1.bin
 
+build/level_03/coin_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                 resources/level_03/coin_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/coin_mask.1.bmp \
+	                               build/level_03/coin_mask.1.bin
+
 build/level_03/gnat_pack.1.bin : build_tools/bmp_to_raw.rb \
                                  resources/level_03/gnat_pack.1.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/gnat_pack.1.bmp \
 	                          build/level_03/gnat_pack.1.bin
+
+build/level_03/gnat_pack_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                      resources/level_03/gnat_pack_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/gnat_pack_mask.1.bmp \
+	                               build/level_03/gnat_pack_mask.1.bin
 
 build/level_03/grass_tuft_a.1.bin : build_tools/bmp_to_raw.rb \
                                     resources/level_03/grass_tuft_a.1.bmp
@@ -1554,6 +1618,11 @@ build/level_03/grass_tuft_big.1.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_big.1.bmp \
 	                          build/level_03/grass_tuft_big.1.bin
 
+build/level_03/grass_tuft_big_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_03/grass_tuft_big_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/grass_tuft_big_mask.1.bmp \
+	                               build/level_03/grass_tuft_big_mask.1.bin
+
 build/level_03/grass_tuft_c.1.bin : build_tools/bmp_to_raw.rb \
                                     resources/level_03/grass_tuft_c.1.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_c.1.bmp \
@@ -1568,6 +1637,11 @@ build/level_03/kamisagi.1.bin : build_tools/bmp_to_raw.rb \
                                 resources/level_03/kamisagi.1.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/kamisagi.1.bmp \
 	                          build/level_03/kamisagi.1.bin
+
+build/level_03/kamisagi_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                     resources/level_03/kamisagi_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/kamisagi_mask.1.bmp \
+	                               build/level_03/kamisagi_mask.1.bin
 
 build/level_03/mukade_bachi_1.1.bin : build_tools/bmp_to_raw.rb \
                                       resources/level_03/mukade_bachi_1.1.bmp
@@ -1614,10 +1688,20 @@ build/level_03/shroom_bomber.1.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/level_03/shroom_bomber.1.bmp \
 	                          build/level_03/shroom_bomber.1.bin
 
+build/level_03/shroom_bomber_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                          resources/level_03/shroom_bomber_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/shroom_bomber_mask.1.bmp \
+	                               build/level_03/shroom_bomber_mask.1.bin
+
 build/level_03/zombie_capybara.1.bin : build_tools/bmp_to_raw.rb \
                                        resources/level_03/zombie_capybara.1.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/zombie_capybara.1.bmp \
 	                          build/level_03/zombie_capybara.1.bin
+
+build/level_03/zombie_capybara_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                            resources/level_03/zombie_capybara_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/zombie_capybara_mask.1.bmp \
+	                               build/level_03/zombie_capybara_mask.1.bin
 
 build/level_03/zombie_salaryman.1.bin : build_tools/bmp_to_raw.rb \
                                         resources/level_03/zombie_salaryman.1.bmp
