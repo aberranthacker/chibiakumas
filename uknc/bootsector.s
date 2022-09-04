@@ -13,7 +13,9 @@
        .=040
         RTI                 # dummy interrupt handler
        .=0104
-68$:    MOV  $040,@$0100    # set dummy Vblank int handler
+68$:    
+        MOVB R0,@$PS.DeviceNumber
+        MOV  $040,@$0100    # set dummy Vblank int handler
         MOV  $SP_RESET,SP
 
         MOV  $TitleStr,R0
@@ -32,7 +34,7 @@ load_bootstrap:
 30$:    TSTB @$PS.Reply
         BMI  30$
         BNE  PrintErrorCode
-
+        BISB @$PS.DeviceNumber,@$Bootstrap_PS.DeviceNumber
         JMP  @$BootstrapStart
 
 PrintErrorCode:
@@ -81,17 +83,17 @@ ParamsStruct:
     PS.CPU_RAM_Address: .word  BootstrapStart
     PS.WordsCount:      .word  BootstrapSizeWords # number of words to transfer
 
-TitleStr:    #---------------------------------------------------------------{{{
+TitleStr: #---------------------------------------------------------------------
       #.byte  033,0240,'2  # character color
       #.byte  033,0241,'7  # character background color
       #.byte  033,0242,'7  # screen background color
       #.byte  033,0247,'0  # cursor color
       #.byte  014          # clear screen
 
-       .byte  033,'Y, 32+1,32+0
-       .ascii "ChibiAkumas  V1.666"
-
-       .byte  033,'H # move curor to "home" position
+       .byte  033, 'Y, 32+1, 32+0
+       .ascii "ChibiAkumas V0.666"
+       .byte  033, 'H # move curor to "home" position
        .byte  0
-#----------------------------------------------------------------------------}}}
+       .even
+#-------------------------------------------------------------------------------
        .=0x200
