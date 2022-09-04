@@ -6,6 +6,8 @@
                 .global Bootstrap_Launch
                 .global Bootstrap_FromR5
                 .global BootstrapEnd
+                .equiv  Bootstrap_PS.DeviceNumber, PS.DeviceNumber
+                .global Bootstrap_PS.DeviceNumber
                 .global BootstrapSize
                 .global BootstrapSizeWords
                 .global BootstrapSizeDWords
@@ -111,9 +113,6 @@ Bootstrap_Launch: # used by bootsector linker script
                 MOV  (R4)+, (R5)+
             SOB R1,200$
        .endif
-
-      # TODO: Load saved settings
-      # TODO: player sprites load
 #----------------------------------------------------------------------------}}}
 
         MOV  $StartOnLevel,R5
@@ -483,7 +482,8 @@ Bootstrap_LoadDiskFile_Start: # ---------------------------------------------{{{
         MOVB R3,@$PS.AddressOnDevice + 1 # sector (1-10)
 
         ASH  $7,R2
-        MOVB R2,@$PS.DeviceNumber        # head (0, 1)
+        BICB $0x80,@$PS.DeviceNumber     # BICB/BISB to preserve drive number
+        BISB R2,@$PS.DeviceNumber        # head (0, 1)
 
         MOVB $-1,@$PS.Status
         CLC
