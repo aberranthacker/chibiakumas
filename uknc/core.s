@@ -161,11 +161,21 @@ not_implemented_check_R0:
        .global ObjectArray_Redraw
 
        .include "core/player_driver.s"
+       .global ContinuesScreenPos
+       .global DroneFlipCurrent
        .global DroneFlipFire
-       .global Player_DrawUI
+       .global DroneFlipFireCurrent
+       .global Fire1Handler
+       .global Fire2Handler
+       .global FireDownHandler
+       .global FireLeftHandler
+       .global FireRightHandler
+       .global FireUpHandler
+       .global PlayerCounter
        .global PlayerHandler
-       .global Player_Handler_DoSmartBomb
+       .global Player_DrawUI
        .global Player_GetPlayerVars
+       .global Player_Handler_DoSmartBomb
        .global SetFireDir_DOWN
        .global SetFireDir_Fire
        .global SetFireDir_FireAndSaveRestore
@@ -174,21 +184,12 @@ not_implemented_check_R0:
        .global SetFireDir_RIGHT
        .global SetFireDir_RIGHTsave
        .global SetFireDir_UP
+       .global ShowContinueCounter
        .global ShowContinuesSelfMod
        .global SpendCreditSelfMod
-       .global DroneFlipCurrent
-       .global DroneFlipFireCurrent
        .global dstCustomPlayerHitter
        .global dstCustomSmartBombEnemy
-       .global Fire1Handler
-       .global Fire2Handler
-       .global FireDownHandler
-       .global FireLeftHandler
-       .global FireRightHandler
-       .global FireUpHandler
        .global dstSmartBombSpecial
-       .global ContinuesScreenPos
-       .global ShowContinueCounter
 
        .include "core/screen_memory.s"
        .global CLS
