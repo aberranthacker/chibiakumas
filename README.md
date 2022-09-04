@@ -37,5 +37,5 @@ configure it to support PDP-11
    make install
 ```
 and thats it.
-Now you are all set to run the `make` command from within `./uknc/` directory to build the project.
+Now you are all set to run the `make` command within `./uknc/` directory to build the project.
 

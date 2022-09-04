@@ -126,7 +126,7 @@ DoMoves_Spec: # Special moves - various kinds
 
         RETURN
 
-      # R4=X, R1=Y, R2: LSB=move, MSB=anything
+      # R4=B=X, R1=C=Y, R2: LSB=D=move, MSB=anything
 DoMoves_Wave:
       # wave pattern  1010DSPP D Depth bit, S Speed, PP Position
         MOV  R4,R1
@@ -152,9 +152,11 @@ DoMoves_Wave:
         ASLB R1 # rem to reduce wave depth
         MOV  R2,R0
         BIC  $0xFFFC,R0
+# DoMoves_WaveEnd
         ASH  $5,R0
         BIS  $0b00011100,R0
         ADD  R0,R1
+
         DEC  R4
         CMP  R4,$24       # we are at the bottom of the screen
         BLO  DoMoves_Kill # over the page

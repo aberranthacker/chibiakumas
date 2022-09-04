@@ -35,3 +35,9 @@ Timer_Paused:
         MOV  R0,@$Timer_TicksOccured
 
         RETURN
+
+# Timer_GetTimer:              ; Return current timer in I
+#     ld a,(Timer_CurrentTick) ; and 'Ticks occured' Xor bitmap
+#     ld i,a
+#     ld a,0 :Timer_TicksOccured_Plus1
+#     ret

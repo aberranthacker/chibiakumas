@@ -965,137 +965,101 @@ Background_DrawB:
         MOV  $GradientTopStart,R1
         MOV  $0b11111100,R2  # Shift on Timer Ticks
         CALL @$Background_Gradient
-                                                  # ;Bottom
-        CLR  R0 # sprite number                   # ld a,0
-        MOV  $LevelTiles,R4                       # ld de,LevelTiles
-        CALL GetSpriteMempos                      # call GetSpriteMempos
-                                                  # push de
+
+        CLR  R0 # sprite number
+        MOV  $LevelTiles,R4
+        CALL GetSpriteMempos
+
       # we will need the position later for Tile bitshifts
-        MOV  R4,-(SP)                             #     push de
-        MOV  $8,R1                                #         ld b,16/2 ;Lines
-        CALL @$Background_FloodFillQuadSprite     #         ld a,1 ;(1/1=2) Black lines
-                                                  #         call BackgroundFloodFillQuadSpriteColumn ;need pointer to sprite in HL
-                                                  #     pop de
-                                                  #     ex hl,de                ;Move down 8 lines
-                                                  #         ld bc,8*8
-                                                  #         add hl,bc
-                                                  #     ex hl,de
-                                                  #     push de
-                                                  #     push de
-        CLR  R0                                   #         ld de,&0000
-        MOV  $4,R1                                #         ld b,4
-        CALL @$Background_SolidFill               #         call BackgroundSolidFill ;need pointer to sprite in HL
-                                                  #     pop de
+        MOV  R4,-(SP)
+        MOV  $8,R1
+        MOV  $1,R2
+        CALL @$Background_FloodFillQuadSpriteColumn
 
-                                                  #     ld b,64/4 ;************ COLUMN WORKS IN MULTIPLES OF 4, so DEVIDE BY 4 and put result in B! ******************
-        MOV  $16,R1                               #     ld a,3 ;Black lines (3/1=4)
-        CALL @$Background_FloodFillQuadSprite     #     call BackgroundFloodFillQuadSpriteColumn ;need pointer to sprite in HL
+        CLR  R0
+        MOV  $4,R1
+        CALL @$Background_SolidFill
 
-                                                  #     pop de
-                                                  #     ex hl,de ;Move down 16 lines
-                                                  #         ld bc,8*16
-                                                  #         add hl,bc
-                                                  #     ex hl,de
-                                                  #     push de
-        CLR  R0                                   #         ld de,&0000
-        MOV  $4,R1                                #         ld b,4
-        CALL @$Background_SolidFill               #         call BackgroundSolidFill ;need pointer to sprite in HL
-                                                  #     pop de
-                                                  #     push de
-        MOV  $8,R1                                #         ld b,8 ;Lines
-        CALL @$Background_FloodFillQuadSprite     #         call BackgroundFloodFillQuadSprite ;need pointer to sprite in HL
+        MOV  $16,R1
+        MOV  $3,R2
+        CALL @$Background_FloodFillQuadSpriteColumn
 
+        CLR  R0
+        MOV  $4,R1
+        CALL @$Background_SolidFill
 
-        CLR  R0                                   #         ld de,&0000
-       #MOV  $16,R1                               #         ld b,16
-        MOV  $16+54,R1
-        CALL @$Background_SolidFill               #         call BackgroundSolidFill ;need pointer to sprite in HL
+        MOV  $8,R1
+        CALL @$Background_FloodFillQuadSprite
 
+        CLR  R0
+        MOV  $16,R1
+        CALL @$Background_SolidFill
+
+        MOV  $GradientBottom,R3 # 40 lines
+        MOV  $GradientBottomStart,R1
+        MOV  $0b11111111,R2 # Shift on Timer Ticks
         MOV  R4,-(SP) # Background_Gradient corrupts R4
-                                                  #         GradientBottomStart equ 40
-        MOV  $GradientBottom,R3 # 40 lines        #         ld de,GradientBottom
-        MOV  $GradientBottomStart,R1              #         ld b,GradientBottomStart
-        MOV  $0b11111111,R2 # Shift on Timer Ticks#         ld c,%11111111          ;Shift on Timer Ticks
-        CALL @$Background_Gradient                #         call Akuyou_Background_Gradient
-                                                  #     pop de
-
-                                                  #     ex hl,de                ;Move down 16 lines
-                                                  #         ld bc,8*8
-                                                  #         add hl,bc
-                                                  #     ex hl,de
-
-        MOV  $8,R1 # number of lines              #     ld b,8 ;Lines
+        CALL @$Background_Gradient
         MOV  (SP)+,R4
-        CALL @$Background_FloodFillQuadSprite     #     call BackgroundFloodFillQuadSprite ;need pointer to sprite in HL
+
+        MOV  $8,R1 # number of lines
+        CALL @$Background_FloodFillQuadSprite
 # Tile Bitshifts ---------------------------------------------------------------
       # pop de ;needed to keep this for the bitshifts
         MOV  (SP)+,R5 # ponter to the first tile
-                                       #        pop de ;needed to keep this for the bitshifts
-       .equiv TileWidthBytes, 8        #        ld hl,0007 ; shift to the right of the sprite
+
+       .equiv TileWidthBytes, 8
       # we do MOV  -(R5),R0 to read words, to be able to use ASH for shifts
       # so R5 should point to next line
-        ADD  $TileWidthBytes,R5        #        add hl,de
+        ADD  $TileWidthBytes,R5
 
-        MOV  $0b11111110,R0     # shift on timer ticks # ld a,%11111110 ;Shift on Timer Ticks
-        MOV  $TileWidthBytes,R1 # bytes                # ld b,&8         ; Bytes
-        MOV  $8,R2              # lines                # ld c,8          ;lines
-        CALL @$BitShifter       #                      # call BitShifter ;need pointer to sprite in HL
-
-                                       # ;must be byte aligned
-        MOV  $0b11111100,R0     # shift on timer ticks # ld a,%11111100 ;Shift on Timer Ticks
-        MOV  $TileWidthBytes,R1 # bytes                # ld b,&8         ; Bytes
-        MOV  $16,R2             # lines                # ld c,16         ;lines
-        CALL @$BitShifter       #                      # call BitShifter ;need pointer to sprite in HL
-
-                                       # ;must be byte aligned - otherwise recalc!
-        MOV  $0b11111110,R0     # shift on timer ticks # ld a,%11111110 ;Shift on Timer Ticks
-        MOV  $TileWidthBytes,R1 # bytes                # ld b,&8         ; Bytes
-        MOV  $8,R2              # lines                # ld c,8          ;lines
-        CALL @$BitShifter       #                      # call BitShifter ;need pointer to sprite in HL
-
-                                                       # inc h   ;Bitshifter wraps on byte align, so manually recalc, or force a move every 32 lines
-
-                                                       # ld a,%11111111 ;Shift on Timer Ticks
-        MOV  $0b11111111,R0     # shift on timer ticks # ld b,&8         ; Bytes
-        MOV  $TileWidthBytes,R1 # bytes                # ld c,8          ;lines
+        MOV  $0b11111110,R0     # shift on timer ticks
+        MOV  $TileWidthBytes,R1 # bytes
         MOV  $8,R2              # lines
-        CALL @$BitShifterDouble #                      # call BitShifterDouble ;need pointer to sprite in HL
-        RETURN                         # ret
+        CALL @$BitShifter       #
 
-                                       # Background_SmartBomb:
-                                       #        ld e,d
-                                       #        jr Background_Fill
-                                       # Background_Black:
-                                       #        ld de,&0000
-                                       # Background_Fill:
-                                       #                ld b,200
-                                       #                jp BackgroundSolidFill
+        MOV  $0b11111100,R0     # shift on timer ticks
+        MOV  $TileWidthBytes,R1 # bytes
+        MOV  $16,R2             # lines
+        CALL @$BitShifter       #
+
+        MOV  $0b11111110,R0     # shift on timer ticks
+        MOV  $TileWidthBytes,R1 # bytes
+        MOV  $8,R2              # lines
+        CALL @$BitShifter       #
+
+        MOV  $0b11111111,R0     # shift on timer ticks
+        MOV  $TileWidthBytes,R1 # bytes
+        MOV  $8,R2              # lines
+        CALL @$BitShifterDouble #
+
+        RETURN
 # Background Data ----------------------------------------------#
    .equiv GradientTopStart, 40 # lines count                    #
- GradientTop:                                                   # GradientTop:
-    .word 0x00FF, 0x00FF                # 1st line              #        defb &0F,&0F    ;1; first line
-    .word GradientTopStart - 10, 0x00DD # 2nd line num, new word#        defb GradientTopStart-10,&0D    ;2; line num, New byte
-    .word GradientTopStart - 16, 0x0077                         #        defb GradientTopStart-16,&07    ;3
-    .word GradientTopStart - 20, 0x00AA                         #        defb GradientTopStart-20,&0A    ;4
-    .word GradientTopStart - 26, 0x0055                         #        defb GradientTopStart-26,&05    ;5
-    .word GradientTopStart - 30, 0x0088                         #        defb GradientTopStart-30,&08    ;6
-    .word GradientTopStart - 36, 0x0022                         #        defb GradientTopStart-36,&02    ;7
-    .word GradientTopStart - 38, 0x0000                         #        defb GradientTopStart-38,&00    ;7
-    .word GradientTopStart - 40, 0x0000                         #        defb GradientTopStart-40,&00    ;7
-    .word 0xFFFF                                                #        defb 255
+ GradientTop:                                                   #
+    .word 0xFF00, 0xFF00                # 1st line              # defb &0F,&0F    ;1; first line
+    .word GradientTopStart - 10, 0xDD00 # 2nd line num, new word# defb GradientTopStart-10,&0D ;2; line num, New byte
+    .word GradientTopStart - 16, 0x7700                         # defb GradientTopStart-16,&07 ;3
+    .word GradientTopStart - 20, 0xAA00                         # defb GradientTopStart-20,&0A ;4
+    .word GradientTopStart - 26, 0x5500                         # defb GradientTopStart-26,&05 ;5
+    .word GradientTopStart - 30, 0x8800                         # defb GradientTopStart-30,&08 ;6
+    .word GradientTopStart - 36, 0x2200                         # defb GradientTopStart-36,&02 ;7
+    .word GradientTopStart - 38, 0x0000                         # defb GradientTopStart-38,&00 ;7
+    .word GradientTopStart - 40, 0x0000                         # defb GradientTopStart-40,&00 ;7
+    .word 0xFFFF                                                # defb 255
 
     .equiv GradientBottomStart, 40 # lines count
- GradientBottom:                                                # GradientBottom:
-    .word 0x0000, 0x0000 # 1st line                             #        defb &0,&0      ;1; first line
-    .word 40, 0x0022     # 2nd line num, new word               #        defb 40,&20     ;10
-    .word 36, 0x0088                                            #        defb 36,&80     ;11
-    .word 30, 0x0055                                            #        defb 30,&50     ;12
-    .word 26, 0x00AA                                            #        defb 26,&A0     ;13
-    .word 20, 0x0077                                            #        defb 20,&70     ;14
-    .word 10, 0x00DD                                            #        defb 10,&D0     ;15
-    .word  4, 0x00FF                                            #        defb 4,&F0      ;15
-    .word  2, 0x00FF                                            #        defb 2,&F0      ;15
-    .word 0xFFFF                                                #        defb 255
+ GradientBottom:                                                #
+    .word 0x0000, 0x0000 # 1st line                             # defb &0,&0  ;1; first line
+    .word 40, 0x0022     # 2nd line num, new word               # defb 40,&20 ;10
+    .word 36, 0x0088                                            # defb 36,&80 ;11
+    .word 30, 0x0055                                            # defb 30,&50 ;12
+    .word 26, 0x00AA                                            # defb 26,&A0 ;13
+    .word 20, 0x0077                                            # defb 20,&70 ;14
+    .word 10, 0x00DD                                            # defb 10,&D0 ;15
+    .word  4, 0x00FF                                            # defb 4,&F0  ;15
+    .word  2, 0x00FF                                            # defb 2,&F0  ;15
+    .word 0xFFFF                                                # defb 255
 #---------------------------------------------------------------#
 
 CustomMoveBouncer:
@@ -1164,106 +1128,105 @@ CustomMoveBouncer:
                                        # ret
 
 CustomMove3:
-                                       #        di
-                                       #        exx
-                                       #        ld hl,CustomMovePatternGeneric
-                                       #        ld de,CustomMovePatternMiniWave
-                                       #        ld bc,CustomMovePattern_Init10
+        MOV  $CustomMovePatternGeneric, @$dstCustomMovePatternA # ld hl,CustomMovePatternGeneric
+        MOV  $CustomMovePatternMiniWave,@$dstCustomMovePatternB # ld de,CustomMovePatternMiniWave
+        MOV  $CustomMovePattern_Init10, @$dstCustomMovePattern_Init # ld bc,CustomMovePattern_Init10
+        BR   CustomMovePattern         #   jr CustomMovePattern
 
-                                       # jr CustomMovePattern
-
-                                       # CustomMovePatternMiniWave:
-                                       #        ; WaveSmall pattern  1010SPPP   S= Speed, PPP Position
-                                       #        ld a,b
-                                       #        srl a   ; unrem for speedup
-                                       #        srl a   ; unrem for speedup
-                                       #        and %00011111
-                                       #        cp  %00010000
-                                       #        jr C,DoMoves_WaveSmallContinue
-                                       #        xor %00011111
-                                       # DoMoves_WaveSmallContinue:
-                                       #        ld C,a
-                                       #        ld a,%00000011
-                                       # DoMoves_WaveEnd
-                                       #        rrca
+      # R4=B=X, R1=C=Y, R2: LSB=D=move, MSB=anything
+CustomMovePatternMiniWave:
+      # WaveSmall pattern  1010SPPP  S= Speed, PPP Position
+        MOV  R4,R1                     #        ld a,b
+        ASR  R1                        #        srl a   ; unrem for speedup
+        ASR  R1                        #        srl a   ; unrem for speedup
+        BIC  $0xFFE0,R1                #        and %00011111
+        CMP  R1,$0x10                  #        cp  %00010000
+        BLO  DoMoves_WaveSmallContinue #        jr C,DoMoves_WaveSmallContinue
+        MOV  $0x1F,R0
+        XOR  R0,R1                     #        xor %00011111
+DoMoves_WaveSmallContinue:
+        MOV  R2,R0                     #        ld C,a
+        BIC  $0xFFFC,R0                #        ld a,%00000011
+# DoMoves_WaveEnd
+        ASH  $5,R0                     #        rrca
                                        #        rrca
                                        #        rrca            ; equivalent to 5 left shifts
-                                       #        or %00011100
-
-                                       #        add C
+        BIS  $0b00011100,R0            #        or %00011100
+        ADD  R0,R1                     #        add C
                                        #        ld C,a
 
-                                       #        ld a,B
+        DEC  R4                        #        ld a,B
                                        #        sub 1
                                        #        ld B,A
-                                       #        cp 24                   ;we are at the bottom of the screen
-                                       #        jp C,CustomMovePatternKill      ;over the page
-                                       #        ret
+        CMP  R4,$24                    #        cp 24                   ;we are at the bottom of the screen
+        BLO  CustomMovePatternKill     #        jp C,CustomMovePatternKill      ;over the page
+        RETURN                         #        ret
 
-                                       # GetCustomRam:
-                                       #        and %00001111
-                                       #                ld hl,CustomRam
-
-                                       #                        ld d,0
-                                       #                        ld e,a
-                                       #                        add hl,de
-                                       #                        add hl,de
-                                       #                        add hl,de
-                                       #                        add hl,de
-                                       #                push hl
-                                       #                pop ix
+GetCustomRam:
+        BIC  $0xFFF0,R5                # and %00001111
+                                       # ld hl,CustomRam
+                                       #   ld d,0
+                                       #   ld e,a
+        ASL  R5                        #   add hl,de
+        ASL  R5                        #   add hl,de
+        ADD  $CustomRam,R5             #   add hl,de
+                                       #   add hl,de
+                                       # push hl
+                                       # pop ix
         RETURN                         # ret
 
-                                       # CustomMovePattern:             ; B=X C=Y D=Move
-                                       #        ld (CustomPatternJump_Plus2-2),hl
-                                       #        ld (CustomPatternbJump_Plus2-2),de
-                                       #        ld (CustomMovePattern_Init_Plus2-2),bc
-                                       #        exx
+CustomRam:
+       .space 128
+      # R1 C = Y
+      # R2 LSB D = move, R3 MSB = anything
+      # R3 LSB ixl = Life, R3 MSB iyl = Program Code
+      # R4 B = X
+CustomMovePattern: # B=X C=Y D=Move
+                                       # ld a,ixl        ;lifCustom
+        PUSH R5                        # ex af,af'
+        MOVB R2,R5                     # ld a,d
+                                       # exx
+                                       # push ix
+        CALL GetCustomRam              #         call GetCustomRam
+                                       #         call Akuyou_Timer_GetTimer
+                                       #         ld d,a
+                                       #         ldai    ; Level time
+                                       #         ld e,a
 
-                                       #        ld a,ixl        ;lifCustom
-                                       #        ex af,af'
+                                       #        ;dont update more than once per tick!
+                                       #         ld a,(ix+1)
+        CMPB 1(R5),@$Timer_CurrentTick #         cp e
+                                       #         jr z,CustomMovePattern_NoTick
+                                       #         ld a,e
+        MOVB @$Timer_CurrentTick,1(R5) #         ld (ix+1),e
 
-                                       #        ld a,d
-                                       #        exx
-                                       #        push ix
+                                       #        ;see if this is our first run
+                                       #         ex af,af'
+        CMPB R3,$0xFF                  #         cp 255
+        BLO  CustomMove_DoMove
+       .equiv dstCustomMovePattern_Init, .+2
+        CALL @$CustomMovePattern_Init  #         call nc,CustomMovePattern_Init :CustomMovePattern_Init_Plus2
+                                       #         ex af,af'
 
-                                       #                call GetCustomRam
-
-                                       #                call Akuyou_Timer_GetTimer
-                                       #                ld d,a
-                                       #                ldai    ; Level time
-                                       #                ld e,a
-
-
-                                       #                ;dont update more than once per tick!
-                                       #                ld a,(ix+1)
-                                       #                cp e
-                                       #                jr z,CustomMovePattern_NoTick
-                                       #                ld a,e
-                                       #                ld (ix+1),e
-
-                                       #                ;see if this is our first run
-                                       #                ex af,af'
-                                       #                        cp 255
-                                       #                        call nc,CustomMovePattern_Init :CustomMovePattern_Init_Plus2
-                                       #                ex af,af'
-
-                                       #                ; here is where we make some moves!
-                                       #                exx
-                                       #                call CustomMovePatternGeneric :CustomPatternJump_Plus2
-                                       #                exx
-                                       #                ;increment the pos
+                                       #        ;here is where we make some moves!
+                                       #         exx
+CustomMove_DoMove:
+       .equiv dstCustomMovePatternA, .+2
+        CALL @$CustomMovePatternGeneric#         call CustomMovePatternGeneric :CustomPatternJump_Plus2
+                                       #         exx
+                                       #        ;increment the pos
 
                                        # CustomMovePattern_NoTick:
-                                       #                ; here is where we make some moves!
-                                       #                exx
-                                       #                call null :CustomPatternbJump_Plus2
+                                       #        ; here is where we make some moves!
+                                       #        exx
+       .equiv dstCustomMovePatternB, .+2
+        CALL @$null                    #        call null :CustomPatternBJump_Plus2
 
-                                       #                ld a,b
-                                       #                cp 160+24
-                                       #                call NC,CustomMovePatternKill
-                                       #                exx
-                                       #                ;increment the pos
+                                       #        ld a,b
+                                       #        cp 160+24
+                                       #        call NC,CustomMovePatternKill
+                                       #        exx
+                                       #        ;increment the pos
 
                                        # CustomMovePattern_Done:
                                        #        ld a,iyl
@@ -1284,48 +1247,37 @@ CustomMove3:
                                        # CustomMovePattern_NotBossTarget:
                                        #        pop ix
                                        #        exx
-
                                        #        ex af,af'
-
                                        #        ld ixl,a        ;lifCustom
-
                                        # ei
                                        # ret
 
-                                       # CustomMovePatternKill:
-                                       #        ;ex af,af'
-                                       #        ;xor a
+CustomMovePatternKill:
+        CLR  R4 #        ld b,0
+        CLR  R1 #        ld c,b
+        CLRB R2 #        ld D,b
+        RETURN  # ret
 
-                                       #        ld b,0
-                                       #        ld c,b
-                                       #        ld D,b
-                                       #        ;ex af,af'
-                                       # ret
+CustomMovePattern_Init10:
+                                       # call CustomMovePattern_Init
+                                       # ld a,lifEnemy+10                ;New Life
+        RETURN                         # ret
 
-                                       # CustomMovePattern_Init10:
-                                       #        call CustomMovePattern_Init
-                                       #        ld a,lifEnemy+10                ;New Life
-                                       # ret
-
-                                       # CustomMovePattern_Init:
+CustomMovePattern_Init:
                                        #        xor a
-
                                        #        ld (ix+0),a
                                        #        ld (ix+1),a
                                        #        ld (ix+2),a
                                        #        ld (ix+3),a
-
                                        #        ld a,lifEnemy+6                 ;New Life
-                                       # ret
+        RETURN                         # ret
 
-                                       # CustomMovePatternGeneric:
-                                       #        ld a,(ix+0)
+CustomMovePatternGeneric:
+        INCB (R5)                      #        ld a,(ix+0)
                                        #        inc a
                                        #        ld (ix+0),a
-                                       # ret
+        RETURN                         # ret
 
-                                       # null:          ;NULL COMMAND MUST BE IN SPECTRUM BLOCK!
-                                       # ret
 BluePalette: #---------------------------------------------------------------{{{
     .word 0, cursorGraphic, scale320 | rgb
     .byte 1, setColors, Black, Blue, Blue, Magenta
@@ -1344,7 +1296,8 @@ RealPalette: #---------------------------------------------------------------{{{
     .word      BR_RED | BR_MAGENTA << 4 | BR_YELLOW << 8 | WHITE   << 12
 
     .word   0, cursorGraphic, scale320 | RGB
-    .byte   1, setColors, Black, Red, brGreen, White
+    .byte   1, setColors, Black, Red,     brGreen, White
+    .byte 150, setColors, Black, Magenta, brGreen, White
     .word endOfScreen
 #----------------------------------------------------------------------------}}}
 end:

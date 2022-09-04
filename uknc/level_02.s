@@ -273,7 +273,7 @@ LevelEndAnim:
     .word 256, evtCallAddress, EndLevel
 
 EndLevel:
-        MOV  $0x8000,R5
+        MOV  $3,R5
         JMP  ExecuteBootstrap # Start the game, no return
 
 LevelInit: # read "..\SrcALL\Akuyou_Multiplatform_Level_GenericInit.asm"
