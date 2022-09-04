@@ -74,12 +74,12 @@ PauseLoop:
 LevelInit:
         MTPS $PR0 # enable interrupts
 
+       .ppudo_ensure $PPU_TitleMusicRestart
+       .ppudo_ensure $PPU_PrintAt,$PressFireKeyStr # Aku/Level00-Menu.asm:1101
+
         MOV  $EventStreamArray_Ep1,R5 # Event Stream
         MOV  $Event_SavedSettings,R3  # Saved Settings
         CALL @$EventStream_Init
-
-       .ppudo_ensure $PPU_TitleMusicRestart
-       .ppudo_ensure $PPU_PrintAt,$PressFireKeyStr # Aku/Level00-Menu.asm:1101
 
         CLR  @$KeyboardScanner_P1 # call Keys_WaitForRelease
 
@@ -101,14 +101,14 @@ ShowTitlePic_Loop: #---------------------------------------------------------{{{
         BR   ShowTitlePic_Loop
 
     glow_delay_and_wait_key$:
-        MOV  $5,R0
+        MOV  $5,R1
     100$:
         CALL TRandW
         WAIT
         BITB $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
         BNZ  finalize_title_pic_loop$
 
-        SOB  R0,100$
+        SOB  R1,100$
         RETURN
 
     finalize_title_pic_loop$:
@@ -148,7 +148,9 @@ ShowMenu:
     .endif
 
 ShowMenu_Loop: #-------------------------------------------------------------{{{
+    .ifdef DebugMode
         CALL @$ShowKeysBitmap
+    .endif
         CALL @$Timer_UpdateTimer
         CALL @$EventStream_Process
 
@@ -332,7 +334,6 @@ GetMemPos:
         ADD  R0,R5
         RETURN
         
-
 Fader: #---------------------------------------------------------------------{{{
         MOV  R0,-(SP)
         MOV  R1,-(SP)
@@ -368,6 +369,7 @@ Fader: #---------------------------------------------------------------------{{{
 RETURN
 #----------------------------------------------------------------------------}}}
 
+    .ifdef DebugMode
 ShowKeysBitmap: # -----------------------------------------------------------{{{
         MOV  @$KeyboardScanner_P1,R3
         CMP  R3,(PC)+; LastKeysBitmap: .word 0
@@ -397,11 +399,10 @@ ShowKeysBitmap: # -----------------------------------------------------------{{{
         MOV  (SP)+,R1
         MOV  (SP)+,R0
        .wait_ppu
-
 1237$:
         RETURN
 
-NumToStr: #------------------------------------------------------------------{{{
+NumToStr: #---------------------------------------------------------------------
         MOV  $8,R0      # R0 - length of the number
                         # R1 - position of number in str (first argument)
                         # R3 - number (second argument)
@@ -417,18 +418,13 @@ NumToStr: #------------------------------------------------------------------{{{
         SOB  R0,100$
 
         RETURN
-#----------------------------------------------------------------------------}}}
+#-------------------------------------------------------------------------------
 ScanCodeStr:
         .byte 0,4
         .asciz "76543210"
         .even
 #----------------------------------------------------------------------------}}}
-
-WaitKey: #-------------------------------------------------------------------{{{
-        TST  @$KeyboardScanner_P1
-        BEQ  .-4
-        CLR  @$KeyboardScanner_P1
-#----------------------------------------------------------------------------}}}
+    .endif
 
 TitleScreenPalette: #--------------------------------------------------------{{{
     .word   0, cursorGraphic, scale320 | RgB
