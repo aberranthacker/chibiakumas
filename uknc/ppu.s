@@ -17,7 +17,6 @@
 
 start:
         MTPS $PR7
-        MOV  $0b001,@$PBPMSK # disable writes to bitplane 0
       # bit 0 if clear disables ROM chip in range 0100000..0117777
       #       which allows to enable RW access to RAM in that range
       #       when bit 4 is set as well
@@ -501,6 +500,7 @@ Print: #---------------------------------------------------------------------{{{
         MOV  $StrBuffer,R3
         MOV  $PBP12D,R4
         MOV  $PBPADR,R5
+        MOV  $0b001,@$PBPMSK # disable writes to bitplane 0
 
         CLC
         ROR  R0
@@ -615,6 +615,7 @@ ShowBossText: #--------------------------------------------------------------{{{
 
         MOV  R0,@$CharsToPrint
         MOV  $DTSOCT,R4
+        MOV  $0b001,@$PBPMSK # disable writes to bitplane 0
 
 SBT_NextTextLine:
         MOVB (R3)+,R0
@@ -1021,39 +1022,39 @@ Player_AddScore_Inc:
                                           # ret
 Player_DrawScore:
         MOV  $PBPADR,R5
-        MOV  $PBP0DT,R2
-        MOV  $PPU_Player_ScoreBytes,R3
-        MOV  $8,R1
-        PUSH $40
+        MOV  $DTSOCT,R4
+        MOV  $8,R3           # number of digits
+        MOV  $40,R2          # screen width, words
+        MOV  $0b111,@$DTSCOL # dots color
+        CLR  @$PBPMSK        # write to all bit-planes
+        CLR  @$BP01BC        # background color, pixels 0-3
+        CLR  @$BP12BC        # background color, pixels 4-7
 
         PlayerScore_Draw_NextDigit:
-            DEC  R1
            .equiv ScoreLineOffset, 40*4*8 - 40*11
            .equiv ScoreLineAddr, OffscreenAreaAddr + ScoreLineOffset
-            MOV  $ScoreLineAddr,(R5)
-            ADD  R1,(R5)
+            MOV  $ScoreLineAddr+8,(R5)
+            SUB  R3,(R5)
 
-            MOVB (R3)+,R0
+            MOVB PPU_Player_ScoreBytes-1(R3),R0
             ASH  $3,R0      # shift left by 3(multiply by 8)
            .equiv FontDigitsOffset, 16*8
            .equiv FontDigitsAddr, FontBitmap + FontDigitsOffset
             ADD  $FontDigitsAddr, R0 # calculate char bitmap address
 
            .rept 8
-            MOV  R2,R4
-            MOVB (R0),(R4)+
-            INC  R4
-            MOVB (R0),(R4)+
-            MOVB (R0)+,(R4)
-            ADD  (SP),(R5) # advance the address register to the next line
+            MOVB (R0)+,R1
+          # MOV fills background with background color
+          # MOVB preserves background
+            MOV  R1,(R4)
+            ADD  R2,(R5) # advance the address register to the next line
            .endr
-        TST  R1
-        BNZ  PlayerScore_Draw_NextDigit
-        TST  (SP)+ # remove value from stack
+        SOB  R3, PlayerScore_Draw_NextDigit
 
 Player_DrawLivesIcons:
         MOV  $39,R2
         CLR  R1
+        MOV  $PBPADR,R5
         MOV  $CPU_P1_P09,(R5) # lives
         MOV  $PBP2DT,R4
         MOVB (R4),R0
@@ -1112,12 +1113,12 @@ Player_RemoveSmartbombIcon:
 
 DrawIcon:
        .rept 16
-        MOV  (R3)+,(R4)+ 
+        MOV  (R3)+,(R4)+
         MOV  (R3)+,(R4)
         TST  -(R4) # decrease R4 by 2
         INC  (R5)
 
-        MOV  (R3)+,(R4)+ 
+        MOV  (R3)+,(R4)+
         MOV  (R3)+,(R4)
         TST  -(R4) # decrease R4 by 2
         ADD  R2,(R5)
@@ -1127,12 +1128,12 @@ DrawIcon:
 ClearIcon:
         MOV  $PBP0DT,R4
         ClearIcon_Loop:
-            CLR  (R4)+ 
+            CLR  (R4)+
             CLR  (R4)
             TST  -(R4) # decrease R4 by 2
             INC  (R5)
 
-            CLRB (R4)+ 
+            CLRB (R4)+
             INC  R4
             CLR  (R4)
             TST  -(R4) # decrease R4 by 2
@@ -1140,7 +1141,6 @@ ClearIcon:
         SOB  R3,ClearIcon
 
         RETURN
-        
 
 .equiv HitpointIconPosition, OffscreenAreaAddr + 40 * 29
 .equiv SmartbombIconPosition, OffscreenAreaAddr + 40 * 29 + 38
