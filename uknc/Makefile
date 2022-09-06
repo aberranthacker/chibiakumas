@@ -96,8 +96,8 @@ build/high_score.bin.lzsa1 : build_tools/bmp_to_raw.rb \
 	build_tools/lzsa -f 1 -r build/high_score.bin build/high_score.bin.lzsa1
 
 build/continue.bin.lzsa1 : build_tools/bmp_to_raw.rb \
-                           resources/bootstrap/continue.bmp
-	build_tools/bmp_to_raw.rb resources/bootstrap/continue.bmp build/continue.bin
+                           resources/bootstrap/continue-320x96.bmp
+	build_tools/bmp_to_raw.rb resources/bootstrap/continue-320x96.bmp build/continue.bin
 	build_tools/lzsa -f 1 -r build/continue.bin build/continue.bin.lzsa1
 
 build/level_01_loading.bin.lzsa1 : build_tools/bmp_to_raw.rb \

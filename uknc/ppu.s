@@ -1041,7 +1041,8 @@ Player_DrawScore:
 
            .rept 8
             MOV  R2,R4
-            MOV  (R0),(R4)+
+            MOVB (R0),(R4)+
+            INC  R4
             MOVB (R0),(R4)+
             MOVB (R0)+,(R4)
             ADD  (SP),(R5) # advance the address register to the next line
@@ -1124,17 +1125,20 @@ DrawIcon:
         RETURN
 
 ClearIcon:
-        CLR  (R4)+ 
-        CLR  (R4)
-        TST  -(R4) # decrease R4 by 2
-        INC  (R5)
+        MOV  $PBP0DT,R4
+        ClearIcon_Loop:
+            CLR  (R4)+ 
+            CLR  (R4)
+            TST  -(R4) # decrease R4 by 2
+            INC  (R5)
 
-        CLR  (R4)+ 
-        CLR  (R4)
-        TST  -(R4) # decrease R4 by 2
-        ADD  R2,(R5)
-
+            CLRB (R4)+ 
+            INC  R4
+            CLR  (R4)
+            TST  -(R4) # decrease R4 by 2
+            ADD  R2,(R5)
         SOB  R3,ClearIcon
+
         RETURN
         
 
@@ -1172,6 +1176,7 @@ CommandsQueue_Top:
        .space 2*2*16
 CommandsQueue_Bottom:
 CommandsQueue_CurrentPosition:
+
        .word CommandsQueue_Bottom
 StrBuffer:
        .even

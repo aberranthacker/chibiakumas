@@ -607,13 +607,11 @@ LevelEndAnim:
 #----------------------------------------------------------------------------}}}
 
 EndLevel:
+       .ppudo_ensure $PPU_LevelEnd
         MOV  $2,R5
         JMP  ExecuteBootstrap
 
 LevelInit:
-        MOV  $Player_Array,R5
-        MOVB $3,9(R5) # set number of lives for the first player
-
        .ppudo_ensure $PPU_LevelMusicRestart
 
         MOV  $LevelSprites.0,R0

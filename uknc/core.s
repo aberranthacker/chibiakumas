@@ -130,24 +130,25 @@ not_implemented_check_R0:
 
        .include "core/do_moves.s"
        .global DoMoves
-       .global Object_DecreaseLifeShot
-       .global dstCustomShotToDeathCall
-       .global dstObjectDoMovesOverride
-       .global dstObjectShotOverride
        .global FireFrequencyA
        .global FireFrequencyB
        .global FireFrequencyC
        .global FireFrequencyD
        .global FireFrequencyE
+       .global Object_DecreaseLifeShot
+       .global dstCustomShotToDeathCall
+       .global dstObjectDoMovesOverride
+       .global dstObjectShotOverride
 
        .include "core/event_stream.s"
        .global DoMovesBackground_SetScroll
-       .global EventStream_Process
-       .global EventStream_Init
        .global EventObjectAnimatorToAdd
        .global EventObjectProgramToAdd
        .global EventObjectSpriteSizeToAdd
+       .global EventStream_Init
+       .global EventStream_Process
        .global Event_LevelTime
+       .global Event_RestorePalette
        .global SetLevelTime
 
        .include "core/execute_bootstrap.s"
@@ -202,20 +203,20 @@ not_implemented_check_R0:
        .global SprShow_BankAddr
 
        .include "core/stararray.s"
-       .global opcStarSlowdown
-       .global StarArray_Redraw
        .global Player_StarArray_Redraw
+       .global StarArray_Redraw
+       .global opcStarSlowdown
 
        .include "core/stararray_add.s"
-       .global Stars_AddBurst_Top
        .global BurstSpacing
+       .global Stars_AddBurst_Top
 
        .include "core/timer.s"
-       .global Timer_GetTimer
-       .global Timer_UpdateTimer
-       .global Timer_CurrentTick
-       .global Timer_TicksOccured
        .global SmartBombTimer
+       .global Timer_CurrentTick
+       .global Timer_GetTimer
+       .global Timer_TicksOccured
+       .global Timer_UpdateTimer
 
        .include "core/virtual_screen_pos_320.s"
        .global ShowSpriteReconfigureEnableDisable

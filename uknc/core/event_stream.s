@@ -272,7 +272,11 @@ Event_CoreReprogram_ObjectHitHandler:
         RETURN # to Event_LoadNextEvt
 
 Event_CoreReprogram_Palette:
-        MOV  (R5)+,@$PPUCommandArg
+        MOV  (R5)+,LastPalette
+Event_RestorePalette:
+      # used to restore palette after displaying continue screen
+       .equiv LastPalette, .+2
+        MOV  $0,@$PPUCommandArg
        .ppudo_ensure $PPU_SetPalette
         RETURN # to Event_LoadNextEvt
 

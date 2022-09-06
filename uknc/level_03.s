@@ -899,6 +899,7 @@ LevelEndAnim:
     .word 255+35, evtCallAddress, EndLevel
 #----------------------------------------------------------------------------}}}
 EndLevel:
+       .ppudo_ensure $PPU_LevelEnd
         MOV  $0x8000,R5
         JMP  ExecuteBootstrap
 
