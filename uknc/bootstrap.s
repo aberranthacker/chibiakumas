@@ -10,7 +10,7 @@
                 .global Bootstrap_PS.DeviceNumber
                 .global BootstrapSize
                 .global BootstrapSizeWords
-                .global BootstrapSizeDWords
+                .global BootstrapSizeQWords
                 .global LoadingScreenPalette
 
                 .global ppu_module.bin
@@ -29,8 +29,8 @@
                 .include "./core_defs.s"
 
                 .equiv BootstrapSize, (end - start)
-                .equiv BootstrapSizeWords, BootstrapSize >> 1
-                .equiv BootstrapSizeDWords, BootstrapSize >> 2 + 1
+                .equiv BootstrapSizeWords, BootstrapSize >> 1 + 1
+                .equiv BootstrapSizeQWords, BootstrapSize >> 3 + 1
 
                 .=BootstrapStart
 start:
@@ -39,13 +39,13 @@ Bootstrap_Launch: # used by bootsector linker script
         MOV  $ppu_module.bin,R0
         CALL Bootstrap_LoadDiskFile_Start
           # copy the bootstrap to upper memory while PPU module loads
-            MOV  $BootstrapSizeDWords,R0
+            MOV  $BootstrapSizeQWords,R0
             MOV  $CBPADR,R1
             MOV  $CBP12D,R2
             MOV  $BootstrapStart,R3
             MOV  $BootstrapCopyAddr,(R1)
             100$:
-                .rept 2
+                .rept 4
                  MOV  (R3)+,(R2)
                  INC  (R1)
                 .endr
@@ -60,6 +60,7 @@ Bootstrap_Launch: # used by bootsector linker script
        .word PPU_ModuleSizeWords
 
       # clear offscreen area bitplanes 1 and 2 while PPU module initializes
+        CALL ClearOffscreenBP12
         MOV  $88*40>>2,R0
         MOV  $CBPADR,R5
         MOV  $OffscreenAreaAddr,(R5)
@@ -132,15 +133,15 @@ Bootstrap_SystemEvent:
         ASL  R5
         JMP  @SystemEventsJmpTable(R5)
     SystemEventsJmpTable:
-       .word Bootstrap_StartGame        # 0; BootsStrap_StartGame
-       .word 0                          # 1; BootsStrap_ContinueScreen
-       .word 0                          # 2; BootsStrap_ConfigureControls
-       .word 0                          # 3; BootStrap_SaveSettings
-       .word 0                          # 4; GameOverWin
-       .word 0                          # 5; NewGame_EP2_1UP
-       .word 0                          # 6; NewGame_EP2_2UP
-       .word 0                          # 7; NewGame_EP2_2P
-       .word 0                          # 8; NewGame_CheatStart
+       .word Bootstrap_StartGame        # 0 BootsStrap_StartGame
+       .word Bootstrap_ContinueScreen   # 1 BootsStrap_ContinueScreen
+       .word 0                          # 2 BootsStrap_ConfigureControls
+       .word 0                          # 3 BootStrap_SaveSettings
+       .word 0                          # 4 GameOverWin
+       .word 0                          # 5 NewGame_EP2_1UP
+       .word 0                          # 6 NewGame_EP2_2UP
+       .word 0                          # 7 NewGame_EP2_2P
+       .word 0                          # 8 NewGame_CheatStart
 
 Bootstrap_Level:
     .ifdef DebugMode
@@ -230,55 +231,110 @@ Bootstrap_Level_3: # --------------------------------------------------------
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
 
-BootsStrap_ContinueScreen: # ../Aku/BootStrap.asm:1324
-Player_Dead_ResumeB: # ../Aku/BootStrap.asm:1411
-        SpendCreditSelfMod2:
-            MOV  $Player_Array,R5 # ld iy,Player_Array ; All credits are (currently) stored in player 1's var!
-       # TODO: finish or remove this!
+Bootstrap_ContinueScreen: # ../Aku/BootStrap.asm:1324
+      # R4 points to player array
+        PUSH R4
+       .ppudo_ensure $PPU_LevelEnd
+       .ppudo_ensure $PPU_SetPalette,$ContinueScreenPalette
+        CALL ClearOffscreenBP12
+        MOV  $continue.bin.lzsa1,R1
+        MOV  $FB1 + 36*80,R2
+        CALL unlzsa1
+
+        POP  R4
+        CLR  R1
+        BISB 5(R4),R1 # number of continues
+        MOV  $NumberOfCreditsStr,R2
+        MOV  $2,R3 # number of digits
+        CALL NumberToDecStr
+       .ppudo_ensure $PPU_PrintAt,$ContinueStr
+
+        MOV  $9,R0
+        ContinueScreen_CoundownLoop:
+            MOV  R0, @$ContinueCountdownStr+2
+            ADD  $'0, @$ContinueCountdownStr+2
+            MOV  $FB1+20*8*80,R5
+            MOV  $8*80,R3
+            10$:
+                CLR  (R5)+
+            SOB  R3,10$
+           .ppudo_ensure $PPU_PrintAt,$ContinueCountdownStr
+
+            MOV  $50,R1
+            ContinueScreen_WaitASecondLoop:
+                BITB @$KeyboardScanner_P1,$KEYMAP_ANY_FIRE
+                BNZ  ContinueScreen_Continue
+                WAIT
+            SOB  R1,ContinueScreen_WaitASecondLoop
+        DEC  R0
+        BPL  ContinueScreen_CoundownLoop
+
+        MOV  $0x8000,R5
+        JMP  Bootstrap_FromR5
+
+ContinueScreen_Continue:
+        DECB 5(R4)    # continues
+        MOVB $3,3(R4) # smartbombs
+        MOVB $7,7(R4) # invincibility for 7 ticks
+        MOVB $3,9(R4) # lives
+        MOV  $INC_R0_OPCODE,@$PlayerCounter
+
+        CALL @$Event_RestorePalette
+       .ppudo_ensure $PPU_LevelStart
+        RETURN
+
+NumberToDecStr:
+      # R1 number
+      # R2 destination string ponter
+      # R3 number of digits
+        ADD  R3,R2
+        10$:
+            CLR  R0      # R0 - most, R1 - least significant word
+            DIV  $10,R0  # quotient -> R0 , remainder -> R1
+            ADD  $'0, R1 # add ASCII code for "0" to the remainder
+            MOVB R1,-(R2)
+            MOV  R0,R1
+        SOB  R3,10$
+
+        RETURN
+
+ContinueStr:
+       .byte 16,16; .ascii "Continue?"; .byte 0xFF
+       .byte 15,18; .ascii "Credits: "
+NumberOfCreditsStr: .ascii "--"; .byte 0x00
+ContinueCountdownStr:
+       .byte 20,20, '-, 0
+
+
+ClearOffscreenBP12:
+        MOV  $88*40>>2,R0
+        MOV  $CBP12D,R1
+        MOV  $CBPADR,R2
+        MOV  $OffscreenAreaAddr,(R2)
+        200$:
+           .rept 1<<2
+            CLR  (R1)
+            INC  (R2)
+           .endr
+        SOB  R0,200$
+        RETURN
 
 StartANewGame: # ../Aku/BootStrap.asm:2151 #---------------------------------{{{
-      # reset the core                   # xor a
-        CLR  @$ShowContinueCounter       # ld (ShowContinueCounter_Plus1-1),a
-
-        MOV  $0012700,R0 # MOV (PC)+,R0  # ld bc,&3E0D ;Split Continues ; 3E n == LD A,n
-        MOV  $0x0D,R1
-        MOV  $0013704,R2 # MOV @(PC)+,R4 # ld de,&2ADD ; LD IX, (addr) == DD 2A dr ad
-                                         # ld a,(ContinueMode)
-        TSTB @$ContinueMode              # or a
-        BNE  ContinueModeSet             # jr nz,ContinueModeSet
-
-        MOV  $0000207,R0 # RTS PC        # ld bc,&C90E ;Shared Continues ; C9 == RET
-        MOV  $0x0E,R1
-        MOV  $0012705,R2 # MOV (PC)+,R5  # ld de,&21FD ; LD IY, hilo   == FD 21 lo hi
-
-ContinueModeSet: # ../Aku/BootStrap.asm:2165
-        MOV  R0,@$ShowContinuesSelfMod
-        MOV  R1,@$ContinuesScreenPos
-        MOV  R2,@$SpendCreditSelfMod
-        MOV  R2,@$SpendCreditSelfMod2
-
+      # reset the core
         CALL FireMode_Normal # set our standard Left-Right Firemode
       # reset all the scores n stuff
-                                       # ld a,(iy-15)
-        TSTB @$FireMode                # and %10000000
+        TSTB @$FireMode
         BPL  NormalFireMode
-        CALL FireMode_4D               # call nz,FireMode_4D
+
+        CALL FireMode_4D
 NormalFireMode:
-                                       # ld a,1
-        MOVB $1,@$LivePlayers          # ld (iy-7),a ;live players
-        MOV  $0005200,@$PlayerCounter
-                                       # ;multiplay support
-       #MOV  $0x003E,R3                # ld hl,&003E
-                                       # ld a,(MultiplayConfig)
-        BITB $1,@$MultiplayConfig      # bit 0,a
-        BZE  StartANewGame_NoMultiplay # jr z,StartANewGame_NoMultiplay
-                                       # ld bc,&F990
-                                       # in a,(c) ;Test if the multiplay is really there!
-                                       # inc a
-                                       # jr z,StartANewGame_NoMultiplay
-                                       # ld hl,&78ED
+        MOVB $1,@$LivePlayers
+        MOV  $INC_R0_OPCODE,@$PlayerCounter
+        BITB $1,@$MultiplayConfig
+        BZE  StartANewGame_NoMultiplay
+
 StartANewGame_NoMultiplay: # ../Aku/BootStrap.asm:2195
-        # TODO: implement this
+      # TODO: implement this
 StartANewGame_NoControlFlip: # ../Aku/BootStrap.asm:2206
         MOV  $Player_Array, R5 # AkuYou_Player_GetPlayerVars
         CALL StartANewGamePlayer
@@ -296,7 +352,7 @@ StartANewGame_NoControlFlip: # ../Aku/BootStrap.asm:2206
        #CALL @$ClearR1Words # wipe highscores
        .ppudo_ensure $PPU_StartANewGame # resets score
 
-        MOV  $Player_Array, R5 # AkuYou_Player_GetPlayerVars
+       #MOV  $Player_Array, R5 # AkuYou_Player_GetPlayerVars
         MOV  $0010000,R2 # MOV R0,R0 # slightly faster than NOP
         BITB $0x40,@$GameDifficulty  # test bit 6
         BNZ  NoBulletSlowdown
@@ -311,13 +367,13 @@ NoBulletSlowdown: # ../Aku/BootStrap.asm:2206
         MOV  $BulletConfigSize,R1
 
         MOV  $BulletConfigHeaven,R3
-        MOV  $0105303,R0 # DECB R3 opcode
+        MOV  $DECB_R3_OPCODE,R0
 
         TSTB @$GameDifficulty # test bit 7
         BMI  HeavenMode
 
         MOV  $BulletConfigHell,R3
-        MOV  $0110303,R0 # MOVB R3,R3 opcode
+        MOV  $MOVB_R3_R3_OPCODE,R0
 HeavenMode: # ../Aku/BootStrap.asm:2242
         MOV  R0,@$BurstSpacing
         100$:
@@ -800,11 +856,21 @@ TitleScreenPalette: #--------------------------------------------------------{{{
     .byte 196, setColors, Black, Green,   brRed,     White
     .word untilEndOfScreen
 #----------------------------------------------------------------------------}}}
+ContinueScreenPalette: #-----------------------------------------------------{{{
+    .byte 1, setColors, Black, Magenta, brCyan, White
+    .word untilEndOfScreen
+#----------------------------------------------------------------------------}}}
+continue.bin.lzsa1:
     .incbin "build/continue.bin.lzsa1"
+high_score.bin.lzsa1:
     .incbin "build/high_score.bin.lzsa1"
+level_01_loading.bin.lzsa1:
     .incbin "build/level_01_loading.bin.lzsa1"
+level_03_loading.bin.lzsa1:
     .incbin "build/level_03_loading.bin.lzsa1"
+level_05_loading.bin.lzsa1:
     .incbin "build/level_05_loading.bin.lzsa1"
+level_07_loading.bin.lzsa1:
     .incbin "build/level_07_loading.bin.lzsa1"
     .even
 #0         1         2         3         4         5         6         7

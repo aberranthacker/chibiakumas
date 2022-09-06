@@ -273,6 +273,7 @@ LevelEndAnim:
     .word 256, evtCallAddress, EndLevel
 
 EndLevel:
+       .ppudo_ensure $PPU_LevelEnd
         MOV  $3,R5
         JMP  ExecuteBootstrap # Start the game, no return
 

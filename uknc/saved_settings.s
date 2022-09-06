@@ -60,7 +60,7 @@
 start:
     GameOptions:     .byte 0b00000001   #  GameOptions (xxxxxxxS) Screen shake
     FireMode:        .byte 0b00000000   #  playmode 0 normal / 128 - 4D
-    ContinueMode:    .byte   0          #  Continue Sharing (0/1)
+    ContinueMode:    .byte   0          #  Continue Sharing (0/1) # not implemented
     SmartBombsReset: .byte   3          #  SmartbombsReset
     ContinuesReset:  .byte  60          #  Continues Reset
     GameDifficulty:  .byte 0b00000000   #  Game difficulty

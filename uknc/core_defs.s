@@ -1,10 +1,10 @@
 #-------------------------------------------------------------------------------
 # Note that the PRESENCE of those variables is tested, NOT their values. -------
- .equiv DebugMode, 1
+#.equiv DebugMode, 1
 #.equiv DebugSprite, 1
 #.equiv ExtMemCore, 1
 #.equiv TwoPlayersGame, 1
- .equiv PlayerInvincible, 1
+#.equiv PlayerInvincible, 1
 #-------------------------------------------------------------------------------
 .equiv MainMenu, 0x8000
 .equiv Episode1_Intro, 0x0000
@@ -12,11 +12,11 @@
 .equiv Level2, 0x0002
 .equiv Level3, 0x0003
 
-#.equiv StartOnLevel, MainMenu
+ .equiv StartOnLevel, MainMenu
 #.equiv StartOnLevel, Episode1_Intro
 #.equiv StartOnLevel, Level1
 #.equiv StartOnLevel, Level2
- .equiv StartOnLevel, Level3
+#.equiv StartOnLevel, Level3
 
 .if StartOnLevel == MainMenu
   .equiv ShowLoadingScreen, 1
@@ -122,7 +122,7 @@
     .endif
 
     .ifndef ExtMemCore
-.equiv Akuyou_LevelStart, 0x9E82 # 40578 0117202 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9EA8 # 40616 0117250 # auto-generated during a build
     .else
 .equiv Akuyou_LevelStart, GameVarsEnd
     .endif
@@ -245,3 +245,8 @@
 .equiv SPR_DOUBLE,   1<<1
 .equiv SPR_PSET,     1<<2
 .equiv SPR_HAS_MASK, 1<<3
+#-------------------------------------------------------------------------------
+.equiv NOP_OPCODE, 000240
+.equiv INC_R0_OPCODE, 0005200
+.equiv DECB_R3_OPCODE, 0105303
+.equiv MOVB_R3_R3_OPCODE, 0110303

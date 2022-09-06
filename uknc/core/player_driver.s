@@ -6,55 +6,15 @@
                                         # Player_GetHighscore:
                                         #     ld hl,HighScoreBytes
                                         #     ret
-# Player_GetPlayerVars:                   # Player_GetPlayerVars:
-#         MOV  $Player_Array,R5           #     ld iy,Player_Array
-#         RETURN                          # ret
+# Player_GetPlayerVars:                 # Player_GetPlayerVars:
+#         MOV  $Player_Array,R5         #     ld iy,Player_Array
+#         RETURN                        # ret
                                         #     ; iy = Pointer to player vars
-NoSpend:                                # NoSpend:
-        MOV  R0,@$SpendTimeout          #     ld (SpendTimeout_Plus1-1),a
-        RETURN                          # ret
-                                        #
-SpendCheck:                             # SpendCheck:
-       .equiv SpendTimeout, .+2
-        MOV  $1,R0                      # ld a,1:SpendTimeout_Plus1 ;Dont let player continue right away!
-        DEC  R0                         # dec a
-        BNZ  NoSpend                    # jr nz,NoSpend
-                                        #
-        BIT  $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1 # ld a, ixl ; read the keymap
-                                        # or KEYMAP_ANY_FIRE
-                                        # inc a
-        BNZ  SpendCredit                # ret z
-
-SpendCredit:                         # SpendCredit:
-        PUSH R5                      #  push iy
-        SpendCreditSelfMod:          # SpendCreditSelfMod:
-        MOV  $Player_Array,R5        #      ld iy,Player_Array ; All credits are (currently) stored in player 1's var!
-        MOVB 5(R5),R0                #      ld a,(iy+5)
-        DECB R0                      #      sub 1
-        POP  R4                      #  pop ix
-        BMI  1237$                   #  ret c ;no credits left!
-
-        MOVB R0,5(R5)                #  ld (iy+5),a
-                                     #  ld a,3
-        MOVB $3,9(R4) # lives        #  ld (ix+9),a
-                                     #  ld a,(SmartbombsReset)
-        MOVB @$SmartBombsReset,3(R4) #  ld (ix+3),a
-1237$:  RETURN                       # ret
 
 # Both players are dead, so pause the game and show the continue screen
-PlayersDead:                            # Players_Dead:
+PlayersDead:
      # TODO: implement PlayersDead
-        MOV  $0x8000,R5
-        JMP  ExecuteBootstrap
-                                        # ld a,&3C
-                                        # ld (PlayerCounter),a
-                                        # ld hl,(&0039)
-                                        # push hl
-                                        #     ld hl,&0001
-                                        #     call ExecuteBootStrap
-                                        # pop hl
-                                        # ld (&0039),hl
-                                        # jp ScreenBuffer_Init
+     .inform_and_hang "player_driver PlayersDead called :-/"
 
 PlayerHandler:
       # Used to update the live player count
@@ -66,72 +26,25 @@ PlayerCounter:
    .ifdef TwoPlayersGame
         INC  R0 # or NOP if player 2 is dead # inc a
    .endif
-        MOVB R0,@$LivePlayers           # ld (LivePlayers),a
-                                        # or a
-        BZE  PlayersDead                # jr z, Players_Dead
+        MOVB R0,@$LivePlayers
+        BZE  PlayersDead
 
-        MOV  $000240,@$PlayerCounter    # ld hl,&0000     ;nop,nop
+        MOV  $NOP_OPCODE,@$PlayerCounter
    .ifdef TwoPlayersGame
-        MOV  $000240,@$PlayerCounter+2  # ld (PlayerCounter),hl
+        MOV  $NOP_OPCODE,@$PlayerCounter+2
    .endif
-                                        # call KeyboardScanner_Read
-                                        # ; returns
-                                        # ; ixl = Keypress bitmap Player
-                                        # ; HL Direct pointer to the keymap
-                                        # call Player_ReadControls
 
-        MOV  $Player_Array,R5           # ld iy,Player_Array
-        TSTB 9(R5)                      # ld a,(P1_P09)   ;See how many lives are left
-                                        # or a
-        BNZ  Player1NotDead             # jr nz,Player1NotDead
+        MOV  $Player_Array,R5
+        TSTB 9(R5)
+
+        BNZ  Player1NotDead
       # player 1 is dead if for some reason we got here
-        RETURN                          # ;if we got here, player 1 is dead
-                                        #
-                                        # call SpendCheck
-                                        # jr Player2Start
-                                        #
-Player1NotDead:                         # Player1NotDead:
-        MOV  $0005200,@$PlayerCounter   #     ld a,&3C
-                                        #     ld (PlayerCounter),a
-                                        #
-       #MOV  $ChibiSprites,R5           #     ld hl,Akuyou_PlayerSpritePos
-                                        #     ld de,&C0C0
-                                        #
-                                        #     xor a
-                                        #     ld b,4
-                                        #     call Player_HandlerOne
-                                        #     call BankSwitch_C0_SetCurrentToC0
-                                        #
-                                        # Player2Start:
-                                        #     call Player_ReadControls2
-                                        #
-                                        #     ld iy,Player_Array2
-                                        #     ld a,(P2_P09)
-                                        #     or a
-                                        #     jp z,SpendCheck
-                                        #
-                                        # Player2NotDead:
-                                        #     ld a,&3C
-                                        #     ld (PlayerCounter+1),a
-                                        #
-                                        #     ld de,&C0C0
-                                        #     ld hl,Akuyou_PlayerSpritePos ; ChibikoPlayerSpriteBank_Plus2
-                                        #
-                                        ##ifdef DualChibikoHack
-                                        #     jr Player2NotDead64kver
-                                        ##endif
-                                        #
-                                        # Player2NotDead64kver:
-                                        #     ld a,12
-                                        #     ld b,16
-                                        #     call Player_HandlerOne
-                                        #
-                                        #     jp BankSwitch_C0_SetCurrentToC0
-Player_HandlerOne:                      # Player_HandlerOne:
-       #MOV  R5,@$SprShow_BankAddr      #     ld (SprShow_BankAddr),hl
-                                        #     ld a,e
-                                        #     ld (PlayerSpriteBank_Plus1-1),a; call Akuyou_BankSwitch_C0_SetCurrent
-                                        #     ld a,ixl
+        RETURN
+
+Player1NotDead:
+        MOV  $INC_R0_OPCODE,@$PlayerCounter
+
+Player_HandlerOne:
       # Check if the game is paused
         TSTB @$KeyboardScanner_P1
         BPL  Player_Handler_PauseCheckDone
@@ -353,7 +266,7 @@ Player_SpriteSkip:
 
 Player_NotInvincible:
       # draw the player
-        MOV  8(R5),R0 # player sprite num
+        MOVB 8(R5),R0 # player sprite num
         BIC  $0xFFF0,R0
         ADD  R3,R0 # add frame number
         MOV  R0,@$SprShow_SprNum
@@ -730,111 +643,35 @@ Player_Hit_Process:
         BNZ  1237$
    .endif
 
-      # number of lives can't be negative or PPUs Player_DrawUI will crash
-      # check if player already dead first
+      # negative number of lives causes PPU's Player_DrawUI to crash
+      # check if the player already dead before subtracting
         TSTB 9(R0) # lives
-        BZE  PlayerKilled # player already dead
+        BZE  1237$ # player already dead, do nothing
         DECB 9(R0) # lives
-        BZE  PlayerKilled
+        BZE  1237$ # player killed
         MOVB $0x07,7(R0)
        .ppudo $PPU_PlaySoundEffect4
 1237$:  RETURN
-
-PlayerKilled:
-        CLRB 3(R0)
-        MOV  $20,@$SpendTimeout
-        MOV  $100,@$ShowContinueCounter
-        RETURN
-
-Player1DoContinue:
-       .equiv ShowContinueCounter, .+2
-        TST  $0
-        BZE  Player1_DeadUI
-
-        CALL Player1Continue
-        BR   Player1_DeadUI
-
-   .ifdef TwoPlayersGame
-Player2DoContinue:
-        TST  @$ShowContinueCounter
-        BZE  Player2_DeadUI
-
-        CALL Player2Continue
-        BR   Player2_DeadUI
-   .endif
 #-------------------------------------------------------------------------------
-# We put Plus sprite anims here, as they have to be run
-# after the playerhandler and mess up practically ALL registers
+# Continue Screen messes all registers
+# so we have to call this after PlayerHandler
 Player_DrawUI:
-        MOV  $Player_Array,R5
-        TSTB @$P1_P09 # See how many lives are left
-        BZE  Player1DoContinue
+      # Bootstrap_ContinueScreen expects Player_Array pointer in R4
+        MOV  $Player_Array,R4
+        TSTB 9(R4) # see how many lives are left
+        BNZ  1237$
 
-        CALL Player1DrawUI
+        TSTB 5(R4) # see how many credits are left
+        BZE  Player_GameOver
 
-Player1_DeadUI:
-   .ifdef TwoPlayersGame # {{{
-        MOV  $PlayerArray2,R5
-        TSTB @$P1_P09 # See how many lives are left
-        BZE  Player2DoContinue
+        MOV  $0x8001,R5 # Continue Screen
+        CALL @$ExecuteBootstrap
 
-        CALL Player2DrawUI
+1237$:  RETURN
 
-Player2_DeadUI:
-        CMPB @$LivePlayers,$2
-        BHIS 1237$
-   .endif # }}}
-      # 1 player or less!
-        TST  @$ShowContinueCounter      # ld a,(ShowContinueCounter_Plus1-1)
-        BZE  1237$                      # ret z
-                                        # call SpriteBank_Font2
-                                        # ld l,&00;14  ; show how many credits are left
-ShowContinues:
-    .ifdef DebugMode
-       .inform_and_hang "no ShowContinues"
-    .else
-        return
-    .endif
-       .equiv ContinuesScreenPos, .+2
-        MOV  $0x0E,R3                   # ld h,&0E    :ContinuesScreenpos_Plus1
-                                        # ld bc,txtCreditsMsg2
-                                        # call DrawText_LocateAndPrintStringUnlimited
-                                        #
-                                        # ld a,(P1_P05)
-                                        # call DrawText_Decimal
-                                        #
-ShowContinuesSelfMod:
-        MOV  $'/, R0                    # ld a,"/"
-                                        # call Akuyou_DrawText_CharSprite
-                                        #
-                                        # ld a,(P2_P05)
-                                        # jp DrawText_Decimal
-                                        #
-Player2Continue:
-                                        # ld hl,&1e01;14 ; show how many credits are left
-                                        # jr Player1ContinueB
-Player1Continue:
-        MOV  $0x8000,R5
+Player_GameOver:
+        MOV  $0x8000,R5 # Game Over Screen
         JMP  @$ExecuteBootstrap
-                                        # ld hl,&0101;14 ; show how many credits are left
-                                        #
-                                        # Player1ContinueB:
-                                        #     push hl
-                                        #         ld hl,ShowContinueCounter_Plus1-1
-                                        #         dec (hl)
-                                        #         call SpriteBank_Font2
-                                        #     pop hl
-                                        #     ld bc,txtPressButtonMsg2
-                                        #     jp DrawText_LocateAndPrintStringUnlimited
-                                        #     txtCreditsMsg2:
-                                        #         db "Credits",":"+&80
-                                        #     txtPressButtonMsg2:
-                                        #         db "Continue","?"+&80
-1237$:  RETURN # to use with player_driver.s:831
-
-Player1DrawUI:
-       .equiv CheadMode, .
-        RETURN                          #     ret: CheatMode_Plus1
 
       # CHEAT MODE!
       # Sssh, we set cheats here - as some levels steal our powerups,
