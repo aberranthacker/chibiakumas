@@ -768,12 +768,7 @@ MusicStop: #-----------------------------------------------------------------{{{
       # don't call PLY_Play on VblankInt
         MOV  $0000401,@$MusicPlayerCall # BR .+4
         CALL PLY_AKG_Stop
-        MOV  $0,R0
-        CALL PLY_SE_StopSoundEffectFromChannel
-        MOV  $1,R0
-        CALL PLY_SE_StopSoundEffectFromChannel
-        MOV  $2,R0
-        CALL PLY_SE_StopSoundEffectFromChannel
+        CALL PLY_SE_Stop
 
         RETURN
 #----------------------------------------------------------------------------}}}
@@ -911,14 +906,14 @@ LevelEnd: #------------------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 ClrTextArea: # --------------------------------------------------------------{{{
         MOV  $88*4,R0
-        MOV  $PBP0DT,R3
-        MOV  $PBP12D,R4
+        MOV  $DTSOCT,R4
         MOV  $PBPADR,R5
         MOV  $OffscreenAreaAddr,(R5)
+        CLR  @$BP01BC # background color, pixels 0-3
+        CLR  @$BP12BC # background color, pixels 4-7
 
         1$:
            .rept 10
-            CLR  (R3)
             CLR  (R4)
             INC  (R5)
            .endr

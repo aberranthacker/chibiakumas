@@ -62,7 +62,7 @@ start:
     FireMode:        .byte 0b00000000   #  playmode 0 normal / 128 - 4D
     ContinueMode:    .byte   0          #  Continue Sharing (0/1) # not implemented
     SmartBombsReset: .byte   3          #  SmartbombsReset
-    ContinuesReset:  .byte  60          #  Continues Reset
+    ContinuesReset:  .byte   3          #  Continues Reset
     GameDifficulty:  .byte 0b00000000   #  Game difficulty
                                         #  (enemy Fire Speed 0=normal, ;1=easy, 2=hard)
                                         #  +128 = heaven mode , +64 = star Speedup
@@ -79,7 +79,7 @@ start:
         P1_P02: .byte 0          #  2 - shoot delay
         P1_P03: .byte 3          #  3 - smartbombs     # <= 127
         P1_P04: .byte 0          #  4 - drones (0/1/2) # <= 127
-        P1_P05: .byte 60         #  5 - continues
+        P1_P05: .byte 3          #  5 - continues
         P1_P06: .byte 0          #  6 - drone pos
         P1_P07: .byte 0b00000111 #  7 - Invincible for how many ticks
         P1_P08: .byte 0          #  8 - Player SpriteNum
@@ -97,7 +97,7 @@ start:
         P2_P02: .byte 0          #  2 - Shoot delay
         P2_P03: .byte 3          #  3 - smartbombs
         P2_P04: .byte 0          #  4 - Drones (0/1/2)
-        P2_P05: .byte 60         #  5 - continues
+        P2_P05: .byte 3          #  5 - continues
         P2_P06: .byte 0          #  6 - Drone Pos
         P2_P07: .byte 0b00000111 #  7 - Invincibility
         P2_P08: .byte 0          #  8 - Player SpriteNum

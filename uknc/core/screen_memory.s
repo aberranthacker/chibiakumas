@@ -1,34 +1,29 @@
 CLS:
         MOV  R0,-(SP)
         MOV  R1,-(SP)
-        MOV  R2,-(SP)
+        MOV  R5,-(SP)
 
       # clear the screen
         CLR  R0
-        MOV  $8000>>4,R1
+        MOV  $200,R1
        .equiv ScreenBuffer_ActiveScreen, .+2
-        MOV  $FB1,R2
-100$:
-       .rept 1<<4
-        MOV  R0,(R2)+
-       .endr
-        SOB  R1,100$
+        MOV  $FB1,R5
 
-        MOV  (SP)+,R2
+        CALL Background_SolidFill
+
+        MOV  (SP)+,R5
         MOV  (SP)+,R1
         MOV  (SP)+,R0
 
         RETURN
 
 ScreenBuffer_Reset:
+        MOV  $PPU_SET_FB0_VISIBLE,@$CCH1OD
         MOV  $0x4000,R0
         BIS  R0,@$StarArray_ActiveScreenBit14
         BIS  R0,@$ShowSprite_ActiveScreenBit14
         MOV  $FB1,@$ScreenBuffer_ActiveScreen
         CALL CLS
-
-        TSTB @$CCH1OS
-        BPL  .-4
 
         MOV  $PPU_SET_FB1_VISIBLE,@$CCH1OD
         RETURN
