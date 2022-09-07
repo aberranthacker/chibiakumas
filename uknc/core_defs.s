@@ -24,37 +24,34 @@
 
 .equiv CPU_PPUCommandArg, PPUCommandArg >> 1
 
-.equiv PPU_NOP,                0
-.equiv PPU_Finalize,           2
-.equiv PPU_SingleProcess,      4
-.equiv PPU_MultiProcess,       6
-.equiv PPU_SetPalette,         8
-.equiv PPU_Print,             10
-.equiv PPU_PrintAt,           12
-.equiv PPU_LoadText,          14
-.equiv PPU_ShowBossText,      16
-.equiv PPU_LoadMusic,         18
-.equiv PPU_MusicRestart,      20
-.equiv PPU_MusicStop,         22
-.equiv PPU_DebugPrint,        24
-.equiv PPU_DebugPrintAt,      26
-.equiv PPU_TitleMusicRestart, 28
-.equiv PPU_IntroMusicRestart, 30
-.equiv PPU_LevelMusicRestart, 32
-.equiv PPU_BossMusicRestart,  34
-.equiv PPU_PlaySoundEffect1,  36
-.equiv PPU_PlaySoundEffect2,  38
-.equiv PPU_PlaySoundEffect3,  40
-.equiv PPU_PlaySoundEffect4,  42
-.equiv PPU_PlaySoundEffect5,  44
-.equiv PPU_PlaySoundEffect6,  46
-.equiv PPU_PlaySoundEffect7,  48
-.equiv PPU_StartANewGame,     50
-.equiv PPU_LevelStart,        52
-.equiv PPU_LevelEnd,          54
-.equiv PPU_DrawPlayerUI,      56
+.equiv PPU_LoadDiskFile,       0
+.equiv PPU_SetPalette,         2
+.equiv PPU_Print,              4
+.equiv PPU_PrintAt,            6
+.equiv PPU_LoadText,           8
+.equiv PPU_ShowBossText,      10
+.equiv PPU_LoadMusic,         12
+.equiv PPU_MusicRestart,      14
+.equiv PPU_MusicStop,         16
+.equiv PPU_DebugPrint,        18
+.equiv PPU_DebugPrintAt,      20
+.equiv PPU_TitleMusicRestart, 22
+.equiv PPU_IntroMusicRestart, 24
+.equiv PPU_LevelMusicRestart, 26
+.equiv PPU_BossMusicRestart,  28
+.equiv PPU_PlaySoundEffect1,  30
+.equiv PPU_PlaySoundEffect2,  32
+.equiv PPU_PlaySoundEffect3,  34
+.equiv PPU_PlaySoundEffect4,  36
+.equiv PPU_PlaySoundEffect5,  38
+.equiv PPU_PlaySoundEffect6,  40
+.equiv PPU_PlaySoundEffect7,  42
+.equiv PPU_StartANewGame,     44
+.equiv PPU_LevelStart,        46
+.equiv PPU_LevelEnd,          48
+.equiv PPU_DrawPlayerUI,      50
 
-.equiv PPU_LastJMPTableIndex, 56
+.equiv PPU_LastJMPTableIndex, 50
 
 .equiv PPU_SET_FB0_VISIBLE, 0
 .equiv PPU_SET_FB1_VISIBLE, 1

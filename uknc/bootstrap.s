@@ -75,6 +75,8 @@ Bootstrap_Launch: # used by bootsector linker script
         Bootstrap_Launch_WaitForPPUInit:
             TST  @$PPUCommandArg
         BNZ  Bootstrap_Launch_WaitForPPUInit
+
+        MOV  $Bootstrap_SendParamsStructAddrViaCh0,@$SendParamsStructAddrProc
       #-------------------------------------------------------------------------
      .ifdef ShowLoadingScreen
         MOV  $loading_screen.bin,R0
@@ -119,7 +121,6 @@ Bootstrap_Launch: # used by bootsector linker script
         MOV  $StartOnLevel,R5
 
 Bootstrap_FromR5:
-       .ppudo_ensure $PPU_MultiProcess
         TST  R5                    # R5 is used as the bootstrap command
         BMI  Bootstrap_SystemEvent # negative means system events (Menu etc)
         BR   Bootstrap_Level       # positive means levels
@@ -168,7 +169,6 @@ Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
         CALL Bootstrap_LoadDiskFile_WaitForFinish
        .check_for_loading_error "level_00.bin"
 
-       .ppudo_ensure $PPU_SingleProcess
         MOV  $SP_RESET,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
@@ -185,7 +185,6 @@ Bootstrap_Level_Intro:
         CALL Bootstrap_LoadDiskFile_WaitForFinish
        .check_for_loading_error "ep1_intro_slides.bin"
 
-       .ppudo_ensure $PPU_SingleProcess
         MOV  $SP_RESET,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
@@ -195,12 +194,11 @@ Bootstrap_Level_1: # --------------------------------------------------------
            .ppudo_ensure $PPU_SetPalette, $BlackPalette
             CALL StartANewGame
             CALL LevelReset0000
-            MOVB $3,@$Player_Array + 9 # set number of lives for the first player
+            MOVB $1,@$Player_Array + 9 # set number of lives for the first player
            .ppudo_ensure $PPU_LevelStart
         CALL Bootstrap_LoadDiskFile_WaitForFinish
        .check_for_loading_error "level_01.bin"
 
-       .ppudo_ensure $PPU_SingleProcess
         MOV  $SP_RESET,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
@@ -213,7 +211,6 @@ Bootstrap_Level_2: # --------------------------------------------------------
         CALL Bootstrap_LoadDiskFile_WaitForFinish
        .check_for_loading_error "level_02.bin"
 
-       .ppudo_ensure $PPU_SingleProcess
         MOV  $SP_RESET,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
@@ -543,8 +540,12 @@ Bootstrap_LoadDiskFile_Start: # ---------------------------------------------{{{
         BISB R2,@$PS.DeviceNumber        # head (0, 1)
 
         MOVB $-1,@$PS.Status
-        CLC
+       .equiv SendParamsStructAddrProc, .+2
+        CALL @$Bootstrap_SendParamsStructAddrViaCh2
 
+        RETURN
+# Bootstrap_LoadDiskFile_Start #---------------------------------------------}}}
+Bootstrap_SendParamsStructAddrViaCh2:
         MOV  $ParamsAddr,R0 # R0 - pointer to channel's init sequence array
         MOV  $8,R1          # R1 - size of the array, 8 bytes
 
@@ -554,9 +555,13 @@ Bootstrap_LoadDiskFile_Start: # ---------------------------------------------{{{
                 TSTB @$CCH2OS
             BPL  CheckChannel2Readiness
         SOB  R1,SendNextByteToChannel2
-
         RETURN
-# Bootstrap_LoadDiskFile_Start #---------------------------------------------}}}
+
+Bootstrap_SendParamsStructAddrViaCh0:
+       .ppudo_ensure $PPU_LoadDiskFile,$ParamsStruct
+        RETURN
+
+
 
        .include "./ppucmd.s"
 
@@ -592,6 +597,7 @@ Bootstrap_LoadDiskFile_WaitForFinish: #--------------------------------------{{{
       # |     13     | Неверный формат сектора                 |
       # |     14     | Не найден индекс (ошибка линии ИНДЕКС)  |
       # +------------------------------------------------------+
+        CLC
         MOVB @$PS.Status,R0
         BMI  Bootstrap_LoadDiskFile_WaitForFinish
         BZE  1237$

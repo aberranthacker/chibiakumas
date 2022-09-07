@@ -285,27 +285,17 @@ PSGPresent:
         MOV  R2,@$PLY_SE_PSGAddress
        #MOV  $0173362,@$4 # restore back trap 4 handler
 
-        MOV  $PGM,@$07124 # add PGM to PPU's processes table
-        MOV  $1,@$07100   # add PGM to PPU's processes execution table
-
       # inform bootstrap that PPU is ready to receive commands
         MOV  $CPU_PPUCommandArg,@$PBPADR
         CLR  @$PBP12D
 
         MTPS $PR0
-        RETURN        # end of the init subroutine
 #-------------------------------------------------------------------------------
-Trap4: .equiv Trap4Detected, .+4
-        MOV  $0xFFFF,$0
-        RTI
-PGM: #--------------------------------------------------------------------------
-        MOV  R0,-(SP) # the process manager requires R0 to be intact
-SingleProcess_Loop:
+Queue_Loop:
         MOV  @$CommandsQueue_CurrentPosition,R5
         CMP  R5,$CommandsQueue_Bottom
-        BEQ  CommandsQueue_Empty
-#-------------------------------------------------------------------------------
-CommandsQueue_Process:
+        BEQ  Queue_Loop
+
         MOV  (R5)+,R1
         MOV  (R5)+,R0
         MOV  R5,@$CommandsQueue_CurrentPosition
@@ -314,25 +304,10 @@ CommandsQueue_Process:
         BHI  .
     .endif
         CALL @CommandVectors(R1)
-        MOV  @$CommandsQueue_CurrentPosition,R5
-        CMP  R5,$CommandsQueue_Bottom
-        BLO  CommandsQueue_Process
-
-CommandsQueue_Empty:
-       .equiv SingleProcessFlag, .+2
-        TST  $0
-        BNZ  SingleProcess_Loop # non-zero, flag is set, loop
-
-        MOV  $PGM,@$07124 # add to processes table
-        MOV  $1,@$07100   # require execution
-        MOV  (SP)+,R0     # restore R0
-        JMP  @$0174170    # jump back to the process manager (63608; 0xF878)
+        BR   Queue_Loop
 #-------------------------------------------------------------------------------
 CommandVectors:
-       .word CommandsQueue_Process # PPU_NOP
-       .word Teardown              # PPU_Finalize
-       .word GoSingleProcess       # PPU_SingleProcess
-       .word GoMultiProcess        # PPU_MultiProcess
+       .word LoadDiskFile
        .word SetPalette            # PPU_SetPalette
        .word Print                 # PPU_Print
        .word PrintAt               # PPU_PrintAt
@@ -358,19 +333,7 @@ CommandVectors:
        .word LevelStart
        .word LevelEnd
        .word Player_DrawUI         # PPU_DrawPlayerUI
-Teardown: #------------------------------------------------------------------{{{
-        MOV  (SP)+,R0
-        CLR  @$07100          # do not run the PGM anymore
-        JMP  @$0174170        # jump back to the process manager (63608; 0xF878)
-#----------------------------------------------------------------------------}}}
-GoSingleProcess: #-----------------------------------------------------------{{{
-        MOV  $1,@$SingleProcessFlag # skip firmware processes
-        RETURN
-#----------------------------------------------------------------------------}}}
-GoMultiProcess: #------------------------------------------------------------{{{
-        CLR  @$SingleProcessFlag
-        RETURN
-#----------------------------------------------------------------------------}}}
+#-------------------------------------------------------------------------------
 SetPalette: #----------------------------------------------------------------{{{
         PUSH @$PASWCR
         MOV  $0x010,@$PASWCR
@@ -1145,6 +1108,9 @@ ClearIcon:
 .equiv HitpointIconPosition, OffscreenAreaAddr + 40 * 29
 .equiv SmartbombIconPosition, OffscreenAreaAddr + 40 * 29 + 38
 #----------------------------------------------------------------------------}}}
+LoadDiskFile:
+        MOV  R0,@$023200
+        JMP  @$0125030
 
        .include "ppu/interrupts_handlers.s"
        .include "music/ep1_title_music_playerconfig.s"
