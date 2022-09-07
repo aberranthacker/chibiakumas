@@ -1,13 +1,11 @@
 DummyInterruptHandler: #-------------------------------------------------------
         RTI
 
-VblankIntHandler: #----------------------------------------------------------{{{
-      # we disabling "single process mode" to load data from disk only,
-      # to avoid random disk loading issues, we disabling our
-      # Vblank handler as well
-        TST  @$SingleProcessFlag
-        BZE  SkipToFirmwareHandler
+Trap4: .equiv Trap4Detected, .+4
+        MOV  $0xFFFF,$0
+        RTI
 
+VblankIntHandler: #----------------------------------------------------------{{{
         MOV  @$PBPADR,-(SP)
         MOV  R5,-(SP)
         MOV  R4,-(SP)
@@ -36,7 +34,6 @@ MusicPlayerCall:
         MOV  (SP)+,R5
         MOV  (SP)+,@$PBPADR
 
-SkipToFirmwareHandler:
       # we do not need firmware interrupt handler except for this small
       # procedure
         TST  @$07130 # is floppy drive spindle rotating?

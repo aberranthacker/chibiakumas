@@ -13,7 +13,9 @@
        .=040
         RTI                 # dummy interrupt handler
        .=0104
-68$:    
+68$:
+      # R0 - drive number
+      # R1 - CSR
         MOVB R0,@$PS.DeviceNumber
         MOV  $040,@$0100    # set dummy Vblank int handler
         MOV  $SP_RESET,SP
@@ -21,20 +23,22 @@
         MOV  $TitleStr,R0
         CALL @$PrintStr
 
-load_bootstrap:
+      # load and execute bootstrap
         MOV  $ParamsAddr,R0 # R0 - pointer to channel's init sequence array
         MOV  $8,R1          # R1 - size of the array, 8 bytes
-10$:    MOVB (R0)+,@$CCH2OD # Send a byte to the channel 2
+        10$:
+            MOVB (R0)+,@$CCH2OD # Send a byte to the channel 2
+            20$:
+                TSTB @$CCH2OS   #
+            BPL  20$            # Wait until the channel is ready
+        SOB  R1,10$             # Next byte
 
-20$:    TSTB @$CCH2OS       #
-        BPL  20$            # Wait until the channel is ready
-
-        SOB  R1,10$         # Next byte
-
-30$:    TSTB @$PS.Reply
+        30$:
+            TSTB @$PS.Reply
         BMI  30$
         BNE  PrintErrorCode
         BISB @$PS.DeviceNumber,@$Bootstrap_PS.DeviceNumber
+
         JMP  @$BootstrapStart
 
 PrintErrorCode:
@@ -45,11 +49,12 @@ PrintErrorCode:
         MOV  $ErrorCode,R1
         ADD  R0,R1
 
-10$:    CLR  R2      # R2 - most, R3 - least significant word
-        DIV  $010,R2 # quotient -> R2 , remainder -> R3
-        ADD  $'0, R3 # add ASCII code for "0" to the remainder
-        MOVB R3,-(R1)
-        MOV  R2,R3
+        10$:
+            CLR  R2      # R2 - most, R3 - least significant word
+            DIV  $010,R2 # quotient -> R2 , remainder -> R3
+            ADD  $'0, R3 # add ASCII code for "0" to the remainder
+            MOVB R3,-(R1)
+            MOV  R2,R3
         SOB  R0,10$
 
         MOV  $ErrorCode,R0
@@ -59,15 +64,14 @@ ErrorCode:   .asciz "1234"
        .even
 
 PrintStr:
-10$:    MOVB (R0)+,R1
-        BZE  1237$
-
-20$:    TSTB @$TTYOST
-        BPL  20$
-
-        MOV  R1, @$TTYODT
+        10$:
+            MOVB (R0)+,R1
+            BZE  1237$
+            20$:
+                TSTB @$TTYOST
+            BPL  20$
+            MOV  R1, @$TTYODT
         BR   10$
-
 1237$:  RETURN
 
 ParamsAddr: .byte  0, 0, 0, 0xFF # init sequence (just in case)
