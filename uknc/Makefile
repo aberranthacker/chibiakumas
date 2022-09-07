@@ -84,6 +84,7 @@ build/bootstrap.o : $(common) \
                     ppucmd.s \
                     build/high_score.bin.lzsa1 \
                     build/continue.bin.lzsa1 \
+                    build/game_over.bin.lzsa1 \
                     build/level_01_loading.bin.lzsa1 \
                     build/level_03_loading.bin.lzsa1 \
                     build/level_05_loading.bin.lzsa1 \
@@ -99,6 +100,11 @@ build/continue.bin.lzsa1 : build_tools/bmp_to_raw.rb \
                            resources/bootstrap/continue-320x96.bmp
 	build_tools/bmp_to_raw.rb resources/bootstrap/continue-320x96.bmp build/continue.bin
 	build_tools/lzsa -f 1 -r build/continue.bin build/continue.bin.lzsa1
+
+build/game_over.bin.lzsa1 : build_tools/bmp_to_raw.rb \
+                            resources/bootstrap/game_over.bmp
+	build_tools/bmp_to_raw.rb resources/bootstrap/game_over.bmp build/game_over.bin
+	build_tools/lzsa -f 1 -r build/game_over.bin build/game_over.bin.lzsa1
 
 build/level_01_loading.bin.lzsa1 : build_tools/bmp_to_raw.rb \
                                    resources/bootstrap/level_01-loading.bmp

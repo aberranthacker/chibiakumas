@@ -135,7 +135,7 @@ Bootstrap_SystemEvent:
         JMP  @SystemEventsJmpTable(R5)
     SystemEventsJmpTable:
        .word Bootstrap_StartGame        # 0 BootsStrap_StartGame
-       .word Bootstrap_ContinueScreen   # 1 BootsStrap_ContinueScreen
+       .word Bootstrap_Continue         # 1 BootsStrap_Continue
        .word 0                          # 2 BootsStrap_ConfigureControls
        .word 0                          # 3 BootStrap_SaveSettings
        .word 0                          # 4 GameOverWin
@@ -223,53 +223,63 @@ Bootstrap_Level_3: # --------------------------------------------------------
         CALL Bootstrap_LoadDiskFile_WaitForFinish
        .check_for_loading_error "level_03.bin"
 
-       .ppudo_ensure $PPU_SingleProcess
         MOV  $SP_RESET,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
-
-Bootstrap_ContinueScreen: # ../Aku/BootStrap.asm:1324
-      # R4 points to player array
-        PUSH R4
+Bootstrap_Continue: # ../Aku/BootStrap.asm:1324
        .ppudo_ensure $PPU_LevelEnd
-       .ppudo_ensure $PPU_SetPalette,$ContinueScreenPalette
-        CALL ClearOffscreenBP12
+        WAIT
+       .ppudo_ensure $PPU_SetPalette,$ContinuePalette
+      # R4 points to player array
+        TSTB 5(R4)
+        BZE  GameOver
+
+        PUSH R4
         MOV  $continue.bin.lzsa1,R1
         MOV  $FB1 + 36*80,R2
         CALL unlzsa1
-
         POP  R4
+
         CLR  R1
         BISB 5(R4),R1 # number of continues
-        MOV  $NumberOfCreditsStr,R2
+
+        MOV  $ContinueStr+23,R2
         MOV  $2,R3 # number of digits
         CALL NumberToDecStr
        .ppudo_ensure $PPU_PrintAt,$ContinueStr
 
         MOV  $9,R0
-        ContinueScreen_CoundownLoop:
+        Continue_CoundownLoop:
             MOV  R0, @$ContinueCountdownStr+2
             ADD  $'0, @$ContinueCountdownStr+2
-            MOV  $FB1+20*8*80,R5
-            MOV  $8*80,R3
-            10$:
-                CLR  (R5)+
-            SOB  R3,10$
+            MOV  $8*80,R1 # 8 lines, 80 bytes per line
+            MOV  $FB1+20*8*80,R3
+            CALL ClearR1Words
            .ppudo_ensure $PPU_PrintAt,$ContinueCountdownStr
 
             MOV  $50,R1
-            ContinueScreen_WaitASecondLoop:
+            Continue_WaitASecondLoop:
                 BITB @$KeyboardScanner_P1,$KEYMAP_ANY_FIRE
-                BNZ  ContinueScreen_Continue
+                BNZ  Continue_Continue
                 WAIT
-            SOB  R1,ContinueScreen_WaitASecondLoop
+            SOB  R1,Continue_WaitASecondLoop
         DEC  R0
-        BPL  ContinueScreen_CoundownLoop
+        BPL  Continue_CoundownLoop
+
+GameOver:
+       .ppudo_ensure $PPU_SetPalette,$BlackPalette
+        CALL CLS
+       .ppudo_ensure $PPU_PrintAt,$GameOver_Text
+        MOV  $game_over.bin.lzsa1,R1
+        MOV  $FB1 + 20*80,R2
+        CALL unlzsa1
+       .ppudo_ensure $PPU_SetPalette,$GameOverPalette
+        BR .
 
         MOV  $0x8000,R5
         JMP  Bootstrap_FromR5
 
-ContinueScreen_Continue:
+Continue_Continue:
         DECB 5(R4)    # continues
         MOVB $3,3(R4) # smartbombs
         MOVB $7,7(R4) # invincibility for 7 ticks
@@ -279,6 +289,19 @@ ContinueScreen_Continue:
         CALL @$Event_RestorePalette
        .ppudo_ensure $PPU_LevelStart
         RETURN
+
+GameOver_Text:
+                         #0         1         2         3
+                         #0123456789012345678901234567890123456789
+    .byte  7, 16; .ascii        "The Moster Hoard has driven"     ; .byte 0xFF
+    .byte  8, 17; .ascii         "Chibiko from her homeland"      ; .byte 0xFF
+    .byte  2, 18; .ascii   "She is forced to live in a cardboard "; .byte 0xFF
+    .byte  8, 19; .ascii         "box as a street vampire! "      ; .byte 0xFF
+    .byte 11, 20; .ascii            "With Chibiko gone, "         ; .byte 0xFF
+    .byte 11, 21; .ascii            "peace and harmony"           ; .byte 0xFF
+    .byte  6, 22; .ascii       "spread through out the land. "    ; .byte 0xFF
+    .byte  9, 24; .ascii          "(Boy! Did you fuck up!)"       ; .byte 0x00
+    .even
 
 NumberToDecStr:
       # R1 number
@@ -296,12 +319,12 @@ NumberToDecStr:
         RETURN
 
 ContinueStr:
-       .byte 16,16; .ascii "Continue?"; .byte 0xFF
-       .byte 15,18; .ascii "Credits: "
-NumberOfCreditsStr: .ascii "--"; .byte 0x00
+       .byte 16, 16; .ascii  "Continue?"  ; .byte 0xFF
+       .byte 15, 18; .ascii "Credits: --" ; .byte 0x00
+       .even
 ContinueCountdownStr:
-       .byte 20,20, '-, 0
-
+       .byte 20, 20, '-, 0
+       .even
 
 ClearOffscreenBP12:
         MOV  $88*40>>2,R0
@@ -451,6 +474,8 @@ StartANewGamePlayer: # ../Aku/BootStrap.asm:2256 ;player fire directions ----{{{
 #----------------------------------------------------------------------------}}}
 
 ClearR1Words:
+      # R1 - number of words
+      # R3 - starting address
       # we have to deal with odd number of iterations before entering the cycle
         INC  R1
         ASR  R1
@@ -862,12 +887,19 @@ TitleScreenPalette: #--------------------------------------------------------{{{
     .byte 196, setColors, Black, Green,   brRed,     White
     .word untilEndOfScreen
 #----------------------------------------------------------------------------}}}
-ContinueScreenPalette: #-----------------------------------------------------{{{
+ContinuePalette: #-----------------------------------------------------{{{
     .byte 1, setColors, Black, Magenta, brCyan, White
+    .word untilEndOfScreen
+#----------------------------------------------------------------------------}}}
+GameOverPalette: #-----------------------------------------------------------{{{
+    .byte   1, setColors, Black, Red, brYellow, White
+    .byte 127, setColors, Black, Red, brMagenta, White
     .word untilEndOfScreen
 #----------------------------------------------------------------------------}}}
 continue.bin.lzsa1:
     .incbin "build/continue.bin.lzsa1"
+game_over.bin.lzsa1:
+    .incbin "build/game_over.bin.lzsa1"
 high_score.bin.lzsa1:
     .incbin "build/high_score.bin.lzsa1"
 level_01_loading.bin.lzsa1:
@@ -881,16 +913,16 @@ level_07_loading.bin.lzsa1:
     .even
 #0         1         2         3         4         5         6         7
 #01234567890123456789012345678901234567890123456789012345678901234567890123456789
-       .even # PPU reads strings word by word, so align
-TestStr: .byte 0,10
-         .byte        '!,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F
-         .byte 0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x3A,0x3B,0x3C,0x3D,0x3E,0x3F
-         .byte 0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F
-         .byte 0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A,0x5B,0x5C,0x5D,0x5E,0x5F
-         .byte 0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67,0x68,0x69,0x6A,0x6B,0x6C,0x6D,0x6E,0x6F
-         .byte 0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77,0x78,0x79,0x7A,0x7B,0x7C,0x7D,0x7E,0x7F
-         .byte 0x80,0x81,0x82,0x83,0x84,0x85
-         .byte 0x00
+#       .even # PPU reads strings word by word, so align
+#TestStr: .byte 0,10
+#         .byte        '!,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F
+#         .byte 0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x3A,0x3B,0x3C,0x3D,0x3E,0x3F
+#         .byte 0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F
+#         .byte 0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A,0x5B,0x5C,0x5D,0x5E,0x5F
+#         .byte 0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67,0x68,0x69,0x6A,0x6B,0x6C,0x6D,0x6E,0x6F
+#         .byte 0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77,0x78,0x79,0x7A,0x7B,0x7C,0x7D,0x7E,0x7F
+#         .byte 0x80,0x81,0x82,0x83,0x84,0x85
+#         .byte 0x00
     .even
 end:
 
