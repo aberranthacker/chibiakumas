@@ -13,10 +13,7 @@
                 .global BootstrapSizeQWords
                 .global LoadingScreenPalette
 
-                .global ppu_module.bin
-                .global loading_screen.bin
                 .global saved_settings.bin
-                .global core.bin
                 .global ep1_intro.bin
                 .global ep1_intro_slides.bin
                 .global level_00.bin
@@ -34,89 +31,20 @@
 
                 .=BootstrapStart
 start:
-Bootstrap_Launch: # used by bootsector linker script
-# Load core modules ---------------------------------------------------------{{{
-        MOV  $ppu_module.bin,R0
-        CALL Bootstrap_LoadDiskFile_Start
-          # copy the bootstrap to upper memory while PPU module loads
-            MOV  $BootstrapSizeQWords,R0
-            MOV  $CBPADR,R1
-            MOV  $CBP12D,R2
-            MOV  $BootstrapStart,R3
-            MOV  $BootstrapCopyAddr,(R1)
-            100$:
-                .rept 4
-                 MOV  (R3)+,(R2)
-                 INC  (R1)
-                .endr
-            SOB  R0,100$
-        CALL Bootstrap_LoadDiskFile_WaitForFinish
-      #-------------------------------------------------------------------------
-      # PPU will clear the value when finishes initializiton
-        MOV  $-1,@$PPUCommandArg
-
-        JSR  R5,@$PPEXEC
-       .word FB1 # PPU module location
-       .word PPU_ModuleSizeWords
-
-      # clear offscreen area bitplanes 1 and 2 while PPU module initializes
-        CALL ClearOffscreenBP12
-        MOV  $88*40>>2,R0
-        MOV  $CBPADR,R5
-        MOV  $OffscreenAreaAddr,(R5)
-        MOV  $CBP12D,R4
-        200$:
-           .rept 1<<2
-            CLR  (R4)
-            INC  (R5)
-           .endr
-        SOB  R0,200$
-
-        Bootstrap_Launch_WaitForPPUInit:
-            TST  @$PPUCommandArg
-        BNZ  Bootstrap_Launch_WaitForPPUInit
-
-        MOV  $Bootstrap_SendParamsStructAddrViaCh0,@$SendParamsStructAddrProc
-      #-------------------------------------------------------------------------
-     .ifdef ShowLoadingScreen
-        MOV  $loading_screen.bin,R0
-        CALL Bootstrap_LoadDiskFile_Start
-           .ppudo_ensure $PPU_SetPalette, $TitleScreenPalette
-        CALL Bootstrap_LoadDiskFile_WaitForFinish
-     .endif
       #-------------------------------------------------------------------------
         MOV  $saved_settings.bin,R0
         CALL Bootstrap_LoadDiskFile_Start
         CALL Bootstrap_LoadDiskFile_WaitForFinish
-       .check_for_loading_error "save_settings.bin"
       #-------------------------------------------------------------------------
-      # Load the game core - this is always in memory
-        MOV  $core.bin,R0
-        CALL Bootstrap_LoadDiskFile_Start
-       .ifndef ShowLoadingScreen
-          # clear main screen area
-            MOV  $8000>>3, R0
-            MOV  $FB1, R1
-            CLR  R3
-            1$:
-               .rept 1<<3
-                MOV  R3, (R1)+
-               .endr
-            SOB  R0, 1$
-       .endif
-        CALL Bootstrap_LoadDiskFile_WaitForFinish
-       .check_for_loading_error "core.bin"
-
-       .ifdef ExtMemCore # copy the core to the extended memory
-            MOV  $GameVarsEnd,R4
-            MOV  $CoreStart,R5
-            MOV  $ExtMemSizeBytes>>2 - 2,R1 # -2 to preserve stack
-            200$:
-                MOV  (R4)+, (R5)+
-                MOV  (R4)+, (R5)+
-            SOB R1,200$
-       .endif
-#----------------------------------------------------------------------------}}}
+   .ifdef ExtMemCore # copy the core to the extended memory
+        MOV  $GameVarsEnd,R4
+        MOV  $CoreStart,R5
+        MOV  $ExtMemSizeBytes>>2 - 2,R1 # -2 to preserve stack
+        200$:
+            MOV  (R4)+, (R5)+
+            MOV  (R4)+, (R5)+
+        SOB R1,200$
+   .endif
 
         MOV  $StartOnLevel,R5
 
@@ -191,11 +119,11 @@ Bootstrap_Level_Intro:
 Bootstrap_Level_1: # --------------------------------------------------------
         MOV  $level_01.bin,R0
         CALL Bootstrap_LoadDiskFile_Start
-           .ppudo_ensure $PPU_SetPalette, $BlackPalette
             CALL StartANewGame
             CALL LevelReset0000
             MOVB $1,@$Player_Array + 9 # set number of lives for the first player
            .ppudo_ensure $PPU_LevelStart
+           .ppudo_ensure $PPU_SetPalette, $BlackPalette
         CALL Bootstrap_LoadDiskFile_WaitForFinish
        .check_for_loading_error "level_01.bin"
 
@@ -205,9 +133,9 @@ Bootstrap_Level_1: # --------------------------------------------------------
 Bootstrap_Level_2: # --------------------------------------------------------
         MOV  $level_02.bin,R0
         CALL Bootstrap_LoadDiskFile_Start
+           .ppudo_ensure $PPU_LevelStart
            .ppudo_ensure $PPU_SetPalette, $BlackPalette
             CALL LevelReset0000
-           .ppudo_ensure $PPU_LevelStart
         CALL Bootstrap_LoadDiskFile_WaitForFinish
        .check_for_loading_error "level_02.bin"
 
@@ -217,9 +145,9 @@ Bootstrap_Level_2: # --------------------------------------------------------
 Bootstrap_Level_3: # --------------------------------------------------------
         MOV  $level_03.bin,R0
         CALL Bootstrap_LoadDiskFile_Start
+           .ppudo_ensure $PPU_LevelStart
            .ppudo_ensure $PPU_SetPalette, $BlackPalette
             CALL LevelReset0000
-           .ppudo_ensure $PPU_LevelStart
         CALL Bootstrap_LoadDiskFile_WaitForFinish
        .check_for_loading_error "level_03.bin"
 
@@ -565,31 +493,10 @@ Bootstrap_LoadDiskFile_Start: # ---------------------------------------------{{{
         BISB R2,@$PS.DeviceNumber        # head (0, 1)
 
         MOVB $-1,@$PS.Status
-       .equiv SendParamsStructAddrProc, .+2
-        CALL @$Bootstrap_SendParamsStructAddrViaCh2
 
-        RETURN
-# Bootstrap_LoadDiskFile_Start #---------------------------------------------}}}
-Bootstrap_SendParamsStructAddrViaCh2:
-        MOV  $ParamsAddr,R0 # R0 - pointer to channel's init sequence array
-        MOV  $8,R1          # R1 - size of the array, 8 bytes
-
-        SendNextByteToChannel2:
-            MOVB (R0)+,@$CCH2OD
-            CheckChannel2Readiness:
-                TSTB @$CCH2OS
-            BPL  CheckChannel2Readiness
-        SOB  R1,SendNextByteToChannel2
-        RETURN
-
-Bootstrap_SendParamsStructAddrViaCh0:
        .ppudo_ensure $PPU_LoadDiskFile,$ParamsStruct
         RETURN
-
-
-
-       .include "./ppucmd.s"
-
+# Bootstrap_LoadDiskFile_Start #---------------------------------------------}}}
 ParamsAddr: .byte 0, 0, 0, 0xFF # init sequence (just in case)
             .word ParamsStruct
             .byte 0xFF, 0xFF    # two termination bytes 0xff, 0xff
@@ -636,20 +543,10 @@ Bootstrap_LoadDiskFile_WaitForFinish: #--------------------------------------{{{
 #   .word address for the data from a disk
 #   .word size in words
 #   .word starting block of a file
-ppu_module.bin:
-    .word FB1
-    .word 0
-    .word 0
-loading_screen.bin:
-    .word FB1
-    .word 0
-    .word 0
+
+#:bpt
 saved_settings.bin:
     .word SavedSettingsStart
-    .word 0
-    .word 0
-core.bin:
-    .word GameVarsEnd
     .word 0
     .word 0
 ep1_intro.bin:
@@ -874,17 +771,6 @@ BlackPalette: #------------------------------------------------------{{{
     .word    BLACK | BLUE  << 4 | BLACK << 8 | BLACK << 12
     .word    BLACK | BLACK << 4 | BLACK << 8 | BLACK << 12
     .byte 1, setColors, Black, Black, Black, Black
-    .word untilEndOfScreen
-#----------------------------------------------------------------------------}}}
-TitleScreenPalette: #--------------------------------------------------------{{{
-    .word   0, cursorGraphic, scale320 | RgB
-    .byte   1, setColors, Black, brBlue,  brRed,     White
-    .byte  49, setColors, Black, Magenta, Blue,      White
-    .byte  63, setColors, Black, Magenta, brMagenta, White
-    .byte  95, setColors, Black, Green,   brCyan,    White
-    .byte 185, setColors, Black, Green,   Black,     White
-    .byte 192, setColors, Black, Green,   brCyan,    White
-    .byte 196, setColors, Black, Green,   brRed,     White
     .word untilEndOfScreen
 #----------------------------------------------------------------------------}}}
 ContinuePalette: #-----------------------------------------------------{{{

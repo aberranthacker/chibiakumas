@@ -30,28 +30,27 @@
 .equiv PPU_PrintAt,            6
 .equiv PPU_LoadText,           8
 .equiv PPU_ShowBossText,      10
-.equiv PPU_LoadMusic,         12
-.equiv PPU_MusicRestart,      14
-.equiv PPU_MusicStop,         16
-.equiv PPU_DebugPrint,        18
-.equiv PPU_DebugPrintAt,      20
-.equiv PPU_TitleMusicRestart, 22
-.equiv PPU_IntroMusicRestart, 24
-.equiv PPU_LevelMusicRestart, 26
-.equiv PPU_BossMusicRestart,  28
-.equiv PPU_PlaySoundEffect1,  30
-.equiv PPU_PlaySoundEffect2,  32
-.equiv PPU_PlaySoundEffect3,  34
-.equiv PPU_PlaySoundEffect4,  36
-.equiv PPU_PlaySoundEffect5,  38
-.equiv PPU_PlaySoundEffect6,  40
-.equiv PPU_PlaySoundEffect7,  42
-.equiv PPU_StartANewGame,     44
-.equiv PPU_LevelStart,        46
-.equiv PPU_LevelEnd,          48
-.equiv PPU_DrawPlayerUI,      50
+.equiv PPU_MusicRestart,      12
+.equiv PPU_MusicStop,         14
+.equiv PPU_DebugPrint,        16
+.equiv PPU_DebugPrintAt,      18
+.equiv PPU_TitleMusicRestart, 20
+.equiv PPU_IntroMusicRestart, 22
+.equiv PPU_LevelMusicRestart, 24
+.equiv PPU_BossMusicRestart,  26
+.equiv PPU_PlaySoundEffect1,  28
+.equiv PPU_PlaySoundEffect2,  30
+.equiv PPU_PlaySoundEffect3,  32
+.equiv PPU_PlaySoundEffect4,  34
+.equiv PPU_PlaySoundEffect5,  36
+.equiv PPU_PlaySoundEffect6,  38
+.equiv PPU_PlaySoundEffect7,  40
+.equiv PPU_StartANewGame,     42
+.equiv PPU_LevelStart,        44
+.equiv PPU_LevelEnd,          46
+.equiv PPU_DrawPlayerUI,      48
 
-.equiv PPU_LastJMPTableIndex, 50
+.equiv PPU_LastJMPTableIndex, 48
 
 .equiv PPU_SET_FB0_VISIBLE, 0
 .equiv PPU_SET_FB1_VISIBLE, 1
@@ -103,7 +102,9 @@
 .equiv PlayerStarArrayPointer, FB_GAP # it fits nicely into the gap
 .equiv FB1, FB_GAP + 384
 
-.equiv BootstrapStart,  FB0
+# update bootstrap starting address in build_tools/update_bootstrap_disk_map.rb
+# after you change it here
+.equiv BootstrapStart, 01000 
 .equiv Ep1IntroSlidesStart, FB0 + 4096
 
 .equiv GameVarsStart, FB1 + 16000
@@ -119,7 +120,7 @@
     .endif
 
     .ifndef ExtMemCore
-.equiv Akuyou_LevelStart, 0x9EA8 # 40616 0117250 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9E82 # 40578 0117202 # auto-generated during a build
     .else
 .equiv Akuyou_LevelStart, GameVarsEnd
     .endif

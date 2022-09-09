@@ -27,61 +27,53 @@ clean :
 
 # chibiakumas.dsk -----------------------------------------------------------{{{
 build/chibiakumas.dsk : build_tools/build_dsk.rb \
-                        build_tools/dsk_image_constants.rb \
-                        build/bootsector.bin \
-                        build/bootstrap.bin \
-                        build/ppu_module.bin \
-                        build/loading_screen.bin \
-                        build/core.bin \
-                        build/ep1_intro.bin \
-                        build/ep1_intro_slides.bin \
-                        build/level_00.bin \
-                        build/level_01.bin \
-                        build/level_02.bin \
-                        build/level_03.bin \
-                        build/saved_settings.bin
+			build_tools/dsk_image_constants.rb \
+			build_tools/update_bootsector_disk_map.rb \
+			build_tools/update_bootstrap_disk_map.rb \
+			build/bootsector.bin \
+			build/bootstrap.bin \
+			build/ppu_module.bin \
+			build/loading_screen.bin \
+			build/core.bin \
+			build/ep1_intro.bin \
+			build/ep1_intro_slides.bin \
+			build/level_00.bin \
+			build/level_01.bin \
+			build/level_02.bin \
+			build/level_03.bin \
+			build/saved_settings.bin
+	build_tools/update_bootstrap_disk_map.rb
+	build_tools/update_bootsector_disk_map.rb
 	build_tools/build_dsk.rb
 # chibiakumas.dsk -----------------------------------------------------------}}}
 
 # bootsector.bin ------------------------------------------------------------{{{
 build/bootsector.bin : build/bootsector.o \
-                       build/bootstrap.o
-	$(LD) $(LDFLAGS) -T linker_scripts/bootsector.cmd -R build/bootstrap.o
+                       build/bootstrap.o \
+                       build/ppu.o
+	$(LD) $(LDFLAGS) -M \
+		-T linker_scripts/bootsector.cmd \
+		-R build/bootstrap.o \
+		-R build/ppu.o > build/bootsector.map.txt
 	chmod -x build/bootsector.bin
+
 build/bootsector.o : $(common) \
                      bootsector.s
-	$(AS) -al bootsector.s -o build/bootsector.o
+	$(AS) -al bootsector.s -o build/bootsector.o | build_tools/format_list.rb
 # bootsector.bin ------------------------------------------------------------}}}
 
 # bootsrap.bin --------------------------------------------------------------{{{
 build/bootstrap.bin : build/bootstrap.o \
-                      build/ppu.o \
-                      build/loading_screen.bin \
                       build/core.o \
-                      build/level_00_menu.o \
-                      build/ep1_intro.o \
-                      build/ep1_intro_slides.o \
-                      build/level_01.o \
-                      build/level_02.o \
-                      build/level_03.o \
                       build/saved_settings.o
-	$(LD) $(LDFLAGS) -M \
-	      -T linker_scripts/bootstrap.cmd \
+	$(LD) $(LDFLAGS) -M build/bootstrap.o \
 	      -R build/core.o \
-	      -R build/ep1_intro_slides.o \
-	      -R build/ep1_intro.o \
-	      -R build/level_00_menu.o \
-	      -R build/level_01.o \
-	      -R build/level_02.o \
-	      -R build/level_03.o \
-	      -R build/ppu.o \
-	      -R build/saved_settings.o > build/bootstrap.map.txt
+	      -R build/saved_settings.o \
+	      -o build/bootstrap.out > build/bootstrap.map.txt
 	ruby build_tools/aout2sav.rb build/bootstrap.out -b -s -o build/bootstrap.bin
-	build_tools/update_bootstrap_disk_map.rb
 
 build/bootstrap.o : $(common) \
                     bootstrap.s \
-                    ppucmd.s \
                     build/high_score.bin.lzsa1 \
                     build/continue.bin.lzsa1 \
                     build/game_over.bin.lzsa1 \

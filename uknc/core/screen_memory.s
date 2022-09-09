@@ -18,7 +18,6 @@ CLS:
         RETURN
 
 ScreenBuffer_Reset:
-        MOV  $PPU_SET_FB0_VISIBLE,@$CCH1OD
         MOV  $0x4000,R0
         BIS  R0,@$StarArray_ActiveScreenBit14
         BIS  R0,@$ShowSprite_ActiveScreenBit14

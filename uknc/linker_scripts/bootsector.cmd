@@ -4,8 +4,6 @@ OUTPUT_ARCH(pdp11)
 INPUT(build/bootsector.o)
 OUTPUT(build/bootsector.bin)
 
-BootstrapSizeWords = ((BootstrapEnd - Bootstrap_Launch) / 2);
-
 SECTIONS
 {
     . = 0;

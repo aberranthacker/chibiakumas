@@ -2,12 +2,13 @@
 # frozen_string_literal: true
 
 require_relative 'dsk_image_constants'
+require 'pry'
 
 metadata = FILES.map do |filename|
   [filename[6..-1], { address: 0, size: File.size(filename) }]
 end.to_h
 
-File.read('build/bootstrap.map.txt').each_line do |line|
+File.read('build/bootsector.map.txt').each_line do |line|
   FILES.each do |file_name|
     key = file_name[6..-1]
     if /0x\p{XDigit}{16}\s+#{key}/.match?(line)
@@ -16,7 +17,7 @@ File.read('build/bootstrap.map.txt').each_line do |line|
   end
 end
 
-bootstrap_bin = File.binread('build/bootstrap.bin').unpack('v*')
+bootsector_bin = File.binread('build/bootsector.bin').unpack('v*')
 
 current_block_num = 0
 
@@ -25,16 +26,13 @@ metadata.each do |label, data|
   size = data[:size]
 
   unless address.zero?
-    # bootstrap starts from address 384
-    # subtract the address to calculate offset
-    # and divide by 2 since we dealing with words here
-    offset = (address - 512) / 2
+    offset = address / 2
 
-    bootstrap_bin[offset+1] = size / 2
-    bootstrap_bin[offset+2] = current_block_num
+    bootsector_bin[offset+1] = size / 2
+    bootsector_bin[offset+2] = current_block_num
   end
 
   current_block_num += (size + 511) / 512
 end
 
-File.binwrite('build/bootstrap.bin', bootstrap_bin.pack('v*'))
+File.binwrite('build/bootsector.bin', bootsector_bin.pack('v*'))
