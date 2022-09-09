@@ -289,21 +289,23 @@ PSGPresent:
         MOV  $CPU_PPUCommandArg,@$PBPADR
         CLR  @$PBP12D
 
+        MOV  $CommandsQueue_CurrentPosition,R4
         MTPS $PR0
 #-------------------------------------------------------------------------------
 Queue_Loop:
-        MOV  @$CommandsQueue_CurrentPosition,R5
+        MOV  (R4),R5
         CMP  R5,$CommandsQueue_Bottom
         BEQ  Queue_Loop
 
         MOV  (R5)+,R1
         MOV  (R5)+,R0
-        MOV  R5,@$CommandsQueue_CurrentPosition
+        MOV  R5,(R4)
     .ifdef DebugMode
         CMP  R1,$PPU_LastJMPTableIndex
         BHI  .
     .endif
         CALL @CommandVectors(R1)
+        MOV  $CommandsQueue_CurrentPosition,R4
         BR   Queue_Loop
 #-------------------------------------------------------------------------------
 CommandVectors:
@@ -1104,8 +1106,12 @@ ClearIcon:
 .equiv SmartbombIconPosition, OffscreenAreaAddr + 40 * 29 + 38
 #----------------------------------------------------------------------------}}}
 LoadDiskFile:
-        MOV  R0,@$023200
-        JMP  @$0125030
+        MOV  $1,@$VblankInt_SkipMusic
+        MOV  R0,@$023200 # set ParamsStruct address for firmware proc to use
+        CALL @$0125030   # firmware proc that handles channel 2
+       #CALL @$0134454   # stop floppy drive spindle
+        CLR  @$VblankInt_SkipMusic
+        RETURN
 
        .include "ppu/interrupts_handlers.s"
        .include "music/ep1_title_music_playerconfig.s"
@@ -1136,9 +1142,7 @@ DummyPSG: .word 0
 CommandsQueue_Top:
        .space 2*2*16
 CommandsQueue_Bottom:
-CommandsQueue_CurrentPosition:
 
-       .word CommandsQueue_Bottom
 StrBuffer:
        .even
 end:

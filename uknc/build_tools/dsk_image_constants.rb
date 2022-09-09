@@ -1,10 +1,10 @@
 FILES = [
   'build/bootsector.bin',
-  'build/bootstrap.bin',
   'build/ppu_module.bin',
   'build/loading_screen.bin',
-  'build/saved_settings.bin',
+  'build/bootstrap.bin',
   'build/core.bin',
+  'build/saved_settings.bin',
   'build/ep1_intro.bin',
   'build/ep1_intro_slides.bin',
   'build/level_00.bin',

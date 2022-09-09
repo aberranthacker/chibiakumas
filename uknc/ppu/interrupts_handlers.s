@@ -6,6 +6,10 @@ Trap4: .equiv Trap4Detected, .+4
         RTI
 
 VblankIntHandler: #----------------------------------------------------------{{{
+       .equiv VblankInt_SkipMusic, .+2
+        TST  $1
+        BNZ  VblankInt_MinimalHandler
+
         MOV  @$PBPADR,-(SP)
         MOV  R5,-(SP)
         MOV  R4,-(SP)
@@ -34,6 +38,7 @@ MusicPlayerCall:
         MOV  (SP)+,R5
         MOV  (SP)+,@$PBPADR
 
+VblankInt_MinimalHandler:
       # we do not need firmware interrupt handler except for this small
       # procedure
         TST  @$07130 # is floppy drive spindle rotating?
@@ -226,7 +231,6 @@ KeyboardIntHadler: #---------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 
 Channel0In_IntHandler: #-----------------------------------------------------{{{
-        MTPS $PR7
         MOV  @$PBPADR,-(SP)
         MOV  R5,-(SP)
 
@@ -237,12 +241,14 @@ Channel0In_IntHandler: #-----------------------------------------------------{{{
    .endif
         MOV  $CPU_PPUCommandArg,@$PBPADR
         MOV  @$PBP12D,-(R5)
+        MTPS $PR7
         MOV  @$PCH0ID,-(R5)
-        MOV  R5,@$CommandsQueue_CurrentPosition
+       .equiv CommandsQueue_CurrentPosition, .+2
+        MOV  R5,$CommandsQueue_Bottom
+        MTPS $PR0
 
         MOV  (SP)+,R5
         MOV  (SP)+,@$PBPADR
-        MTPS $PR0
 
         RTI
 CommandsQueue_Full:
