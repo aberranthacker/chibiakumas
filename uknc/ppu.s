@@ -34,13 +34,7 @@ start:
       # **Beware** this is **not** how the real hardware behaves!
         MOV  $0x0F0,@$PASWCR
 #-------------------------------------------------------------------------------
-        MOV  $88*2,R0
-        MOV  $OffscreenAreaAddr,R5
-        1$:
-           .rept 10
-            CLR  (R5)+
-           .endr
-        SOB  R0,1$
+        CALL ClearOffscreenArea
 
 # initialize our scanlines parameters table (SLTAB): ------------------------{{{
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -275,12 +269,13 @@ SLTABInit:
       # R1 now contains 0177360, address of PSG0
 
         TST  @$Trap4Detected
-        BZE  PSGPresent
+        BZE  AberrantSoundModulePresent
 
         CLR  @$Trap4Detected
         MOV  $DummyPSG,R1
         MOV  R1,R2
-PSGPresent:
+
+AberrantSoundModulePresent:
         MOV  R1,@$PLY_AKG_PSGAddress
         MOV  R2,@$PLY_SE_PSGAddress
        #MOV  $0173362,@$4 # restore back trap 4 handler
@@ -315,7 +310,6 @@ CommandVectors:
        .word PrintAt               # PPU_PrintAt
        .word LoadText              # PPU_LoadText
        .word ShowBossText          # PPU_ShowBossText
-       .word LoadMusic             # PPU_LoadMusic
        .word MusicRestart          # PPU_MusicRestart
        .word MusicStop             # PPU_MusicStop
        .word Debug_Print           # PPU_Debug_Print
@@ -474,6 +468,7 @@ Print: #---------------------------------------------------------------------{{{
 LoadNext2Bytes:
         MOV  (R4),R0  # load 2 bytes from CPU RAM
         MOV  R0,(R3)+ # store them into buffer
+        TSTB R0       # test least significant byte
         BZE  3$       # end of text
         BMI  2$       # end of string
 
@@ -612,9 +607,6 @@ SBT_NextChar:
         BR   SBT_NextChar
 
 1237$:  RETURN
-#----------------------------------------------------------------------------}}}
-LoadMusic: #-----------------------------------------------------------------{{{
-        RETURN
 #----------------------------------------------------------------------------}}}
 Debug_PrintAt: #-------------------------------------------------------------{{{
         MOV  $PBP12D,R4
@@ -887,6 +879,7 @@ LevelStart: #----------------------------------------------------------------{{{
         CLR  @$P1_P03
         CLR  @$P1_P09
         CLR  @$Skip_Player_DrawUI
+        CALL ClearOffscreenArea
         CALL Player_DrawScore
         RETURN
 #----------------------------------------------------------------------------}}}
@@ -902,24 +895,25 @@ LevelEnd: #------------------------------------------------------------------{{{
             MOV  (R3)+,(R4)
             INC  (R5)
         SOB  R0,LevelEnd_NextScoreWord
-        CALL ClrTextArea
+        CALL ClearOffscreenArea
 
         RETURN
 #----------------------------------------------------------------------------}}}
-ClrTextArea: # --------------------------------------------------------------{{{
-        MOV  $88*4,R0
+ClearOffscreenArea: # -------------------------------------------------------{{{
+        MOV  $88*4,R1
         MOV  $DTSOCT,R4
         MOV  $PBPADR,R5
         MOV  $OffscreenAreaAddr,(R5)
+        CLR  @$PBPMSK # write to all bit-planes
         CLR  @$BP01BC # background color, pixels 0-3
         CLR  @$BP12BC # background color, pixels 4-7
 
-        1$:
+        100$:
            .rept 10
             CLR  (R4)
             INC  (R5)
            .endr
-        SOB  R0,1$
+        SOB  R1,100$
 
         RETURN
 #----------------------------------------------------------------------------}}}

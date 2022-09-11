@@ -153,6 +153,7 @@ not_implemented_check_R0:
 
        .include "core/execute_bootstrap.s"
        .global ExecuteBootstrap
+       .global ExecuteBootstrap_NoCLS
 
        .include "core/gradient.s"
        .global Background_Gradient

@@ -194,9 +194,26 @@ Introduction: #--------------------------------------------------------------{{{
         CALL ExecuteBootstrap
 #----------------------------------------------------------------------------}}}
 StartGame_1UP: #-------------------------------------------------------------{{{
-        MOVB $3,@$Player_Array+9 # set number of lives for the first player
+        CALL Fader
+
+       .ppudo $PPU_SetPalette,$Level01_TitlePalette
+        MOV  $level_01_title.bin.lzsa1,R1
+        MOV  $FB0,R2
+        CALL @$unlzsa1
+
+       .ppudo $PPU_PrintAt,$Level1_TitleText
+        MOV  $FB0,R1
+        MOV  $FB1+(12*2),R2
+        MOV  $96,R3
+        96$:
+           .rept 16
+            MOV  (R1)+,(R2)+
+           .endr
+        ADD  $24*2,R2
+        SOB  R3,96$
+
         MOV  $1,R5
-        CALL ExecuteBootstrap
+        CALL ExecuteBootstrap_NoCLS
 #----------------------------------------------------------------------------}}}
 StartGame_2UP: #-------------------------------------------------------------{{{
         JMP  @$ShowMenu_Loop
@@ -333,7 +350,7 @@ GetMemPos:
         ASL  R0
         ADD  R0,R5
         RETURN
-        
+
 Fader: #---------------------------------------------------------------------{{{
         MOV  R0,-(SP)
         MOV  R1,-(SP)
@@ -469,34 +486,56 @@ FireKeyBlackPalette:
     .byte 185, setColors, Black, Green, Black, White
     .word untilLine | 192
 #----------------------------------------------------------------------------}}}
+Level01_TitlePalette: #------------------------------------------------------{{{
+    .byte   1, setColors, Black, Magenta, brCyan,    White
+    .byte  96, setColors, Black, Magenta, Gray, White
+    .byte 104, setColors, Black, Magenta, brMagenta, White
+    .word endOfScreen
+#----------------------------------------------------------------------------}}}
 
 PressFireKeyStr: .byte 9,23
                  .asciz "Press Fire to Continue"
                  .even
-MenuText:
-                        #0         1         2         3         4
-                        #01234567890123456789012345678901234567890
-    .byte 10,10; .ascii "Hit ESC to set controls"; .byte 0xFF
+                         #0---------1---------2---------3---------
+MenuText:                #0123456789012345678901234567890123456789
+    .byte 10, 10; .ascii           "Hit ESC to set controls"        ; .byte -1 ; .even
 
-    .byte 11,12; .ascii "Start Game as Chibiko"  ; .byte 0xFF
-    .byte 11,13; .ascii "Start Game as Bochan "  ; .byte 0xFF
-    .byte 11,14; .ascii "Start 2 Player game"    ; .byte 0xFF
-    .byte 11,15; .ascii "Watch the Intro"        ; .byte 0xFF
-    .byte 11,16; .ascii "Configure Settings "    ; .byte 0xFF
+    .byte 11, 12; .ascii           "Start Game as Chibiko"          ; .byte -1 ; .even
+    .byte 11, 13; .ascii           "Start Game as Bochan"           ; .byte -1 ; .even
+    .byte 11, 14; .ascii           "Start 2 Player game"            ; .byte -1 ; .even
+    .byte 11, 15; .ascii           "Watch the Intro"                ; .byte -1 ; .even
+    .byte 11, 16; .ascii           "Configure Settings"             ; .byte -1 ; .even
   .ifdef CompileEP2
-    .byte 11,17; .ascii "Special Content"        ; .byte 0xFF
-    .byte 11,18; .ascii "Credits & Thanks "      ; .byte 0xFF
+    .byte 11, 17; .ascii           "Special Content"                ; .byte -1 ; .even
+    .byte 11, 18; .ascii           "Credits & Thanks"               ; .byte -1 ; .even
   .else
-    .byte 11,17; .ascii "Credits & Thanks "      ; .byte 0xFF
+    .byte 11, 17; .ascii           "Credits & Thanks"               ; .byte -1 ; .even
   .endif
 
-    .byte 10,22; .ascii "www.chibiakumas.com"    ; .byte 0xFF
+    .byte 10, 22; .ascii           "www.chibiakumas.com"            ; .byte -1 ; .even
 
-    .byte  9,24; .ascii "HighScore: "            ; .byte 0x00
+    .byte  9, 24; .ascii           "HighScore:"                     ; .byte 0  ; .even
 
     .even
 
 CursorSpr: .incbin "build/menu_cursor.spr"
 
+level_01_title.bin.lzsa1:
+    .incbin "build/level_01_title.bin.lzsa1"
+    .even
+                         #0---------1---------2---------3---------
+Level1_TitleText:        #0123456789012345678901234567890123456789
+    .byte  2, 13; .ascii   "After a hard nights work massacring"    ; .byte 0xFF ; .even
+    .byte  2, 14; .ascii   "villagers and harvesting their blood"   ; .byte 0xFF ; .even
+    .byte  1, 15; .ascii  "Chibico is having a well earned day's"   ; .byte 0xFF ; .even
+    .byte  2, 16; .ascii   "sleep... Suddenly she is awoken by a"   ; .byte 0xFF ; .even
+    .byte  2, 17; .ascii   "commotion. A swarm of noisy, stupid,"   ; .byte 0xFF ; .even
+    .byte  1, 18; .ascii  "ill concieved and badly drawn monsters"  ; .byte 0xFF ; .even
+    .byte  1, 19; .ascii  "are being drawn to her castle, and are"  ; .byte 0xFF ; .even
+    .byte  4, 20; .ascii     "seriously disturbing the peace!"      ; .byte 0xFF ; .even
+    .byte  5, 21; .ascii      "No self respecting vampire can"      ; .byte 0xFF ; .even
+    .byte  3, 22; .ascii    "overlook this insult! It's time to"    ; .byte 0xFF ; .even
+    .byte  3, 23; .ascii    "'rise from your grave' and unleash"    ; .byte 0xFF ; .even
+    .byte  7, 24; .ascii        "hell on whoever sent them!"        ; .byte 0x00 ; .even
     .even
 end:

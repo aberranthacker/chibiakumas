@@ -66,7 +66,7 @@
              INC  (R1)
             .endr
         SOB  R0,100$
- 
+
         MOV $core.bin,R0
         CALL LoadDiskFile_Start
 

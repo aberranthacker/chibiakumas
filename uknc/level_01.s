@@ -747,11 +747,17 @@ GradientBottom:
    .word 0xFFFF
 #----------------------------------------------------------------------------}}}
 BluePalette: #---------------------------------------------------------------{{{
+    .byte   0, setOffscreenColors
+    .word      BLACK  | BLUE << 4 | BLUE << 8 | BLUE     << 12
+    .word      BLUE   | BLUE << 4 | BLUE << 8  | BR_BLUE << 12
     .word 0, cursorGraphic, scale320 | rgb
     .byte 1, setColors, Black, Blue, Blue, Magenta
     .word endOfScreen
 #----------------------------------------------------------------------------}}}
 DarkRealPalette: #-----------------------------------------------------------{{{
+    .byte   0, setOffscreenColors
+    .word      BLACK  | BLUE    << 4 | GREEN  << 8 | CYAN  << 12
+    .word      RED    | MAGENTA << 4 | YELLOW << 8 | WHITE << 12
     .word   0, cursorGraphic, scale320 | rgb
     .byte   1, setColors, Black, brBlue,  brYellow, White
     .byte  49, setColors, Black, Magenta, Blue,     White

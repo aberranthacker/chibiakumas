@@ -77,10 +77,9 @@ build/bootstrap.o : $(common) \
                     build/high_score.bin.lzsa1 \
                     build/continue.bin.lzsa1 \
                     build/game_over.bin.lzsa1 \
-                    build/level_01_loading.bin.lzsa1 \
-                    build/level_03_loading.bin.lzsa1 \
-                    build/level_05_loading.bin.lzsa1 \
-                    build/level_07_loading.bin.lzsa1
+                    build/level_03_title.bin.lzsa1 \
+                    build/level_05_title.bin.lzsa1 \
+                    build/level_07_title.bin.lzsa1
 	$(AS) -al bootstrap.s -o build/bootstrap.o | build_tools/format_list.rb
 
 build/high_score.bin.lzsa1 : build_tools/bmp_to_raw.rb \
@@ -98,25 +97,20 @@ build/game_over.bin.lzsa1 : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/bootstrap/game_over.bmp build/game_over.bin
 	build_tools/lzsa -f 1 -r build/game_over.bin build/game_over.bin.lzsa1
 
-build/level_01_loading.bin.lzsa1 : build_tools/bmp_to_raw.rb \
-                                   resources/bootstrap/level_01-loading.bmp
-	build_tools/bmp_to_raw.rb resources/bootstrap/level_01-loading.bmp build/level_01_loading.bin
-	build_tools/lzsa -f 1 -r build/level_01_loading.bin build/level_01_loading.bin.lzsa1
+build/level_03_title.bin.lzsa1 : build_tools/bmp_to_raw.rb \
+                                   resources/bootstrap/level_03-title.bmp
+	build_tools/bmp_to_raw.rb resources/bootstrap/level_03-title.bmp build/level_03_title.bin
+	build_tools/lzsa -f 1 -r build/level_03_title.bin build/level_03_title.bin.lzsa1
 
-build/level_03_loading.bin.lzsa1 : build_tools/bmp_to_raw.rb \
-                                   resources/bootstrap/level_03-loading.bmp
-	build_tools/bmp_to_raw.rb resources/bootstrap/level_03-loading.bmp build/level_03_loading.bin
-	build_tools/lzsa -f 1 -r build/level_03_loading.bin build/level_03_loading.bin.lzsa1
+build/level_05_title.bin.lzsa1 : build_tools/bmp_to_raw.rb \
+                                   resources/bootstrap/level_05-title.bmp
+	build_tools/bmp_to_raw.rb resources/bootstrap/level_05-title.bmp build/level_05_title.bin
+	build_tools/lzsa -f 1 -r build/level_05_title.bin build/level_05_title.bin.lzsa1
 
-build/level_05_loading.bin.lzsa1 : build_tools/bmp_to_raw.rb \
-                                   resources/bootstrap/level_05-loading.bmp
-	build_tools/bmp_to_raw.rb resources/bootstrap/level_05-loading.bmp build/level_05_loading.bin
-	build_tools/lzsa -f 1 -r build/level_05_loading.bin build/level_05_loading.bin.lzsa1
-
-build/level_07_loading.bin.lzsa1 : build_tools/bmp_to_raw.rb \
-                                   resources/bootstrap/level_07-loading.bmp
-	build_tools/bmp_to_raw.rb resources/bootstrap/level_07-loading.bmp build/level_07_loading.bin
-	build_tools/lzsa -f 1 -r build/level_07_loading.bin build/level_07_loading.bin.lzsa1
+build/level_07_title.bin.lzsa1 : build_tools/bmp_to_raw.rb \
+                                   resources/bootstrap/level_07-title.bmp
+	build_tools/bmp_to_raw.rb resources/bootstrap/level_07-title.bmp build/level_07_title.bin
+	build_tools/lzsa -f 1 -r build/level_07_title.bin build/level_07_title.bin.lzsa1
 # bootsrap.bin --------------------------------------------------------------}}}
 
 # saved_settings.bin --------------------------------------------------------{{{
@@ -229,7 +223,8 @@ build/level_00.bin : build/core.o \
 build/level_00_menu.o : $(common) \
                         level_00_menu.s \
                         build/menu.spr \
-                        build/menu_cursor.spr
+                        build/menu_cursor.spr \
+                        build/level_01_title.bin.lzsa1
 	$(AS) -al level_00_menu.s -o build/level_00_menu.o | build_tools/format_list.rb
 
 build/menu.spr : build_tools/spr_cpc_to_uknc.rb \
@@ -239,6 +234,11 @@ build/menu.spr : build_tools/spr_cpc_to_uknc.rb \
 build/menu_cursor.spr : build_tools/bmp_to_raw.rb \
                         resources/menu/cursor-Sheet.bmp
 	build_tools/bmp_to_raw.rb resources/menu/cursor-Sheet.bmp build/menu_cursor.spr
+
+build/level_01_title.bin.lzsa1 : build_tools/bmp_to_raw.rb \
+                                   resources/bootstrap/level_01-title.bmp
+	build_tools/bmp_to_raw.rb resources/bootstrap/level_01-title.bmp build/level_01_title.bin
+	build_tools/lzsa -f 1 -r build/level_01_title.bin build/level_01_title.bin.lzsa1
 # level_00_menu.o -----------------------------------------------------------}}}
 
 # ep1_intro.bin -------------------------------------------------------------{{{

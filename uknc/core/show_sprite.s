@@ -486,7 +486,6 @@ SprDraw_WithMaskRenderer_Vectors:
        .word SprDraw_WithMaskRenderer_96pxInit  # 24 96
 
 SprDraw_WithMaskRenderer_LineDoubler:
-        #:bpt
         MOV  $80-6,R1
         ASL  R2
         PUSH R2

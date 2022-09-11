@@ -13,8 +13,8 @@
 
 # Both players are dead, so pause the game and show the continue screen
 PlayersDead:
-     # TODO: implement PlayersDead
-     .inform_and_hang "player_driver PlayersDead called :-/"
+        MOV  $0x8001,R5
+        JMP  ExecuteBootstrap
 
 PlayerHandler:
       # Used to update the live player count
@@ -670,7 +670,7 @@ Player_DrawUI:
 1237$:  RETURN
 
 Player_GameOver:
-        MOV  $0x8000,R5 # Game Over Screen
+        MOV  $0x8001,R5 # Game Over Screen
         JMP  @$ExecuteBootstrap
 
       # CHEAT MODE!
