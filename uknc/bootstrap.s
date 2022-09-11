@@ -122,10 +122,14 @@ Bootstrap_Level_1: # --------------------------------------------------------
             CALL StartANewGame
             CALL LevelReset0000
             MOVB $1,@$Player_Array + 9 # set number of lives for the first player
-           .ppudo_ensure $PPU_LevelStart
-           .ppudo_ensure $PPU_SetPalette, $BlackPalette
         CALL Bootstrap_LoadDiskFile_WaitForFinish
        .check_for_loading_error "level_01.bin"
+
+        CALL Bootstrap_WaitForFireKey
+
+       .ppudo_ensure $PPU_SetPalette, $BlackPalette
+        WAIT
+       .ppudo_ensure $PPU_LevelStart
 
         MOV  $SP_RESET,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
@@ -156,11 +160,10 @@ Bootstrap_Level_3: # --------------------------------------------------------
 #----------------------------------------------------------------------------
 Bootstrap_Continue: # ../Aku/BootStrap.asm:1324
        .ppudo_ensure $PPU_LevelEnd
-        WAIT
        .ppudo_ensure $PPU_SetPalette,$ContinuePalette
       # R4 points to player array
         TSTB 5(R4)
-        BZE  GameOver
+        BZE  Bootstrap_GameOver
 
         PUSH R4
         MOV  $continue.bin.lzsa1,R1
@@ -188,13 +191,14 @@ Bootstrap_Continue: # ../Aku/BootStrap.asm:1324
             MOV  $50,R1
             Continue_WaitASecondLoop:
                 BITB @$KeyboardScanner_P1,$KEYMAP_ANY_FIRE
-                BNZ  Continue_Continue
+                BNZ  Continue_SpendCredit
                 WAIT
             SOB  R1,Continue_WaitASecondLoop
         DEC  R0
         BPL  Continue_CoundownLoop
 
-GameOver:
+Bootstrap_GameOver:
+       .ppudo_ensure $PPU_MusicStop
        .ppudo_ensure $PPU_SetPalette,$BlackPalette
         CALL CLS
        .ppudo_ensure $PPU_PrintAt,$GameOver_Text
@@ -207,7 +211,7 @@ GameOver:
         MOV  $0x8000,R5
         JMP  Bootstrap_FromR5
 
-Continue_Continue:
+Continue_SpendCredit:
         DECB 5(R4)    # continues
         MOVB $3,3(R4) # smartbombs
         MOVB $7,7(R4) # invincibility for 7 ticks
@@ -216,21 +220,19 @@ Continue_Continue:
 
         CALL @$Event_RestorePalette
        .ppudo_ensure $PPU_LevelStart
+        BIC  $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
         RETURN
-
-GameOver_Text:
-                         #0         1         2         3
-                         #0123456789012345678901234567890123456789
-    .byte  7, 16; .ascii        "The Moster Hoard has driven"     ; .byte 0xFF
-    .byte  8, 17; .ascii         "Chibiko from her homeland"      ; .byte 0xFF
-    .byte  2, 18; .ascii   "She is forced to live in a cardboard "; .byte 0xFF
-    .byte  8, 19; .ascii         "box as a street vampire! "      ; .byte 0xFF
-    .byte 11, 20; .ascii            "With Chibiko gone, "         ; .byte 0xFF
-    .byte 11, 21; .ascii            "peace and harmony"           ; .byte 0xFF
-    .byte  6, 22; .ascii       "spread through out the land. "    ; .byte 0xFF
-    .byte  9, 24; .ascii          "(Boy! Did you fuck up!)"       ; .byte 0x00
-    .even
-
+                         #0---------1---------2---------3---------
+GameOver_Text:           #0123456789012345678901234567890123456789
+    .byte  7, 16; .ascii        "The Moster Hoard has driven"       ; .byte 0xFF ; .even
+    .byte  8, 17; .ascii         "Chibiko from her homeland"        ; .byte 0xFF ; .even
+    .byte  2, 18; .ascii   "She is forced to live in a cardboard"   ; .byte 0xFF ; .even
+    .byte  8, 19; .ascii         "box as a street vampire! "        ; .byte 0xFF ; .even
+    .byte 11, 20; .ascii            "With Chibiko gone,"            ; .byte 0xFF ; .even
+    .byte 11, 21; .ascii            "peace and harmony"             ; .byte 0xFF ; .even
+    .byte  6, 22; .ascii       "spread through out the land."       ; .byte 0xFF ; .even
+    .byte  9, 24; .ascii          "(Boy! Did you fuck up!)"         ; .byte 0x00 ; .even
+ 
 NumberToDecStr:
       # R1 number
       # R2 destination string ponter
@@ -400,6 +402,60 @@ StartANewGamePlayer: # ../Aku/BootStrap.asm:2256 ;player fire directions ----{{{
 
         RETURN
 #----------------------------------------------------------------------------}}}
+Bootstrap_WaitForFireKey: # Bootstrap_WFK -----------------------------------{{{
+       .ppudo $PPU_DebugPrintAt,$HitAFireKeyStr
+        Bootstrap_WFK_Loop:
+            CALL Bootstrap_WFK_DelayLoop
+           .ppudo $PPU_SetPalette,$P3
+            CALL Bootstrap_WFK_DelayLoop
+           .ppudo $PPU_SetPalette,$P4
+            CALL Bootstrap_WFK_DelayLoop
+           .ppudo $PPU_SetPalette,$P3
+            CALL Bootstrap_WFK_DelayLoop
+           .ppudo $PPU_SetPalette,$P2
+            CALL Bootstrap_WFK_DelayLoop
+           .ppudo $PPU_SetPalette,$P1
+            CALL Bootstrap_WFK_DelayLoop
+           .ppudo $PPU_SetPalette,$P2
+        BR   Bootstrap_WFK_Loop
+
+Bootstrap_WFK_DelayLoop:
+        MOV  $4,R1
+        DelayLoop_Next:
+            WAIT
+            BITB $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
+            BZE  DelayLoop_NoFirePressed
+
+            CLRB @$KeyboardScanner_P1
+            TST  (SP)+ # remove returning address from stack
+            RETURN     # out of Bootstrap_WaitForFireKey
+            DelayLoop_NoFirePressed:
+        SOB  R1,DelayLoop_Next
+        RETURN
+
+HitAFireKeyStr:
+    .byte 13, 7; .ascii "hit a fire key"    ; .byte 0 ; .even
+P1:
+    .byte   0, setOffscreenColors
+    .word      BLACK  | BLACK      << 4 | BR_GREEN  << 8 | BR_CYAN << 12
+    .word      BR_RED | BR_MAGENTA << 4 | BR_YELLOW << 8 | WHITE   << 12
+    .word untilLine | 0
+P2:
+    .byte   0, setOffscreenColors
+    .word      BLACK  | BLUE       << 4 | BR_GREEN  << 8 | BR_CYAN << 12
+    .word      BR_RED | BR_MAGENTA << 4 | BR_YELLOW << 8 | WHITE   << 12
+    .word untilLine | 0
+P3:
+    .byte   0, setOffscreenColors
+    .word      BLACK  | BR_BLUE    << 4 | BR_GREEN  << 8 | BR_CYAN << 12
+    .word      BR_RED | BR_MAGENTA << 4 | BR_YELLOW << 8 | WHITE   << 12
+    .word untilLine | 0
+P4:
+    .byte   0, setOffscreenColors
+    .word      BLACK  | CYAN       << 4 | BR_GREEN  << 8 | BR_CYAN << 12
+    .word      BR_RED | BR_MAGENTA << 4 | BR_YELLOW << 8 | WHITE   << 12
+    .word untilLine | 0
+#----------------------------------------------------------------------------}}}
 
 ClearR1Words:
       # R1 - number of words
@@ -543,8 +599,6 @@ Bootstrap_LoadDiskFile_WaitForFinish: #--------------------------------------{{{
 #   .word address for the data from a disk
 #   .word size in words
 #   .word starting block of a file
-
-#:bpt
 saved_settings.bin:
     .word SavedSettingsStart
     .word 0
@@ -788,28 +842,6 @@ game_over.bin.lzsa1:
     .incbin "build/game_over.bin.lzsa1"
 high_score.bin.lzsa1:
     .incbin "build/high_score.bin.lzsa1"
-level_01_loading.bin.lzsa1:
-    .incbin "build/level_01_loading.bin.lzsa1"
-level_03_loading.bin.lzsa1:
-    .incbin "build/level_03_loading.bin.lzsa1"
-level_05_loading.bin.lzsa1:
-    .incbin "build/level_05_loading.bin.lzsa1"
-level_07_loading.bin.lzsa1:
-    .incbin "build/level_07_loading.bin.lzsa1"
-    .even
-#0         1         2         3         4         5         6         7
-#01234567890123456789012345678901234567890123456789012345678901234567890123456789
-#       .even # PPU reads strings word by word, so align
-#TestStr: .byte 0,10
-#         .byte        '!,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F
-#         .byte 0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x3A,0x3B,0x3C,0x3D,0x3E,0x3F
-#         .byte 0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F
-#         .byte 0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A,0x5B,0x5C,0x5D,0x5E,0x5F
-#         .byte 0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67,0x68,0x69,0x6A,0x6B,0x6C,0x6D,0x6E,0x6F
-#         .byte 0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77,0x78,0x79,0x7A,0x7B,0x7C,0x7D,0x7E,0x7F
-#         .byte 0x80,0x81,0x82,0x83,0x84,0x85
-#         .byte 0x00
+
     .even
 end:
-
-BootstrapEnd: # used by bootsector linker script

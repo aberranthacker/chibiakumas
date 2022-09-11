@@ -2,6 +2,7 @@
 ExecuteBootstrap:
         CALL ScreenBuffer_Reset
 
+ExecuteBootstrap_NoCLS:
         MOV  $BootstrapSizeQWords,R0
         MOV  $CBPADR,R1
         MOV  $CBP12D,R2
