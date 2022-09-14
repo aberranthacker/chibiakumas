@@ -915,7 +915,6 @@ LevelInit: # read "..\SrcALL\Akuyou_Multiplatform_Level_GenericInit.asm"
 
         MOV  $EventStreamArray,R5     # Event Stream
         CALL EventStream_Init
-        CALL ScreenBuffer_Init
         MTPS $PR0
                                        # LevelInit:
                                        #        read "..\SrcALL\Akuyou_Multiplatform_Level_GenericInit.asm"

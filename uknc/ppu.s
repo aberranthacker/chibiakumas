@@ -17,7 +17,7 @@
 
 start:
         MTPS $PR7
-      # bit 0 if clear disables ROM chip in range 0100000..0117777
+      # bit 0 if clear, disables ROM chip in range 0100000..0117777
       #       which allows to enable RW access to RAM in that range
       #       when bit 4 is set as well
       # bits 1-3 used to select ROM cartridge banks
@@ -73,7 +73,7 @@ bit 1: size of the next record
        0 - next is a 2-word record
 
 bit 2: 1) for 2-word record - bit 2 of address of the next element of the table
-       2) for 4-word record - selects register where data will be loaded:
+       2) for 4-word record - selects register to which data will be loaded:
           0 - cursor, pallete, and horizontal scale control register
           1 - colors control register
 -----------------------------------------------------------------------------}}}
@@ -142,9 +142,10 @@ SLTABInit:
         MOV  R0,R1           # R0 address of current record (2)
 
         MOV  $15,R2          #  records 2..16 are same
-1$:     CLR  (R0)+           #--addresses of lines 2..16
-        ADD  $4,R1           #  calc address of next record of SLTAB
-        MOV  R1,(R0)+        #--address of records 3..17
+        1$: 
+            CLR  (R0)+       #--addresses of lines 2..16
+            ADD  $4,R1       #  calc address of next record of SLTAB
+            MOV  R1,(R0)+    #--address of records 3..17
         SOB  R2,1$
 
       # we are switching from 2-word records to 4-word records
@@ -175,10 +176,11 @@ SLTABInit:
 #------------------------------------- top region, header
         MOV  $OffscreenAreaAddr,R2 # scanlines 20..307 are visible
         MOV  $43,R3          #
-2$:     MOV  R2,(R0)+        #--address of screenline
-        ADD  $4,R1           #  calc address of next record of SLTAB
-        MOV  R1,(R0)+        #--set address of next record of SLTAB
-        ADD  $40,R2          #  calculate address of next screenline
+        2$:
+            MOV  R2,(R0)+    #--address of screenline
+            ADD  $4,R1       #  calc address of next record of SLTAB
+            MOV  R1,(R0)+    #--set address of next record of SLTAB
+            ADD  $40,R2      #  calculate address of next screenline
         SOB  R3,2$           #
 
       # we are switching from 2-word records to 4-word records
@@ -208,13 +210,13 @@ SLTABInit:
 #----------------------------- main screen area
         MOV  $FB1 >> 1,R2    # address of second frame-buffer
         MOV  $200,R3         # number of lines on main screen area
-3$:     MOV  $0x0000,(R0)+   #  colors  011  010  001  000 (YRGB)
-        MOV  $0x0000,(R0)+   #  colors  111  110  101  100 (YRGB)
-        MOV  R2,(R0)+        #--main RAM address of a scanline
-        ADD  $8,R1           #  calc address of next record of SLTAB
-        MOV  R1,(R0)+        #--pointer to the next record of SLTAB
-        ADD  $40,R2          #  calculate address of next screenline
-
+        3$:                  #
+            MOV  $0x0000,(R0)+ #  colors  011  010  001  000 (YRGB)
+            MOV  $0x0000,(R0)+ #  colors  111  110  101  100 (YRGB)
+            MOV  R2,(R0)+      #--main RAM address of a scanline
+            ADD  $8,R1         #  calc address of next record of SLTAB
+            MOV  R1,(R0)+      #--pointer to the next record of SLTAB
+            ADD  $40,R2        #  calculate address of next screenline
         SOB  R3,3$           #
 #------------------------------------- bottom region, footer
         MOV  R0,@$BottomAreaColors # store the address for future use
@@ -228,22 +230,23 @@ SLTABInit:
         MOV  R1,(R0)+        #--set address of record 265
 
         MOV  $42,R3          #
-4$:     MOV  R2,(R0)+        #--address of a screenline
-        ADD  $4,R1           #  calc address of next record of SLTAB
-        MOV  R1,(R0)+        #--pointer to the next record of SLTAB
-        ADD  $40,R2          # calculate address of next screenline
-
+        4$:     
+            MOV  R2,(R0)+    #--address of a screenline
+            ADD  $4,R1       #  calc address of next record of SLTAB
+            MOV  R1,(R0)+    #--pointer to the next record of SLTAB
+            ADD  $40,R2      # calculate address of next screenline
         SOB  R3,4$           #
                              #
         CLR  (R0)+           #--address of line 308
         MOV  R1,(R0)         #--pointer back to record 308
+        #:bpt
 #----------------------------------------------------------------------------}}}
         MOV  $0x001,@$PASWCR
 #-------------------------------------------------------------------------------
         MOV  $SLTAB, @$0272   # use our SLTAB
 
         MOV  $SoundEffects,R5
-        CALL PLY_SE_InitSoundEffects
+        CALL PLY_SE_InitSoundEffects # initialize sound effects player
 
         MOV  $VblankIntHandler,@$0100
         MOV  $KeyboardIntHadler,@$KBINT
@@ -271,16 +274,16 @@ SLTABInit:
         TST  @$Trap4Detected
         BZE  AberrantSoundModulePresent
 
-        CLR  @$Trap4Detected
         MOV  $DummyPSG,R1
         MOV  R1,R2
 
 AberrantSoundModulePresent:
+        CLR  @$Trap4Detected
         MOV  R1,@$PLY_AKG_PSGAddress
         MOV  R2,@$PLY_SE_PSGAddress
-       #MOV  $0173362,@$4 # restore back trap 4 handler
+       #MOV  $0173362,@$4 # restore back Trap 4 handler
 
-      # inform bootstrap that PPU is ready to receive commands
+      # inform loader that PPU is ready to receive commands
         MOV  $CPU_PPUCommandArg,@$PBPADR
         CLR  @$PBP12D
 
@@ -308,8 +311,8 @@ CommandVectors:
        .word SetPalette            # PPU_SetPalette
        .word Print                 # PPU_Print
        .word PrintAt               # PPU_PrintAt
-       .word LoadText              # PPU_LoadText
-       .word ShowBossText          # PPU_ShowBossText
+       .word ShowBossText_Init     # PPU_ShowBossText_Start
+       .word ShowBossText          # PPU_ShowBossText_Init
        .word MusicRestart          # PPU_MusicRestart
        .word MusicStop             # PPU_MusicStop
        .word Debug_Print           # PPU_Debug_Print
@@ -332,48 +335,61 @@ CommandVectors:
 #-------------------------------------------------------------------------------
 SetPalette: #----------------------------------------------------------------{{{
         PUSH @$PASWCR
-        MOV  $0x010,@$PASWCR
+        MOV  $0x040,@$PASWCR
+        MOV  $PBPADR,R4
 
         CLC
         ROR  R0
-        MOV  R0,@$PBPADR # palette address
+        MOV  R0,(R4) # palette address
       # R0 - first parameter word
       # R1 - second parameter word
       # R2 - display/color parameters flag
       # R3 - current line
       # R4 - next line where parameters change
       # R5 - pointer to a word that we'll modify
-        CLR  R3
-        BISB @$PBP1DT,R3  # get line number
-        MOV  R3,R4
+        MOVB @$PBP1DT,@$NextLineNum  # get line number
+        PUSH (R4)
 SetPalette_NextRecord:
-        MOV  R4,R3        # R3 = previous iteration's next line
-        MOV  R3,R5        # prepare to calculate address of SLTAB section to modify
-        ASH  $3,R5        # calculate offset by multiplying by 8 (by shifting R5 left by 3 bits)
+        MOV  @$NextLineNum,R3 # R3 = previous iteration's next line
+        MOV  R3,R5            # prepare to calculate address of SLTAB section to modify
+        ASH  $3,R5            # calculate offset by multiplying by 8 (by shifting R5 left by 3 bits)
        .equiv FBSLTAB, .+2
         ADD  $0,R5        # and add address of SLTAB section we modify
 
+        POP  (R4)
         MOVB @$PBP2DT,R2         # get display/color parameters flag
         BMI  SetPalette_Finalize # negative value - terminator
 
-        INC  @$PBPADR
+        INC  (R4)
         MOV  @$PBP12D,R0     # get first data word
-        INC  @$PBPADR
+        INC  (R4)
         MOV  @$PBP12D,R1     # get second data word
-        INC  @$PBPADR
-        CLR  R4
-        BISB @$PBP1DT,R4     # get next line idx
+        INC  (R4)
+        MOVB @$PBP1DT,@$NextLineNum # get next line idx
+        PUSH (R4)
 
         CMP  R2,$2
         BEQ  SetPalette_OffscreenColors
     set_params$:
         TSTB R2
-        BNZ  set_colors$     # 1 - set colors
-        BIC  $0b100,(R5)+    # 0 - set data
+        BNZ  SetPalette_SetColorRegisters # 1 - set colors
+
+#SetPalette_SetControlRegisters:
+       #BIC  $0b100,(R5)+    # 0 - set data
+        MOV  R5,(R4)
+        BICB $0b100,@$PBP0DT    # 0 - set data
+        INC  R5
+        INC  R5
+ 
         BR   set_data$
 
-    set_colors$:
-        BIS  $0b100,(R5)+
+SetPalette_SetColorRegisters:
+       #BIS  $0b100,(R5)+
+        MOV  R5,(R4)
+        BISB $0b100,@$PBP0DT    # 0 - set data
+        INC  R5
+        INC  R5
+
     set_data$:
         MOV  R0,(R5)+
         MOV  R1,(R5)+
@@ -381,12 +397,13 @@ SetPalette_NextRecord:
         INC  R5           # skip third word (screen line address)
 
         INC  R3           # increase current line idx
-        CMP  R3,R4        # compare current line idx with next line idx
+       .equiv NextLineNum, .+2
+        CMP  R3,$0        # compare current line idx with next line idx
         BLO  set_params$  # branch if lower
 
-        CMP  R4,$201
+        CMP  @$NextLineNum,$201
         BNE  SetPalette_NextRecord
-        BR   SetPalette_Finalize
+        BR   SetPalette_Finalize_POP_R4
 
 SetPalette_OffscreenColors:
        .equiv TopAreaColors, .+2
@@ -399,6 +416,8 @@ SetPalette_OffscreenColors:
         MOV  R1,(R2)
         BR   SetPalette_NextRecord
 
+SetPalette_Finalize_POP_R4:
+        POP  R4 # remove a value from the stack
 SetPalette_Finalize:
         POP  @$PASWCR
 
@@ -543,7 +562,7 @@ DonePrinting:
         RETURN
 
 #----------------------------------------------------------------------------}}}
-LoadText: #------------------------------------------------------------------{{{
+ShowBossText_Init: #----------------------------------------------------------{{{
         MOV  $StrBuffer,R3
         MOV  $PBP12D,R4
         MOV  $PBPADR,R5
@@ -556,13 +575,17 @@ LoadText: #------------------------------------------------------------------{{{
         100$:
             MOV  (R4),R0  # load 2 bytes from CPU RAM
             MOV  R0,(R3)+ # store them into the buffer
-            BZE  1237$    # end of the text
+            BZE  ShowBossText_TextLoaded # end of the text
 
             SWAB R0       # swap bytes to test most significant one
-            BZE  1237$    # end of the text
+            BZE  ShowBossText_TextLoaded # end of the text
 
             INC  (R5)     # next address
         BR   100$
+
+ShowBossText_TextLoaded:
+        MOV  $1,@$ShowBossText_InProgress
+        MOV  $1,@$ShowBossText_CharsToPrint
 
 1237$:  RETURN
 #----------------------------------------------------------------------------}}}
@@ -570,33 +593,36 @@ ShowBossText: #--------------------------------------------------------------{{{
         MOV  $10<<1,@$DTSCOL # foreground color
         MOV  $LineWidth,R2
         MOV  $StrBuffer,R3
-        MOV  $PBP12D,R4
+        MOV  $DTSOCT,R4
         MOV  $PBPADR,R5
 
-        MOV  R0,@$CharsToPrint
-        MOV  $DTSOCT,R4
+        MOV  R0,@$ShowBossText_CharsToPrintCounter
         MOV  $0b001,@$PBPMSK # disable writes to bitplane 0
+        MOV  $Font,-(SP)
 
 SBT_NextTextLine:
         MOVB (R3)+,R0
-        ADD  $FbStart,R0
+       .equiv ShowBossText_ActiveScreen, .+2
+        ADD  $FB1>>1,R0
 
         MOVB (R3)+,R1
         MUL  $CharLineSize,R1
         ADD  R0,R1
 
 SBT_NextChar:
-       .equiv CharsToPrint, .+2
+       .equiv ShowBossText_CharsToPrintCounter, .+2
         DEC  $0xFF
-        BZE  1237$
+        BZE  ShowBossText_Finalize
 
         MOV  R1,(R5)      # load address of the next char into address register
         MOVB (R3)+,R0     # load character code from string buffer
         BMI  SBT_NextTextLine
-        BZE  1237$        # return if we are reached end of the text
+        BZE  ShowBossText_ReachedEndOfText # return if we are reached end of the text
 
-        ASH  $3,R0        # shift left by 3(multiply by 8)
-        ADD  $Font,R0     # calculate char bitmap address
+        ASL  R0
+        ASL  R0
+        ASL  R0          # shift left by 3(multiply by 8)
+        ADD  (SP),R0     # calculate char bitmap address
 
        .rept 8
         MOVB (R0)+,(R4) #
@@ -606,7 +632,16 @@ SBT_NextChar:
         INC  R1
         BR   SBT_NextChar
 
-1237$:  RETURN
+ShowBossText_ReachedEndOfText:
+       .equiv SBT_PersistanceCounter, .+2
+        DEC  $40
+        BNZ  ShowBossText_Finalize
+
+        CLR  @$ShowBossText_InProgress
+
+ShowBossText_Finalize:
+        TST  (SP)+
+        RETURN
 #----------------------------------------------------------------------------}}}
 Debug_PrintAt: #-------------------------------------------------------------{{{
         MOV  $PBP12D,R4

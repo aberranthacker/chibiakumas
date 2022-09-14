@@ -220,13 +220,11 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .byte        24+ 21, 24+ 159+24
 
    # Spikeyrock
-    .word 0, evtMultipleCommands | 3
+    .word 0, evtMultipleCommands | 4
     .word    evtSetMove, mveBackground | 0b0001
-# defb    48+2, 24+100, 24+24+128, 24, 8, 9 ; Two sprites,
-    .word    evtSingleSprite, sprSingleFrame | SPIKEY_ROCK_A
-    .byte        24+ 24+128, 24+ 100
-    .word    evtSingleSprite, sprSingleFrame | SPIKEY_ROCK_B
-    .byte        24+ 48+128, 24+ 100
+    .word    evtAddToForeground
+    .word    evtSingleSprite, sprSingleFrame | SPIKEY_ROCK_A, (24+100)<<X | (24+24+128)<<Y
+    .word    evtSingleSprite, sprSingleFrame | SPIKEY_ROCK_B, (24+100)<<X | (24+48+128)<<Y
 
 # Start of fade in block -------------------------------------------------------
     .equiv FadeStartPoint, 0
@@ -245,10 +243,10 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     #----------
 
    # Rock Pt 1
-    .word 10, evtMultipleCommands | 2
+    .word 10, evtMultipleCommands | 3
     .word     evtLoadObjSettings | 0
-    .word     evtSingleSprite, sprSingleFrame | ROCK_PT1
-    .byte         24+ 176, 24+ 160
+    .word     evtAddToForeground
+    .word     evtSingleSprite, sprSingleFrame | ROCK_PT1, (24+160)<<X|(24+176)<<Y
 
    # Cross, impaled bloke
     .word 13, evtMultipleCommands | 2
@@ -263,10 +261,10 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .word     evtSingleSprite | 10 # Row 19, last Column, Last Sprite
 
    # Rock Pt 2
-    .word 16, evtMultipleCommands | 2
+    .word 16, evtMultipleCommands | 3
     .word     evtLoadObjSettings | 0
-    .word     evtSingleSprite, sprSingleFrame | ROCK_PT2
-    .byte         24+ 176, 24+ 160
+    .word     evtAddToForeground
+    .word     evtSingleSprite, sprSingleFrame | ROCK_PT2, (24+160)<<X|(24+176)<<Y
 
    # Powerup Rate
     .word 17, evtMultipleCommands | 2
@@ -275,10 +273,10 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .byte         24+ 50, 24+ 160
 
    # Rock Pt 3
-    .word 22, evtMultipleCommands | 2
+    .word 22, evtMultipleCommands | 3
     .word     evtLoadObjSettings | 0
-    .word     evtSingleSprite, sprSingleFrame | ROCK_PT3
-    .byte         24+ 176, 24+ 160
+    .word     evtAddToForeground
+    .word     evtSingleSprite, sprSingleFrame | ROCK_PT3, (24+160)<<X|(24+176)<<Y
 
    # rock chick enemy
     .word 25, evtMultipleCommands | 2
@@ -325,15 +323,13 @@ EventStreamArray_Ep1: #---------------------------------------------------------
     .byte         24+ 16, 24+ 160-24
 
    # Spikeyrock
-    .word 67, evtMultipleCommands | 4
+    .word 67, evtMultipleCommands | 5
     .word     evtLoadObjSettings | 0
+    .word     evtAddToForeground
 # defb    48+   3   ,160+24,24+ 128,24,       8,9,10 ; Three sprites,
-    .word     evtSingleSprite, sprSingleFrame | SPIKEY_ROCK_A
-    .byte         24+ 128, 24+ 160
-    .word     evtSingleSprite, sprSingleFrame | SPIKEY_ROCK_B
-    .byte         24+ 24+128, 24+ 160
-    .word     evtSingleSprite, sprSingleFrame | SPIKEY_ROCK_C
-    .byte         24+ 48+128, 24+ 160
+    .word     evtSingleSprite, sprSingleFrame | SPIKEY_ROCK_A, (24+160)<<X|(24+128)<<Y
+    .word     evtSingleSprite, sprSingleFrame | SPIKEY_ROCK_B, (24+160)<<X|(24+24+128)<<Y
+    .word     evtSingleSprite, sprSingleFrame | SPIKEY_ROCK_C, (24+160)<<X|(24+48+128)<<Y
 
    # rock chick enemy
     .word 75, evtMultipleCommands | 2
@@ -623,7 +619,6 @@ LevelInit:
 
         MOV  $EventStreamArray_Ep1,R5 # Event Stream
         CALL EventStream_Init
-        CALL ScreenBuffer_Init
         MTPS $PR0
 #-------------------------------------------------------------------------------
 LevelLoop:

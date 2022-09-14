@@ -220,7 +220,7 @@ LevelLoop:
         ASL  R0
 
         MOV  SubtitlesTable(R0), @$PPUCommandArg
-       .ppudo_ensure $PPU_LoadText
+       .ppudo_ensure $PPU_ShowBossText_Init
 
         MOV  $1, @$CharsToPrint
         MOV  $ShowBossText, @$dstShowBossTextCommand
