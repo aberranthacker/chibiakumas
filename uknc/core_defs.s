@@ -12,10 +12,10 @@
 .equiv Level2, 0x0002
 .equiv Level3, 0x0003
 
- .equiv StartOnLevel, MainMenu
+#.equiv StartOnLevel, MainMenu
 #.equiv StartOnLevel, Episode1_Intro
 #.equiv StartOnLevel, Level1
-#.equiv StartOnLevel, Level2
+ .equiv StartOnLevel, Level2
 #.equiv StartOnLevel, Level3
 
 .if StartOnLevel == MainMenu
@@ -28,7 +28,7 @@
 .equiv PPU_SetPalette,         2
 .equiv PPU_Print,              4
 .equiv PPU_PrintAt,            6
-.equiv PPU_LoadText,           8
+.equiv PPU_ShowBossText_Init,  8
 .equiv PPU_ShowBossText,      10
 .equiv PPU_MusicRestart,      12
 .equiv PPU_MusicStop,         14
@@ -120,7 +120,7 @@
     .endif
 
     .ifndef ExtMemCore
-.equiv Akuyou_LevelStart, 0x9E50 # 40528 0117120 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9E26 # 40486 0117046 # auto-generated during a build
     .else
 .equiv Akuyou_LevelStart, GameVarsEnd
     .endif
@@ -138,7 +138,7 @@
 #-end of PPU memory map---------------------------------------------------------
 #-------------------------------------------------------------------------------
 # VRAM memory map --------------------------------------------------------------
-.equiv SLTAB, 0100000 # 32768 0x8000 # bank 0
+.equiv SLTAB, 0140000 # 32768 0x8000 # bank 0
 .equiv BootstrapCopyAddr, 0100000 # banks 1 and 2
 .equiv OffscreenAreaAddr, 0160000 # 49152 0xC000 # banks 0, 1 and 2
 #-end of VRAM memory map--------------------------------------------------------

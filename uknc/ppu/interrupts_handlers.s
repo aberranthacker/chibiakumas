@@ -29,7 +29,8 @@ MusicPlayerCall:
        .word PLY_AKG_Play
 
         CALL PLY_SE_PlaySoundEffectsStream
-
+       
+VblankInt_Finalize:
         MOV  (SP)+,R0
         MOV  (SP)+,R1
         MOV  (SP)+,R2
@@ -257,49 +258,74 @@ CommandsQueue_Full:
 #----------------------------------------------------------------------------}}}
 
 Channel1In_IntHandler: #-----------------------------------------------------{{{
+        MTPS $PR7
         PUSH R0
         PUSH R1
         PUSH R2
+        PUSH R4
         PUSH R5
+        PUSH @$PBPADR
 
         TSTB @$PCH1ID
         BZE  ShowFB0
         BR   ShowFB1
 ShowFB0: #----------------------------------------------------------------------
-        MOV  @$PASWCR,-(SP) # PPU address space window control register
-        MOV  $0x010,@$PASWCR
+       .equiv ShowBossText_InProgress, .+2
+        TST  $0
+        BZE  ShowFB0_Finalize
 
-        MOV  $0x2000,R0
+        PUSH R3
+        MOV  $FB0>>1,@$ShowBossText_ActiveScreen
+       .equiv ShowBossText_CharsToPrint, .+2
+        INC  $1
+        MOV  @$ShowBossText_CharsToPrint,R0
+        CALL ShowBossText
+        POP  R3
+
+ShowFB0_Finalize:
+        MOV  $0x20,R0
         MOV  $8,R1 # length of the screenlines table record
         MOV  $200>>3,R2
+        MOV  $PBP0DT,R4
+        MOV  $PBPADR,R5
        .equiv FirstMainScreenLinePointer, .+2
-        MOV  $0,R5
+        MOV  $0,(R5)
+        INC  (R5)
 
 100$:  .rept 1<<3
-        BIC  R0,(R5)
-        ADD  R1,R5
+        BICB R0,(R4)
+        ADD  R1,(R5)
        .endr
         SOB  R2,100$
 
-        MOV  (SP)+,@$PASWCR
         BR   Channel1In_IntHandler_Finalize
 #-------------------------------------------------------------------------------
 ShowFB1: #----------------------------------------------------------------------
-        MOV  @$PASWCR,-(SP) # PPU address space window control register
-        MOV  $0x010,@$PASWCR
+        TST  @$ShowBossText_InProgress
+        BZE  ShowFB1_Finalize
 
-        MOV  $0x2000,R0
+        PUSH R3
+        MOV  $FB1>>1,@$ShowBossText_ActiveScreen
+        INC  @$ShowBossText_CharsToPrint
+        MOV  @$ShowBossText_CharsToPrint,R0
+        CALL ShowBossText
+        POP  R3
+
+ShowFB1_Finalize:
+        MOV  $0x20,R0
         MOV  $8,R1
         MOV  $200>>3,R2
-        MOV  @$FirstMainScreenLinePointer,R5
+        MOV  $PBP0DT,R4
+        MOV  $PBPADR,R5
+        MOV  @$FirstMainScreenLinePointer,(R5)
+        INC  (R5)
 
 100$:  .rept 1<<3
-        BIS  R0,(R5)
-        ADD  R1,R5
+        BISB R0,(R4)
+        ADD  R1,(R5)
        .endr
         SOB  R2,100$
 
-        MOV  (SP)+, @$PASWCR
         BR   Channel1In_IntHandler_Finalize
 #-------------------------------------------------------------------------------
 Channel1In_IntHandler_Finalize:
@@ -312,9 +338,12 @@ Channel1In_IntHandler_Finalize:
         MOV  $PPU_DrawPlayerUI,-(R5)
         MOV  R5,@$CommandsQueue_CurrentPosition
 
+        POP  @$PBPADR
         POP  R5
+        POP  R4
         POP  R2
         POP  R1
         POP  R0
+        MTPS $PR0
         RTI
 #----------------------------------------------------------------------------}}}

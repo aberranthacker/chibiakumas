@@ -127,6 +127,7 @@ EventStreamArray:
 .word FadeStartPoint + 2, evtSetPalette, DarkRealPalette
 .word FadeStartPoint + 3, evtSetPalette, RealPalette
 # Start of fade in block -------------------------------------------------------
+.word FadeStartPoint + 4, evtCallAddress, ShowBossText_Init
     #----------
 #   .word 3, evtChangeStreamTime, 60, HandAttack1
     #----------
@@ -289,12 +290,10 @@ LevelInit: # read "..\SrcALL\Akuyou_Multiplatform_Level_GenericInit.asm"
 
         MOV  $EventStreamArray,R5     # Event Stream
         CALL EventStream_Init
-        CALL ScreenBuffer_Init
         MTPS $PR0
 #-------------------------------------------------------------------------------
 LevelLoop:
       #.include "level_levelloop_preflip.s" # read "..\SrcALL\Akuyou_Multiplatform_Level_Levelloop_PreFlip.asm"
-
        .equiv Background_Call, .+2
         CALL @$Background_Draw
 
@@ -317,7 +316,8 @@ LevelLoop:
                                             # ld (Randomizer_Plus1-1),a
                                             # and %00001100
                                             # call z,StarArrayWarp ; welcome to hell!
-        TST  @$BossHurt
+       .equiv BossHurt, .+2
+        TST  $0
         BZE  DontReset
 
         DEC  @$BossHurt
@@ -487,33 +487,18 @@ RealPalette: #---------------------------------------------------------------{{{
                                             #         pop hl
                                             #     ret
 
-                                            # BossText:
-                                            # if BuildLang=''
-                                            # ;      .1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
-                                            # ;      .9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-                                            # db  11,"W A R N I N G ! ! ","!"+&80
-                                            # db  06,"A Big Enemy is approaching","!"+&80
-                                            # db  07,"Skull + Spider = Skullder","!"+&80
-                                            # db  05,""," "+&80
-                                            # db  05,""," "+&80
-                                            # db  06,"(Or Spill, if you prefer!",")"+&80
-                                            # ;b  "12345678901234567890123456789","0"+&80
-                                            # db &0
-                                            # endif
-
-                                            # if BuildLang='r'
-                                            #      ;      19      18      17      16      15      14      13      12      11      10       9       8       7       6       5       4       3       2       1   0
-                                            # db  9,  111," ",112," ",97," ",114," ",110," ",111," ",114," ",115," ",125," ","!"," ","!"," ","!",255
-                                            # db  6,  110,134,152,147,143," ",143,132,145,143,141,142,143,134," ",144,145,137,130,140,137,135,129,134,147,146,160,"!",255
-                                            # db  11, 114," ",107," ",116," ",108," ",108," ",101," ",102," ",113," ","!",255
-                                            # db  05,""," ",255
-                                            # db  05,""," ",255
-                                            # db  7,  "(",137,140,137," ",114,139,148,140,140,137,","," ",133,140,160," ",139,143,132,143," ",139,129,139,")",255
-                                            # db &0
-                                            # endif
-
-BossLife:     .word 100                     # BossLife: defb 100
-BossHurt:     .word 0                       # BossHurt: defb &0
+ShowBossText_Init:
+       .ppudo_ensure $PPU_ShowBossText_Init,$BossText
+        RETURN
+                         #0---------1---------2---------3---------
+BossText:                #0123456789012345678901234567890123456789
+        .ifndef BuildLang
+   .byte  11,  5; .ascii            "W A R N I N G ! ! !"           ; .byte -1
+   .byte   6,  8; .ascii       "A Big Enemy is approaching!"        ; .byte -1
+   .byte   7, 11; .ascii        "Skull + Spider = Skullder!"        ; .byte -1
+   .byte   6, 14; .ascii       "(Or Spill, if you prefer!)"         ; .byte 0
+   .even
+        .endif
 
 CustomObjectHitHandler:
         MOV  R3,R0
@@ -557,7 +542,8 @@ CustomObjectHitHandler:
 
         MOV  $2,@$BossHurt
 
-        MOV  @$BossLife,R0
+       .equiv BossLife, .+2
+        MOV  $100,R0
         DEC  R0
         CMP  R0,$80
         BEQ  BossLife80

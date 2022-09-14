@@ -27,17 +27,6 @@ ScreenBuffer_Reset:
         MOV  $PPU_SET_FB1_VISIBLE,@$CCH1OD
         RETURN
 
-ScreenBuffer_Init:
-        MOV  $0x4000,R0
-        BIS  R0,@$StarArray_ActiveScreenBit14
-        BIS  R0,@$ShowSprite_ActiveScreenBit14
-        MOV  $FB0,@$ScreenBuffer_ActiveScreen
-        CALL CLS
-        MOV  $FB1,@$ScreenBuffer_ActiveScreen
-        CALL CLS
-        MOV  $PPU_SET_FB0_VISIBLE,@$CCH1OD
-        RETURN
-
 ScreenBuffer_Flip:
         MOV  $0x4000,R0
         BIT  R0,@$StarArray_ActiveScreenBit14
