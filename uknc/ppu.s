@@ -142,7 +142,7 @@ SLTABInit:
         MOV  R0,R1           # R0 address of current record (2)
 
         MOV  $15,R2          #  records 2..16 are same
-        1$: 
+        1$:
             CLR  (R0)+       #--addresses of lines 2..16
             ADD  $4,R1       #  calc address of next record of SLTAB
             MOV  R1,(R0)+    #--address of records 3..17
@@ -230,7 +230,7 @@ SLTABInit:
         MOV  R1,(R0)+        #--set address of record 265
 
         MOV  $42,R3          #
-        4$:     
+        4$:
             MOV  R2,(R0)+    #--address of a screenline
             ADD  $4,R1       #  calc address of next record of SLTAB
             MOV  R1,(R0)+    #--pointer to the next record of SLTAB
@@ -295,9 +295,11 @@ Queue_Loop:
         CMP  R5,$CommandsQueue_Bottom
         BEQ  Queue_Loop
 
+        #MTPS $PR7
         MOV  (R5)+,R1
         MOV  (R5)+,R0
         MOV  R5,(R4)
+        #MTPS $PR0
     .ifdef DebugMode
         CMP  R1,$PPU_LastJMPTableIndex
         BHI  .
@@ -380,7 +382,7 @@ SetPalette_NextRecord:
         BICB $0b100,@$PBP0DT    # 0 - set data
         INC  R5
         INC  R5
- 
+
         BR   set_data$
 
 SetPalette_SetColorRegisters:
@@ -470,7 +472,6 @@ Print: #---------------------------------------------------------------------{{{
        .equiv CharHeight, 8
        .equiv CharLineSize, LineWidth * CharHeight
        .equiv FbStart, FB1 >> 1
-       .equiv Font, FontBitmap - (32 * 8)
        .equiv BPDataReg, DTSOCT
 
         MOV  $10<<1,@$DTSCOL # foreground color
@@ -595,19 +596,21 @@ ShowBossText: #--------------------------------------------------------------{{{
         MOV  $StrBuffer,R3
         MOV  $DTSOCT,R4
         MOV  $PBPADR,R5
+        MOV  $Font,-(SP)
 
         MOV  R0,@$ShowBossText_CharsToPrintCounter
         MOV  $0b001,@$PBPMSK # disable writes to bitplane 0
-        MOV  $Font,-(SP)
 
 SBT_NextTextLine:
-        MOVB (R3)+,R0
+        MOVB (R3)+,R1 # X pos
        .equiv ShowBossText_ActiveScreen, .+2
-        ADD  $FB1>>1,R0
+        ADD  $FB1>>1,R1
 
-        MOVB (R3)+,R1
-        MUL  $CharLineSize,R1
-        ADD  R0,R1
+        MOVB (R3)+,R0 # Y pos
+       #MUL  $CharLineSize,R1
+       #ADD  R0,R1
+        ASL  R0
+        ADD  CharLinesTable(R0),R1
 
 SBT_NextChar:
        .equiv ShowBossText_CharsToPrintCounter, .+2
@@ -640,7 +643,7 @@ ShowBossText_ReachedEndOfText:
         CLR  @$ShowBossText_InProgress
 
 ShowBossText_Finalize:
-        TST  (SP)+
+        TST  (SP)+ # remove font address from the stack
         RETURN
 #----------------------------------------------------------------------------}}}
 Debug_PrintAt: #-------------------------------------------------------------{{{
@@ -1157,11 +1160,19 @@ LevelMusic: .include "build/ep1_level_music.formatted.s"
 BossMusic:  .include "build/ep1_boss_music.formatted.s"
 SoundEffects: .include "music/ep1_sfx.s"
 
-FontBitmap: .space 8 # whitespace symbol
-            .incbin "resources/font.raw"
+      .equiv Font, FontBitmap - (32 * 8)
+FontBitmap:
+      .space 8 # whitespace symbol
+      .incbin "resources/font.raw"
+
 CGAFontBitmap: .incbin "resources/cga8x8b.raw"
 HitpointIcon:  .incbin "build/hitpoint_icon.bin"
 SmartbombIcon: .incbin "build/smartbomb_icon.bin"
+
+CharLinesTable:
+    .word 0x0000, 0x0140, 0x0280, 0x03C0, 0x0500, 0x0640, 0x0780, 0x08C0, 0x0A00, 0x0B40
+    .word 0x0C80, 0x0DC0, 0x0F00, 0x1040, 0x1180, 0x12C0, 0x1400, 0x1540, 0x1680, 0x17C0
+    .word 0x1900, 0x1A40, 0x1B80, 0x1CC0, 0x1E00
 
 PPU_Player_ScoreBytes: .space 8
 PPU_Player_ScoreBytesEnd:

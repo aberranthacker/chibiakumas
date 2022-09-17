@@ -109,8 +109,8 @@ start:
         P2_P14: .byte 0          # 14 - PlayerShootPower_Plus1
         P2_P15: .byte 0x67       # 15 - FireDir
 
-    Player_ScoreBytes:  .space 8 # Player 1 current score
-    Player_ScoreBytes2: .space 8 # Player 2 current score
+    Player_ScoreBytes:  .space 8,0 # Player 1 current score
+    Player_ScoreBytes2: .space 8,0 # Player 2 current score
 
-    HighScoreBytes:     .space 8 # Highscore
+    HighScoreBytes:     .space 8,0 # Highscore
 end:

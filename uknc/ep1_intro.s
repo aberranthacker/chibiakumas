@@ -406,7 +406,8 @@ ShowBossText: # ../Aku/Level252-Intro.asm:1950
        .equiv CharsToPrint, .+2
         MOV  $1, @$PPUCommandArg
        .ppudo_ensure $PPU_ShowBossText
-RETURN
+
+        RETURN
 
 # Subtitles #----------------------------------------------------------------{{{
 SubtitlesEmpty: #------------------------------------------------------------{{{

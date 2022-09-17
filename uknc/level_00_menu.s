@@ -19,12 +19,6 @@ start:
 
        .incbin "build/menu.spr"
 
-EventStreamArray_Ep1: #------------------------------------------------------{{{
-    .word 0, evtSetPalette, TitleScreenPalette
-
-    .word 4, evtChangeStreamTime, 60, PauseLoop
-#----------------------------------------------------------------------------}}}
-
 EventStreamArray_Menu_EP1: #-------------------------------------------------{{{
     .word 0 # time
     .word evtSetPalette, MenuPalette # Event_CoreReprogram_Palette
@@ -73,48 +67,8 @@ PauseLoop:
 
 LevelInit:
         MTPS $PR0 # enable interrupts
-
        .ppudo_ensure $PPU_TitleMusicRestart
-       .ppudo_ensure $PPU_PrintAt,$PressFireKeyStr # Aku/Level00-Menu.asm:1101
-
-        MOV  $EventStreamArray_Ep1,R5 # Event Stream
-        MOV  $Event_SavedSettings,R3  # Saved Settings
-        CALL @$EventStream_Init
-
         CLR  @$KeyboardScanner_P1 # call Keys_WaitForRelease
-
-.ifdef ShowLoadingScreen
-ShowTitlePic_Loop: #---------------------------------------------------------{{{
-       .ppudo_ensure $PPU_SetPalette, $FireKeyDarkPalette
-        CALL glow_delay_and_wait_key$
-       .ppudo_ensure $PPU_SetPalette, $FireKeyNormalPalette
-        CALL glow_delay_and_wait_key$
-       .ppudo_ensure $PPU_SetPalette, $FireKeyBrightPalette
-        CALL glow_delay_and_wait_key$
-       .ppudo_ensure $PPU_SetPalette, $FireKeyNormalPalette
-        CALL glow_delay_and_wait_key$
-       .ppudo_ensure $PPU_SetPalette, $FireKeyDarkPalette
-        CALL glow_delay_and_wait_key$
-       .ppudo_ensure $PPU_SetPalette, $FireKeyBlackPalette
-        CALL glow_delay_and_wait_key$
-
-        BR   ShowTitlePic_Loop
-
-    glow_delay_and_wait_key$:
-        MOV  $5,R1
-    100$:
-        CALL TRandW
-        WAIT
-        BITB $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
-        BNZ  finalize_title_pic_loop$
-
-        SOB  R1,100$
-        RETURN
-
-    finalize_title_pic_loop$:
-        TST  (SP)+ # remove return address from the stack
-#----------------------------------------------------------------------------}}}
-.endif
 
 ShowMenu:
       # CALL CallFade # Aku/Level00-Menu.asm:1170
@@ -134,6 +88,18 @@ ShowMenu:
         WAIT
 
        .ppudo_ensure $PPU_PrintAt,$MenuText
+
+        MOV  $8,R1
+        MOV  $HighScoreBytes+8,R4
+        MOV  $HighScoreText+2,R5
+        ScoreToStrLoop:
+            CLRB R0
+            BISB -(R4),R0
+            ADD  $'0,R0
+            MOVB R0,(R5)+
+        SOB  R1,ScoreToStrLoop
+
+       .ppudo_ensure $PPU_PrintAt,$HighScoreText
         CALL @$ObjectArray_Redraw
 
         JSR  R5,@$OnscreenCursorDefine
@@ -443,17 +409,6 @@ ScanCodeStr:
 #----------------------------------------------------------------------------}}}
     .endif
 
-TitleScreenPalette: #--------------------------------------------------------{{{
-    .word   0, cursorGraphic, scale320 | RgB
-    .byte   1, setColors, Black, brBlue,  brRed,     White
-    .byte  49, setColors, Black, Magenta, Blue,      White
-    .byte  63, setColors, Black, Magenta, brMagenta, White
-    .byte  95, setColors, Black, Green,   brCyan,    White
-    .byte 185, setColors, Black, Green,   Black,     White
-    .byte 192, setColors, Black, Green,   brCyan,    White
-    .byte 196, setColors, Black, Green,   brRed,     White
-    .word endOfScreen
-#----------------------------------------------------------------------------}}}
 MenuPalette: #---------------------------------------------------------------{{{
     .word   0, cursorGraphic, scale320 | RGB
     .byte   1, setColors, Black, brMagenta, brYellow, White
@@ -473,19 +428,6 @@ MenuPalette: #---------------------------------------------------------------{{{
     .byte 191, setColors, Black, Yellow,    brYellow, White
     .word endOfScreen
 #----------------------------------------------------------------------------}}}
-FireKeyBrightPalette: #------------------------------------------------------{{{
-    .byte 185, setColors, Black, Green, brYellow, White
-    .word untilLine | 192
-FireKeyNormalPalette:
-    .byte 185, setColors, Black, Green, brRed, White
-    .word untilLine | 192
-FireKeyDarkPalette:
-    .byte 185, setColors, Black, Green, Red, White
-    .word untilLine | 192
-FireKeyBlackPalette:
-    .byte 185, setColors, Black, Green, Black, White
-    .word untilLine | 192
-#----------------------------------------------------------------------------}}}
 Level01_TitlePalette: #------------------------------------------------------{{{
     .byte   1, setColors, Black, Magenta, brCyan,    White
     .byte  96, setColors, Black, Magenta, Gray, White
@@ -493,9 +435,6 @@ Level01_TitlePalette: #------------------------------------------------------{{{
     .word endOfScreen
 #----------------------------------------------------------------------------}}}
 
-PressFireKeyStr: .byte 9,23
-                 .asciz "Press Fire to Continue"
-                 .even
                          #0---------1---------2---------3---------
 MenuText:                #0123456789012345678901234567890123456789
     .byte 10, 10; .ascii           "Hit ESC to set controls"        ; .byte -1 ; .even
@@ -514,9 +453,11 @@ MenuText:                #0123456789012345678901234567890123456789
 
     .byte 10, 22; .ascii           "www.chibiakumas.com"            ; .byte -1 ; .even
 
-    .byte  9, 24; .ascii           "HighScore:"                     ; .byte 0  ; .even
+    .byte 10, 24; .ascii           "HighScore:"                     ; .byte 0  ; .even
 
-    .even
+                         #0---------1---------2---------3---------
+HighScoreText:           #0123456789012345678901234567890123456789
+    .byte 21, 24; .ascii                      "--------"            ; .byte  0; .even
 
 CursorSpr: .incbin "build/menu_cursor.spr"
 
