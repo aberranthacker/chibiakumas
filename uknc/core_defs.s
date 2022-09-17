@@ -12,10 +12,10 @@
 .equiv Level2, 0x0002
 .equiv Level3, 0x0003
 
-#.equiv StartOnLevel, MainMenu
+ .equiv StartOnLevel, MainMenu
 #.equiv StartOnLevel, Episode1_Intro
 #.equiv StartOnLevel, Level1
- .equiv StartOnLevel, Level2
+#.equiv StartOnLevel, Level2
 #.equiv StartOnLevel, Level3
 
 .if StartOnLevel == MainMenu
@@ -120,7 +120,7 @@
     .endif
 
     .ifndef ExtMemCore
-.equiv Akuyou_LevelStart, 0x9E26 # 40486 0117046 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9E28 # 40488 0117050 # auto-generated during a build
     .else
 .equiv Akuyou_LevelStart, GameVarsEnd
     .endif

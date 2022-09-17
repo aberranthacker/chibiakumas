@@ -32,7 +32,6 @@
 .equiv CBP2DT, 0176643 # CPU bitplane 2 data register
 .equiv CBP12D, CBP1DT  # CPU bitplanes 1 and 2 data register
                        # alias for word access
-
 # serial port
 .equiv S2IST, 0176570
 .equiv S2IDT, 0176572

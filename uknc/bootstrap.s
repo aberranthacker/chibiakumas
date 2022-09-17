@@ -33,8 +33,8 @@
 start:
       #-------------------------------------------------------------------------
         MOV  $saved_settings.bin,R0
-        CALL Bootstrap_LoadDiskFile_Start
-        CALL Bootstrap_LoadDiskFile_WaitForFinish
+        CALL Bootstrap_ReadFromDisk_Start
+        CALL Bootstrap_DiskIO_WaitForFinish
       #-------------------------------------------------------------------------
    .ifdef ExtMemCore # copy the core to the extended memory
         MOV  $GameVarsEnd,R4
@@ -46,7 +46,59 @@ start:
         SOB R1,200$
    .endif
 
+.if StartOnLevel == MainMenu
+        MOV  $level_00.bin,R0
+        CALL Bootstrap_ReadFromDisk_Start
+            CALL StartANewGame
+            CALL LevelReset0000
+        CALL Bootstrap_DiskIO_WaitForFinish
+       .check_for_loading_error "level_00.bin"
+
+        MOV  $SP_RESET,SP # we are not returning, so reset the stack
+.endif
+
+.ifdef ShowLoadingScreen
+       .ppudo_ensure $PPU_TitleMusicRestart
+       .ppudo_ensure $PPU_PrintAt,$PressFireKeyStr
+        MTPS $PR0 # enable interrupts
+
+ShowTitlePic_Loop: #---------------------------------------------------------{{{
+       .ppudo_ensure $PPU_SetPalette, $FireKeyDarkPalette
+        CALL glow_delay_and_wait_key$
+       .ppudo_ensure $PPU_SetPalette, $FireKeyNormalPalette
+        CALL glow_delay_and_wait_key$
+       .ppudo_ensure $PPU_SetPalette, $FireKeyBrightPalette
+        CALL glow_delay_and_wait_key$
+       .ppudo_ensure $PPU_SetPalette, $FireKeyNormalPalette
+        CALL glow_delay_and_wait_key$
+       .ppudo_ensure $PPU_SetPalette, $FireKeyDarkPalette
+        CALL glow_delay_and_wait_key$
+       .ppudo_ensure $PPU_SetPalette, $FireKeyBlackPalette
+        CALL glow_delay_and_wait_key$
+
+        BR   ShowTitlePic_Loop
+
+    glow_delay_and_wait_key$:
+        MOV  $5,R1
+        100$:
+            CALL TRandW
+            WAIT
+            BITB $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
+            BNZ  finalize_title_pic_loop$
+        SOB  R1,100$
+
+        RETURN
+
+    finalize_title_pic_loop$:
+        TST  (SP)+ # remove return address from the stack
+#----------------------------------------------------------------------------}}}
+.endif
+
+.if StartOnLevel == MainMenu
+        JMP  @$Akuyou_LevelStart
+.else
         MOV  $StartOnLevel,R5
+.endif
 
 Bootstrap_FromR5:
         TST  R5                    # R5 is used as the bootstrap command
@@ -91,10 +143,10 @@ Bootstrap_StartGame:
 
 Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
         MOV  $level_00.bin,R0
-        CALL Bootstrap_LoadDiskFile_Start
+        CALL Bootstrap_ReadFromDisk_Start
             CALL StartANewGame
             CALL LevelReset0000
-        CALL Bootstrap_LoadDiskFile_WaitForFinish
+        CALL Bootstrap_DiskIO_WaitForFinish
        .check_for_loading_error "level_00.bin"
 
         MOV  $SP_RESET,SP # we are not returning, so reset the stack
@@ -102,15 +154,15 @@ Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
 #----------------------------------------------------------------------------
 Bootstrap_Level_Intro:
         MOV  $ep1_intro.bin,R0
-        CALL Bootstrap_LoadDiskFile_Start
+        CALL Bootstrap_ReadFromDisk_Start
            .ppudo_ensure $PPU_SetPalette, $BlackPalette
             CALL LevelReset0000
-        CALL Bootstrap_LoadDiskFile_WaitForFinish
+        CALL Bootstrap_DiskIO_WaitForFinish
        .check_for_loading_error "ep1_intro.bin"
 
         MOV  $ep1_intro_slides.bin,R0
-        CALL Bootstrap_LoadDiskFile_Start
-        CALL Bootstrap_LoadDiskFile_WaitForFinish
+        CALL Bootstrap_ReadFromDisk_Start
+        CALL Bootstrap_DiskIO_WaitForFinish
        .check_for_loading_error "ep1_intro_slides.bin"
 
         MOV  $SP_RESET,SP # we are not returning, so reset the stack
@@ -118,11 +170,11 @@ Bootstrap_Level_Intro:
 #----------------------------------------------------------------------------
 Bootstrap_Level_1: # --------------------------------------------------------
         MOV  $level_01.bin,R0
-        CALL Bootstrap_LoadDiskFile_Start
+        CALL Bootstrap_ReadFromDisk_Start
             CALL StartANewGame
             CALL LevelReset0000
             MOVB $1,@$Player_Array + 9 # set number of lives for the first player
-        CALL Bootstrap_LoadDiskFile_WaitForFinish
+        CALL Bootstrap_DiskIO_WaitForFinish
        .check_for_loading_error "level_01.bin"
 
         CALL Bootstrap_WaitForFireKey
@@ -136,11 +188,11 @@ Bootstrap_Level_1: # --------------------------------------------------------
 #----------------------------------------------------------------------------
 Bootstrap_Level_2: # --------------------------------------------------------
         MOV  $level_02.bin,R0
-        CALL Bootstrap_LoadDiskFile_Start
+        CALL Bootstrap_ReadFromDisk_Start
            .ppudo_ensure $PPU_LevelStart
            .ppudo_ensure $PPU_SetPalette, $BlackPalette
             CALL LevelReset0000
-        CALL Bootstrap_LoadDiskFile_WaitForFinish
+        CALL Bootstrap_DiskIO_WaitForFinish
        .check_for_loading_error "level_02.bin"
 
         MOV  $SP_RESET,SP # we are not returning, so reset the stack
@@ -148,16 +200,28 @@ Bootstrap_Level_2: # --------------------------------------------------------
 #----------------------------------------------------------------------------
 Bootstrap_Level_3: # --------------------------------------------------------
         MOV  $level_03.bin,R0
-        CALL Bootstrap_LoadDiskFile_Start
+        CALL Bootstrap_ReadFromDisk_Start
            .ppudo_ensure $PPU_LevelStart
            .ppudo_ensure $PPU_SetPalette, $BlackPalette
             CALL LevelReset0000
-        CALL Bootstrap_LoadDiskFile_WaitForFinish
+        CALL Bootstrap_DiskIO_WaitForFinish
        .check_for_loading_error "level_03.bin"
 
         MOV  $SP_RESET,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 #----------------------------------------------------------------------------
+Continue_SpendCredit:
+        DECB 5(R4)    # continues
+        MOVB $3,3(R4) # smartbombs
+        MOVB $7,7(R4) # invincibility for 7 ticks
+        MOVB $3,9(R4) # lives
+        MOV  $INC_R0_OPCODE,@$PlayerCounter
+
+        CALL @$Event_RestorePalette
+       .ppudo_ensure $PPU_LevelStart
+        BIC  $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
+        RETURN
+
 Bootstrap_Continue: # ../Aku/BootStrap.asm:1324
        .ppudo_ensure $PPU_LevelEnd
        .ppudo_ensure $PPU_SetPalette,$ContinuePalette
@@ -180,6 +244,8 @@ Bootstrap_Continue: # ../Aku/BootStrap.asm:1324
        .ppudo_ensure $PPU_PrintAt,$ContinueStr
 
         MOV  $9,R0
+        BIC  $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
+        WAIT
         Continue_CoundownLoop:
             MOV  R0, @$ContinueCountdownStr+2
             ADD  $'0, @$ContinueCountdownStr+2
@@ -202,37 +268,218 @@ Bootstrap_GameOver:
        .ppudo_ensure $PPU_SetPalette,$BlackPalette
         CALL CLS
        .ppudo_ensure $PPU_PrintAt,$GameOver_Text
+       .ppudo_ensure $PPU_SetPalette,$GameOverPalette
+
         MOV  $game_over.bin.lzsa1,R1
         MOV  $FB1 + 20*80,R2
         CALL unlzsa1
-       .ppudo_ensure $PPU_SetPalette,$GameOverPalette
-        BR .
+
+        CALL Bootstrap_WaitForFireKey_NoMessage
+
+Bootstrap_Review:
+       .ppudo_ensure $PPU_SetPalette,$BlackPalette
+        CALL CLS
+
+        MOV  $8,R1
+        MOV  $Player_ScoreBytes+8,R2
+        MOV  $PlayerScoreText+2,R3
+        MOV  $HighScoreBytes+8,R4
+        MOV  $HighScoreText+2,R5
+        ScoreToStrLoop:
+            CLRB R0
+            BISB -(R2),R0
+            ADD  $'0,R0
+            MOVB R0,(R3)+
+
+            CLRB R0
+            BISB -(R4),R0
+            ADD  $'0,R0
+            MOVB R0,(R5)+
+        SOB  R1,ScoreToStrLoop
+
+        MOV  $9,R1
+        MOV  $Player_ScoreBytes+8,R2
+        MOV  $HighScoreBytes+8,R3
+        CompareNextDigit:
+            DEC  R1
+            BZE  MehScore
+
+            CMPB -(R3),-(R2)
+        BEQ  CompareNextDigit
+        BLO  PlayerScoreHigher
+
+MehScore:
+        MOV  $ChibikoReviewsMehScore,@$MehOrNewScore
+        BR   ShowScore
+
+PlayerScoreHigher:
+        MOV  $ChibikoReviewsNewScore,@$MehOrNewScore
+        MOV  $8,R1
+        MOV  $Player_ScoreBytes,R4
+        MOV  $HighScoreBytes,R5
+
+        PlayerScoreHigher_CopyNextByte:
+            MOVB (R4)+,(R5)+
+        SOB  R1,PlayerScoreHigher_CopyNextByte
+
+        MOV  $saved_settings.bin,R0
+        CALL Bootstrap_WriteToDisk_Start
+        CALL Bootstrap_DiskIO_WaitForFinish
+
+ShowScore:
+       .wait_ppu
+        CALL @$TRandW
+        BIC  $0xFFF9,R0
+       .equiv MehOrNewScore, .+2
+        MOV  ChibikoReviewsNewScore(R0),@$PPUCommandArg
+       .ppudo $PPU_PrintAt
+       .ppudo_ensure $PPU_PrintAt,$ChibikoReview
+
+        MOV  $high_score.bin.lzsa1,R1
+        MOV  $LevelStart,R2
+        CALL unlzsa1
+
+       .ppudo_ensure $PPU_PrintAt,$RankText
+
+        MOV  $LevelStart,R4
+        MOV  $FB1+80*136,R5
+        MOV  $64,R1
+        LinesLoop:
+            MOV  $8,R2
+            LineLoop:
+                MOV  (R4),(R5)+
+                CLR  (R4)+
+            SOB  R2,LineLoop
+            ADD  $64,R5
+        SOB  R1,LinesLoop
+
+       .ppudo_ensure $PPU_SetPalette,$ReviewPalette
+
+       .ppudo_ensure $PPU_PrintAt,$PlayerScoreText
+       .ppudo_ensure $PPU_PrintAt,$HighScoreText
+       .ppudo_ensure $PPU_PrintAt,$RankF
+
+        CALL Bootstrap_WaitForFireKey_NoMessage
 
         MOV  $0x8000,R5
         JMP  Bootstrap_FromR5
 
-Continue_SpendCredit:
-        DECB 5(R4)    # continues
-        MOVB $3,3(R4) # smartbombs
-        MOVB $7,7(R4) # invincibility for 7 ticks
-        MOVB $3,9(R4) # lives
-        MOV  $INC_R0_OPCODE,@$PlayerCounter
+ChibikoReviewsWin:
+    .word ChibikoReviewWin
+ChibikoReviewsNewScore:
+    .word ChibikoReview1
+    .word ChibikoReview2
+    .word ChibikoReview3
+    .word ChibikoReview4
+ChibikoReviewsMehScore:
+    .word ChibikoReview5
+    .word ChibikoReview6
+    .word ChibikoReview7
+    .word ChibikoReview8
 
-        CALL @$Event_RestorePalette
-       .ppudo_ensure $PPU_LevelStart
-        BIC  $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
-        RETURN
+                         #0---------1---------2---------3---------
+ContinueStr:             #0123456789012345678901234567890123456789
+       .byte 16, 16; .ascii              "Continue?"                ; .byte -1 ; .even
+       .byte 15, 18; .ascii              "Credits: --"              ; .byte  0 ; .even
+                         #0---------1---------2---------3---------
+ContinueCountdownStr:    #0123456789012345678901234567890123456789
+       .byte 20, 20; .ascii                  "-"                    ; .byte  0 ; .even
                          #0---------1---------2---------3---------
 GameOver_Text:           #0123456789012345678901234567890123456789
-    .byte  7, 16; .ascii        "The Moster Hoard has driven"       ; .byte 0xFF ; .even
-    .byte  8, 17; .ascii         "Chibiko from her homeland"        ; .byte 0xFF ; .even
-    .byte  2, 18; .ascii   "She is forced to live in a cardboard"   ; .byte 0xFF ; .even
-    .byte  8, 19; .ascii         "box as a street vampire! "        ; .byte 0xFF ; .even
-    .byte 11, 20; .ascii            "With Chibiko gone,"            ; .byte 0xFF ; .even
-    .byte 11, 21; .ascii            "peace and harmony"             ; .byte 0xFF ; .even
-    .byte  6, 22; .ascii       "spread through out the land."       ; .byte 0xFF ; .even
-    .byte  9, 24; .ascii          "(Boy! Did you fuck up!)"         ; .byte 0x00 ; .even
- 
+    .byte  7, 16; .ascii        "The Moster Hoard has driven"       ; .byte -1 ; .even
+    .byte  8, 17; .ascii         "Chibiko from her homeland"        ; .byte -1 ; .even
+    .byte  2, 18; .ascii   "She is forced to live in a cardboard"   ; .byte -1 ; .even
+    .byte  8, 19; .ascii         "box as a street vampire! "        ; .byte -1 ; .even
+    .byte 11, 20; .ascii            "With Chibiko gone,"            ; .byte -1 ; .even
+    .byte 11, 21; .ascii            "peace and harmony"             ; .byte -1 ; .even
+    .byte  6, 22; .ascii       "spread through out the land."       ; .byte -1 ; .even
+    .byte  9, 24; .ascii          "(Boy! Did you fuck up!)"         ; .byte  0 ; .even
+                         #0---------1---------2---------3---------
+RankText:                #0123456789012345678901234567890123456789
+    .byte  8,  1; .ascii         "Your Score was:"                  ; .byte -1 ; .even
+
+    .byte 13,  3; .ascii              "HighScore:"                  ; .byte -1 ; .even
+
+    .byte  3,  7; .ascii    "Your 'Chibiko Scoring System (TM)'"    ; .byte -1 ; .even
+    .byte 15,  8; .ascii                "Rank was -"                ; .byte  0 ; .even
+                         #0---------1---------2---------3---------
+PlayerScoreText:         #0123456789012345678901234567890123456789
+    .byte 24,  1; .ascii                         "--------"         ; .byte  0; .even
+                         #0---------1---------2---------3---------
+HighScoreText:           #0123456789012345678901234567890123456789
+    .byte 24,  3; .ascii                         "--------"         ; .byte  0; .even
+                         #0---------1---------2---------3---------
+RankF:                   #0123456789012345678901234567890123456789
+    .byte 17, 10; .ascii                  "*****"                   ; .byte -1 ; .even
+    .byte 17, 11; .ascii                  "*    "                   ; .byte -1 ; .even
+    .byte 17, 12; .ascii                  "*****"                   ; .byte -1 ; .even
+    .byte 17, 13; .ascii                  "*    "                   ; .byte -1 ; .even
+    .byte 17, 14; .ascii                  "*    "                   ; .byte  0 ; .even
+                         #0---------1---------2---------3---------
+ChibikoReview:           #0123456789012345678901234567890123456789
+    .byte 12, 17; .ascii             "Chibiko says:"                ; .byte  0 ; .even
+                         #0---------1---------2---------3---------
+ChibikoReviewWin:        #0123456789012345678901234567890123456789
+    .byte  9, 19; .ascii          "Well, you won!"                  ; .byte -1 ; .even
+    .byte  9, 20; .ascii          "But I'm still giving you an F!"  ; .byte -1 ; .even
+
+    .byte  9, 22; .ascii          "Try get a better score next"     ; .byte -1 ; .even
+    .byte  9, 23; .ascii          "time sucker! ;-)"                ; .byte  0 ; .even
+                         #0---------1---------2---------3---------
+ChibikoReview1:          #0123456789012345678901234567890123456789
+    .byte  9, 19; .ascii          "Good Job!"                       ; .byte -1 ; .even
+    .byte  9, 20; .ascii          "Now try plugging the controller" ; .byte -1 ; .even
+    .byte  9, 21; .ascii          "in first before starting the"    ; .byte -1 ; .even
+    .byte  9, 22; .ascii          "game!"                           ; .byte  0 ; .even
+                         #0---------1---------2---------3---------
+ChibikoReview2:          #0123456789012345678901234567890123456789
+    .byte  9, 19; .ascii          "Amazing!!!"                      ; .byte -1 ; .even
+    .byte  9, 20; .ascii          "You survived SUCH a long time"   ; .byte -1 ; .even
+    .byte  9, 21; .ascii          "by aimlessly hitting buttons"    ; .byte -1 ; .even
+    .byte  9, 22; .ascii          "at random!"                      ; .byte  0 ; .even
+                         #0---------1---------2---------3---------
+ChibikoReview3:          #0123456789012345678901234567890123456789
+    .byte  9, 19; .ascii          "Superb Performace!"              ; .byte -1 ; .even
+    .byte  9, 20; .ascii          "Imagine how good you'll be"      ; .byte -1 ; .even
+    .byte  9, 21; .ascii          "when you actually learn how"     ; .byte -1 ; .even
+    .byte  9, 22; .ascii          "to play!"                        ; .byte  0 ; .even
+                         #0---------1---------2---------3---------
+ChibikoReview4:          #0123456789012345678901234567890123456789
+    .byte  9, 19; .ascii          "Well Done!"                      ; .byte -1 ; .even
+    .byte  9, 20; .ascii          "I'm sure there's worse players"  ; .byte -1 ; .even
+    .byte  9, 21; .ascii          "out there, I mean, the world"    ; .byte -1 ; .even
+    .byte  9, 22; .ascii          "population is 7.6 billion"       ; .byte -1 ; .even
+    .byte  9, 23; .ascii          "....There MUST be, right?"       ; .byte  0 ; .even
+                         #0---------1---------2---------3---------
+ChibikoReview5:          #0123456789012345678901234567890123456789
+    .byte  9, 19; .ascii          "You're really something, after"  ; .byte -1 ; .even
+    .byte  9, 20; .ascii          "all, It's rare to see someone"   ; .byte -1 ; .even
+    .byte  9, 21; .ascii          "CLINICALLY BRAINDEAD still able" ; .byte -1 ; .even
+    .byte  9, 22; .ascii          "to play computer games!"         ; .byte  0 ; .even
+                         #0---------1---------2---------3---------
+ChibikoReview6:          #0123456789012345678901234567890123456789
+    .byte  9, 19; .ascii          "If YOU are the result of 2 "     ; .byte -1 ; .even
+    .byte  9, 20; .ascii          "million years of human "         ; .byte -1 ; .even
+    .byte  9, 21; .ascii          "evolution I'd say the species"   ; .byte -1 ; .even
+    .byte  9, 22; .ascii          "is seriously fucked!"            ; .byte  0 ; .even
+                         #0---------1---------2---------3---------
+ChibikoReview7:          #0123456789012345678901234567890123456789
+    .byte  9, 19; .ascii          "Never mind!"                     ; .byte -1 ; .even
+    .byte  9, 20; .ascii          "Maybe you will manage to serve"  ; .byte -1 ; .even
+    .byte  9, 21; .ascii          "some purpose one day!?!"         ; .byte -1 ; .even
+    .byte  9, 22; .ascii          "You DO own an organ donor "      ; .byte -1 ; .even
+    .byte  9, 23; .ascii          "card don't you?"                 ; .byte  0 ; .even
+                         #0---------1---------2---------3---------
+ChibikoReview8:          #0123456789012345678901234567890123456789
+    .byte  9, 19; .ascii          "I'd say the purpose of your"     ; .byte -1 ; .even
+    .byte  9, 20; .ascii          "existance is to define"          ; .byte -1 ; .even
+    .byte  9, 21; .ascii          "utter failure so the rest"       ; .byte -1 ; .even
+    .byte  9, 22; .ascii          "of the population can feel"      ; .byte -1 ; .even
+    .byte  9, 23; .ascii          "superior!"                       ; .byte  0 ; .even
+                         #0---------1---------2---------3---------
+PressFireKeyStr:         #0123456789012345678901234567890123456789
+    .byte  9, 23; .ascii          "Press Fire to Continue"          ; .byte  0 ; .even
+
 NumberToDecStr:
       # R1 number
       # R2 destination string ponter
@@ -247,14 +494,6 @@ NumberToDecStr:
         SOB  R3,10$
 
         RETURN
-
-ContinueStr:
-       .byte 16, 16; .ascii  "Continue?"  ; .byte 0xFF
-       .byte 15, 18; .ascii "Credits: --" ; .byte 0x00
-       .even
-ContinueCountdownStr:
-       .byte 20, 20, '-, 0
-       .even
 
 ClearOffscreenBP12:
         MOV  $88*40>>2,R0
@@ -402,6 +641,13 @@ StartANewGamePlayer: # ../Aku/BootStrap.asm:2256 ;player fire directions ----{{{
 
         RETURN
 #----------------------------------------------------------------------------}}}
+Bootstrap_WaitForFireKey_NoMessage:
+        BIC  $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
+
+        BITB $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
+        BZE  .-6
+        RETURN
+
 Bootstrap_WaitForFireKey: # Bootstrap_WFK -----------------------------------{{{
        .ppudo $PPU_DebugPrintAt,$HitAFireKeyStr
         Bootstrap_WFK_Loop:
@@ -505,7 +751,7 @@ ResetCore: # ../Aku/BootStrap.asm:2318
         CLR  @$EventObjectProgramToAdd
         CLR  @$Timer_TicksOccured
 
-        CALL DroneFlipFire
+        CALL @$DroneFlipFire
 
         MOV  $Object_DecreaseLifeShot, @$dstObjectShotOverride
 
@@ -529,7 +775,14 @@ ResetCore: # ../Aku/BootStrap.asm:2318
         RETURN
 # LevelReset0000 end --------------------------------------------------------}}}
 
-Bootstrap_LoadDiskFile_Start: # ---------------------------------------------{{{
+Bootstrap_WriteToDisk_Start: # ------------------------------------------------
+        MOVB $020,@$PS.Command # read from disk
+        BR   Bootstrap_DiskIO_Start
+
+Bootstrap_ReadFromDisk_Start: # ------------------------------------------------
+        MOVB $010,@$PS.Command # read from disk
+
+Bootstrap_DiskIO_Start:
         MOV  (R0)+,@$PS.CPU_RAM_Address
         MOV  (R0)+,@$PS.WordsCount
         MOV  (R0),R0 # starting block number
@@ -552,7 +805,7 @@ Bootstrap_LoadDiskFile_Start: # ---------------------------------------------{{{
 
        .ppudo_ensure $PPU_LoadDiskFile,$ParamsStruct
         RETURN
-# Bootstrap_LoadDiskFile_Start #---------------------------------------------}}}
+# Bootstrap_ReadFromDisk_Start #---------------------------------------------}}}
 ParamsAddr: .byte 0, 0, 0, 0xFF # init sequence (just in case)
             .word ParamsStruct
             .byte 0xFF, 0xFF    # two termination bytes 0xff, 0xff
@@ -564,7 +817,7 @@ ParamsStruct:
     PS.AddressOnDevice: .byte 0, 1     # track 0(0-79), sector 1(1-10)
     PS.CPU_RAM_Address: .word 0
     PS.WordsCount:      .word 0        # number of words to transfer
-Bootstrap_LoadDiskFile_WaitForFinish: #--------------------------------------{{{
+Bootstrap_DiskIO_WaitForFinish: #--------------------------------------{{{
       # +------------------------------------------------------+
       # | Код ответа |  Значение                               |
       # +------------+-----------------------------------------+
@@ -587,12 +840,12 @@ Bootstrap_LoadDiskFile_WaitForFinish: #--------------------------------------{{{
       # +------------------------------------------------------+
         CLC
         MOVB @$PS.Status,R0
-        BMI  Bootstrap_LoadDiskFile_WaitForFinish
+        BMI  Bootstrap_DiskIO_WaitForFinish
         BZE  1237$
 
         SEC  # set carry flag to indicate that there was an error
 1237$:  RETURN
-# Bootstrap_LoadDiskFile_WaitForFinish #-------------------------------------}}}
+# Bootstrap_DiskIO_WaitForFinish #-------------------------------------}}}
 
 # files related data --------------------------------------------------------{{{
 # each record is 3 words:
@@ -828,13 +1081,37 @@ BlackPalette: #------------------------------------------------------{{{
     .word untilEndOfScreen
 #----------------------------------------------------------------------------}}}
 ContinuePalette: #-----------------------------------------------------{{{
+    .word   0, cursorGraphic, scale320 | RGB
     .byte 1, setColors, Black, Magenta, brCyan, White
     .word untilEndOfScreen
 #----------------------------------------------------------------------------}}}
 GameOverPalette: #-----------------------------------------------------------{{{
+    .word   0, cursorGraphic, scale320 | RGB
     .byte   1, setColors, Black, Red, brYellow, White
     .byte 127, setColors, Black, Red, brMagenta, White
     .word untilEndOfScreen
+#----------------------------------------------------------------------------}}}
+ReviewPalette: #-------------------------------------------------------------{{{
+    .word   0, cursorGraphic, scale320 | RgB
+    .byte   1, setColors, Black, brCyan, brYellow, White
+    .word  39, cursorGraphic, scale320 | rGB
+    .byte  40, setColors, Black, brCyan, brMagenta, White
+    .word 135, cursorGraphic, scale320 | RGB
+    .byte 136, setColors, Black, Magenta, brCyan, White
+    .word untilEndOfScreen
+#----------------------------------------------------------------------------}}}
+FireKeyBrightPalette: #------------------------------------------------------{{{
+    .byte 185, setColors, Black, Green, brYellow, White
+    .word untilLine | 192
+FireKeyNormalPalette:
+    .byte 185, setColors, Black, Green, brRed, White
+    .word untilLine | 192
+FireKeyDarkPalette:
+    .byte 185, setColors, Black, Green, Red, White
+    .word untilLine | 192
+FireKeyBlackPalette:
+    .byte 185, setColors, Black, Green, Black, White
+    .word untilLine | 192
 #----------------------------------------------------------------------------}}}
 continue.bin.lzsa1:
     .incbin "build/continue.bin.lzsa1"
