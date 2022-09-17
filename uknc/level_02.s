@@ -220,7 +220,10 @@ DebugStartPoint:
 .word     evtSingleSprite, sprSingleFrame | LEGS_RIGHT_C, (24+160)<<X | (24+90+48)<<Y
 .word     evtSaveObjPointer, HandObject6
 
+.word 65, evtCallAddress, ShowBossText_RemoveWait
+
 .word 70, evtCallAddress, StopBossMovement
+
 
 HandAttack1:
    .word 75, evtMultipleCommands | 7
@@ -307,6 +310,8 @@ LevelLoop:
         CALL @$StarArray_Redraw
 
         CALL @$ScreenBuffer_Flip
+       .equiv ShowBossText_WaitOpcode, .
+        WAIT # added to give PPU time to draw boss text
 
        .equiv FadeCommandCall, .+2
         CALL @$null
@@ -490,13 +495,16 @@ RealPalette: #---------------------------------------------------------------{{{
 ShowBossText_Init:
        .ppudo_ensure $PPU_ShowBossText_Init,$BossText
         RETURN
+ShowBossText_RemoveWait:
+        MOV  $NOP_OPCODE,@$ShowBossText_WaitOpcode
+        RETURN
                          #0---------1---------2---------3---------
 BossText:                #0123456789012345678901234567890123456789
         .ifndef BuildLang
-   .byte  11,  5; .ascii            "W A R N I N G ! ! !"           ; .byte -1
-   .byte   6,  8; .ascii       "A Big Enemy is approaching!"        ; .byte -1
-   .byte   7, 11; .ascii        "Skull + Spider = Skullder!"        ; .byte -1
-   .byte   6, 14; .ascii       "(Or Spill, if you prefer!)"         ; .byte 0
+   .byte  11,  8; .ascii            "W A R N I N G ! ! !"           ; .byte -1
+   .byte   6, 11; .ascii       "A Big Enemy is approaching!"        ; .byte -1
+   .byte   7, 14; .ascii        "Skull + Spider = Skullder!"        ; .byte -1
+   .byte   6, 17; .ascii       "(Or Spill, if you prefer!)"         ; .byte 0
    .even
         .endif
 
