@@ -242,7 +242,7 @@ not_implemented_check_R0:
        .global GetSpriteMempos
 
        .even
-      #.space 2
+       .space 2
 end: FileEndCore:
 
 LevelStart:
