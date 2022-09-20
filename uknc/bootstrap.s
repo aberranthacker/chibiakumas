@@ -626,6 +626,7 @@ ResetCore: # ../Aku/BootStrap.asm:2318
         CLR  @$EventObjectProgramToAdd
         CLR  @$Timer_TicksOccured
 
+        CLR  R0
         CALL @$DroneFlipFire
 
         MOV  $Object_DecreaseLifeShot, @$dstObjectShotOverride
