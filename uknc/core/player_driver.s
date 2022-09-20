@@ -400,10 +400,10 @@ dodrone:
       # B = R2 = X
       # ResetCore sets to add a,c
        .equiv DroneFlipFirePos3, .
-        ADD  R0,R2
+        ADD  R0,R1
         CALL Stars_AddObject
        .equiv DroneFlipFirePos2, .
-        SUB  R0,R2
+        SUB  R0,R1
         RETURN
 
 DroneFlipFire:
