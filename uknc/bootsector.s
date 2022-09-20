@@ -31,7 +31,6 @@
         30$:
             MOVB @$PS.Status,R0
         BMI  30$
-        BNZ  .
 
       # PPU will clear the value when finishes initializiton
         MOV  $-1,@$PPUCommandArg
@@ -46,14 +45,14 @@
      .ifdef ShowLoadingScreen
         MOV  $loading_screen.bin,R0
         CALL LoadDiskFile_Start
-       .ppudo_ensure $PPU_SetPalette, $TitleScreenPalette
+       .ppudo $PPU_SetPalette, $TitleScreenPalette
      .endif
-
+      #-------------------------------------------------------------------------
         MOV  $bootstrap.bin,R0
         CALL LoadDiskFile_Start
-
+      #-------------------------------------------------------------------------
         BISB @$PS.DeviceNumber,@$Bootstrap_PS.DeviceNumber
-
+      #-------------------------------------------------------------------------
       # copy the bootstrap to upper memory while PPU module loads
         MOV  $BootstrapSizeQWords,R0
         MOV  $CBPADR,R1
@@ -66,12 +65,27 @@
              INC  (R1)
             .endr
         SOB  R0,100$
-
-        MOV $core.bin,R0
+      #-------------------------------------------------------------------------
+        MOV  $core.bin,R0
         CALL LoadDiskFile_Start
-
+      #-------------------------------------------------------------------------
+        MOV  $saved_settings.bin,R0
+        CALL LoadDiskFile_Start
+      #-------------------------------------------------------------------------
+   .ifdef ExtMemCore # copy the core to the extended memory
+        MOV  $GameVarsEnd,R4
+        MOV  $CoreStart,R5
+        MOV  $ExtMemSizeBytes>>3 - 1,R1 # -1 to preserve stack
+        200$:
+           .rept 4
+            MOV  (R4)+, (R5)+
+           .endr
+        SOB R1,200$
+   .endif
+      #-------------------------------------------------------------------------
         JMP  @$BootstrapStart
-
+      #-------------------------------------------------------------------------
+      #-------------------------------------------------------------------------
 LoadDiskFile_Start: # ----------------------------------------------------------
         MOV  (R0)+,@$PS.CPU_RAM_Address
         MOV  (R0)+,@$PS.WordsCount
@@ -124,10 +138,7 @@ PrintTitleStr:
         BR   10$
 1237$:  RETURN
 TitleStr: #---------------------------------------------------------------------
-       .byte  033, 'Y, 32+1, 32+0
-       .ascii "ChibiAkumas V0.666"
-       .byte  033, 'H # move curor to "home" position
-       .byte  0
+       .asciz "ChibiAkumas"
        .even
 #-------------------------------------------------------------------------------
 PPEXEC: #-----------------------------------------------------------------------
@@ -167,7 +178,7 @@ PPUModule_PS:
     PPUModule_PS.A1:      .word  0   # Argument 1
     PPUModule_PS.A2:      .word  PPU_UserRamSizeWords   # Argument 2
     PPUModule_PS.A3:      .word  0   # Argument 3
-
+#-------------------------------------------------------------------------------
 loading_screen.bin:
     .word FB1
     .word 0
@@ -180,7 +191,7 @@ core.bin:
     .word GameVarsEnd
     .word 0
     .word 0
-
+#-------------------------------------------------------------------------------
 TitleScreenPalette: #-----------------------------------------------------------
     .word   0, cursorGraphic, scale320 | RgB
     .byte   1, setColors, Black, brBlue,  brRed,     White

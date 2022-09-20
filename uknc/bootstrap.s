@@ -31,37 +31,14 @@
 
                 .=BootstrapStart
 start:
-      #-------------------------------------------------------------------------
-        MOV  $saved_settings.bin,R0
-        CALL Bootstrap_ReadFromDisk_Start
-        CALL Bootstrap_DiskIO_WaitForFinish
-      #-------------------------------------------------------------------------
-   .ifdef ExtMemCore # copy the core to the extended memory
-        MOV  $GameVarsEnd,R4
-        MOV  $CoreStart,R5
-        MOV  $ExtMemSizeBytes>>2 - 2,R1 # -2 to preserve stack
-        200$:
-            MOV  (R4)+, (R5)+
-            MOV  (R4)+, (R5)+
-        SOB R1,200$
-   .endif
-
+        MTPS $PR0 # enable interrupts
 .if StartOnLevel == MainMenu
-        MOV  $level_00.bin,R0
-        CALL Bootstrap_ReadFromDisk_Start
-            CALL StartANewGame
-            CALL LevelReset0000
-        CALL Bootstrap_DiskIO_WaitForFinish
-       .check_for_loading_error "level_00.bin"
-
-        MOV  $SP_RESET,SP # we are not returning, so reset the stack
+        CALL Bootstrap_LoadLevel_0
 .endif
 
 .ifdef ShowLoadingScreen
        .ppudo_ensure $PPU_TitleMusicRestart
        .ppudo_ensure $PPU_PrintAt,$PressFireKeyStr
-        MTPS $PR0 # enable interrupts
-
 ShowTitlePic_Loop: #---------------------------------------------------------{{{
        .ppudo_ensure $PPU_SetPalette, $FireKeyDarkPalette
         CALL glow_delay_and_wait_key$
@@ -95,7 +72,7 @@ ShowTitlePic_Loop: #---------------------------------------------------------{{{
 .endif
 
 .if StartOnLevel == MainMenu
-        JMP  @$Akuyou_LevelStart
+        JMP  @$Bootstrap_StartLevel
 .else
         MOV  $StartOnLevel,R5
 .endif
@@ -139,18 +116,24 @@ Bootstrap_Level:
        .word Bootstrap_Level_2
        .word Bootstrap_Level_3
 
-Bootstrap_StartGame:
 
-Bootstrap_Level_0: # ../Aku/BootStrap.asm:838  main menu --------------------
+Bootstrap_StartLevel:
+        MOV  $SP_RESET,SP # we are not returning, so reset the stack
+        JMP  @$Akuyou_LevelStart
+
+Bootstrap_StartGame:
+Bootstrap_Level_0:
+        CALL Bootstrap_LoadLevel_0
+        BR   Bootstrap_StartLevel
+
+Bootstrap_LoadLevel_0: # ../Aku/BootStrap.asm:838  main menu --------------------
         MOV  $level_00.bin,R0
         CALL Bootstrap_ReadFromDisk_Start
             CALL StartANewGame
             CALL LevelReset0000
         CALL Bootstrap_DiskIO_WaitForFinish
        .check_for_loading_error "level_00.bin"
-
-        MOV  $SP_RESET,SP # we are not returning, so reset the stack
-        JMP  @$Akuyou_LevelStart
+        RETURN
 #----------------------------------------------------------------------------
 Bootstrap_Level_Intro:
         MOV  $ep1_intro.bin,R0
@@ -165,8 +148,7 @@ Bootstrap_Level_Intro:
         CALL Bootstrap_DiskIO_WaitForFinish
        .check_for_loading_error "ep1_intro_slides.bin"
 
-        MOV  $SP_RESET,SP # we are not returning, so reset the stack
-        JMP  @$Akuyou_LevelStart
+        JMP  @$Bootstrap_StartLevel
 #----------------------------------------------------------------------------
 Bootstrap_Level_1: # --------------------------------------------------------
         MOV  $level_01.bin,R0
@@ -183,8 +165,7 @@ Bootstrap_Level_1: # --------------------------------------------------------
         WAIT
        .ppudo_ensure $PPU_LevelStart
 
-        MOV  $SP_RESET,SP # we are not returning, so reset the stack
-        JMP  @$Akuyou_LevelStart
+        JMP  @$Bootstrap_StartLevel
 #----------------------------------------------------------------------------
 Bootstrap_Level_2: # --------------------------------------------------------
         MOV  $level_02.bin,R0
@@ -195,8 +176,7 @@ Bootstrap_Level_2: # --------------------------------------------------------
         CALL Bootstrap_DiskIO_WaitForFinish
        .check_for_loading_error "level_02.bin"
 
-        MOV  $SP_RESET,SP # we are not returning, so reset the stack
-        JMP  @$Akuyou_LevelStart
+        JMP  @$Bootstrap_StartLevel
 #----------------------------------------------------------------------------
 Bootstrap_Level_3: # --------------------------------------------------------
         MOV  $level_03.bin,R0
@@ -207,8 +187,7 @@ Bootstrap_Level_3: # --------------------------------------------------------
         CALL Bootstrap_DiskIO_WaitForFinish
        .check_for_loading_error "level_03.bin"
 
-        MOV  $SP_RESET,SP # we are not returning, so reset the stack
-        JMP  @$Akuyou_LevelStart
+        JMP  @$Bootstrap_StartLevel
 #----------------------------------------------------------------------------
 Continue_SpendCredit:
         DECB 5(R4)    # continues
@@ -300,19 +279,19 @@ Bootstrap_Review:
         MOV  $9,R1
         MOV  $Player_ScoreBytes+8,R2
         MOV  $HighScoreBytes+8,R3
-        CompareNextDigit:
+        CompareScoreDigitsLoop:
             DEC  R1
-            BZE  MehScore
+            BZE  Bootstrap_Review_MehScore
 
             CMPB -(R3),-(R2)
-        BEQ  CompareNextDigit
-        BLO  PlayerScoreHigher
+        BEQ  CompareScoreDigitsLoop
+        BLO  Bootstrap_Review_NewScore
 
-MehScore:
+Bootstrap_Review_MehScore:
         MOV  $ChibikoReviewsMehScore,@$MehOrNewScore
-        BR   ShowScore
+        BR   Bootstrap_Review_ShowScore
 
-PlayerScoreHigher:
+Bootstrap_Review_NewScore:
         MOV  $ChibikoReviewsNewScore,@$MehOrNewScore
         MOV  $8,R1
         MOV  $Player_ScoreBytes,R4
@@ -326,7 +305,7 @@ PlayerScoreHigher:
         CALL Bootstrap_WriteToDisk_Start
         CALL Bootstrap_DiskIO_WaitForFinish
 
-ShowScore:
+Bootstrap_Review_ShowScore:
        .wait_ppu
         CALL @$TRandW
         BIC  $0xFFF9,R0
@@ -363,7 +342,7 @@ ShowScore:
 
         MOV  $0x8000,R5
         JMP  Bootstrap_FromR5
-
+#-------------------------------------------------------------------------------
 ChibikoReviewsWin:
     .word ChibikoReviewWin
 ChibikoReviewsNewScore:
@@ -376,7 +355,7 @@ ChibikoReviewsMehScore:
     .word ChibikoReview6
     .word ChibikoReview7
     .word ChibikoReview8
-
+# Texts/strings -------------------------------------------------------------{{{
                          #0---------1---------2---------3---------
 ContinueStr:             #0123456789012345678901234567890123456789
        .byte 16, 16; .ascii              "Continue?"                ; .byte -1 ; .even
@@ -479,34 +458,7 @@ ChibikoReview8:          #0123456789012345678901234567890123456789
                          #0---------1---------2---------3---------
 PressFireKeyStr:         #0123456789012345678901234567890123456789
     .byte  9, 23; .ascii          "Press Fire to Continue"          ; .byte  0 ; .even
-
-NumberToDecStr:
-      # R1 number
-      # R2 destination string ponter
-      # R3 number of digits
-        ADD  R3,R2
-        10$:
-            CLR  R0      # R0 - most, R1 - least significant word
-            DIV  $10,R0  # quotient -> R0 , remainder -> R1
-            ADD  $'0, R1 # add ASCII code for "0" to the remainder
-            MOVB R1,-(R2)
-            MOV  R0,R1
-        SOB  R3,10$
-
-        RETURN
-
-ClearOffscreenBP12:
-        MOV  $88*40>>2,R0
-        MOV  $CBP12D,R1
-        MOV  $CBPADR,R2
-        MOV  $OffscreenAreaAddr,(R2)
-        200$:
-           .rept 1<<2
-            CLR  (R1)
-            INC  (R2)
-           .endr
-        SOB  R0,200$
-        RETURN
+#----------------------------------------------------------------------------}}}
 
 StartANewGame: # ../Aku/BootStrap.asm:2151 #---------------------------------{{{
       # reset the core
@@ -641,12 +593,97 @@ StartANewGamePlayer: # ../Aku/BootStrap.asm:2256 ;player fire directions ----{{{
 
         RETURN
 #----------------------------------------------------------------------------}}}
+LevelReset0000: # ../Aku/BootStrap.asm:2306 ---------------------------------{{{
+      # wipe our memory, to clear out any junk from old levels
+        MOV  $ObjectArraySizeBytes >> 1,R1
+        MOV  $ObjectArrayPointer,R3
+        CALL @$ClearR1Words
+
+        MOV  $StarArraySizeBytes >> 1,R1
+        MOV  $StarArrayPointer,R3
+        CALL @$ClearR1Words
+
+        MOV  $PlayerStarArraySizeBytes >> 1,R1
+        MOV  $PlayerStarArrayPointer,R3
+        CALL @$ClearR1Words
+
+        MOV  $Event_SavedSettingsSizeBytes >> 1,R1
+        MOV  $Event_SavedSettings,R3
+        CALL @$ClearR1Words
+
+      # This resets anything the last level may have messed with during
+      # play so we can start a new level with everything back to normal
+ResetCore: # ../Aku/BootStrap.asm:2318
+        MOV  $1,R0
+        CALL ShowSpriteReconfigureEnableDisable # ./SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm:82
+
+        MOV  $0x69,R0
+        MOV  R0,@$Timer_CurrentTick
+        MOV  R0,@$DroneFlipCurrent
+
+        CLR  @$EventObjectAnimatorToAdd
+        CLR  @$EventObjectSpriteSizeToAdd
+        CLR  @$EventObjectProgramToAdd
+        CLR  @$Timer_TicksOccured
+
+        CALL @$DroneFlipFire
+
+        MOV  $Object_DecreaseLifeShot, @$dstObjectShotOverride
+
+      # set stuff that happens every level
+        MOV  $0x2064,@$Player_Array  # X:0x20 Y:0x64
+   .ifdef TwoPlayersGame
+        MOV  $0x2096,@$Player_Array2 # X:0x20 Y:0x96
+   .endif
+
+        MOV  $DoMoves,@$dstObjectDoMovesOverride
+
+        MOV  $null,R3
+        MOV  R3,@$dstSmartBombSpecial
+        MOV  R3,@$dstCustomSmartBombEnemy
+        MOV  R3,@$dstCustomPlayerHitter
+        MOV  R3,@$dstCustomShotToDeathCall
+
+        CLR  R0
+        CALL @$DoMovesBackground_SetScroll # TODO: implement the subroutine
+
+        RETURN
+# LevelReset0000 end --------------------------------------------------------}}}
+#----------------------------------------------------------------------------
+NumberToDecStr:
+      # R1 number
+      # R2 destination string ponter
+      # R3 number of digits
+        ADD  R3,R2
+        10$:
+            CLR  R0      # R0 - most, R1 - least significant word
+            DIV  $10,R0  # quotient -> R0 , remainder -> R1
+            ADD  $'0, R1 # add ASCII code for "0" to the remainder
+            MOVB R1,-(R2)
+            MOV  R0,R1
+        SOB  R3,10$
+        RETURN
+#----------------------------------------------------------------------------
+ClearOffscreenBP12:
+        MOV  $88*40>>2,R0
+        MOV  $CBP12D,R1
+        MOV  $CBPADR,R2
+        MOV  $OffscreenAreaAddr,(R2)
+        200$:
+           .rept 1<<2
+            CLR  (R1)
+            INC  (R2)
+           .endr
+        SOB  R0,200$
+        RETURN
+#----------------------------------------------------------------------------
 Bootstrap_WaitForFireKey_NoMessage:
         BIC  $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
 
         BITB $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
         BZE  .-6
         RETURN
+#----------------------------------------------------------------------------
 
 Bootstrap_WaitForFireKey: # Bootstrap_WFK -----------------------------------{{{
        .ppudo $PPU_DebugPrintAt,$HitAFireKeyStr
@@ -715,71 +752,14 @@ ClearR1Words:
         2$:
             CLR  (R3)+
         SOB  R1, 100$
-
         RETURN
+#----------------------------------------------------------------------------
 
-LevelReset0000: # ../Aku/BootStrap.asm:2306 ---------------------------------{{{
-      # wipe our memory, to clear out any junk from old levels
-        MOV  $ObjectArraySizeBytes >> 1,R1
-        MOV  $ObjectArrayPointer,R3
-        CALL @$ClearR1Words
-
-        MOV  $StarArraySizeBytes >> 1,R1
-        MOV  $StarArrayPointer,R3
-        CALL @$ClearR1Words
-
-        MOV  $PlayerStarArraySizeBytes >> 1,R1
-        MOV  $PlayerStarArrayPointer,R3
-        CALL @$ClearR1Words
-
-        MOV  $Event_SavedSettingsSizeBytes >> 1,R1
-        MOV  $Event_SavedSettings,R3
-        CALL @$ClearR1Words
-
-      # This resets anything the last level may have messed with during
-      # play so we can start a new level with everything back to normal
-ResetCore: # ../Aku/BootStrap.asm:2318
-        MOV  $1,R0
-        CALL ShowSpriteReconfigureEnableDisable # ./SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm:82
-
-        MOV  $0x69,R0
-        MOV  R0,@$Timer_CurrentTick
-        MOV  R0,@$DroneFlipCurrent
-
-        CLR  @$EventObjectAnimatorToAdd
-        CLR  @$EventObjectSpriteSizeToAdd
-        CLR  @$EventObjectProgramToAdd
-        CLR  @$Timer_TicksOccured
-
-        CALL @$DroneFlipFire
-
-        MOV  $Object_DecreaseLifeShot, @$dstObjectShotOverride
-
-      # set stuff that happens every level
-        MOV  $0x2064,@$Player_Array  # X:0x20 Y:0x64
-   .ifdef TwoPlayersGame
-        MOV  $0x2096,@$Player_Array2 # X:0x20 Y:0x96
-   .endif
-
-        MOV  $DoMoves,@$dstObjectDoMovesOverride
-
-        MOV  $null,R3
-        MOV  R3,@$dstSmartBombSpecial
-        MOV  R3,@$dstCustomSmartBombEnemy
-        MOV  R3,@$dstCustomPlayerHitter
-        MOV  R3,@$dstCustomShotToDeathCall
-
-        CLR  R0
-        CALL @$DoMovesBackground_SetScroll # TODO: implement the subroutine
-
-        RETURN
-# LevelReset0000 end --------------------------------------------------------}}}
-
-Bootstrap_WriteToDisk_Start: # ------------------------------------------------
-        MOVB $020,@$PS.Command # read from disk
+Bootstrap_WriteToDisk_Start: #--------------------------------------------------
+        MOVB $020,@$PS.Command # write to disk
         BR   Bootstrap_DiskIO_Start
 
-Bootstrap_ReadFromDisk_Start: # ------------------------------------------------
+Bootstrap_ReadFromDisk_Start: #-------------------------------------------------
         MOVB $010,@$PS.Command # read from disk
 
 Bootstrap_DiskIO_Start:
@@ -805,10 +785,7 @@ Bootstrap_DiskIO_Start:
 
        .ppudo_ensure $PPU_LoadDiskFile,$ParamsStruct
         RETURN
-# Bootstrap_ReadFromDisk_Start #---------------------------------------------}}}
-ParamsAddr: .byte 0, 0, 0, 0xFF # init sequence (just in case)
-            .word ParamsStruct
-            .byte 0xFF, 0xFF    # two termination bytes 0xff, 0xff
+# Bootstrap_ReadFromDisk_Start #------------------------------------------------
 ParamsStruct:
     PS.Status:          .byte -1  # operation status code
     PS.Command:         .byte 010 # read data from disk
@@ -817,7 +794,11 @@ ParamsStruct:
     PS.AddressOnDevice: .byte 0, 1     # track 0(0-79), sector 1(1-10)
     PS.CPU_RAM_Address: .word 0
     PS.WordsCount:      .word 0        # number of words to transfer
-Bootstrap_DiskIO_WaitForFinish: #--------------------------------------{{{
+Bootstrap_DiskIO_WaitForFinish: #--------------------------------------------{{{
+        CLC
+        MOVB @$PS.Status,R0
+        BMI  Bootstrap_DiskIO_WaitForFinish
+        BZE  1237$
       # +------------------------------------------------------+
       # | Код ответа |  Значение                               |
       # +------------+-----------------------------------------+
@@ -838,14 +819,10 @@ Bootstrap_DiskIO_WaitForFinish: #--------------------------------------{{{
       # |     13     | Неверный формат сектора                 |
       # |     14     | Не найден индекс (ошибка линии ИНДЕКС)  |
       # +------------------------------------------------------+
-        CLC
-        MOVB @$PS.Status,R0
-        BMI  Bootstrap_DiskIO_WaitForFinish
-        BZE  1237$
-
         SEC  # set carry flag to indicate that there was an error
+
 1237$:  RETURN
-# Bootstrap_DiskIO_WaitForFinish #-------------------------------------}}}
+# Bootstrap_DiskIO_WaitForFinish #-------------------------------------------}}}
 
 # files related data --------------------------------------------------------{{{
 # each record is 3 words:
@@ -1073,7 +1050,7 @@ BulletConfigHell: #----------------------------------------------------------{{{
 BulletConfigHell_End:
 #----------------------------------------------------------------------------}}}
 
-BlackPalette: #------------------------------------------------------{{{
+BlackPalette: #--------------------------------------------------------------{{{
     .byte 1, setOffscreenColors
     .word    BLACK | BLUE  << 4 | BLACK << 8 | BLACK << 12
     .word    BLACK | BLACK << 4 | BLACK << 8 | BLACK << 12
