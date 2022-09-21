@@ -39,7 +39,7 @@ PlayerCounter:
 
         BNZ  Player1NotDead
       # player 1 is dead if for some reason we got here
-        RETURN
+1237$:  RETURN
 
 Player1NotDead:
         MOV  $INC_R0_OPCODE,@$PlayerCounter
@@ -661,17 +661,10 @@ Player_DrawUI:
         TSTB 9(R4) # see how many lives are left
         BNZ  1237$
 
-        TSTB 5(R4) # see how many credits are left
-        BZE  Player_GameOver
-
         MOV  $0x8001,R5 # Continue Screen
         CALL @$ExecuteBootstrap
 
 1237$:  RETURN
-
-Player_GameOver:
-        MOV  $0x8001,R5 # Game Over Screen
-        JMP  @$ExecuteBootstrap
 
       # CHEAT MODE!
       # Sssh, we set cheats here - as some levels steal our powerups,

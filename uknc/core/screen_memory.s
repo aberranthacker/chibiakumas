@@ -22,9 +22,12 @@ ScreenBuffer_Reset:
         BIS  R0,@$StarArray_ActiveScreenBit14
         BIS  R0,@$ShowSprite_ActiveScreenBit14
         MOV  $FB1,@$ScreenBuffer_ActiveScreen
-        CALL CLS
 
         MOV  $PPU_SET_FB1_VISIBLE,@$CCH1OD
+      # frame buffer switching triggers ShowBossText
+      # we wait before CLS because PPU may stil be drawing the BossText
+        WAIT
+        CALL CLS
         RETURN
 
 ScreenBuffer_Flip:
