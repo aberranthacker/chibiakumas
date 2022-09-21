@@ -10,7 +10,10 @@ FILES = [
   'build/level_00.bin',
   'build/level_01.bin',
   'build/level_02.bin',
-  'build/level_03.bin'
+  'build/level_03_title.bin',
+  'build/level_03.bin',
+  'build/level_05_title.bin',
+  'build/level_07_title.bin',
 ]
 
 FILLER = '#'.ord

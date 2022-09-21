@@ -156,10 +156,12 @@ MainMenuSelection: #---------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 
 Introduction: #--------------------------------------------------------------{{{
+       .ppudo_ensure $PPU_MusicStop
         MOV  $0,R5
         CALL ExecuteBootstrap
 #----------------------------------------------------------------------------}}}
 StartGame_1UP: #-------------------------------------------------------------{{{
+       .ppudo_ensure $PPU_MusicStop
         CALL Fader
 
        .ppudo $PPU_SetPalette,$Level01_TitlePalette
@@ -429,6 +431,7 @@ MenuPalette: #---------------------------------------------------------------{{{
     .word endOfScreen
 #----------------------------------------------------------------------------}}}
 Level01_TitlePalette: #------------------------------------------------------{{{
+    .word   0, cursorGraphic, scale320 | RGb
     .byte   1, setColors, Black, Magenta, brCyan,    White
     .byte  96, setColors, Black, Magenta, Gray, White
     .byte 104, setColors, Black, Magenta, brMagenta, White
