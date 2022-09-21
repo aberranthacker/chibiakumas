@@ -1415,17 +1415,25 @@ build/level_03.0.o : level_03.0.s \
 	             build/level_03/gnat_pack.0.bin \
 	             build/level_03/gnat_pack_mask.0.bin \
 	             build/level_03/grass_tuft_a.0.bin \
+	             build/level_03/grass_tuft_a_mask.0.bin \
 	             build/level_03/grass_tuft_b.0.bin \
+	             build/level_03/grass_tuft_b_mask.0.bin \
 	             build/level_03/grass_tuft_big.0.bin \
 	             build/level_03/grass_tuft_big_mask.0.bin \
 	             build/level_03/grass_tuft_c.0.bin \
+	             build/level_03/grass_tuft_c_mask.0.bin \
 	             build/level_03/grass_tuft_d.0.bin \
+	             build/level_03/grass_tuft_d_mask.0.bin \
 	             build/level_03/kamisagi.0.bin \
 	             build/level_03/kamisagi_mask.0.bin \
 	             build/level_03/mukade_bachi_1.0.bin \
+	             build/level_03/mukade_bachi_1_mask.0.bin \
 	             build/level_03/mukade_bachi_2.0.bin \
+	             build/level_03/mukade_bachi_2_mask.0.bin \
 	             build/level_03/mukade_bachi_3.0.bin \
+	             build/level_03/mukade_bachi_3_mask.0.bin \
 	             build/level_03/mukade_bachi_5.0.bin \
+	             build/level_03/mukade_bachi_5_mask.0.bin \
 	             build/level_03/powerup_drone.0.bin \
 	             build/level_03/powerup_drone_mask.0.bin \
 	             build/level_03/powerup_power.0.bin \
@@ -1473,10 +1481,20 @@ build/level_03/grass_tuft_a.0.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_a.0.bmp \
 	                          build/level_03/grass_tuft_a.0.bin
 
+build/level_03/grass_tuft_a_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_03/grass_tuft_a_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/grass_tuft_a_mask.0.bmp \
+	                               build/level_03/grass_tuft_a_mask.0.bin
+
 build/level_03/grass_tuft_b.0.bin : build_tools/bmp_to_raw.rb \
                                     resources/level_03/grass_tuft_b.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_b.0.bmp \
 	                          build/level_03/grass_tuft_b.0.bin
+
+build/level_03/grass_tuft_b_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_03/grass_tuft_b_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/grass_tuft_b_mask.0.bmp \
+	                               build/level_03/grass_tuft_b_mask.0.bin
 
 build/level_03/grass_tuft_big.0.bin : build_tools/bmp_to_raw.rb \
                                       resources/level_03/grass_tuft_big.0.bmp
@@ -1493,10 +1511,20 @@ build/level_03/grass_tuft_c.0.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_c.0.bmp \
 	                          build/level_03/grass_tuft_c.0.bin
 
+build/level_03/grass_tuft_c_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_03/grass_tuft_c_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/grass_tuft_c_mask.0.bmp \
+	                               build/level_03/grass_tuft_c_mask.0.bin
+
 build/level_03/grass_tuft_d.0.bin : build_tools/bmp_to_raw.rb \
                                     resources/level_03/grass_tuft_d.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_d.0.bmp \
 	                          build/level_03/grass_tuft_d.0.bin
+
+build/level_03/grass_tuft_d_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_03/grass_tuft_d_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/grass_tuft_d_mask.0.bmp \
+	                               build/level_03/grass_tuft_d_mask.0.bin
 
 build/level_03/kamisagi.0.bin : build_tools/bmp_to_raw.rb \
                                 resources/level_03/kamisagi.0.bmp
@@ -1513,20 +1541,40 @@ build/level_03/mukade_bachi_1.0.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/level_03/mukade_bachi_1.0.bmp \
 	                          build/level_03/mukade_bachi_1.0.bin
 
+build/level_03/mukade_bachi_1_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_03/mukade_bachi_1_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/mukade_bachi_1_mask.0.bmp \
+	                               build/level_03/mukade_bachi_1_mask.0.bin
+
 build/level_03/mukade_bachi_2.0.bin : build_tools/bmp_to_raw.rb \
                                       resources/level_03/mukade_bachi_2.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/mukade_bachi_2.0.bmp \
 	                          build/level_03/mukade_bachi_2.0.bin
+
+build/level_03/mukade_bachi_2_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_03/mukade_bachi_2_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/mukade_bachi_2_mask.0.bmp \
+	                               build/level_03/mukade_bachi_2_mask.0.bin
 
 build/level_03/mukade_bachi_3.0.bin : build_tools/bmp_to_raw.rb \
                                       resources/level_03/mukade_bachi_3.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/mukade_bachi_3.0.bmp \
 	                          build/level_03/mukade_bachi_3.0.bin
 
+build/level_03/mukade_bachi_3_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_03/mukade_bachi_3_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/mukade_bachi_3_mask.0.bmp \
+	                               build/level_03/mukade_bachi_3_mask.0.bin
+
 build/level_03/mukade_bachi_5.0.bin : build_tools/bmp_to_raw.rb \
                                       resources/level_03/mukade_bachi_5.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/mukade_bachi_5.0.bmp \
 	                          build/level_03/mukade_bachi_5.0.bin
+
+build/level_03/mukade_bachi_5_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_03/mukade_bachi_5_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/mukade_bachi_5_mask.0.bmp \
+	                               build/level_03/mukade_bachi_5_mask.0.bin
 
 build/level_03/powerup_drone.0.bin : build_tools/bmp_to_raw.rb \
                                      resources/level_03/powerup_drone.0.bmp
@@ -1593,17 +1641,25 @@ build/level_03.1.o : level_03.1.s \
 	             build/level_03/gnat_pack.1.bin \
 	             build/level_03/gnat_pack_mask.1.bin \
 	             build/level_03/grass_tuft_a.1.bin \
+	             build/level_03/grass_tuft_a_mask.1.bin \
 	             build/level_03/grass_tuft_b.1.bin \
+	             build/level_03/grass_tuft_b_mask.1.bin \
 	             build/level_03/grass_tuft_big.1.bin \
 	             build/level_03/grass_tuft_big_mask.1.bin \
 	             build/level_03/grass_tuft_c.1.bin \
+	             build/level_03/grass_tuft_c_mask.1.bin \
 	             build/level_03/grass_tuft_d.1.bin \
+	             build/level_03/grass_tuft_d_mask.1.bin \
 	             build/level_03/kamisagi.1.bin \
 	             build/level_03/kamisagi_mask.1.bin \
 	             build/level_03/mukade_bachi_1.1.bin \
+	             build/level_03/mukade_bachi_1_mask.1.bin \
 	             build/level_03/mukade_bachi_2.1.bin \
+	             build/level_03/mukade_bachi_2_mask.1.bin \
 	             build/level_03/mukade_bachi_3.1.bin \
+	             build/level_03/mukade_bachi_3_mask.1.bin \
 	             build/level_03/mukade_bachi_5.1.bin \
+	             build/level_03/mukade_bachi_5_mask.1.bin \
 	             build/level_03/powerup_drone.1.bin \
 	             build/level_03/powerup_drone_mask.1.bin \
 	             build/level_03/powerup_power.1.bin \
@@ -1651,10 +1707,20 @@ build/level_03/grass_tuft_a.1.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_a.1.bmp \
 	                          build/level_03/grass_tuft_a.1.bin
 
+build/level_03/grass_tuft_a_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_03/grass_tuft_a_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/grass_tuft_a_mask.1.bmp \
+	                               build/level_03/grass_tuft_a_mask.1.bin
+
 build/level_03/grass_tuft_b.1.bin : build_tools/bmp_to_raw.rb \
                                     resources/level_03/grass_tuft_b.1.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_b.1.bmp \
 	                          build/level_03/grass_tuft_b.1.bin
+
+build/level_03/grass_tuft_b_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_03/grass_tuft_b_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/grass_tuft_b_mask.1.bmp \
+	                               build/level_03/grass_tuft_b_mask.1.bin
 
 build/level_03/grass_tuft_big.1.bin : build_tools/bmp_to_raw.rb \
                                       resources/level_03/grass_tuft_big.1.bmp
@@ -1671,10 +1737,20 @@ build/level_03/grass_tuft_c.1.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_c.1.bmp \
 	                          build/level_03/grass_tuft_c.1.bin
 
+build/level_03/grass_tuft_c_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_03/grass_tuft_c_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/grass_tuft_c_mask.1.bmp \
+	                               build/level_03/grass_tuft_c_mask.1.bin
+
 build/level_03/grass_tuft_d.1.bin : build_tools/bmp_to_raw.rb \
                                     resources/level_03/grass_tuft_d.1.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/grass_tuft_d.1.bmp \
 	                          build/level_03/grass_tuft_d.1.bin
+
+build/level_03/grass_tuft_d_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_03/grass_tuft_d_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/grass_tuft_d_mask.1.bmp \
+	                               build/level_03/grass_tuft_d_mask.1.bin
 
 build/level_03/kamisagi.1.bin : build_tools/bmp_to_raw.rb \
                                 resources/level_03/kamisagi.1.bmp
@@ -1691,20 +1767,40 @@ build/level_03/mukade_bachi_1.1.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/level_03/mukade_bachi_1.1.bmp \
 	                          build/level_03/mukade_bachi_1.1.bin
 
+build/level_03/mukade_bachi_1_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_03/mukade_bachi_1_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/mukade_bachi_1_mask.1.bmp \
+	                               build/level_03/mukade_bachi_1_mask.1.bin
+
 build/level_03/mukade_bachi_2.1.bin : build_tools/bmp_to_raw.rb \
                                       resources/level_03/mukade_bachi_2.1.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/mukade_bachi_2.1.bmp \
 	                          build/level_03/mukade_bachi_2.1.bin
+
+build/level_03/mukade_bachi_2_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_03/mukade_bachi_2_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/mukade_bachi_2_mask.1.bmp \
+	                               build/level_03/mukade_bachi_2_mask.1.bin
 
 build/level_03/mukade_bachi_3.1.bin : build_tools/bmp_to_raw.rb \
                                       resources/level_03/mukade_bachi_3.1.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/mukade_bachi_3.1.bmp \
 	                          build/level_03/mukade_bachi_3.1.bin
 
+build/level_03/mukade_bachi_3_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_03/mukade_bachi_3_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/mukade_bachi_3_mask.1.bmp \
+	                               build/level_03/mukade_bachi_3_mask.1.bin
+
 build/level_03/mukade_bachi_5.1.bin : build_tools/bmp_to_raw.rb \
                                       resources/level_03/mukade_bachi_5.1.bmp
 	build_tools/bmp_to_raw.rb resources/level_03/mukade_bachi_5.1.bmp \
 	                          build/level_03/mukade_bachi_5.1.bin
+
+build/level_03/mukade_bachi_5_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_03/mukade_bachi_5_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_03/mukade_bachi_5_mask.1.bmp \
+	                               build/level_03/mukade_bachi_5_mask.1.bin
 
 build/level_03/powerup_drone.1.bin : build_tools/bmp_to_raw.rb \
                                      resources/level_03/powerup_drone.1.bmp
