@@ -168,6 +168,7 @@ StartIntroProper:
     .word 768+64, evtCallAddress, EndLevel
 
 EndLevel:
+       .ppudo_ensure $PPU_MusicStop
         MOV  $0x8000,R5
         JMP  @$ExecuteBootstrap
 

@@ -1,4 +1,4 @@
-                .list
+                .nolist
 
                 .TITLE BootstrapChibi Akumas loader
 
@@ -19,7 +19,10 @@
                 .global level_00.bin
                 .global level_01.bin
                 .global level_02.bin
+                .global level_03_title.bin
                 .global level_03.bin
+                .global level_05_title.bin
+                .global level_07_title.bin
 
                 .include "./hwdefs.s"
                 .include "./macros.s"
@@ -32,6 +35,7 @@
                 .=BootstrapStart
 start:
         MTPS $PR0 # enable interrupts
+
 .if StartOnLevel == MainMenu
         CALL Bootstrap_LoadLevel_0
 .endif
@@ -155,7 +159,7 @@ Bootstrap_Level_1: # --------------------------------------------------------
         CALL Bootstrap_ReadFromDisk_Start
             CALL StartANewGame
             CALL LevelReset0000
-            MOVB $1,@$Player_Array + 9 # set number of lives for the first player
+            MOVB $3,@$Player_Array + 9 # set number of lives for the first player
         CALL Bootstrap_DiskIO_WaitForFinish
        .check_for_loading_error "level_01.bin"
 
@@ -179,17 +183,50 @@ Bootstrap_Level_2: # --------------------------------------------------------
         JMP  @$Bootstrap_StartLevel
 #----------------------------------------------------------------------------
 Bootstrap_Level_3: # --------------------------------------------------------
+        MOV  $level_03_title.bin,R0
+        CALL Bootstrap_ReadFromDisk_Start
+       .if StartOnLevel != MainMenu
+            CALL CLS
+       .endif
+        CALL Bootstrap_DiskIO_WaitForFinish
+       .check_for_loading_error "level_03_title.bin"
+
+        MOV  $level_03_title.bin.lzsa1,R1
+        MOV  $FB1+8000,R2
+        CALL @$unlzsa1
+
+       .ppudo_ensure $PPU_SetPalette,$Level03_TitlePalette
+        CALL Bootstrap_DisplayUnpackedTitleImage
+       .ppudo_ensure $PPU_PrintAt,$Level03_TitleText
+
         MOV  $level_03.bin,R0
         CALL Bootstrap_ReadFromDisk_Start
-           .ppudo_ensure $PPU_LevelStart
-           .ppudo_ensure $PPU_SetPalette, $BlackPalette
             CALL LevelReset0000
         CALL Bootstrap_DiskIO_WaitForFinish
        .check_for_loading_error "level_03.bin"
 
+        CALL Bootstrap_WaitForFireKey
+
+       .ppudo_ensure $PPU_SetPalette, $BlackPalette
+        WAIT
+       .ppudo_ensure $PPU_LevelStart
+
         JMP  @$Bootstrap_StartLevel
 #----------------------------------------------------------------------------
-Continue_SpendCredit:
+Bootstrap_DisplayUnpackedTitleImage:
+        MOV  $FB1+8000,R1
+        MOV  $FB1+(12*2),R2
+        MOV  $96,R3
+        96$:
+           .rept 16
+            MOV  (R1),(R2)+
+            CLR  (R1)+
+           .endr
+        ADD  $24*2,R2
+        SOB  R3,96$
+        RETURN
+#----------------------------------------------------------------------------
+Bootstrap_Continue_SpendCredit:
         DECB 5(R4)    # continues
         MOVB $3,3(R4) # smartbombs
         MOVB $7,7(R4) # invincibility for 7 ticks
@@ -236,7 +273,7 @@ Bootstrap_Continue: # ../Aku/BootStrap.asm:1324
             MOV  $50,R1
             Continue_WaitASecondLoop:
                 BITB @$KeyboardScanner_P1,$KEYMAP_ANY_FIRE
-                BNZ  Continue_SpendCredit
+                BNZ  Bootstrap_Continue_SpendCredit
                 WAIT
             SOB  R1,Continue_WaitASecondLoop
         DEC  R0
@@ -650,7 +687,7 @@ ResetCore: # ../Aku/BootStrap.asm:2318
 
         RETURN
 # LevelReset0000 end --------------------------------------------------------}}}
-#----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 NumberToDecStr:
       # R1 number
       # R2 destination string ponter
@@ -664,7 +701,7 @@ NumberToDecStr:
             MOV  R0,R1
         SOB  R3,10$
         RETURN
-#----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 ClearOffscreenBP12:
         MOV  $88*40>>2,R0
         MOV  $CBP12D,R1
@@ -677,14 +714,14 @@ ClearOffscreenBP12:
            .endr
         SOB  R0,200$
         RETURN
-#----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 Bootstrap_WaitForFireKey_NoMessage:
         BIC  $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
 
         BITB $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
         BZE  .-6
         RETURN
-#----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 Bootstrap_WaitForFireKey: # Bootstrap_WFK -----------------------------------{{{
        .ppudo $PPU_DebugPrintAt,$HitAFireKeyStr
@@ -754,7 +791,7 @@ ClearR1Words:
             CLR  (R3)+
         SOB  R1, 100$
         RETURN
-#----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 Bootstrap_WriteToDisk_Start: #--------------------------------------------------
         MOVB $020,@$PS.Command # write to disk
@@ -854,7 +891,19 @@ level_02.bin:
     .word Akuyou_LevelStart
     .word 0
     .word 0
+level_03_title.bin:
+    .word Akuyou_LevelStart
+    .word 0
+    .word 0
 level_03.bin:
+    .word Akuyou_LevelStart
+    .word 0
+    .word 0
+level_05_title.bin:
+    .word Akuyou_LevelStart
+    .word 0
+    .word 0
+level_07_title.bin:
     .word Akuyou_LevelStart
     .word 0
     .word 0

@@ -278,6 +278,7 @@ LevelEndAnim:
 
 EndLevel:
        .ppudo_ensure $PPU_LevelEnd
+       .ppudo_ensure $PPU_MusicStop
         MOV  $3,R5
         JMP  ExecuteBootstrap # Start the game, no return
 

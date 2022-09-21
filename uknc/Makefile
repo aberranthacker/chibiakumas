@@ -40,7 +40,10 @@ build/chibiakumas.dsk : build_tools/build_dsk.rb \
 			build/level_00.bin \
 			build/level_01.bin \
 			build/level_02.bin \
+			build/level_03_title.bin \
 			build/level_03.bin \
+			build/level_05_title.bin \
+			build/level_07_title.bin \
 			build/saved_settings.bin
 	build_tools/update_bootstrap_disk_map.rb
 	build_tools/update_bootsector_disk_map.rb
@@ -65,10 +68,16 @@ build/bootsector.o : $(common) \
 # bootsrap.bin --------------------------------------------------------------{{{
 build/bootstrap.bin : build/bootstrap.o \
                       build/core.o \
-                      build/saved_settings.o
+                      build/saved_settings.o \
+                      build/level_03_title.o \
+                      build/level_05_title.o \
+                      build/level_07_title.o
 	$(LD) $(LDFLAGS) -M build/bootstrap.o \
 	      -R build/core.o \
 	      -R build/saved_settings.o \
+              -R build/level_03_title.o \
+              -R build/level_05_title.o \
+              -R build/level_07_title.o \
 	      -o build/bootstrap.out > build/bootstrap.map.txt
 	ruby build_tools/aout2sav.rb build/bootstrap.out -b -s -o build/bootstrap.bin
 
@@ -1336,6 +1345,42 @@ build/level_02/hand_right.1.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/level_02/hand_right.1.bmp \
 		                  build/level_02/hand_right.1.bin
 # level_02.1.spr ------------------------------------------------------------}}}
+
+# level_03_title.bin --------------------------------------------------------{{{
+build/level_03_title.bin : build/core.o \
+                           build/level_03_title.o
+	$(LD) $(LDFLAGS) build/level_03_title.o -R build/core.o -o build/level_03_title.out
+	ruby build_tools/aout2sav.rb build/level_03_title.out -b -s -o build/level_03_title.bin
+
+build/level_03_title.o : $(common) \
+                         level_03_title.s \
+                         build/level_03_title.bin.lzsa1
+	$(AS) level_03_title.s -o build/level_03_title.o
+# level_03_title.bin --------------------------------------------------------}}}
+
+# level_05_title.bin --------------------------------------------------------{{{
+build/level_05_title.bin : build/core.o \
+                           build/level_05_title.o
+	$(LD) $(LDFLAGS) build/level_05_title.o -R build/core.o -o build/level_05_title.out
+	ruby build_tools/aout2sav.rb build/level_05_title.out -b -s -o build/level_05_title.bin
+
+build/level_05_title.o : $(common) \
+                         level_05_title.s \
+                         build/level_05_title.bin.lzsa1
+	$(AS) level_05_title.s -o build/level_05_title.o
+# level_05_title.bin --------------------------------------------------------}}}
+
+# level_07_title.bin --------------------------------------------------------{{{
+build/level_07_title.bin : build/core.o \
+                           build/level_07_title.o
+	$(LD) $(LDFLAGS) build/level_07_title.o -R build/core.o -o build/level_07_title.out
+	ruby build_tools/aout2sav.rb build/level_07_title.out -b -s -o build/level_07_title.bin
+
+build/level_07_title.o : $(common) \
+                         level_07_title.s \
+                         build/level_07_title.bin.lzsa1
+	$(AS) level_07_title.s -o build/level_07_title.o
+# level_07_title.bin --------------------------------------------------------}}}
 
 # level_03.bin --------------------------------------------------------------{{{
 build/level_03.bin : build/core.o \

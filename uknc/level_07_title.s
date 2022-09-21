@@ -1,3 +1,25 @@
+               .nolist
+
+               .include "./core_defs.s"
+
+               .global start # make entry point available to a linker
+               .global Level07_TitlePalette
+               .global level_07_title.bin.lzsa1
+               .global Level7_TitleText
+               .equiv  Level07TitleSizeWords, (end - start) >> 1
+               .global Level07TitleSizeWords
+
+               .=Akuyou_LevelStart
+
+start:
+
+Level07_TitlePalette:
+    .word   0, cursorGraphic, scale320 | RGb
+    .byte   1, setColors, Black, brMagenta, White, brGreen
+    .byte  96, setColors, Black, Magenta, Gray, White
+    .byte 104, setColors, Black, Magenta, brMagenta, White
+    .word endOfScreen
+
 level_07_title.bin.lzsa1:
     .incbin "build/level_07_title.bin.lzsa1"
                          #0---------1---------2---------3---------
@@ -14,3 +36,4 @@ Level7_TitleText:        #0123456789012345678901234567890123456789
     .byte  0, 21; .ascii       "Victory is in your grasp! "         ; .byte 0xFF
     .byte  0, 22; .ascii "Go in there, and 'Sort this shit out!'"   ; .byte 0x00
     .even
+end:
