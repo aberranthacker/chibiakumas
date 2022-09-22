@@ -239,6 +239,7 @@ Bootstrap_Continue_SpendCredit:
         RETURN
 
 Bootstrap_Continue: # ../Aku/BootStrap.asm:1324
+       .ppudo_ensure $PPU_LevelEnd
        .ppudo_ensure $PPU_SetPalette,$ContinuePalette
         MOV  $Player_Array,R4
         TSTB 5(R4)
