@@ -85,7 +85,7 @@
     .word MukadeBachi1 # sprite offset
     .word MukadeBachi1Mask # bit-mask offset
     .byte 14 # height of the sprite
-    .byte 0 # Y offset
+    .byte 10 # Y offset
     .byte 6 # witdh
     .byte SPR_HAS_MASK # attributes
 
@@ -101,7 +101,7 @@
     .word MukadeBachi3 # sprite offset
     .word MukadeBachi3Mask # bit-mask offset
     .byte 12 # height of the sprite
-    .byte 0 # Y offset
+    .byte 12 # Y offset
     .byte 6 # witdh
     .byte SPR_HAS_MASK # attributes
 
@@ -109,33 +109,33 @@
     .word MukadeBachi5 # sprite offset
     .word MukadeBachi5Mask # bit-mask offset
     .byte 13 # height of the sprite
-    .byte 0 # Y offset
+    .byte 11 # Y offset
     .byte 6 # witdh
     .byte SPR_HAS_MASK # attributes
 
    # sprite 14 PowerupDrone
     .word PowerupDrone # sprite offset
-    .word PowerupDroneMask # bit-mask offset
+    .word PowerupMask # bit-mask offset
     .byte 21 # height of the sprite
-    .byte 0 # Y offset
+    .byte 3 # Y offset
     .byte 6 # witdh
     .byte SPR_HAS_MASK # attributes
 
    # sprite 15 PowerupPower
     .word PowerupPower # sprite offset
-    .word 0 # bit-mask offset
+    .word PowerupMask # bit-mask offset
     .byte 21 # height of the sprite
-    .byte 0 # Y offset
+    .byte 3 # Y offset
     .byte 6 # witdh
-    .byte SPR_PSET # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 16 PowerupRate
     .word PowerupRate # sprite offset
-    .word 0 # bit-mask offset
+    .word PowerupMask # bit-mask offset
     .byte 21 # height of the sprite
-    .byte 0 # Y offset
+    .byte 3 # Y offset
     .byte 6 # witdh
-    .byte SPR_PSET # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 17 ShroomBomber
     .word ShroomBomber # sprite offset
@@ -228,14 +228,12 @@ MukadeBachi5Mask:
 
 PowerupDrone:
     .incbin "build/level_03/powerup_drone.1.bin"
-PowerupDroneMask:
-    .incbin "build/level_03/powerup_drone_mask.1.bin"
-
 PowerupPower:
     .incbin "build/level_03/powerup_power.1.bin"
-
 PowerupRate:
     .incbin "build/level_03/powerup_rate.1.bin"
+PowerupMask:
+    .incbin "build/level_03/powerup_drone_mask.1.bin"
 
 ShroomBomber:
     .incbin "build/level_03/shroom_bomber.1.bin"

@@ -3,6 +3,7 @@
 #******************************************************************************#
 Player_StarArray_Redraw:
        .equiv PlayerBulletColor, 0x0003
+
        .equiv PlayerStarColor0, .+2
         MOV  $PlayerBulletColor,   @$StarColor0
        .equiv PlayerStarColor1, .+2
