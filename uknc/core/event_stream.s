@@ -575,24 +575,29 @@ ObjectSettingsVectors:
        .word EventObjectAnimatorToAdd
        .word ObjectAddToForeBack
 
-                                        # ; --------------------------------------------------
-                                        # ;                 Reset Powerup
-                                        # ; --------------------------------------------------
-                                        # ResetPowerup: ; used by levelcode to take our bonuses
-                                        #     push iy
-                                        #         ld iy,Player_Array
-                                        #         call ResetPlayerPowerup
-                                        #         ld iy,Player_Array2
-                                        #         call ResetPlayerPowerup
-                                        #     pop iy
-                                        # ret
+# --------------------------------------------------
+#                 Reset Powerup
+# --------------------------------------------------
+Event_ResetPowerups: # used at the start of each level to take the users powerups
+#ResetPowerup: # used by levelcode to take our bonuses
+        PUSH R4                   # push iy
+        MOV  $Player_Array,R4     #     ld iy,Player_Array
+        CALL ResetPlayerPowerup   #     call ResetPlayerPowerup
+   .ifdef TwoPlayersGame
+        MOV  $Playr_Array2,R4     #     ld iy,Player_Array2
+        CALL ResetPlayerPowerup   #     call ResetPlayerPowerup
+   .endif
+        POP  R4                   # pop iy
+        RETURN                    # ret
 
-                                        # ResetPlayerPowerup:
-                                        #         ld (iy+4),0
-                                        #         ld a,&06
-                                        #         ld (PlayerStarColor_Plus1-1),a
-                                        #         xor a
-                                        #         ld (iy+14),a ; (PlayerShootPower_Plus1
-                                        #         ld a,%00000100
-                                        #         ld (iy+11),a ; ld (PlayerShootSpeed_Plus1-1),a
-                                        # ret
+ResetPlayerPowerup:
+                                                      # ld a,&06
+      # MOV  $PlayerBulletColor, @$PlayerStarColor0   # ld (PlayerStarColor_Plus1 -1),a
+      #.equiv PlayerBulletColor2, PlayerBulletColor << 2
+      # MOV  $PlayerBulletColor2,@$PlayerStarColor1
+        CLRB 4(R4)  # drones                          # ld (iy+4),0
+                                                      # ld a,%00000100
+        MOVB $0x04,11(R4) # PlayerShootSpeed          # ld (iy+11),a ; ld (PlayerShootSpeed_Plus1-1),a
+                                                      # xor a
+        CLRB 14(R4) # PlayerShootPower                # ld (iy+14),a ; (PlayerShootPower_Plus1
+        RETURN                                        # ret

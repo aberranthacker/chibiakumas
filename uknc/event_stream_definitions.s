@@ -56,6 +56,7 @@
 #                            ; used for boss sprites
 .equiv evtSaveObjPointer,   (0x1A * 2) << 8 # 52
 # evtResetPowerup    equ 139 ; Take away the player powerups... how mean!
+.equiv evtResetPowerup,     (0x1B * 2) << 8 # 52
 # evtSetLevelSpeed   equ 140 ; Change the speed of the object array to b1...
 #                            ; %00000100 is default.. .%00000010 is faster
 
@@ -82,34 +83,32 @@
                                         # evtReprogramShotToDeath equ %11110011 ; Define Custom destroy object event as call
                                         #                                       ; to w1, used for nuke satellite, and lasers
                                         #                                       ; in Ep2 Tech Noir level
-                                        # evtReprogramSmartBombed equ %11111100
-                                        #
-                                        # evtReprogramCustomPlayerHitter equ %11111011 ; Define Custom hit handler for players as call to w1 - used for steaks in Alchemy level of ep2
-                                        #
-                                        # evtReprogramCustomMove1 equ %11110100 ; Define Custom Move handler1 to call w1 each object move
+# evtReprogramCustomMove1 equ %11110100 ; Define Custom Move handler1 to call w1 each object move
 .equiv evtReprogramCustomMove1, (0x24 * 2) << 8 # 72
-                                        # evtReprogramCustomMove2 equ %11110101 ; Define Custom Move handler1 to call w2 each object move
-.equiv evtReprogramCustomMove2, (0x26 * 2) << 8 # 74
-                                        # evtReprogramCustomMove3 equ %11110111 ; Define Custom Move handler1 to call w3 each object move
-.equiv evtReprogramCustomMove3, (0x28 * 2) << 8 # 76
-                                        # evtReprogramCustomMove4 equ %11111000 ; Define Custom Move handler1 to call w4 each object move
-.equiv evtReprogramCustomMove4, (0x2A * 2) << 8 # 78
+# evtReprogramCustomMove2 equ %11110101 ; Define Custom Move handler1 to call w2 each object move
+.equiv evtReprogramCustomMove2, (0x25 * 2) << 8 # 74
+# evtReprogramCustomMove3 equ %11110111 ; Define Custom Move handler1 to call w3 each object move
+.equiv evtReprogramCustomMove3, (0x26 * 2) << 8 # 76
+# evtReprogramCustomMove4 equ %11111000 ; Define Custom Move handler1 to call w4 each object move
+.equiv evtReprogramCustomMove4, (0x27 * 2) << 8 # 78
+# evtReprogram_PowerupSprites equ %11110110 ; Define the sprite numbers of the
+#                                           ; power up objects and coin to b1,b2,b3,b4
+.equiv evtReprogram_PowerupSprites, (0x28 * 2) << 8 # 80
                                         #
                                         # evtReprogramCustomProg1 equ %11111001 ; Define Custom Programmer handler1 to call
                                         #                                       ; w1 each program tick (custom fire patterns)
                                         # evtReprogramCustomProg2 equ %11111010 ; Define Custom Programmer handler1 to call
                                         #                                       ; w2 each program tick (custom fire patterns)
+                                        # evtReprogramCustomPlayerHitter equ %11111011 ; Define Custom hit handler for players as call to w1 - used for steaks in Alchemy level of ep2
                                         #
-# evtReprogram_PowerupSprites equ %11110110 ; Define the sprite numbers of the
-#                                           ; power up objects and coin to b1,b2,b3,b4
-.equiv evtReprogram_PowerupSprites, (0x26 * 2) << 8 # 76
-                                                            #
-                                                            # evtReprogramObjectBurstPosition   equ %11111101 ; Set Burst Animation position to
-                                                            #                                                 ; (b1,b2)... used for nuke blasts in Ep2
-                                                            # evtReprogramObjectFullCustomMoves equ %11111110 ; All Move events call to w1
-                                                            #
-                                                            # evtReprogramSmartBombSpecial      equ %11111111   ;Smart bomb event calls to w1... used by omega array to wipe omega stars
-                                                            #
+                                        # evtReprogramSmartBombed equ %11111100
+                                        #
+                                        # evtReprogramObjectBurstPosition   equ %11111101 ; Set Burst Animation position to
+                                        #                                                 ; (b1,b2)... used for nuke blasts in Ep2
+                                        # evtReprogramObjectFullCustomMoves equ %11111110 ; All Move events call to w1
+                                        #
+                                        # evtReprogramSmartBombSpecial      equ %11111111   ;Smart bomb event calls to w1... used by omega array to wipe omega stars
+#-------------------------------------------------------------------------------
 # evtSingleSprite equ 0 ; Single sprite... multiple options depending on V
 #                       ; 0+0      add one object, sprite b1, at pos (b2,b3)
 #                       ; 0+1      add one sprite to pos b1 far right (sprite predefined)

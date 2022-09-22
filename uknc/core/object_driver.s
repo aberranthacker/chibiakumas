@@ -650,6 +650,14 @@ ObjectProgram_MovePlayerDone:
 
         RETURN
 
+# ObjectProgram_SpriteBankSwitch:        ; an object which uses sprite bank 2
+#       ld a,2                           ; this is to split one sprite into 2 non animated
+#                                        ; for basic background objects / enemies
+# ObjectProgram_SpriteBankSwitchCustomB: ; an object which uses sprite bank 2
+#       ld (ObjectSpriteBank_Plus1-1),a  ; second anim frame
+#
+#       ret
+
 ObjectProgram_FrameAnimate: # Used To animate spider legs in 1st boss
       # R3 LSB iyl = Program code, MSB = 0
         BIC  $0xFFF8,R3 # -----XXX
