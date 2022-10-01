@@ -54,36 +54,30 @@ EventStreamArray:
 #  ------------ (Far)           %11000100
 #  -----X---X-- (mid)           %11000010       Bank 1
 #  []=====[]=== (foreground)    %11000001       Bank 0
-   # Install a custom hit handler
-    .word 0, evtReprogramHitHandler, CustomObjectHitHandler
-   # Custom move code
-    .word 0, evtReprogramCustomMove1, CustomMove.YoYo
-   # Define powerup sprites
-    .word 0, evtReprogram_PowerupSprites 
-    .byte    sprTwoFrame | DUMMY_SPRITE
-    .byte    sprTwoFrame | DUMMY_SPRITE
-    .byte    sprTwoFrame | DUMMY_SPRITE
-    .byte    sprTwoFrame | COIN
+ # Install a custom hit handler
+  .word 0, evtReprogramHitHandler, CustomObjectHitHandler
+ # Custom move code
+  .word 0, evtReprogramCustomMove1, CustomMove.YoYo
+ # Define powerup sprites
+  .word 0, evtReprogram_PowerupSprites 
+  .byte    sprTwoFrame | DUMMY_SPRITE
+  .byte    sprTwoFrame | DUMMY_SPRITE
+  .byte    sprTwoFrame | DUMMY_SPRITE
+  .byte    sprTwoFrame | COIN
 
-    .word 0, evtMultipleCommands | 5
-    .word    evtSetProgMoveLife, prgBitShift, mveBackground | 0b0001, lifeImmortal
-    .word    evtSetObjectSize | 0             # 2
-    .word    evtSetAnimator | anmNone         # 3
-    .word    evtAddToBackground               # 4
-    .word    evtSaveObjSettings | 0           # 5
+  .word 0, evtMultipleCommands | 5
+  .word    evtSetProgMoveLife, prgBitShift, mveBackground | 0b0001, lifeImmortal
+  .word    evtSetObjectSize | 0             # 2
+  .word    evtSetAnimator | anmNone         # 3
+  .word    evtAddToBackground               # 4
+  .word    evtSaveObjSettings | 0           # 5
 
-    .word 0, evtMultipleCommands | 5
-    .word    evtSetProgMoveLife, prgBitShift, mveBackground | 0b0010, lifeImmortal
-    .word    evtSetObjectSize | 0             # 2
-    .word    evtSetAnimator | anmNone         # 3
-    .word    evtAddToBackground               # 4
-    .word    evtSaveObjSettings | 1           # 5
-# defb 0,evtMultipleCommands+5 ; 3 commands at the same timepoint
-# defb    evtSetProgMoveLife,prgFireMid2+17,&61,lifEnemy+3    ; Program - Fire Left... Move - wave 10101100 ... Hurt by bullets, hurts player, life 4
-# defb    evtSetSprite,TwoFrameSprite+17
-# defb evtSetObjectSize,24
-# defb evtAddToForeground
-# defb    evtSettingsBank_Save,2
+  .word 0, evtMultipleCommands | 5
+  .word    evtSetProgMoveLife, prgBitShift, mveBackground | 0b0010, lifeImmortal
+  .word    evtSetObjectSize | 0             # 2
+  .word    evtSetAnimator | anmNone         # 3
+  .word    evtAddToBackground               # 4
+  .word    evtSaveObjSettings | 1           # 5
  # Lambtron
   .word 0, evtMultipleCommands | 5
   .word    evtSetProgMoveLife
@@ -94,12 +88,6 @@ EventStreamArray:
   .word    evtSetObjectSize | 24
   .word    evtAddToForeground
   .word    evtSaveObjSettings | 2
-# defb 0,evtMultipleCommands+5 ; 3 commands at the same timepoint
-# defb    evtSetProgMoveLife,0,&7C,%11000000+6
-# defb    evtSetSprite,TwoFrameSprite+18
-# defb evtSetObjectSize,24
-# defb evtAddToForeground
-# defb    evtSettingsBank_Save,3
  # Shoe!
   .word 0, evtMultipleCommands | 5
   .word    evtSetProgMoveLife, prgNone, mvRegular | spdFast | 074, lifeEnemy | 6
@@ -107,12 +95,6 @@ EventStreamArray:
   .word    evtSetObjectSize | 24
   .word    evtAddToForeground
   .word    evtSaveObjSettings | 3
-# defb 0,evtMultipleCommands+5 ; 3 commands at the same timepoint
-# defb    evtSetProgMoveLife,0,mveSeaker,lifEnemy+6
-# defb evtSetObjectSize,24
-# defb evtAddToForeground
-# defb    evtSetSprite,TwoFrameSprite+19
-# defb    evtSettingsBank_Save,4
  # CHU!
   .word 0, evtMultipleCommands | 5
   .word    evtSetProgMoveLife, prgNone, mveSeaker, lifeEnemy | 6
@@ -120,12 +102,6 @@ EventStreamArray:
   .word    evtSetObjectSize | 24
   .word    evtAddToForeground
   .word    evtSaveObjSettings | 4
-# defb 0,evtMultipleCommands+5 ; 3 commands at the same timepoint
-# defb    evtSetProgMoveLife,0,mvestatic,lifTimed+3
-# defb evtSetObjectSize,24
-# defb evtAddToForeground
-# defb    evtSetSprite,TwoFrameSprite+20
-# defb    evtSettingsBank_Save,5
  # CHU! Text
   .word 0, evtMultipleCommands | 5
   .word    evtSetProgMoveLife, prgNone, mvStatic, lifeTimed | 3
@@ -145,24 +121,11 @@ EventStreamArray:
    #.word 3, evtChangeStreamTime, 100, EventStreamArray_DebugPoint
     #----------
 EventStreamArray_DebugPoint:
-# defb 10,%01110000+3         ; 2 commands at the same timepoint;
-# defb    128+4,prgSpecial,mveCustom1,%11000000+40 ; Program - Starburst ... Move - dir Left Slow ... Hurt by bullets, hurts player, life 4;
-# defb    0,21,160+27+6,64+24+24-24+8 ; Single Object sprite 11 (animated)
-# defb    138                 ; save Object pointer
-# defw        BossTarget          ; save Object pointer
  # hit target
   .word 10, evtMultipleCommands | 3
   .word     evtSetProgMoveLife, prgSpecial, mveCustom1, lifeEnemy | 40
   .word     evtSingleSprite, sprSingleFrame | DUMMY_SPRITE, (24+160+9)<<X | (24+64+24-24+8)<<Y
   .word     evtSaveObjPointer, BossTarget
-# defb 10,%01110000+6         ; 3 commands at the same timepoint
-# defb    evtAddToBackground
-# defb    %10010000+0+1       ; Load Settings from bank 1
-# defb    evtSetMove,mveCustom1
-# defb    129,0               ; Change to program Custom
-# defb    0,128+  0,160+24,64+24-24+8 ;   ; Single Object sprite 11 (animated)
-# defb    138                 ; save Object pointer
-# defw        BossObject1     ; save Object pointer
  # boss1
   .word 10, evtMultipleCommands | 6
   .word     evtAddToBackground
@@ -171,14 +134,6 @@ EventStreamArray_DebugPoint:
   .word     evtSetMove, mveCustom1
   .word     evtSingleSprite, sprTwoFrame | BOSS_ABOVE_75_A, (24+160)<<X | (24+64-24+8)<<Y
   .word     evtSaveObjPointer, BossObject1
-# defb 10+3,%01110000+6       ; 3 commands at the same timepoint
-# defb    evtAddToBackground
-# defb    %10010000+0+1       ; Load Settings from bank 1
-# defb    129,0               ; Change to program Custom
-# defb    evtSetMove,mveCustom1
-# defb    0,128+  1,160+24,64+24-24+8 ; Single Object sprite 11 (animated)
-# defb    138                 ; save Object pointer
-# defw        BossObject2     ; save Object pointer
  # Boss2
   .word 13, evtMultipleCommands | 6
   .word     evtAddToBackground
@@ -187,24 +142,11 @@ EventStreamArray_DebugPoint:
   .word     evtSetMove, mveCustom1
   .word     evtSingleSprite, sprTwoFrame | BOSS_ABOVE_75_B, (24+160)<<X | (24+64-24+8)<<Y
   .word     evtSaveObjPointer, BossObject2
-# defb 10+3,%01110000+3       ; 2 commands at the same timepoint;
-# defb    128+4,%01100000+13,mveCustom1,0 ; Program - Starburst ... Move - dir Left Slow ... Hurt by bullets, hurts player, life 4;
-# defb    0,21,160+27,64+24-24+8  ; Single Object sprite 11 (animated)
-# defb    138                 ; save Object pointer
-# defw        FireTarget1     ; save Object pointer
  # Fire target 1
   .word 13, evtMultipleCommands | 3
   .word     evtSetProgMoveLife, prgFireSlow | fireBurst, mveCustom1, lifeImmortal
   .word     evtSingleSprite, sprSingleFrame | DUMMY_SPRITE, (24+160+3)<<X | (24+64-24+8)<<Y
   .word     evtSaveObjPointer, FireTarget1
-# defb 10+6,%01110000+6       ; 3 commands at the same timepoint
-# defb    evtAddToBackground
-# defb    %10010000+0+1       ; Load Settings from bank 1
-# defb    129,0               ; Change to program Custom
-# defb    evtSetMove,mveCustom1
-# defb    0,128+  2,160+24,64+24-24+8 ; Single Object sprite 11 (animated)
-# defb    138                 ; save Object pointer
-# defw        BossObject3     ; save Object pointer
  # Boss3
   .word 16, evtMultipleCommands | 6
   .word     evtAddToBackground
@@ -213,9 +155,6 @@ EventStreamArray_DebugPoint:
   .word     evtSetMove, mveCustom1
   .word     evtSingleSprite, sprTwoFrame | BOSS_ABOVE_75_C, (24+160)<<X | (24+64-24+8)<<Y
   .word     evtSaveObjPointer, BossObject3
-# defb 26,%01110000+2         ; 3 commands at the same timepoint
-# defb evtSetProgMoveLife,0,&24,3
-# defb    0,128+  15,120+24,170+24 ; Single Object sprite 11 (animated)
  # akanbee
   .word 26, evtMultipleCommands | 2
   .word     evtSetProgMoveLife, prgNone, mvStatic, lifeTimed | 3
@@ -248,7 +187,6 @@ AttackLoop:
   .word     evtSingleSprite, sprSingleFrame | SHOE, (24+12* 9)<<X | (24)<<Y
   .word     evtSingleSprite, sprSingleFrame | SHOE, (24+12*11)<<X | (24)<<Y
   .word     evtSingleSprite, sprSingleFrame | SHOE, (24+12*13)<<X | (24)<<Y
-
  # Lambtron
   .word 50, evtMultipleCommands | 2
   .word     evtLoadObjSettings | 2
@@ -296,20 +234,18 @@ ChuAttack:
   .word 25,evtAddToBackground
 
   .word 25, evtChangeStreamTime
-            EndChuTime: .word 20
-            EndChuPointer: .word AttackLoop
+              EndChuTime: .word 20
+              EndChuPointer: .word AttackLoop
 
 LevelEndAnim:
-    .word 253, evtMultipleCommands | 2
+    .word 253, evtMultipleCommands | 3
+    .word      evtCallAddress, Player_Handler_DoSmartBomb
     .word      evtSetProgMoveLife, prgMovePlayer, mvStatic, 10
-    .word      evtSingleSprite, sprTwoFrame | DUMMY_SPRITE, (24+136)<<X | (24+100)<<Y
-
-    .word 255+30, evtCallAddress, Player_Handler_DoSmartBomb
+    .word      evtSingleSprite, sprTwoFrame | DUMMY_SPRITE, (24+140)<<X | (24+100)<<Y
 # Start of fade out block ------------------------------------------------------
     .equiv FadeOutStartPoint, 253
     .word FadeOutStartPoint + 1, evtSetPalette, DarkRealPalette
     .word FadeOutStartPoint + 2, evtSetPalette, BluePalette
-
     .word FadeOutStartPoint + 3, evtCallAddress, EndLevel
 #----------------------------------------------------------------------------}}}
 EndLevel:
@@ -627,30 +563,30 @@ CustomMove.YoYo:
         MOV  @$Timer_TicksOccured,R0
         BZE  1237$ # Only run every two ticks on v9990
 
-        BITB $0b0100,@$Timer_CurrentTick
+        BIT  $0b0100,R0
         BZE  CustomMove.YoYo.NoTick
       
        .equiv CustomMove.YoYo.Timer_CurrentTick, .+2
-        CMPB $0,R0
+        CMP  $0,@$Timer_CurrentTick
         BZE  CustomMove.YoYo.NoTick
 
-        MOVB R0,@$CustomMove.YoYo.Timer_CurrentTick
-        INCB @$CustomMove.YoYo.Counter
+        MOV  @$Timer_CurrentTick,@$CustomMove.YoYo.Timer_CurrentTick
+        INC  @$CustomMove.YoYo.Counter
 CustomMove.YoYo.NoTick:
        .equiv CustomMove.YoYo.Counter, .+2
-        MOVB $0,R0
-        CMPB R0,$12
+        MOV  $0,R0
+        CMP  R0,$12
         BHIS CustomMove.YoYo.AttackRetreat
 
         DEC  R4 # X coordinate
 1237$:  RETURN
 
 CustomMove.YoYo.AttackRetreat:
-        CMPB R0,$32
+        CMP  R0,$32
         BLO  CustomMove.YoYo.NoAttack
-        CMPB R0,$32+16
+        CMP  R0,$32+16
         BHIS CustomMove.YoYo.NoAttack
-        CMPB R0,$32+8
+        CMP  R0,$32+8
         BHIS CustomMove.YoYo.Retreat
         SUB  $4,R4
         BR   CustomMove.YoYo.NoAttack
@@ -658,13 +594,13 @@ CustomMove.YoYo.AttackRetreat:
 CustomMove.YoYo.Retreat:
         ADD  $4,R4
 CustomMove.YoYo.NoAttack:
-        CMPB R0,$32+16
+        CMP  R0,$32+16
         BNE  CustomMove.YoYo.Vert
 
         MOV  @$Event_NextEventPointer,R0
         DEC  R0
-        DEC  R0 # now R0 points to next event time
-        MOV  (R0),@$EndChuPointer
+        DEC  R0 # now R0 points to the next event time
+        MOV  R0,@$EndChuPointer
         MOV  @$Event_NextEventTime,@$EndChuTime
         MOVB R4,@$ChuXa
         MOVB R4,@$ChuXb
@@ -677,7 +613,7 @@ CustomMove.YoYo.NoAttack:
         POP  R5
         MOVB $12,@$CustomMove.YoYo.Counter
 CustomMove.YoYo.Vert:
-        BITB $0x10,@$Timer_CurrentTick
+        BIT  $0x10,@$Timer_CurrentTick
         BZE  CustomMove.YoYo.Up
 #CustomMove.YoYo.Down:
         SUB  $6,R1

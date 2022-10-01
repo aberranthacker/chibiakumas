@@ -264,17 +264,15 @@ HandAttack1:
    .word 82, evtChangeStreamTime, 60, HandAttack1
 
 LevelEndAnim:
-    .word 253, evtCallAddress, Player_Handler_DoSmartBomb
-
-    .word 253, evtMultipleCommands | 2
+    .word 253, evtMultipleCommands | 3
+    .word      evtCallAddress, Player_Handler_DoSmartBomb
     .word      evtSetProgMoveLife, prgMovePlayer, mvStatic, 10
     .word      evtSingleSprite, sprTwoFrame | DUMMY_SPRITE, (24+140)<<X | (24+100)<<Y
 
     .equiv FadeOutStartPoint, 254
     .word FadeOutStartPoint, evtSetPalette, DarkRealPalette
     .word FadeOutStartPoint + 1, evtSetPalette, BluePalette
-
-    .word 256, evtCallAddress, EndLevel
+    .word FadeOutStartPoint + 3, evtCallAddress, EndLevel
 
 EndLevel:
        .ppudo_ensure $PPU_LevelEnd
