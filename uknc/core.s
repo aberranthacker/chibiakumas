@@ -148,6 +148,8 @@ not_implemented_check_R0:
        .global EventStream_Init
        .global EventStream_Process
        .global Event_LevelTime
+       .global Event_NextEventPointer
+       .global Event_NextEventTime
        .global Event_RestorePalette
        .global SetLevelTime
 

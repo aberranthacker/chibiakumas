@@ -22,7 +22,7 @@ def generate_s_file(sprites_dir, level_name, s_file_idx)
     f.puts('    .byte 0  # height of the sprite')
     f.puts('    .byte 0  # Y offset')
     f.puts('    .byte 6  # width')
-    f.puts('    .byte SPR_PSET  # attributes')
+    f.puts('    .byte SPR_TURBO  # attributes')
     f.puts
 
     spritenames = Dir.glob("#{sprites_dir}/*.#{s_file_idx}.bmp").map do |path|
@@ -51,7 +51,7 @@ def generate_s_file(sprites_dir, level_name, s_file_idx)
       if spritenames.include?("#{spritename}_mask")
         f.puts("    .byte SPR_HAS_MASK # attributes")
       else
-        f.puts("    .byte SPR_PSET # attributes")
+        f.puts("    .byte SPR_TURBO # attributes")
       end
       f.puts
 

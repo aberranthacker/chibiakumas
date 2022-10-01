@@ -1,13 +1,13 @@
-                .nolist
+                .list
 
                 .TITLE BootstrapChibi Akumas loader
 
                 .global start
-                .global Bootstrap_Launch
-                .global Bootstrap_FromR5
+                .global Bootstrap.Launch
+                .global Bootstrap.FromR5
                 .global BootstrapEnd
-                .equiv  Bootstrap_PS.DeviceNumber, PS.DeviceNumber
-                .global Bootstrap_PS.DeviceNumber
+                .equiv  Bootstrap.PS.DeviceNumber, PS.DeviceNumber
+                .global Bootstrap.PS.DeviceNumber
                 .global BootstrapSize
                 .global BootstrapSizeWords
                 .global BootstrapSizeQWords
@@ -21,6 +21,7 @@
                 .global level_02.bin
                 .global level_03_title.bin
                 .global level_03.bin
+                .global level_04.bin
                 .global level_05_title.bin
                 .global level_07_title.bin
 
@@ -37,7 +38,7 @@ start:
         MTPS $PR0 # enable interrupts
 
 .if StartOnLevel == MainMenu
-        CALL Bootstrap_LoadLevel_0
+        CALL Bootstrap.LoadLevel_0
 .endif
 
 .ifdef ShowLoadingScreen
@@ -76,17 +77,17 @@ ShowTitlePic_Loop: #---------------------------------------------------------{{{
 .endif
 
 .if StartOnLevel == MainMenu
-        JMP  @$Bootstrap_StartLevel
+        JMP  @$Bootstrap.StartLevel
 .else
         MOV  $StartOnLevel,R5
 .endif
 
-Bootstrap_FromR5:
+Bootstrap.FromR5:
         TST  R5                    # R5 is used as the bootstrap command
-        BMI  Bootstrap_SystemEvent # negative means system events (Menu etc)
-        BR   Bootstrap_Level       # positive means levels
+        BMI  Bootstrap.SystemEvent # negative means system events (Menu etc)
+        BR   Bootstrap.Level       # positive means levels
 
-Bootstrap_SystemEvent:
+Bootstrap.SystemEvent:
         BIC  $0x8000,R5
     .ifdef DebugMode
         CMP  R5,$8
@@ -95,8 +96,8 @@ Bootstrap_SystemEvent:
         ASL  R5
         JMP  @SystemEventsJmpTable(R5)
     SystemEventsJmpTable:
-       .word Bootstrap_StartGame        # 0 BootsStrap_StartGame
-       .word Bootstrap_Continue         # 1 BootsStrap_Continue
+       .word Bootstrap.StartGame        # 0 BootsStrap_StartGame
+       .word Bootstrap.Continue         # 1 BootsStrap_Continue
        .word 0                          # 2 BootsStrap_ConfigureControls
        .word 0                          # 3 BootStrap_SaveSettings
        .word 0                          # 4 GameOverWin
@@ -105,90 +106,90 @@ Bootstrap_SystemEvent:
        .word 0                          # 7 NewGame_EP2_2P
        .word 0                          # 8 NewGame_CheatStart
 
-Bootstrap_Level:
+Bootstrap.Level:
     .ifdef DebugMode
-        CMP  R5,$3
+        CMP  R5,$4
         BLOS 1$
-       .inform_and_hang2 "bootstrap: no levels further than 3"
+       .inform_and_hang2 "bootstrap: no levels further than 4"
         1$:
     .endif
         ASL  R5
         JMP  @LevelsJmpTable(R5)
     LevelsJmpTable:
-       .word Bootstrap_Level_Intro
-       .word Bootstrap_Level_1
-       .word Bootstrap_Level_2
-       .word Bootstrap_Level_3
+       .word Bootstrap.Level_Intro
+       .word Bootstrap.Level_1
+       .word Bootstrap.Level_2
+       .word Bootstrap.Level_3
+       .word Bootstrap.Level_4
 
-
-Bootstrap_StartLevel:
+Bootstrap.StartLevel:
         MOV  $SP_RESET,SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 
-Bootstrap_StartGame:
-Bootstrap_Level_0:
-        CALL Bootstrap_LoadLevel_0
-        BR   Bootstrap_StartLevel
+Bootstrap.StartGame:
+Bootstrap.Level_0:
+        CALL Bootstrap.LoadLevel_0
+        BR   Bootstrap.StartLevel
 
-Bootstrap_LoadLevel_0: # ../Aku/BootStrap.asm:838  main menu --------------------
+Bootstrap.LoadLevel_0: # ../Aku/BootStrap.asm:838  main menu --------------------
         MOV  $level_00.bin,R0
-        CALL Bootstrap_ReadFromDisk_Start
+        CALL Bootstrap.DiskRead_Start
             CALL StartANewGame
             CALL LevelReset0000
-        CALL Bootstrap_DiskIO_WaitForFinish
+        CALL Bootstrap.DiskIO_WaitForFinish
        .check_for_loading_error "level_00.bin"
         RETURN
 #----------------------------------------------------------------------------
-Bootstrap_Level_Intro:
+Bootstrap.Level_Intro:
         MOV  $ep1_intro.bin,R0
-        CALL Bootstrap_ReadFromDisk_Start
+        CALL Bootstrap.DiskRead_Start
            .ppudo_ensure $PPU_SetPalette, $BlackPalette
             CALL LevelReset0000
-        CALL Bootstrap_DiskIO_WaitForFinish
+        CALL Bootstrap.DiskIO_WaitForFinish
        .check_for_loading_error "ep1_intro.bin"
 
         MOV  $ep1_intro_slides.bin,R0
-        CALL Bootstrap_ReadFromDisk_Start
-        CALL Bootstrap_DiskIO_WaitForFinish
+        CALL Bootstrap.DiskRead_Start
+        CALL Bootstrap.DiskIO_WaitForFinish
        .check_for_loading_error "ep1_intro_slides.bin"
 
-        JMP  @$Bootstrap_StartLevel
+        JMP  @$Bootstrap.StartLevel
 #----------------------------------------------------------------------------
-Bootstrap_Level_1: # --------------------------------------------------------
+Bootstrap.Level_1: # --------------------------------------------------------
         MOV  $level_01.bin,R0
-        CALL Bootstrap_ReadFromDisk_Start
+        CALL Bootstrap.DiskRead_Start
             CALL StartANewGame
             CALL LevelReset0000
             MOVB $3,@$Player_Array + 9 # set number of lives for the first player
-        CALL Bootstrap_DiskIO_WaitForFinish
+        CALL Bootstrap.DiskIO_WaitForFinish
        .check_for_loading_error "level_01.bin"
 
-        CALL Bootstrap_WaitForFireKey
+        CALL Bootstrap.WaitForFireKey
 
        .ppudo_ensure $PPU_SetPalette, $BlackPalette
         WAIT
        .ppudo_ensure $PPU_LevelStart
 
-        JMP  @$Bootstrap_StartLevel
+        JMP  @$Bootstrap.StartLevel
 #----------------------------------------------------------------------------
-Bootstrap_Level_2: # --------------------------------------------------------
+Bootstrap.Level_2: # --------------------------------------------------------
         MOV  $level_02.bin,R0
-        CALL Bootstrap_ReadFromDisk_Start
+        CALL Bootstrap.DiskRead_Start
            .ppudo_ensure $PPU_LevelStart
            .ppudo_ensure $PPU_SetPalette, $BlackPalette
             CALL LevelReset0000
-        CALL Bootstrap_DiskIO_WaitForFinish
+        CALL Bootstrap.DiskIO_WaitForFinish
        .check_for_loading_error "level_02.bin"
 
-        JMP  @$Bootstrap_StartLevel
+        JMP  @$Bootstrap.StartLevel
 #----------------------------------------------------------------------------
-Bootstrap_Level_3: # --------------------------------------------------------
+Bootstrap.Level_3: # --------------------------------------------------------
         MOV  $level_03_title.bin,R0
-        CALL Bootstrap_ReadFromDisk_Start
+        CALL Bootstrap.DiskRead_Start
        .if StartOnLevel != MainMenu
             CALL CLS
        .endif
-        CALL Bootstrap_DiskIO_WaitForFinish
+        CALL Bootstrap.DiskIO_WaitForFinish
        .check_for_loading_error "level_03_title.bin"
 
         MOV  $level_03_title.bin.lzsa1,R1
@@ -196,24 +197,37 @@ Bootstrap_Level_3: # --------------------------------------------------------
         CALL @$unlzsa1
 
        .ppudo_ensure $PPU_SetPalette,$Level03_TitlePalette
-        CALL Bootstrap_DisplayUnpackedTitleImage
+        CALL Bootstrap.DisplayUnpackedTitleImage
        .ppudo_ensure $PPU_PrintAt,$Level03_TitleText
 
         MOV  $level_03.bin,R0
-        CALL Bootstrap_ReadFromDisk_Start
+        CALL Bootstrap.DiskRead_Start
             CALL LevelReset0000
-        CALL Bootstrap_DiskIO_WaitForFinish
+        CALL Bootstrap.DiskIO_WaitForFinish
        .check_for_loading_error "level_03.bin"
 
-        CALL Bootstrap_WaitForFireKey
+        CALL Bootstrap.WaitForFireKey
 
        .ppudo_ensure $PPU_SetPalette, $BlackPalette
         WAIT
        .ppudo_ensure $PPU_LevelStart
 
-        JMP  @$Bootstrap_StartLevel
+        JMP  @$Bootstrap.StartLevel
 #----------------------------------------------------------------------------
-Bootstrap_DisplayUnpackedTitleImage:
+Bootstrap.Level_4: # --------------------------------------------------------
+        MOV  $level_04.bin,R0
+        CALL Bootstrap.DiskRead_Start
+           .ppudo_ensure $PPU_LevelStart
+           .ppudo_ensure $PPU_SetPalette, $BlackPalette
+            CALL LevelReset0000
+        CALL Bootstrap.DiskIO_WaitForFinish
+       .check_for_loading_error "level_04.bin"
+
+#:bpt
+        JMP  @$Bootstrap.StartLevel
+#----------------------------------------------------------------------------
+
+Bootstrap.DisplayUnpackedTitleImage:
         MOV  $FB1+8000,R1
         MOV  $FB1+(12*2),R2
         MOV  $96,R3
@@ -226,7 +240,7 @@ Bootstrap_DisplayUnpackedTitleImage:
         SOB  R3,96$
         RETURN
 #----------------------------------------------------------------------------
-Bootstrap_Continue_SpendCredit:
+Bootstrap.Continue_SpendCredit:
         DECB 5(R4)    # continues
         MOVB $3,3(R4) # smartbombs
         MOVB $7,7(R4) # invincibility for 7 ticks
@@ -238,12 +252,12 @@ Bootstrap_Continue_SpendCredit:
         BIC  $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
         RETURN
 
-Bootstrap_Continue: # ../Aku/BootStrap.asm:1324
+Bootstrap.Continue: # ../Aku/BootStrap.asm:1324
        .ppudo_ensure $PPU_LevelEnd
        .ppudo_ensure $PPU_SetPalette,$ContinuePalette
         MOV  $Player_Array,R4
         TSTB 5(R4)
-        BZE  Bootstrap_GameOver
+        BZE  Bootstrap.GameOver
 
         PUSH R4
         MOV  $continue.bin.lzsa1,R1
@@ -273,13 +287,13 @@ Bootstrap_Continue: # ../Aku/BootStrap.asm:1324
             MOV  $50,R1
             Continue_WaitASecondLoop:
                 BITB @$KeyboardScanner_P1,$KEYMAP_ANY_FIRE
-                BNZ  Bootstrap_Continue_SpendCredit
+                BNZ  Bootstrap.Continue_SpendCredit
                 WAIT
             SOB  R1,Continue_WaitASecondLoop
         DEC  R0
         BPL  Continue_CoundownLoop
 
-Bootstrap_GameOver:
+Bootstrap.GameOver:
        .ppudo_ensure $PPU_MusicStop
        .ppudo_ensure $PPU_SetPalette,$BlackPalette
         CALL CLS
@@ -290,9 +304,9 @@ Bootstrap_GameOver:
         MOV  $FB1 + 20*80,R2
         CALL unlzsa1
 
-        CALL Bootstrap_WaitForFireKey_NoMessage
+        CALL Bootstrap.WaitForFireKey_NoMessage
 
-Bootstrap_Review:
+Bootstrap.Review:
        .ppudo_ensure $PPU_SetPalette,$BlackPalette
         CALL CLS
 
@@ -318,17 +332,17 @@ Bootstrap_Review:
         MOV  $HighScoreBytes+8,R3
         CompareScoreDigitsLoop:
             DEC  R1
-            BZE  Bootstrap_Review_MehScore
+            BZE  Bootstrap.Review_MehScore
 
             CMPB -(R3),-(R2)
         BEQ  CompareScoreDigitsLoop
-        BLO  Bootstrap_Review_NewScore
+        BLO  Bootstrap.Review_NewScore
 
-Bootstrap_Review_MehScore:
+Bootstrap.Review_MehScore:
         MOV  $ChibikoReviewsMehScore,@$MehOrNewScore
-        BR   Bootstrap_Review_ShowScore
+        BR   Bootstrap.Review_ShowScore
 
-Bootstrap_Review_NewScore:
+Bootstrap.Review_NewScore:
         MOV  $ChibikoReviewsNewScore,@$MehOrNewScore
         MOV  $8,R1
         MOV  $Player_ScoreBytes,R4
@@ -339,10 +353,10 @@ Bootstrap_Review_NewScore:
         SOB  R1,PlayerScoreHigher_CopyNextByte
 
         MOV  $saved_settings.bin,R0
-        CALL Bootstrap_WriteToDisk_Start
-        CALL Bootstrap_DiskIO_WaitForFinish
+        CALL Bootstrap.DiskWrite_Start
+        CALL Bootstrap.DiskIO_WaitForFinish
 
-Bootstrap_Review_ShowScore:
+Bootstrap.Review_ShowScore:
        .wait_ppu
         CALL @$TRandW
         BIC  $0xFFF9,R0
@@ -375,10 +389,10 @@ Bootstrap_Review_ShowScore:
        .ppudo_ensure $PPU_PrintAt,$HighScoreText
        .ppudo_ensure $PPU_PrintAt,$RankF
 
-        CALL Bootstrap_WaitForFireKey_NoMessage
+        CALL Bootstrap.WaitForFireKey_NoMessage
 
         MOV  $0x8000,R5
-        JMP  Bootstrap_FromR5
+        JMP  Bootstrap.FromR5
 #-------------------------------------------------------------------------------
 ChibikoReviewsWin:
     .word ChibikoReviewWin
@@ -715,7 +729,7 @@ ClearOffscreenBP12:
         SOB  R0,200$
         RETURN
 #-------------------------------------------------------------------------------
-Bootstrap_WaitForFireKey_NoMessage:
+Bootstrap.WaitForFireKey_NoMessage:
         BIC  $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
 
         BITB $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
@@ -723,24 +737,24 @@ Bootstrap_WaitForFireKey_NoMessage:
         RETURN
 #-------------------------------------------------------------------------------
 
-Bootstrap_WaitForFireKey: # Bootstrap_WFK -----------------------------------{{{
+Bootstrap.WaitForFireKey: # Bootstrap.WFK -----------------------------------{{{
        .ppudo $PPU_DebugPrintAt,$HitAFireKeyStr
-        Bootstrap_WFK_Loop:
-            CALL Bootstrap_WFK_DelayLoop
+        Bootstrap.WFK_Loop:
+            CALL Bootstrap.WFK_DelayLoop
            .ppudo $PPU_SetPalette,$P3
-            CALL Bootstrap_WFK_DelayLoop
+            CALL Bootstrap.WFK_DelayLoop
            .ppudo $PPU_SetPalette,$P4
-            CALL Bootstrap_WFK_DelayLoop
+            CALL Bootstrap.WFK_DelayLoop
            .ppudo $PPU_SetPalette,$P3
-            CALL Bootstrap_WFK_DelayLoop
+            CALL Bootstrap.WFK_DelayLoop
            .ppudo $PPU_SetPalette,$P2
-            CALL Bootstrap_WFK_DelayLoop
+            CALL Bootstrap.WFK_DelayLoop
            .ppudo $PPU_SetPalette,$P1
-            CALL Bootstrap_WFK_DelayLoop
+            CALL Bootstrap.WFK_DelayLoop
            .ppudo $PPU_SetPalette,$P2
-        BR   Bootstrap_WFK_Loop
+        BR   Bootstrap.WFK_Loop
 
-Bootstrap_WFK_DelayLoop:
+Bootstrap.WFK_DelayLoop:
         MOV  $4,R1
         DelayLoop_Next:
             WAIT
@@ -749,7 +763,7 @@ Bootstrap_WFK_DelayLoop:
 
             CLRB @$KeyboardScanner_P1
             TST  (SP)+ # remove returning address from stack
-            RETURN     # out of Bootstrap_WaitForFireKey
+            RETURN     # out of Bootstrap.WaitForFireKey
             DelayLoop_NoFirePressed:
         SOB  R1,DelayLoop_Next
         RETURN
@@ -793,14 +807,14 @@ ClearR1Words:
         RETURN
 #-------------------------------------------------------------------------------
 
-Bootstrap_WriteToDisk_Start: #--------------------------------------------------
+Bootstrap.DiskWrite_Start: #--------------------------------------------------
         MOVB $020,@$PS.Command # write to disk
-        BR   Bootstrap_DiskIO_Start
+        BR   Bootstrap.DiskIO_Start
 
-Bootstrap_ReadFromDisk_Start: #-------------------------------------------------
+Bootstrap.DiskRead_Start: #-------------------------------------------------
         MOVB $010,@$PS.Command # read from disk
 
-Bootstrap_DiskIO_Start:
+Bootstrap.DiskIO_Start:
         MOV  (R0)+,@$PS.CPU_RAM_Address
         MOV  (R0)+,@$PS.WordsCount
         MOV  (R0),R0 # starting block number
@@ -823,7 +837,7 @@ Bootstrap_DiskIO_Start:
 
        .ppudo_ensure $PPU_LoadDiskFile,$ParamsStruct
         RETURN
-# Bootstrap_ReadFromDisk_Start #------------------------------------------------
+# Bootstrap.DiskRead_Start #------------------------------------------------
 ParamsStruct:
     PS.Status:          .byte -1  # operation status code
     PS.Command:         .byte 010 # read data from disk
@@ -832,10 +846,10 @@ ParamsStruct:
     PS.AddressOnDevice: .byte 0, 1     # track 0(0-79), sector 1(1-10)
     PS.CPU_RAM_Address: .word 0
     PS.WordsCount:      .word 0        # number of words to transfer
-Bootstrap_DiskIO_WaitForFinish: #--------------------------------------------{{{
+Bootstrap.DiskIO_WaitForFinish: #--------------------------------------------{{{
         CLC
         MOVB @$PS.Status,R0
-        BMI  Bootstrap_DiskIO_WaitForFinish
+        BMI  Bootstrap.DiskIO_WaitForFinish
         BZE  1237$
       # +------------------------------------------------------+
       # | Код ответа |  Значение                               |
@@ -860,7 +874,7 @@ Bootstrap_DiskIO_WaitForFinish: #--------------------------------------------{{{
         SEC  # set carry flag to indicate that there was an error
 
 1237$:  RETURN
-# Bootstrap_DiskIO_WaitForFinish #-------------------------------------------}}}
+# Bootstrap.DiskIO_WaitForFinish #-------------------------------------------}}}
 
 # files related data --------------------------------------------------------{{{
 # each record is 3 words:
@@ -896,6 +910,10 @@ level_03_title.bin:
     .word 0
     .word 0
 level_03.bin:
+    .word Akuyou_LevelStart
+    .word 0
+    .word 0
+level_04.bin:
     .word Akuyou_LevelStart
     .word 0
     .word 0

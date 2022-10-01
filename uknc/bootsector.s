@@ -51,7 +51,7 @@
         MOV  $bootstrap.bin,R0
         CALL LoadDiskFile_Start
       #-------------------------------------------------------------------------
-        BISB @$PS.DeviceNumber,@$Bootstrap_PS.DeviceNumber
+        BISB @$PS.DeviceNumber,@$Bootstrap.PS.DeviceNumber
       #-------------------------------------------------------------------------
       # copy the bootstrap to upper memory while PPU module loads
         MOV  $BootstrapSizeQWords,R0

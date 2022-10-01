@@ -116,7 +116,7 @@ EventStreamArray:
     .word    evtAddToForeground
     .word    evtSaveObjSettings | 3
    # Kamisagi program code
-    .word 0, evtReprogramCustomMove1, CustomMoveBouncer
+    .word 0, evtReprogramCustomMove1, CustomMove.Bouncer
    # GnatPack
     .word 0, evtMultipleCommands | 5
     .word    evtSetProgMoveLife, prgFireFast | 16, mveWave | 0b0001, lifeEnemy | 3
@@ -659,13 +659,13 @@ Background_DrawB:
       #      R3 MSB updated program code
       #      R4 new X
       #      R5 unmodified
-CustomMoveBouncer:
+CustomMove.Bouncer:
         MOV  $190,R1                   # ld c,190
         PUSH R5                        # push hl
                                        #     ; B=X C=Y D=Move
                                        #     ld a,b
         CMP  R4,$24+160                #     cp 184
-        BNE  1$                        #     call z,CustomMoveBouncer_Init
+        BNE  1$                        #     call z,CustomMove.Bouncer_Init
         DEC  R4
     1$:                                #     call Akuyou_Timer_GetTimer
                                        #     ld h,a
@@ -680,23 +680,23 @@ CustomMoveBouncer:
         MOV  R0,R5                     #     ldia
 
         BITB $0x20,R0                  #     bit 5,a
-        BZE  CustomMoveBouncer_Vert    #     jr z,CustomMoveBouncer_Vert
+        BZE  CustomMove.Bouncer.Vert   #     jr z,CustomMove.Bouncer_Vert
 
         DEC  R4                        #     dec b
         BIC  $0xFF00,R3                #     ld iyl,0 ; Program - do nothing
-        BR   CustomMoveBouncer_Done    #     jr CustomMoveBouncer_Done
-CustomMoveBouncer_Vert:
+        BR   CustomMove.Bouncer.Done   #     jr CustomMove.Bouncer_Done
+CustomMove.Bouncer.Vert:
                                        #     ;0000D111
         BITB $0x10,R0                  #     bit 4,a
-        BZE  CustomMoveBouncer_DoJump  #     jr z,CustomMoveBouncer_DoJump
+        BZE  CustomMove.Bouncer.DoJump  #     jr z,CustomMove.Bouncer_DoJump
 
         PUSH R0
         MOV  $0x0F,R0
         XOR  R0,(SP)                   #     xor %00001111
         POP  R0
-        BR   CustomMoveBouncer_DoJump  #     jr CustomMoveBouncer_DoJump
+        BR   CustomMove.Bouncer.DoJump  #     jr CustomMove.Bouncer_DoJump
 
-CustomMoveBouncer_DoJump:
+CustomMove.Bouncer.DoJump:
         BIC  $0xFFF0,R0                #     and %00001111
         ASL  R0                        #     rlca
         ASL  R0                        #     rlca
@@ -709,27 +709,27 @@ CustomMoveBouncer_DoJump:
         MOV  R5,R0                     #     ldai
         BIC  $0xFFE0,R0                #     and %00011111
         CMPB R0,$0b00001110            #     cp  %00001110
-        BNE  CustomMoveBouncer_FireNormal #     jp nz,CustomMoveBouncer_FireNormal
+        BNE  CustomMove.Bouncer.FireNormal #     jp nz,CustomMove.Bouncer_FireNormal
       # R3 MSB iyl = Program Code
         BIC  $0xFF00,R3
         BIS  $(prgFireFast|13)<<8,R3   #     ld iyl,prgFireFast+13 ; Program Fire
-        BR   CustomMoveBouncer_DoSprite#     jp CustomMoveBouncer_DoSprite
+        BR   CustomMove.Bouncer.DoSprite#     jp CustomMove.Bouncer_DoSprite
 
-CustomMoveBouncer_FireNormal:
+CustomMove.Bouncer.FireNormal:
         BIC  $0xFF00,R3
         BIS  $(prgFireFast|16)<<8,R3   #     ld iyl,prgFireFast+16 ; Program Fire
 
-CustomMoveBouncer_DoSprite:
+CustomMove.Bouncer.DoSprite:
                                        #     ld a,h
         BIT  $0x02,@$Timer_TicksOccured#     bit 1,a
-        BZE  CustomMoveBouncer_Done    #     jp z,CustomMoveBouncer_Done
+        BZE  CustomMove.Bouncer.Done    #     jp z,CustomMove.Bouncer_Done
 
         MOV  @$SpriteBanksVectors+4,@$SprShow_BankAddr # call Akuyou_ObjectProgram_SpriteBankSwitch
-CustomMoveBouncer_Done:
+CustomMove.Bouncer.Done:
         POP  R5                        # pop hl
         RETURN                         # ret
 
-                                       # CustomMoveBouncer_Init:
+                                       # CustomMove.Bouncer_Init:
                                        #        dec b
                                        # ret
 
