@@ -573,92 +573,92 @@ ObjectProgram:                          # ret z       ; return if zero
       # R3 LSB iyl = Program code, MSB = 0, ixl = Life
         MOV  R3,R0
         CMP  R0,$0b00000001         # Used by background, sprite bank based on X co-ord
-        BEQ  ObjectProgram_BitShiftSprite
+        BEQ  ObjectProgram.BitShiftSprite
         BIC  $0b00000111,R0         # 00000xxx = Powerup
-        BZE  ObjectProgram_Misc
+        BZE  ObjectProgram.Misc
         CMP  $0b11110000,R0         # 11110xxx = Animate every X frames
-        BZE  ObjectProgram_FrameAnimate
+        BZE  ObjectProgram.FrameAnimate
         BIC  $0b00011111,R0         # 0001xxxx = Smartbombable Powerup
-        BZE  ObjectProgram_Misc
+        BZE  ObjectProgram.Misc
 
         ASR  R0
         ASR  R0
         ASR  R0
         ASR  R0
-        JMP  @ObjectProgram_Fire_JumpTable-2(R0)
-ObjectProgram_Fire_JumpTable:
-       .word ObjectProgram_FastFire       # 001xxxxx
-       .word ObjectProgram_MidFire        # 010xxxxx
-       .word ObjectProgram_SlowFire       # 011xxxxx
-       .word ObjectProgram_SnailFire      # 100xxxxx
-       .word ObjectProgram_HyperFire      # 101xxxxx
-       .word ObjectProgram_AboveMidFire   # 110xxxxx
-       .word ObjectProgram_CustomPrograms
+        JMP  @ObjectProgram.Fire_JumpTable-2(R0)
+ObjectProgram.Fire_JumpTable:
+       .word ObjectProgram.FastFire       # 001xxxxx
+       .word ObjectProgram.MidFire        # 010xxxxx
+       .word ObjectProgram.SlowFire       # 011xxxxx
+       .word ObjectProgram.SnailFire      # 100xxxxx
+       .word ObjectProgram.HyperFire      # 101xxxxx
+       .word ObjectProgram.AboveMidFire   # 110xxxxx
+       .word ObjectProgram.CustomPrograms
 
-ObjectProgram_CustomPrograms:
+ObjectProgram.CustomPrograms:
         BIC  $0xFFFC0,R3 # 0b11111100
         ASL  R3
-        JMP  @ObjectProgram_CustomPrograms_JumpTable(R3)
-ObjectProgram_CustomPrograms_JumpTable:
-        ObjectProgram_Custom1: .word null # jp null   :CustomProgram1_Plus2
-        ObjectProgram_Custom2: .word null # jp z,null :CustomProgram2_Plus2
-        ObjectProgram_Custom3: .word null # jp z,null :CustomProgram3_Plus2
+        JMP  @ObjectProgram.CustomPrograms_JumpTable(R3)
+ObjectProgram.CustomPrograms_JumpTable:
+        ObjectProgram.Custom1: .word null # jp null   :CustomProgram1_Plus2
+        ObjectProgram.Custom2: .word null # jp z,null :CustomProgram2_Plus2
+        ObjectProgram.Custom3: .word null # jp z,null :CustomProgram3_Plus2
                                .word SpecialMoveChibiko # Only used by ep2 for a crap joke!
 
-ObjectProgram_Misc:
+ObjectProgram.Misc:
                                         # ld a,iyl
         BIC  $0xFFF0,R3                 # and %00001111
         CMP  R3,$4                      # cp 4
-        BEQ  ObjectProgram_MovePlayer   # jr z,ObjectProgram_MovePlayer
+        BEQ  ObjectProgram.MovePlayer   # jr z,ObjectProgram_MovePlayer
        #CMP  R3,$8                      # cp 8                ;Custom 1
-       #BEQ  ObjectProgram_Custom1      # jr z,ObjectProgram_Custom1
+       #BEQ  ObjectProgram.Custom1      # jr z,ObjectProgram_Custom1
 1237$:  RETURN                          # ret
 
-ObjectProgram_MovePlayer: # Used by end of level code to make player fly to a point
+ObjectProgram.MovePlayer: # Used by end of level code to make player fly to a point
       # R4 b = X, R1 c = Y, R3 iyl = Program
    .ifdef TwoPlayersGame
         MOV  $Player_Array2,R5
-        CALL ObjectProgram_DoMovePlayer
+        CALL ObjectProgram.DoMovePlayer
    .endif
 SpecialMoveChibiko:
         MOV  $Player_Array,R5
 
-ObjectProgram_DoMovePlayer:
+ObjectProgram.DoMovePlayer:
         MOVB (R5),R0
         CMPB R0,R1
-        BEQ  ObjectProgram_MovePlayerX
-        BHIS ObjectProgram_MovePlayerYUp
+        BEQ  ObjectProgram.MovePlayerX
+        BHIS ObjectProgram.MovePlayerYUp
 
         ADD  $8,R0
-        BR   ObjectProgram_MovePlayerX
-ObjectProgram_MovePlayerYUp:
+        BR   ObjectProgram.MovePlayerX
+ObjectProgram.MovePlayerYUp:
         SUB  $8,R0
-ObjectProgram_MovePlayerX:
+ObjectProgram.MovePlayerX:
         MOVB R0,(R5)+
 
         MOVB (R5),R0
         CMPB R0,R4
-        BEQ  ObjectProgram_MovePlayerDone
-        BHIS ObjectProgram_MovePlayerXUp
+        BEQ  ObjectProgram.MovePlayerDone
+        BHIS ObjectProgram.MovePlayerXUp
 
         ADD  $6,R0
-        BR   ObjectProgram_MovePlayerDone
-ObjectProgram_MovePlayerXUp:
+        BR   ObjectProgram.MovePlayerDone
+ObjectProgram.MovePlayerXUp:
         SUB  $6,R0
-ObjectProgram_MovePlayerDone:
+ObjectProgram.MovePlayerDone:
         MOVB R0,(R5)
 
         RETURN
 
-# ObjectProgram_SpriteBankSwitch:        ; an object which uses sprite bank 2
+# ObjectProgram.SpriteBankSwitch:        ; an object which uses sprite bank 2
 #       ld a,2                           ; this is to split one sprite into 2 non animated
 #                                        ; for basic background objects / enemies
-# ObjectProgram_SpriteBankSwitchCustomB: ; an object which uses sprite bank 2
+# ObjectProgram.SpriteBankSwitchCustomB: ; an object which uses sprite bank 2
 #       ld (ObjectSpriteBank_Plus1-1),a  ; second anim frame
 #
 #       ret
 
-ObjectProgram_FrameAnimate: # Used To animate spider legs in 1st boss
+ObjectProgram.FrameAnimate: # Used To animate spider legs in 1st boss
       # R3 LSB iyl = Program code, MSB = 0
         BIC  $0xFFF8,R3 # -----XXX
         CLR  R0
@@ -671,7 +671,7 @@ ObjectProgram_FrameAnimate: # Used To animate spider legs in 1st boss
 1237$:  RETURN
 
 # Every other X column uses an alternate sprite - for background anim ----------
-ObjectProgram_BitShiftSprite:
+ObjectProgram.BitShiftSprite:
       # R4 b = X
         MOV  R4,@$SprShow_X # Makesure sprite pos is updated for Domoves
         BIT  $2,R4          # 4 pixel
@@ -680,33 +680,33 @@ ObjectProgram_BitShiftSprite:
         MOV  @$SpriteBanksVectors+4,@$SprShow_BankAddr
 1237$:  RETURN
 
-ObjectProgram_SnailFire:
+ObjectProgram.SnailFire:
        .equiv  FireFrequencyA, .+2
         MOV  $0b00010000,R0
-        BR   ObjectProgram_Fire
-ObjectProgram_SlowFire:
+        BR   ObjectProgram.Fire
+ObjectProgram.SlowFire:
        .equiv  FireFrequencyB, .+2
         MOV  $0b00001000,R0
-        BR   ObjectProgram_Fire
-ObjectProgram_MidFire:
+        BR   ObjectProgram.Fire
+ObjectProgram.MidFire:
        .equiv  FireFrequencyC, .+2
         MOV  $0b00001000,R0
-        BR   ObjectProgram_Fire
-ObjectProgram_AboveMidFire:
+        BR   ObjectProgram.Fire
+ObjectProgram.AboveMidFire:
        .equiv  FireFrequencyD, .+2
         MOV  $0b00000100,R0
-        BR   ObjectProgram_Fire
-ObjectProgram_FastFire:
+        BR   ObjectProgram.Fire
+ObjectProgram.FastFire:
        .equiv  FireFrequencyE, .+2
         MOV  $0b00000010,R0
 
-ObjectProgram_Fire:
+ObjectProgram.Fire:
                                      # ld d,a
                                      # ei  ; Why is interrupts disabled here??
         BIT  R0,@$Timer_TicksOccured # ld a,(Timer_TicksOccured)
         BZE  1237$                   # and d
                                      # ret z
-ObjectProgram_HyperFire:
+ObjectProgram.HyperFire:
        .ppudo $PPU_PlaySoundEffect2
       # B=R4=X, C=R1=Y, IYL=R3=Prg         #
         MOV  @$SpriteSizeShiftHalfB,R2     # ld a,(SpriteSizeShiftHalfB_Plus1 - 1)
