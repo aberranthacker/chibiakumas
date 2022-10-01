@@ -248,11 +248,11 @@ Event_CoreReprogram_AnimatorPointer:
         RETURN # to Event_LoadNextEvt
 
 Event_CustomProgram1:
-        MOV  (R5)+,@$ObjectProgram_Custom1
+        MOV  (R5)+,@$ObjectProgram.Custom1
         RETURN # JMP @$Event_LoadNextEvt
 
 Event_CustomProgram2:
-        MOV  (R5)+,@$ObjectProgram_Custom2
+        MOV  (R5)+,@$ObjectProgram.Custom2
         RETURN # to Event_LoadNextEvt
 
 Event_CustomPlayerHitter:
