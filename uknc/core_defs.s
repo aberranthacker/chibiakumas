@@ -4,19 +4,21 @@
 #.equiv DebugSprite, 1
 #.equiv ExtMemCore, 1
 #.equiv TwoPlayersGame, 1
-#.equiv PlayerInvincible, 1
+ .equiv PlayerInvincible, 1
 #-------------------------------------------------------------------------------
 .equiv MainMenu, 0x8000
 .equiv Episode1_Intro, 0x0000
 .equiv Level1, 0x0001
 .equiv Level2, 0x0002
 .equiv Level3, 0x0003
+.equiv Level4, 0x0004
 
- .equiv StartOnLevel, MainMenu
+#.equiv StartOnLevel, MainMenu
 #.equiv StartOnLevel, Episode1_Intro
 #.equiv StartOnLevel, Level1
 #.equiv StartOnLevel, Level2
 #.equiv StartOnLevel, Level3
+ .equiv StartOnLevel, Level4
 
 .if StartOnLevel == MainMenu
   .equiv ShowLoadingScreen, 1
@@ -115,13 +117,9 @@
 
     .ifndef ExtMemCore
 .equiv CoreStart, GameVarsEnd
+.equiv Akuyou_LevelStart, 0x9E38 # 40504 0117070 # auto-generated during a build
     .else
 .equiv CoreStart, 0160000
-    .endif
-
-    .ifndef ExtMemCore
-.equiv Akuyou_LevelStart, 0x9E18 # 40472 0117030 # auto-generated during a build
-    .else
 .equiv Akuyou_LevelStart, GameVarsEnd
     .endif
 
@@ -248,3 +246,5 @@
 .equiv INC_R0_OPCODE, 0005200
 .equiv DECB_R3_OPCODE, 0105303
 .equiv MOVB_R3_R3_OPCODE, 0110303
+
+.equiv SBT_PersistanceCounterReset, 15

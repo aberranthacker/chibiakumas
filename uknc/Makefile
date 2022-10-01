@@ -21,6 +21,7 @@ pre-build :
 	mkdir -p build/level_01
 	mkdir -p build/level_02
 	mkdir -p build/level_03
+	mkdir -p build/level_04
 
 clean :
 	rm -rf build/*
@@ -42,6 +43,7 @@ build/chibiakumas.dsk : build_tools/build_dsk.rb \
 			build/level_02.bin \
 			build/level_03_title.bin \
 			build/level_03.bin \
+			build/level_04.bin \
 			build/level_05_title.bin \
 			build/level_07_title.bin \
 			build/saved_settings.bin
@@ -1399,7 +1401,22 @@ build/level_03.o : $(common) \
 build/level_03_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
 	                   resources/level_03_tiles.cpc.spr
 	build_tools/spr_cpc_to_uknc.rb resources/level_03_tiles.cpc.spr -o build/level_03_tiles.spr
-# level_02.bin --------------------------------------------------------------}}}
+# level_03.bin --------------------------------------------------------------}}}
+
+# level_04.bin --------------------------------------------------------------{{{
+build/level_04.bin : build/core.o \
+                     build/level_04.o
+	$(LD) $(LDFLAGS) build/level_04.o -R build/core.o -o build/level_04.out
+	ruby build_tools/aout2sav.rb build/level_04.out -b -s -o build/level_04.bin
+
+build/level_04.o : $(common) \
+                   level_04.s \
+		   build/level_04.0.spr \
+		   build/level_04.1.spr \
+		   build/level_03_tiles.spr \
+		   build/chibi_lr.spr
+	$(AS) -al level_04.s -o build/level_04.o | build_tools/format_list.rb
+# level_04.bin --------------------------------------------------------------}}}
 
 # level_03.0.spr ------------------------------------------------------------{{{
 build/level_03.0.spr : build/level_03.0.o \
@@ -1852,3 +1869,365 @@ build/level_03/zombie_salaryman_mask.1.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb -b 1 resources/level_03/zombie_salaryman_mask.1.bmp \
 	                               build/level_03/zombie_salaryman_mask.1.bin
 # level_03.1.spr ------------------------------------------------------------}}}
+
+# level_04.0.spr ------------------------------------------------------------{{{
+build/level_04.0.spr : build/level_04.0.o \
+                       linker_scripts/sprites.cmd
+	$(LD) $(LDFLAGS) build/level_04.0.o -T linker_scripts/sprites.cmd \
+	                 -o build/level_04.0.spr
+
+build/level_04.0.o : level_04.0.s \
+	             build/level_04/s01_boss_above_75_a.0.bin \
+	             build/level_04/s01_boss_above_75_a_mask.0.bin \
+	             build/level_04/s02_boss_above_75_b.0.bin \
+	             build/level_04/s02_boss_above_75_b_mask.0.bin \
+	             build/level_04/s03_boss_above_75_c.0.bin \
+	             build/level_04/s03_boss_above_75_c_mask.0.bin \
+	             build/level_04/s04_boss_below_75_a.0.bin \
+	             build/level_04/s04_boss_below_75_a_mask.0.bin \
+	             build/level_04/s05_boss_below_75_b.0.bin \
+	             build/level_04/s06_boss_below_75_c.0.bin \
+	             build/level_04/s06_boss_below_75_c_mask.0.bin \
+	             build/level_04/s07_coin.0.bin \
+	             build/level_04/s07_coin_mask.0.bin \
+	             build/level_04/s08_akanbee.0.bin \
+	             build/level_04/s08_akanbee_mask.0.bin \
+	             build/level_04/s09_lambtron.0.bin \
+	             build/level_04/s09_lambtron_mask.0.bin \
+	             build/level_04/s10_chu.0.bin \
+	             build/level_04/s10_chu_mask.0.bin \
+	             build/level_04/s11_chu_text.0.bin \
+	             build/level_04/s11_chu_text_mask.0.bin \
+	             build/level_04/s12_shoe.0.bin \
+	             build/level_04/s12_shoe_mask.0.bin \
+	             build/level_04/s13_boss_above_75_hit_a.0.bin \
+	             build/level_04/s13_boss_above_75_hit_a_mask.0.bin \
+	             build/level_04/s15_boss_above_75_hit_b.0.bin \
+	             build/level_04/s15_boss_above_75_hit_c.0.bin \
+	             build/level_04/s15_boss_above_75_hit_c_mask.0.bin \
+	             build/level_04/s16_boss_below_75_hit_a.0.bin \
+	             build/level_04/s16_boss_below_75_hit_a_mask.0.bin \
+	             build/level_04/s18_boss_below_75_hit_b.0.bin \
+	             build/level_04/s18_boss_below_75_hit_c.0.bin \
+	             build/level_04/s18_boss_below_75_hit_c_mask.0.bin \
+	             build/level_04/s19_boss_dead_a.0.bin \
+	             build/level_04/s20_boss_dead_b.0.bin \
+	             build/level_04/s21_boss_dead_c.0.bin
+	$(AS) -al level_04.0.s -o build/level_04.0.o
+
+build/level_04/s01_boss_above_75_a.0.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_04/s01_boss_above_75_a.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s01_boss_above_75_a.0.bmp \
+	                          build/level_04/s01_boss_above_75_a.0.bin
+
+build/level_04/s01_boss_above_75_a_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                                resources/level_04/s01_boss_above_75_a_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s01_boss_above_75_a_mask.0.bmp \
+	                               build/level_04/s01_boss_above_75_a_mask.0.bin
+
+build/level_04/s02_boss_above_75_b.0.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_04/s02_boss_above_75_b.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s02_boss_above_75_b.0.bmp \
+	                          build/level_04/s02_boss_above_75_b.0.bin
+
+build/level_04/s02_boss_above_75_b_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                                resources/level_04/s02_boss_above_75_b_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s02_boss_above_75_b_mask.0.bmp \
+	                               build/level_04/s02_boss_above_75_b_mask.0.bin
+
+build/level_04/s03_boss_above_75_c.0.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_04/s03_boss_above_75_c.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s03_boss_above_75_c.0.bmp \
+	                          build/level_04/s03_boss_above_75_c.0.bin
+
+build/level_04/s03_boss_above_75_c_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                                resources/level_04/s03_boss_above_75_c_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s03_boss_above_75_c_mask.0.bmp \
+	                               build/level_04/s03_boss_above_75_c_mask.0.bin
+
+build/level_04/s04_boss_below_75_a.0.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_04/s04_boss_below_75_a.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s04_boss_below_75_a.0.bmp \
+	                          build/level_04/s04_boss_below_75_a.0.bin
+
+build/level_04/s04_boss_below_75_a_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                                resources/level_04/s04_boss_below_75_a_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s04_boss_below_75_a_mask.0.bmp \
+	                               build/level_04/s04_boss_below_75_a_mask.0.bin
+
+build/level_04/s05_boss_below_75_b.0.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_04/s05_boss_below_75_b.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s05_boss_below_75_b.0.bmp \
+	                          build/level_04/s05_boss_below_75_b.0.bin
+
+build/level_04/s06_boss_below_75_c.0.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_04/s06_boss_below_75_c.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s06_boss_below_75_c.0.bmp \
+	                          build/level_04/s06_boss_below_75_c.0.bin
+
+build/level_04/s06_boss_below_75_c_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                                resources/level_04/s06_boss_below_75_c_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s06_boss_below_75_c_mask.0.bmp \
+	                               build/level_04/s06_boss_below_75_c_mask.0.bin
+
+build/level_04/s07_coin.0.bin : build_tools/bmp_to_raw.rb \
+                                resources/level_04/s07_coin.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s07_coin.0.bmp \
+	                          build/level_04/s07_coin.0.bin
+
+build/level_04/s07_coin_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                     resources/level_04/s07_coin_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s07_coin_mask.0.bmp \
+	                               build/level_04/s07_coin_mask.0.bin
+
+build/level_04/s08_akanbee.0.bin : build_tools/bmp_to_raw.rb \
+                                   resources/level_04/s08_akanbee.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s08_akanbee.0.bmp \
+	                          build/level_04/s08_akanbee.0.bin
+
+build/level_04/s08_akanbee_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                        resources/level_04/s08_akanbee_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s08_akanbee_mask.0.bmp \
+	                               build/level_04/s08_akanbee_mask.0.bin
+
+build/level_04/s09_lambtron.0.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_04/s09_lambtron.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s09_lambtron.0.bmp \
+	                          build/level_04/s09_lambtron.0.bin
+
+build/level_04/s09_lambtron_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_04/s09_lambtron_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s09_lambtron_mask.0.bmp \
+	                               build/level_04/s09_lambtron_mask.0.bin
+
+build/level_04/s10_chu.0.bin : build_tools/bmp_to_raw.rb \
+                               resources/level_04/s10_chu.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s10_chu.0.bmp \
+	                          build/level_04/s10_chu.0.bin
+
+build/level_04/s10_chu_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_04/s10_chu_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s10_chu_mask.0.bmp \
+	                               build/level_04/s10_chu_mask.0.bin
+
+build/level_04/s11_chu_text.0.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_04/s11_chu_text.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s11_chu_text.0.bmp \
+	                          build/level_04/s11_chu_text.0.bin
+
+build/level_04/s11_chu_text_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_04/s11_chu_text_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s11_chu_text_mask.0.bmp \
+	                               build/level_04/s11_chu_text_mask.0.bin
+
+build/level_04/s12_shoe.0.bin : build_tools/bmp_to_raw.rb \
+                                resources/level_04/s12_shoe.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s12_shoe.0.bmp \
+	                          build/level_04/s12_shoe.0.bin
+
+build/level_04/s12_shoe_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                     resources/level_04/s12_shoe_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s12_shoe_mask.0.bmp \
+	                               build/level_04/s12_shoe_mask.0.bin
+
+build/level_04/s13_boss_above_75_hit_a.0.bin : build_tools/bmp_to_raw.rb \
+                                               resources/level_04/s13_boss_above_75_hit_a.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s13_boss_above_75_hit_a.0.bmp \
+	                          build/level_04/s13_boss_above_75_hit_a.0.bin
+
+build/level_04/s13_boss_above_75_hit_a_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                                    resources/level_04/s13_boss_above_75_hit_a_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s13_boss_above_75_hit_a_mask.0.bmp \
+	                               build/level_04/s13_boss_above_75_hit_a_mask.0.bin
+
+build/level_04/s15_boss_above_75_hit_b.0.bin : build_tools/bmp_to_raw.rb \
+                                               resources/level_04/s15_boss_above_75_hit_b.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s15_boss_above_75_hit_b.0.bmp \
+	                          build/level_04/s15_boss_above_75_hit_b.0.bin
+
+build/level_04/s15_boss_above_75_hit_c.0.bin : build_tools/bmp_to_raw.rb \
+                                               resources/level_04/s15_boss_above_75_hit_c.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s15_boss_above_75_hit_c.0.bmp \
+	                          build/level_04/s15_boss_above_75_hit_c.0.bin
+
+build/level_04/s15_boss_above_75_hit_c_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                                    resources/level_04/s15_boss_above_75_hit_c_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s15_boss_above_75_hit_c_mask.0.bmp \
+	                               build/level_04/s15_boss_above_75_hit_c_mask.0.bin
+
+build/level_04/s16_boss_below_75_hit_a.0.bin : build_tools/bmp_to_raw.rb \
+                                               resources/level_04/s16_boss_below_75_hit_a.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s16_boss_below_75_hit_a.0.bmp \
+	                          build/level_04/s16_boss_below_75_hit_a.0.bin
+
+build/level_04/s16_boss_below_75_hit_a_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                                    resources/level_04/s16_boss_below_75_hit_a_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s16_boss_below_75_hit_a_mask.0.bmp \
+	                               build/level_04/s16_boss_below_75_hit_a_mask.0.bin
+
+build/level_04/s18_boss_below_75_hit_b.0.bin : build_tools/bmp_to_raw.rb \
+                                               resources/level_04/s18_boss_below_75_hit_b.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s18_boss_below_75_hit_b.0.bmp \
+	                          build/level_04/s18_boss_below_75_hit_b.0.bin
+
+build/level_04/s18_boss_below_75_hit_c.0.bin : build_tools/bmp_to_raw.rb \
+                                               resources/level_04/s18_boss_below_75_hit_c.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s18_boss_below_75_hit_c.0.bmp \
+	                          build/level_04/s18_boss_below_75_hit_c.0.bin
+
+build/level_04/s18_boss_below_75_hit_c_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                                    resources/level_04/s18_boss_below_75_hit_c_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s18_boss_below_75_hit_c_mask.0.bmp \
+	                               build/level_04/s18_boss_below_75_hit_c_mask.0.bin
+
+build/level_04/s19_boss_dead_a.0.bin : build_tools/bmp_to_raw.rb \
+                                       resources/level_04/s19_boss_dead_a.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s19_boss_dead_a.0.bmp \
+	                          build/level_04/s19_boss_dead_a.0.bin
+
+build/level_04/s20_boss_dead_b.0.bin : build_tools/bmp_to_raw.rb \
+                                       resources/level_04/s20_boss_dead_b.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s20_boss_dead_b.0.bmp \
+	                          build/level_04/s20_boss_dead_b.0.bin
+
+build/level_04/s21_boss_dead_c.0.bin : build_tools/bmp_to_raw.rb \
+                                       resources/level_04/s21_boss_dead_c.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s21_boss_dead_c.0.bmp \
+	                          build/level_04/s21_boss_dead_c.0.bin
+# level_04.0.spr ------------------------------------------------------------}}}
+
+# level_04.1.spr ------------------------------------------------------------{{{
+build/level_04.1.spr : build/level_04.1.o \
+                       linker_scripts/sprites.cmd
+	$(LD) $(LDFLAGS) build/level_04.1.o -T linker_scripts/sprites.cmd \
+	                 -o build/level_04.1.spr
+
+build/level_04.1.o : level_04.1.s \
+	             build/level_04/s01_boss_above_75_a.1.bin \
+	             build/level_04/s01_boss_above_75_a_mask.1.bin \
+	             build/level_04/s02_boss_above_75_b.1.bin \
+	             build/level_04/s02_boss_above_75_b_mask.1.bin \
+	             build/level_04/s03_boss_above_75_c.1.bin \
+	             build/level_04/s03_boss_above_75_c_mask.1.bin \
+	             build/level_04/s04_boss_below_75_a.1.bin \
+	             build/level_04/s04_boss_below_75_a_mask.1.bin \
+	             build/level_04/s05_boss_below_75_b.1.bin \
+	             build/level_04/s06_boss_below_75_c.1.bin \
+	             build/level_04/s06_boss_below_75_c_mask.1.bin \
+	             build/level_04/s07_coin.1.bin \
+	             build/level_04/s07_coin_mask.1.bin \
+	             build/level_04/s08_akanbee.1.bin \
+	             build/level_04/s08_akanbee_mask.1.bin \
+	             build/level_04/s09_lambtron.1.bin \
+	             build/level_04/s09_lambtron_mask.1.bin \
+	             build/level_04/s10_chu.1.bin \
+	             build/level_04/s10_chu_mask.1.bin \
+	             build/level_04/s11_chu_text.1.bin \
+	             build/level_04/s11_chu_text_mask.1.bin
+	$(AS) -al level_04.1.s -o build/level_04.1.o
+
+build/level_04/s01_boss_above_75_a.1.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_04/s01_boss_above_75_a.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s01_boss_above_75_a.1.bmp \
+	                          build/level_04/s01_boss_above_75_a.1.bin
+
+build/level_04/s01_boss_above_75_a_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                                resources/level_04/s01_boss_above_75_a_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s01_boss_above_75_a_mask.1.bmp \
+	                               build/level_04/s01_boss_above_75_a_mask.1.bin
+
+build/level_04/s02_boss_above_75_b.1.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_04/s02_boss_above_75_b.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s02_boss_above_75_b.1.bmp \
+	                          build/level_04/s02_boss_above_75_b.1.bin
+
+build/level_04/s02_boss_above_75_b_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                                resources/level_04/s02_boss_above_75_b_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s02_boss_above_75_b_mask.1.bmp \
+	                               build/level_04/s02_boss_above_75_b_mask.1.bin
+
+build/level_04/s03_boss_above_75_c.1.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_04/s03_boss_above_75_c.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s03_boss_above_75_c.1.bmp \
+	                          build/level_04/s03_boss_above_75_c.1.bin
+
+build/level_04/s03_boss_above_75_c_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                                resources/level_04/s03_boss_above_75_c_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s03_boss_above_75_c_mask.1.bmp \
+	                               build/level_04/s03_boss_above_75_c_mask.1.bin
+
+build/level_04/s04_boss_below_75_a.1.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_04/s04_boss_below_75_a.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s04_boss_below_75_a.1.bmp \
+	                          build/level_04/s04_boss_below_75_a.1.bin
+
+build/level_04/s04_boss_below_75_a_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                                resources/level_04/s04_boss_below_75_a_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s04_boss_below_75_a_mask.1.bmp \
+	                               build/level_04/s04_boss_below_75_a_mask.1.bin
+
+build/level_04/s05_boss_below_75_b.1.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_04/s05_boss_below_75_b.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s05_boss_below_75_b.1.bmp \
+	                          build/level_04/s05_boss_below_75_b.1.bin
+
+build/level_04/s06_boss_below_75_c.1.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_04/s06_boss_below_75_c.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s06_boss_below_75_c.1.bmp \
+	                          build/level_04/s06_boss_below_75_c.1.bin
+
+build/level_04/s06_boss_below_75_c_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                                resources/level_04/s06_boss_below_75_c_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s06_boss_below_75_c_mask.1.bmp \
+	                               build/level_04/s06_boss_below_75_c_mask.1.bin
+
+build/level_04/s07_coin.1.bin : build_tools/bmp_to_raw.rb \
+                                resources/level_04/s07_coin.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s07_coin.1.bmp \
+	                          build/level_04/s07_coin.1.bin
+
+build/level_04/s07_coin_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                     resources/level_04/s07_coin_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s07_coin_mask.1.bmp \
+	                               build/level_04/s07_coin_mask.1.bin
+
+build/level_04/s08_akanbee.1.bin : build_tools/bmp_to_raw.rb \
+                                   resources/level_04/s08_akanbee.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s08_akanbee.1.bmp \
+	                          build/level_04/s08_akanbee.1.bin
+
+build/level_04/s08_akanbee_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                        resources/level_04/s08_akanbee_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s08_akanbee_mask.1.bmp \
+	                               build/level_04/s08_akanbee_mask.1.bin
+
+build/level_04/s09_lambtron.1.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_04/s09_lambtron.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s09_lambtron.1.bmp \
+	                          build/level_04/s09_lambtron.1.bin
+
+build/level_04/s09_lambtron_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_04/s09_lambtron_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s09_lambtron_mask.1.bmp \
+	                               build/level_04/s09_lambtron_mask.1.bin
+
+build/level_04/s10_chu.1.bin : build_tools/bmp_to_raw.rb \
+                               resources/level_04/s10_chu.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s10_chu.1.bmp \
+	                          build/level_04/s10_chu.1.bin
+
+build/level_04/s10_chu_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_04/s10_chu_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s10_chu_mask.1.bmp \
+	                               build/level_04/s10_chu_mask.1.bin
+
+build/level_04/s11_chu_text.1.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_04/s11_chu_text.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_04/s11_chu_text.1.bmp \
+	                          build/level_04/s11_chu_text.1.bin
+
+build/level_04/s11_chu_text_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_04/s11_chu_text_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s11_chu_text_mask.1.bmp \
+	                               build/level_04/s11_chu_text_mask.1.bin
+# level_04.1.spr ------------------------------------------------------------}}}

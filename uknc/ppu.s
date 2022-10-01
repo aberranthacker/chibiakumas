@@ -584,6 +584,7 @@ ShowBossText_Init: #----------------------------------------------------------{{
         BR   100$
 
 ShowBossText_TextLoaded:
+        MOV  $SBT_PersistanceCounterReset,@$SBT_PersistanceCounter
         MOV  $1,@$ShowBossText_InProgress
         MOV  $1,@$ShowBossText_CharsToPrint
 
@@ -636,7 +637,7 @@ SBT_NextChar:
 
 ShowBossText_ReachedEndOfText:
        .equiv SBT_PersistanceCounter, .+2
-        DEC  $40
+        DEC  $SBT_PersistanceCounterReset
         BNZ  ShowBossText_Finalize
 
         CLR  @$ShowBossText_InProgress

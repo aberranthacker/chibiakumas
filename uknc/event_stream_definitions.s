@@ -242,8 +242,8 @@
                             # fireSmallBurst equ 14
                             # fireOuterBurst equ 15  ;Necromancer attack
 # single dot
-.equiv fireSingleWest, 16   # fireSingleWest      equ 16
-                            # fireSingleNorthWest equ 17
+.equiv fireSingleWest, 16      # fireSingleWest      equ 16
+.equiv fireSingleNorthWest, 17 # fireSingleNorthWest equ 17
                             # fireSingleNorth     equ 18
                             # fireSingleNorthEast equ 19
                             # fireSingleEast      equ 20
@@ -325,7 +325,7 @@
                              # lifCustom   equ 255       ; We use 63 as a marker for custom code's INIT -
                              #                           ; a real life will be set by the custom code
 .equiv lifeEnemy, 0b11000000 # lifEnemy    equ %11000000 ; HurtByBullets,Hurts Player
-                             # lifTimed    equ %00000000 ; Doesnt hurt, dies automatically
+.equiv lifeTimed, 0b00000000 # lifTimed    equ %00000000 ; Doesnt hurt, dies automatically
                              # lifDeadly   equ %01000000 ; Deadly and cant be shot
 .equiv lifeImmortal, 0       # lifImmortal equ 0
 

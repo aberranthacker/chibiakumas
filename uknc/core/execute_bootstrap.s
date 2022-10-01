@@ -16,4 +16,4 @@ ExecuteBootstrap_NoCLS:
            .endr
         SOB  R0,100$
 
-        JMP  @$Bootstrap_FromR5
+        JMP  @$Bootstrap.FromR5
