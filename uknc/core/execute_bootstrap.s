@@ -1,6 +1,6 @@
 
 ExecuteBootstrap:
-        CALL ScreenBuffer_Reset
+        CALL ScreenBuffer.Reset
 
 ExecuteBootstrap_NoCLS:
         MOV  $BootstrapSizeQWords,R0

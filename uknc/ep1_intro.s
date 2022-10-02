@@ -173,7 +173,7 @@ EndLevel:
         JMP  @$ExecuteBootstrap
 
 LevelInit:
-        CALL @$ScreenBuffer_Reset
+        CALL @$ScreenBuffer.Reset
        .ppudo_ensure $PPU_IntroMusicRestart
 
         MOV  $LevelSprites,R0
@@ -221,7 +221,7 @@ LevelLoop:
         ASL  R0
 
         MOV  SubtitlesTable(R0), @$PPUCommandArg
-       .ppudo_ensure $PPU_ShowBossText_Init
+       .ppudo_ensure $PPU_ShowBossText.Init
 
         MOV  $1, @$CharsToPrint
         MOV  $ShowBossText, @$dstShowBossTextCommand
@@ -529,7 +529,7 @@ Clear4000: #-----------------------------------------------------------------{{{
 
         MOV  $8000 >> Clear4000_PowerOfTwo, R0
         CLR  R1
-        MOV  @$ScreenBuffer_ActiveScreen,R2
+        MOV  @$ScreenBuffer.ActiveScreen,R2
     10$:
        .rept 1 << Clear4000_PowerOfTwo
         MOV  R1,(R2)+

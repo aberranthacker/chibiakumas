@@ -127,7 +127,7 @@ EventStreamArray:
 .word FadeStartPoint + 2, evtSetPalette, DarkRealPalette
 .word FadeStartPoint + 3, evtSetPalette, RealPalette
 # Start of fade in block -------------------------------------------------------
-.word FadeStartPoint + 4, evtCallAddress, ShowBossText_Init
+.word FadeStartPoint + 4, evtCallAddress, ShowBossText.Init
     #----------
 #   .word 3, evtChangeStreamTime, 60, HandAttack1
     #----------
@@ -220,7 +220,7 @@ DebugStartPoint:
 .word     evtSingleSprite, sprSingleFrame | LEGS_RIGHT_C, (24+160)<<X | (24+90+48)<<Y
 .word     evtSaveObjPointer, HandObject6
 
-.word 65, evtCallAddress, ShowBossText_RemoveWait
+.word 65, evtCallAddress, ShowBossText.RemoveWait
 
 .word 70, evtCallAddress, StopBossMovement
 
@@ -308,8 +308,8 @@ LevelLoop:
         CALL @$Player_StarArray_Redraw
         CALL @$StarArray_Redraw
 
-        CALL @$ScreenBuffer_Flip
-       .equiv ShowBossText_WaitOpcode, .
+        CALL @$ScreenBuffer.Flip
+       .equiv ShowBossText.WaitOpcode, .
         WAIT # added to give PPU time to draw boss text
 
        .equiv FadeCommandCall, .+2
@@ -347,7 +347,7 @@ Background_Draw:
         MOV  $0,R0 # 0=left
         CALL @$Background_GradientScroll
 
-        MOV  @$ScreenBuffer_ActiveScreen,R5
+        MOV  @$ScreenBuffer.ActiveScreen,R5
 
         CALL @$Timer_UpdateTimer # R0 = SmartBomb color or 0
         BNZ  Background_SmartBomb
@@ -492,11 +492,11 @@ RealPalette: #---------------------------------------------------------------{{{
                                             #         pop hl
                                             #     ret
 
-ShowBossText_Init:
-       .ppudo_ensure $PPU_ShowBossText_Init,$BossText
+ShowBossText.Init:
+       .ppudo_ensure $PPU_ShowBossText.Init,$BossText
         RETURN
-ShowBossText_RemoveWait:
-        MOV  $NOP_OPCODE,@$ShowBossText_WaitOpcode
+ShowBossText.RemoveWait:
+        MOV  $NOP_OPCODE,@$ShowBossText.WaitOpcode
         RETURN
                          #0---------1---------2---------3---------
 BossText:                #0123456789012345678901234567890123456789

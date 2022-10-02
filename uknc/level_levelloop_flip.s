@@ -1,4 +1,4 @@
-                                        # call Akuyou_ScreenBuffer_Flip
+                                        # call Akuyou_ScreenBuffer.Flip
                                         # ld (BackgroundSolidFillNextLine_Minus1+1),hl
 
                                         ##ifndef UseBackgroundVert

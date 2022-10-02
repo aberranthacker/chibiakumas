@@ -270,15 +270,15 @@ Channel1In_IntHandler: #-----------------------------------------------------{{{
         BZE  ShowFB0
         BR   ShowFB1
 ShowFB0: #----------------------------------------------------------------------
-       .equiv ShowBossText_InProgress, .+2
+       .equiv ShowBossText.InProgress, .+2
         TST  $0
         BZE  ShowFB0_Finalize
 
         PUSH R3
-        MOV  $FB0>>1,@$ShowBossText_ActiveScreen
-       .equiv ShowBossText_CharsToPrint, .+2
+        MOV  $FB0>>1,@$ShowBossText.ActiveScreen
+       .equiv ShowBossText.CharsToPrint, .+2
         INC  $1
-        MOV  @$ShowBossText_CharsToPrint,R0
+        MOV  @$ShowBossText.CharsToPrint,R0
         CALL ShowBossText
         POP  R3
 
@@ -301,13 +301,13 @@ ShowFB0_Finalize:
         BR   Channel1In_IntHandler_Finalize
 #-------------------------------------------------------------------------------
 ShowFB1: #----------------------------------------------------------------------
-        TST  @$ShowBossText_InProgress
+        TST  @$ShowBossText.InProgress
         BZE  ShowFB1_Finalize
 
         PUSH R3
-        MOV  $FB1>>1,@$ShowBossText_ActiveScreen
-        INC  @$ShowBossText_CharsToPrint
-        MOV  @$ShowBossText_CharsToPrint,R0
+        MOV  $FB1>>1,@$ShowBossText.ActiveScreen
+        INC  @$ShowBossText.CharsToPrint
+        MOV  @$ShowBossText.CharsToPrint,R0
         CALL ShowBossText
         POP  R3
 

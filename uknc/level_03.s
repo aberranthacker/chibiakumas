@@ -524,7 +524,7 @@ LevelLoop:
         CALL @$Player_StarArray_Redraw
         CALL @$StarArray_Redraw
 
-        CALL @$ScreenBuffer_Flip
+        CALL @$ScreenBuffer.Flip
 
         BR   LevelLoop
 #-------------------------------------------------------------------------------
@@ -533,7 +533,7 @@ Background_Draw:
         MOV  $0,R0 # 0=left
         CALL @$Background_GradientScroll
 
-        MOV  @$ScreenBuffer_ActiveScreen,R5
+        MOV  @$ScreenBuffer.ActiveScreen,R5
 
         CALL @$Timer_UpdateTimer # R0 = SmartBomb color or 0
         BNZ  Background_SmartBomb

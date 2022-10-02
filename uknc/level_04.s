@@ -116,18 +116,19 @@ EventStreamArray:
     .word FadeStartPoint + 2, evtSetPalette, DarkRealPalette
     .word FadeStartPoint + 3, evtSetPalette, RealPalette
 # End of fade in block ---------------------------------------------------------
-
+  .word  4, evtCallAddress, ShowBossText.Init
+  .word 35, evtCallAddress, ShowBossText.Init2
     #----------
    #.word 3, evtChangeStreamTime, 100, EventStreamArray_DebugPoint
     #----------
 EventStreamArray_DebugPoint:
  # hit target
-  .word 10, evtMultipleCommands | 3
+  .word AttackLoop_StartTime - 20, evtMultipleCommands | 3
   .word     evtSetProgMoveLife, prgSpecial, mveCustom1, lifeEnemy | 40
   .word     evtSingleSprite, sprSingleFrame | DUMMY_SPRITE, (24+160+9)<<X | (24+64+24-24+8)<<Y
   .word     evtSaveObjPointer, BossTarget
  # boss1
-  .word 10, evtMultipleCommands | 6
+  .word AttackLoop_StartTime - 20, evtMultipleCommands | 6
   .word     evtAddToBackground
   .word     evtLoadObjSettings | 1
   .word     evtSetProg, prgNone
@@ -135,7 +136,7 @@ EventStreamArray_DebugPoint:
   .word     evtSingleSprite, sprTwoFrame | BOSS_ABOVE_75_A, (24+160)<<X | (24+64-24+8)<<Y
   .word     evtSaveObjPointer, BossObject1
  # Boss2
-  .word 13, evtMultipleCommands | 6
+  .word AttackLoop_StartTime - 17, evtMultipleCommands | 6
   .word     evtAddToBackground
   .word     evtLoadObjSettings | 1
   .word     evtSetProg, prgNone
@@ -143,12 +144,12 @@ EventStreamArray_DebugPoint:
   .word     evtSingleSprite, sprTwoFrame | BOSS_ABOVE_75_B, (24+160)<<X | (24+64-24+8)<<Y
   .word     evtSaveObjPointer, BossObject2
  # Fire target 1
-  .word 13, evtMultipleCommands | 3
+  .word AttackLoop_StartTime - 17, evtMultipleCommands | 3
   .word     evtSetProgMoveLife, prgFireSlow | fireBurst, mveCustom1, lifeImmortal
   .word     evtSingleSprite, sprSingleFrame | DUMMY_SPRITE, (24+160+3)<<X | (24+64-24+8)<<Y
   .word     evtSaveObjPointer, FireTarget1
  # Boss3
-  .word 16, evtMultipleCommands | 6
+  .word AttackLoop_StartTime - 14, evtMultipleCommands | 6
   .word     evtAddToBackground
   .word     evtLoadObjSettings | 1
   .word     evtSetProg, prgNone
@@ -156,29 +157,31 @@ EventStreamArray_DebugPoint:
   .word     evtSingleSprite, sprTwoFrame | BOSS_ABOVE_75_C, (24+160)<<X | (24+64-24+8)<<Y
   .word     evtSaveObjPointer, BossObject3
  # akanbee
-  .word 26, evtMultipleCommands | 2
+  .word AttackLoop_StartTime - 4, evtMultipleCommands | 2
   .word     evtSetProgMoveLife, prgNone, mvStatic, lifeTimed | 3
   .word     evtSingleSprite, sprTwoFrame | AKANBEE, (24+120)<<X | (24+179)<<Y
 
+  .equiv AttackLoop_StartTime, 62 # must be 110, or 1110, or 11110, and so on
+  .word AttackLoop_StartTime, evtCallAddress, ShowBossText.RemoveWait
 AttackLoop:
  # Lambtron
-  .word 30, evtMultipleCommands | 2
+  .word AttackLoop_StartTime, evtMultipleCommands | 2
   .word     evtLoadObjSettings | 2
   .word     evtSingleSprite | 12 # Row 23, last Column, Last Sprite
  # Lambtron
-  .word 32, evtMultipleCommands | 2
+  .word AttackLoop_StartTime + 2, evtMultipleCommands | 2
   .word     evtLoadObjSettings | 2
   .word     evtSingleSprite | 12 # Row 23, last Column, Last Sprite
  # Lambtron
-  .word 34, evtMultipleCommands | 2
+  .word AttackLoop_StartTime + 4, evtMultipleCommands | 2
   .word     evtLoadObjSettings | 2
   .word     evtSingleSprite | 12 # Row 23, last Column, Last Sprite
  # Lambtron
-  .word 36, evtMultipleCommands | 2
+  .word AttackLoop_StartTime + 6, evtMultipleCommands | 2
   .word     evtLoadObjSettings | 2
   .word     evtSingleSprite | 12 # Row 23, last Column, Last Sprite
  # Shoe!
-  .word 36, evtMultipleCommands | 8
+  .word AttackLoop_StartTime + 6, evtMultipleCommands | 8
   .word     evtLoadObjSettings | 3
   .word     evtSingleSprite, sprSingleFrame | SHOE, (24+12* 1)<<X | (24)<<Y
   .word     evtSingleSprite, sprSingleFrame | SHOE, (24+12* 3)<<X | (24)<<Y
@@ -188,23 +191,23 @@ AttackLoop:
   .word     evtSingleSprite, sprSingleFrame | SHOE, (24+12*11)<<X | (24)<<Y
   .word     evtSingleSprite, sprSingleFrame | SHOE, (24+12*13)<<X | (24)<<Y
  # Lambtron
-  .word 50, evtMultipleCommands | 2
+  .word AttackLoop_StartTime + 20, evtMultipleCommands | 2
   .word     evtLoadObjSettings | 2
   .word     evtSingleSprite | 12 # Row 23, last Column, Last Sprite
  # Lambtron
-  .word 52, evtMultipleCommands | 2
+  .word AttackLoop_StartTime + 22, evtMultipleCommands | 2
   .word     evtLoadObjSettings | 2
   .word     evtSingleSprite | 12 # Row 23, last Column, Last Sprite
  # Lambtron
-  .word 54, evtMultipleCommands | 2
+  .word AttackLoop_StartTime + 24, evtMultipleCommands | 2
   .word     evtLoadObjSettings | 2
   .word     evtSingleSprite | 12 # Row 23, last Column, Last Sprite
  # Lambtron
-  .word 56, evtMultipleCommands | 2
+  .word AttackLoop_StartTime + 26, evtMultipleCommands | 2
   .word     evtLoadObjSettings | 2
   .word     evtSingleSprite | 12 # Row 23, last Column, Last Sprite
  # Shoe!
-  .word 56, evtMultipleCommands | 8
+  .word AttackLoop_StartTime + 26, evtMultipleCommands | 8
   .word     evtLoadObjSettings | 3
   .word     evtSingleSprite, sprSingleFrame | SHOE, (24+12* 0)<<X | (24)<<Y
   .word     evtSingleSprite, sprSingleFrame | SHOE, (24+12* 2)<<X | (24)<<Y
@@ -214,27 +217,27 @@ AttackLoop:
   .word     evtSingleSprite, sprSingleFrame | SHOE, (24+12*10)<<X | (24)<<Y
   .word     evtSingleSprite, sprSingleFrame | SHOE, (24+12*12)<<X | (24)<<Y
 
-  .word 80, evtChangeStreamTime, 20, AttackLoop
+  .word AttackLoop_StartTime + 50, evtChangeStreamTime, AttackLoop_StartTime - 10, AttackLoop
 
 ChuAttack:
-  .word 25, evtAddToForeground
+  .word AttackLoop_StartTime - 5, evtAddToForeground
 
-  .word 25, evtMultipleCommands | 2
+  .word AttackLoop_StartTime - 5, evtMultipleCommands | 2
   .word     evtLoadObjSettings | 4
   .word     evtSingleSprite, sprTwoFrame | CHU
               ChuYa: .byte 24+140
               ChuXa: .byte 24+170
 
-  .word 25, evtMultipleCommands | 2
+  .word AttackLoop_StartTime - 5, evtMultipleCommands | 2
   .word     evtLoadObjSettings | 5
   .word     evtSingleSprite, sprTwoFrame | CHU_TEXT
               ChuYb: .byte 24+140
               ChuXb: .byte 24+170
 
-  .word 25,evtAddToBackground
+  .word AttackLoop_StartTime - 5,evtAddToBackground
 
-  .word 25, evtChangeStreamTime
-              EndChuTime: .word 20
+  .word AttackLoop_StartTime - 5, evtChangeStreamTime
+              EndChuTime: .word AttackLoop_StartTime - 10
               EndChuPointer: .word AttackLoop
 
 LevelEndAnim:
@@ -278,9 +281,9 @@ LevelLoop:
         CALL @$Player_StarArray_Redraw
         CALL @$StarArray_Redraw
 
-        CALL @$ScreenBuffer_Flip
+        CALL @$ScreenBuffer.Flip
 
-       .equiv ShowBossText_WaitOpcode, .
+       .equiv ShowBossText.WaitOpcode, .
         WAIT # added to give PPU time to draw boss text
 
        .equiv FadeCommandCall, .+2
@@ -326,7 +329,7 @@ Background_Draw:
         MOV  $0,R0 # 0=left
         CALL @$Background_GradientScroll
 
-        MOV  @$ScreenBuffer_ActiveScreen,R5
+        MOV  @$ScreenBuffer.ActiveScreen,R5
 
         CALL @$Timer_UpdateTimer # R0 = SmartBomb color or 0
         BNZ  Background_SmartBomb
@@ -565,25 +568,26 @@ CustomMove.YoYo:
         CMP  @$BossLife,$1
         BEQ  1237$ # dont mess with moves if the boss is dead
 
-        MOV  @$Timer_TicksOccured,R0
-        BZE  1237$ # Only run every two ticks on v9990
+       #TSTB @$Timer_TicksOccured
+       #BZE  1237$ # Only run every two ticks on v9990
 
-        BIT  $0b0100,R0
+        BIT  $0b0100,@$Timer_TicksOccured # every forth tick
         BZE  CustomMove.YoYo.NoTick
-      
+      # The boss consist of three pieces moving simultaneously
+      # so the proc will be executed 3 times
        .equiv CustomMove.YoYo.Timer_CurrentTick, .+2
-        CMP  $0,@$Timer_CurrentTick
-        BZE  CustomMove.YoYo.NoTick
+        CMP  $0,@$Timer_CurrentTick # Timer_CurrentTick changed since last call?
+        BEQ  CustomMove.YoYo.NoTick # no, don't increase CustomMove.YoYo.Counter
 
         MOV  @$Timer_CurrentTick,@$CustomMove.YoYo.Timer_CurrentTick
         INC  @$CustomMove.YoYo.Counter
 CustomMove.YoYo.NoTick:
        .equiv CustomMove.YoYo.Counter, .+2
         MOV  $0,R0
-        CMP  R0,$12
-        BHIS CustomMove.YoYo.AttackRetreat
+        CMP  R0,$12 # initial movement to the left?
+        BHIS CustomMove.YoYo.AttackRetreat # no, ZombiChu is on screen
 
-        DEC  R4 # X coordinate
+        DEC  R4 # initial movement to the left
 1237$:  RETURN
 
 CustomMove.YoYo.AttackRetreat:
@@ -613,11 +617,12 @@ CustomMove.YoYo.NoAttack:
         MOVB R1,@$ChuYb
         PUSH R5
         MOV  $ChuAttack,R5
-        MOV  $24,R0
+        MOV  $AttackLoop_StartTime-6,R0
         CALL SetLevelTime
         POP  R5
-        MOVB $12,@$CustomMove.YoYo.Counter
+        MOV  $12,@$CustomMove.YoYo.Counter
 CustomMove.YoYo.Vert:
+      # move 16 times up, 16 times down, and so on
         BIT  $0x10,@$Timer_CurrentTick
         BZE  CustomMove.YoYo.Up
 #CustomMove.YoYo.Down:
@@ -649,4 +654,34 @@ RealPalette: #---------------------------------------------------------------{{{
     .byte 150, setColors, Black, Magenta, brGreen, White
     .word endOfScreen
 #----------------------------------------------------------------------------}}}
+
+ShowBossText.Init:
+       .ppudo_ensure $PPU_ShowBossText.Init,$BossText
+        RETURN
+ShowBossText.Init2:
+       .ppudo_ensure $PPU_ShowBossText.Init,$BossText2
+        RETURN
+ShowBossText.RemoveWait:
+        MOV  $NOP_OPCODE,@$ShowBossText.WaitOpcode
+        RETURN
+                         #0---------1---------2---------3---------
+BossText:                #0123456789012345678901234567890123456789
+        .ifndef BuildLang
+   .byte  11,  8; .ascii            "W A R N I N G ! ! !"           ; .byte -1
+   .byte   6, 11; .ascii       "A Big Copyright-Infringement"       ; .byte -1
+   .byte   7, 13; .ascii        "Is approaching: ZombiChu!!!"       ; .byte -1
+
+   .byte   5, 17; .ascii      "(Don't sue - I have no money!)"      ; .byte 0
+   .even
+        .endif
+                         #0---------1---------2---------3---------
+BossText2:               #0123456789012345678901234567890123456789
+        .ifndef BuildLang
+   .byte   5, 12; .ascii      "And anyway, Satire is protected"     ; .byte -1
+   .byte   8, 15; .ascii         "according to the TPP and"         ; .byte -1
+   .byte   9, 17; .ascii          "Freedom of speech laws."         ; .byte -1
+
+   .byte  14, 21; .ascii               "So bite me!!!"              ; .byte 0
+   .even
+        .endif
 end:
