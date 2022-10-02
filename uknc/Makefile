@@ -1005,6 +1005,7 @@ build/level_02.bin : build/core.o \
 
 build/level_02.o : $(common) \
                    level_02.s \
+                   star_array_warp.s \
 		   build/level_02.0.spr \
 		   build/level_02.1.spr \
 		   build/level_02_tiles.spr \
@@ -1411,6 +1412,7 @@ build/level_04.bin : build/core.o \
 
 build/level_04.o : $(common) \
                    level_04.s \
+                   star_array_warp.s \
 		   build/level_04.0.spr \
 		   build/level_04.1.spr \
 		   build/level_03_tiles.spr \
@@ -1880,7 +1882,6 @@ build/level_04.0.o : level_04.0.s \
 	             build/level_04/s01_boss_above_75_a.0.bin \
 	             build/level_04/s01_boss_above_75_a_mask.0.bin \
 	             build/level_04/s02_boss_above_75_b.0.bin \
-	             build/level_04/s02_boss_above_75_b_mask.0.bin \
 	             build/level_04/s03_boss_above_75_c.0.bin \
 	             build/level_04/s03_boss_above_75_c_mask.0.bin \
 	             build/level_04/s04_boss_below_75_a.0.bin \
@@ -1929,11 +1930,6 @@ build/level_04/s02_boss_above_75_b.0.bin : build_tools/bmp_to_raw.rb \
                                            resources/level_04/s02_boss_above_75_b.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_04/s02_boss_above_75_b.0.bmp \
 	                          build/level_04/s02_boss_above_75_b.0.bin
-
-build/level_04/s02_boss_above_75_b_mask.0.bin : build_tools/bmp_to_raw.rb \
-                                                resources/level_04/s02_boss_above_75_b_mask.0.bmp
-	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s02_boss_above_75_b_mask.0.bmp \
-	                               build/level_04/s02_boss_above_75_b_mask.0.bin
 
 build/level_04/s03_boss_above_75_c.0.bin : build_tools/bmp_to_raw.rb \
                                            resources/level_04/s03_boss_above_75_c.0.bmp
@@ -2106,7 +2102,6 @@ build/level_04.1.o : level_04.1.s \
 	             build/level_04/s01_boss_above_75_a.1.bin \
 	             build/level_04/s01_boss_above_75_a_mask.1.bin \
 	             build/level_04/s02_boss_above_75_b.1.bin \
-	             build/level_04/s02_boss_above_75_b_mask.1.bin \
 	             build/level_04/s03_boss_above_75_c.1.bin \
 	             build/level_04/s03_boss_above_75_c_mask.1.bin \
 	             build/level_04/s04_boss_below_75_a.1.bin \
@@ -2140,11 +2135,6 @@ build/level_04/s02_boss_above_75_b.1.bin : build_tools/bmp_to_raw.rb \
                                            resources/level_04/s02_boss_above_75_b.1.bmp
 	build_tools/bmp_to_raw.rb resources/level_04/s02_boss_above_75_b.1.bmp \
 	                          build/level_04/s02_boss_above_75_b.1.bin
-
-build/level_04/s02_boss_above_75_b_mask.1.bin : build_tools/bmp_to_raw.rb \
-                                                resources/level_04/s02_boss_above_75_b_mask.1.bmp
-	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s02_boss_above_75_b_mask.1.bmp \
-	                               build/level_04/s02_boss_above_75_b_mask.1.bin
 
 build/level_04/s03_boss_above_75_c.1.bin : build_tools/bmp_to_raw.rb \
                                            resources/level_04/s03_boss_above_75_c.1.bmp
