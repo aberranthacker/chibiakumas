@@ -19,11 +19,11 @@
 
    # sprite 2 S02BossAbove75B
     .word S02BossAbove75B # sprite offset
-    .word S02BossAbove75BMask # bit-mask offset
+    .word 0 # bit-mask offset
     .byte 68 # height of the sprite
     .byte 0 # Y offset
     .byte 6 # witdh
-    .byte SPR_HAS_MASK # attributes
+    .byte SPR_TURBO # attributes
 
    # sprite 3 S03BossAbove75C
     .word S03BossAbove75C # sprite offset
@@ -184,8 +184,6 @@ S01BossAbove75AMask:
 
 S02BossAbove75B:
     .incbin "build/level_04/s02_boss_above_75_b.0.bin"
-S02BossAbove75BMask:
-    .incbin "build/level_04/s02_boss_above_75_b_mask.0.bin"
 
 S03BossAbove75C:
     .incbin "build/level_04/s03_boss_above_75_c.0.bin"

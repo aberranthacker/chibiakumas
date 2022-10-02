@@ -197,9 +197,9 @@ not_implemented_check_R0:
 
        .include "core/screen_memory.s"
        .global CLS
-       .global ScreenBuffer_ActiveScreen
-       .global ScreenBuffer_Flip
-       .global ScreenBuffer_Reset
+       .global ScreenBuffer.ActiveScreen
+       .global ScreenBuffer.Flip
+       .global ScreenBuffer.Reset
 
        .include "core/show_sprite.s"
        .global SprShow_BankAddr
@@ -244,7 +244,7 @@ not_implemented_check_R0:
        .global GetSpriteMempos
 
        .even
-      #.space 2
+       .space 2
 end: FileEndCore:
 
 LevelStart:

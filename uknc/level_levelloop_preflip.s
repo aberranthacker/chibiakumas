@@ -17,7 +17,7 @@
 
        #CALL @$PlaySfx
 
-       #CALL @$ScreenBuffer_Flip
+       #CALL @$ScreenBuffer.Flip
 
        .equiv FadeCommandCall, .+2
         CALL @$null

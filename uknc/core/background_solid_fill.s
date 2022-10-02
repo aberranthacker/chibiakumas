@@ -1,10 +1,10 @@
 # Solid fill render - fill lines with DE R0
 
 # Note, you must inject the correct Nextline code into this function with code like:
-# call Akuyou_ScreenBuffer_Init
+# call Akuyou_ScreenBuffer.Init
 # ld (BackgroundSolidFillNextLine_Minus1-1),hl
 
-# call Akuyou_ScreenBuffer_Flip
+# call Akuyou_ScreenBuffer.Flip
 # ld (BackgroundSolidFillNextLine_Minus1+1),hl
 
 #  To add some lines to your background

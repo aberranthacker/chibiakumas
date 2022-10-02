@@ -30,7 +30,7 @@
 .equiv PPU_SetPalette,         2
 .equiv PPU_Print,              4
 .equiv PPU_PrintAt,            6
-.equiv PPU_ShowBossText_Init,  8
+.equiv PPU_ShowBossText.Init,  8
 .equiv PPU_ShowBossText,      10
 .equiv PPU_MusicRestart,      12
 .equiv PPU_MusicStop,         14
@@ -117,7 +117,7 @@
 
     .ifndef ExtMemCore
 .equiv CoreStart, GameVarsEnd
-.equiv Akuyou_LevelStart, 0x9E38 # 40504 0117070 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9E3A # 40506 0117072 # auto-generated during a build
     .else
 .equiv CoreStart, 0160000
 .equiv Akuyou_LevelStart, GameVarsEnd
@@ -247,4 +247,4 @@
 .equiv DECB_R3_OPCODE, 0105303
 .equiv MOVB_R3_R3_OPCODE, 0110303
 
-.equiv SBT_PersistanceCounterReset, 15
+.equiv SBT_PersistanceCounterReset, 10

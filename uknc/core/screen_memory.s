@@ -6,7 +6,7 @@ CLS:
       # clear the screen
         CLR  R0
         MOV  $200,R1
-       .equiv ScreenBuffer_ActiveScreen, .+2
+       .equiv ScreenBuffer.ActiveScreen, .+2
         MOV  $FB1,R5
 
         CALL Background_SolidFill
@@ -17,11 +17,11 @@ CLS:
 
         RETURN
 
-ScreenBuffer_Reset:
+ScreenBuffer.Reset:
         MOV  $0x4000,R0
         BIS  R0,@$StarArray_ActiveScreenBit14
         BIS  R0,@$ShowSprite_ActiveScreenBit14
-        MOV  $FB1,@$ScreenBuffer_ActiveScreen
+        MOV  $FB1,@$ScreenBuffer.ActiveScreen
 
         MOV  $PPU_SET_FB1_VISIBLE,@$CCH1OD
       # frame buffer switching triggers ShowBossText
@@ -30,26 +30,26 @@ ScreenBuffer_Reset:
         CALL CLS
         RETURN
 
-ScreenBuffer_Flip:
+ScreenBuffer.Flip:
         MOV  $0x4000,R0
         BIT  R0,@$StarArray_ActiveScreenBit14
-        BZE  ScreenBuffer_SetFB1Active
+        BZE  ScreenBuffer.SetFB1Active
 
       # FB1 active, switch to FB0
         MOV  $PPU_SET_FB1_VISIBLE,@$CCH1OD
 
         BIC  R0,@$StarArray_ActiveScreenBit14
         BIC  R0,@$ShowSprite_ActiveScreenBit14
-        MOV  $FB0,@$ScreenBuffer_ActiveScreen
+        MOV  $FB0,@$ScreenBuffer.ActiveScreen
         RETURN
 
       # FB0 active, switch to FB1
-    ScreenBuffer_SetFB1Active:
+    ScreenBuffer.SetFB1Active:
         MOV  $PPU_SET_FB0_VISIBLE,@$CCH1OD
 
         BIS  R0,@$StarArray_ActiveScreenBit14
         BIS  R0,@$ShowSprite_ActiveScreenBit14
-        MOV  $FB1,@$ScreenBuffer_ActiveScreen
+        MOV  $FB1,@$ScreenBuffer.ActiveScreen
         RETURN
 
    .ifndef DebugMode

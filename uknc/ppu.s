@@ -312,8 +312,8 @@ CommandVectors:
        .word SetPalette            # PPU_SetPalette
        .word Print                 # PPU_Print
        .word PrintAt               # PPU_PrintAt
-       .word ShowBossText_Init     # PPU_ShowBossText_Start
-       .word ShowBossText          # PPU_ShowBossText_Init
+       .word ShowBossText.Init     # PPU_ShowBossText.Start
+       .word ShowBossText          # PPU_ShowBossText.Init
        .word MusicRestart          # PPU_MusicRestart
        .word MusicStop             # PPU_MusicStop
        .word Debug_Print           # PPU_Debug_Print
@@ -562,7 +562,7 @@ DonePrinting:
         RETURN
 
 #----------------------------------------------------------------------------}}}
-ShowBossText_Init: #----------------------------------------------------------{{{
+ShowBossText.Init: #----------------------------------------------------------{{{
         MOV  $StrBuffer,R3
         MOV  $PBP12D,R4
         MOV  $PBPADR,R5
@@ -575,18 +575,18 @@ ShowBossText_Init: #----------------------------------------------------------{{
         100$:
             MOV  (R4),R0  # load 2 bytes from CPU RAM
             MOV  R0,(R3)+ # store them into the buffer
-            BZE  ShowBossText_TextLoaded # end of the text
+            BZE  ShowBossText.TextLoaded # end of the text
 
             SWAB R0       # swap bytes to test most significant one
-            BZE  ShowBossText_TextLoaded # end of the text
+            BZE  ShowBossText.TextLoaded # end of the text
 
             INC  (R5)     # next address
         BR   100$
 
-ShowBossText_TextLoaded:
+ShowBossText.TextLoaded:
         MOV  $SBT_PersistanceCounterReset,@$SBT_PersistanceCounter
-        MOV  $1,@$ShowBossText_InProgress
-        MOV  $1,@$ShowBossText_CharsToPrint
+        MOV  $1,@$ShowBossText.InProgress
+        MOV  $1,@$ShowBossText.CharsToPrint
 
 1237$:  RETURN
 #----------------------------------------------------------------------------}}}
@@ -598,12 +598,12 @@ ShowBossText: #--------------------------------------------------------------{{{
         MOV  $PBPADR,R5
         MOV  $Font,-(SP)
 
-        MOV  R0,@$ShowBossText_CharsToPrintCounter
+        MOV  R0,@$ShowBossText.CharsToPrintCounter
         MOV  $0b001,@$PBPMSK # disable writes to bitplane 0
 
 SBT_NextTextLine:
         MOVB (R3)+,R1 # X pos
-       .equiv ShowBossText_ActiveScreen, .+2
+       .equiv ShowBossText.ActiveScreen, .+2
         ADD  $FB1>>1,R1
 
         MOVB (R3)+,R0 # Y pos
@@ -613,14 +613,14 @@ SBT_NextTextLine:
         ADD  CharLinesTable(R0),R1
 
 SBT_NextChar:
-       .equiv ShowBossText_CharsToPrintCounter, .+2
+       .equiv ShowBossText.CharsToPrintCounter, .+2
         DEC  $0xFF
-        BZE  ShowBossText_Finalize
+        BZE  ShowBossText.Finalize
 
         MOV  R1,(R5)      # load address of the next char into address register
         MOVB (R3)+,R0     # load character code from string buffer
         BMI  SBT_NextTextLine
-        BZE  ShowBossText_ReachedEndOfText # return if we are reached end of the text
+        BZE  ShowBossText.ReachedEndOfText # return if we are reached end of the text
 
         ASL  R0
         ASL  R0
@@ -635,14 +635,14 @@ SBT_NextChar:
         INC  R1
         BR   SBT_NextChar
 
-ShowBossText_ReachedEndOfText:
+ShowBossText.ReachedEndOfText:
        .equiv SBT_PersistanceCounter, .+2
         DEC  $SBT_PersistanceCounterReset
-        BNZ  ShowBossText_Finalize
+        BNZ  ShowBossText.Finalize
 
-        CLR  @$ShowBossText_InProgress
+        CLR  @$ShowBossText.InProgress
 
-ShowBossText_Finalize:
+ShowBossText.Finalize:
         TST  (SP)+ # remove font address from the stack
         RETURN
 #----------------------------------------------------------------------------}}}
