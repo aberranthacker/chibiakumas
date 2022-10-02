@@ -17,12 +17,12 @@ be  &0202 and the move would be at  &0302.
     Enemy bullets may hit the player, so when drawing the enemy bullets, the
 players location 'hit box' is pre-calculated and inserted into the conditions
 by 'self modifying code' to reduce the amount of time during the star loop - for
-the player loop this hit code is also disabled by self modifying code... 
+the player loop this hit code is also disabled by self modifying code...
 
     player bullets hitting enemies is handled during the 'object drawing loop'
 which draws enemies and background objects.
 
-    'Moves' in Chibiakumas are a 1 byte command where each bit has a meaning 
+    'Moves' in Chibiakumas are a 1 byte command where each bit has a meaning
 
 0-------  normal move - Explained below
 1-------  Special move - handled by various program code... these do everything
@@ -31,8 +31,8 @@ which draws enemies and background objects.
 
 Normal moves:
 -1------  Fast Move  - speed up object movement.
--0------  Normal Move 
---YYYXXX  Move direction in Y and X axis 
+-0------  Normal Move
+--YYYXXX  Move direction in Y and X axis
 
 
     This results in a grid of possible moves for any bullet or object which

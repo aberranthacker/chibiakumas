@@ -286,17 +286,18 @@ LevelLoop:
        .equiv FadeCommandCall, .+2
         CALL @$null
 
-                                            # ld a,r
-                                            # xor 0 :Randomizer_Plus1
-                                            # ld (Randomizer_Plus1-1),a
-                                            # and %00001100
-                                            # call z,StarArrayWarp ; welcome to hell!
+        CALL TRandW
+        BICB $0b11111000,R0
+        CMPB R0,$0b00000111
+        BNE  LevelLoop.NoWarp
+        CALL StarArrayWarp # welcome to hell!
+LevelLoop.NoWarp:
        .equiv BossHurt, .+2
         TST  $0
-        BZE  DontReset
+        BZE  LevelLoop.DontReset
 
         DEC  @$BossHurt
-        BNZ  DontReset
+        BNZ  LevelLoop.DontReset
 
         MOV  @$BossObject1,R5
         MOV  @$BossSpriteNum1,R0
@@ -313,10 +314,14 @@ LevelLoop:
         BIS  $sprTwoFrame,R0
         MOVB R0,3(R5)
 
-DontReset:
+LevelLoop.DontReset:
         BR   LevelLoop
-#-------------------------------------------------------------------------------
-# Generic Background Begin -----------------------------------------------------
+# ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+# ;;         Level specific code                                  ;;
+# ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+      # Warp the bullet array (for boss battles)
+       .include "star_array_warp.s"
+
 Background_Draw:
         MOV  $0,R0 # 0=left
         CALL @$Background_GradientScroll

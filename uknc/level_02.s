@@ -315,11 +315,12 @@ LevelLoop:
        .equiv FadeCommandCall, .+2
         CALL @$null
 
-                                            # ld a,r
-                                            # xor 0 :Randomizer_Plus1
-                                            # ld (Randomizer_Plus1-1),a
-                                            # and %00001100
-                                            # call z,StarArrayWarp ; welcome to hell!
+        CALL TRandW
+        BICB $0b11111000,R0
+        CMPB R0,$0b00000111
+        BNE  LevelLoop.NoWarp
+        CALL StarArrayWarp # welcome to hell!
+LevelLoop.NoWarp:
        .equiv BossHurt, .+2
         TST  $0
         BZE  DontReset
@@ -337,10 +338,10 @@ DontReset:
                                             #
         BR   LevelLoop                      #     jp LevelLoop
 # ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-# ;           Level specific code
+# ;;         Level specific code                                  ;;
 # ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-# ;Warp the bullet array (for boss battles)
-# read "Core_StarArrayWarp.asm"
+      # Warp the bullet array (for boss battles)
+       .include "star_array_warp.s"
 
 Background_Draw:
         MOV  $0,R0 # 0=left
