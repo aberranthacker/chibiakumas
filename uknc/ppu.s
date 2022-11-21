@@ -258,13 +258,14 @@ SLTABInit:
       # read from the channel, just in case
         TST  @$PCH1ID
 
+       .equiv ScanRangeWords, 3
       # Aberrant Sound Module detection
-        MOV  $PSG0+16,R1
+        MOV  $PSG0+ScanRangeWords * 2,R1
         MOV  $PSG1,R2
         MOV  $Trap4,@$4
       # Aberrant Sound Module uses addresses range 0177360-0177377
       # 16 addresses in total
-        MOV  $8,R0 # 8 even addresses
+        MOV  $ScanRangeWords,R0
         TestNextSoundBoardAddress:
             TST  -(R1)
         SOB  R0,TestNextSoundBoardAddress
