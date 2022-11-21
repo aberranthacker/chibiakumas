@@ -193,7 +193,7 @@ LevelLoop:
        .equiv dstFadeCommand, .+2
         CALL @$null
 
-        CALL @$Timer_UpdateTimer
+        CALL @$Timer.UpdateTimer
         CALL @$EventStream_Process
 
        .equiv dstDoubleStreamProcess, .+2

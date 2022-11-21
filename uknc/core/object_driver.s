@@ -83,7 +83,7 @@ ObjectArray_ConfigureForSize:
 1234$:  RETURN
 # ObjectArray_ConfigureForSize ----------------------------------------------}}}
 ObjectArray_Redraw:
-        TST  @$Timer_TicksOccured # see if game is paused (TicksOccurred = 0)
+        TST  @$Timer.TicksOccured # see if game is paused (TicksOccurred = 0)
         BZE  game_paused
       # Define player 1 and 2 hitboxes
         CALL @$ObjectArray_ConfigureForSize
@@ -138,7 +138,7 @@ ObjectArray_NextObject:
         BIT  $0xC0,R2
         BZE  Objectloop_OneFrameSprite
 
-        MOV  @$Timer_CurrentTick,R0
+        MOV  @$Timer.CurrentTick,R0
         BIT  $0x40,R2
         BZE  Objectloop_TwoFrameSprite
 
@@ -248,7 +248,7 @@ ObjectLoopBothPlayerSkip:                                   # ObjectLoopBothPlay
         BIT  $0x80,R3
         BNZ  ObjectLoop_AgelessIXLCheck # If it can be shot, it doesn't auto age
 
-        BIT  $0b00001000,@$Timer_TicksOccured # see if its time to age the sprite
+        BIT  $0b00001000,@$Timer.TicksOccured # see if its time to age the sprite
         BZE  ObjectLoop_Ageless
 
         CALL Object_DecreaseLife
@@ -402,8 +402,8 @@ ObjectAnimator:
 #                                        # ;check if a tick has occured
 #                                        # ld a,(hl)
 #                                        # ld e,a
-#                                        # ld a,(Timer_TicksOccured)
-#        BITB (R5)+,@$Timer_TicksOccured # and e
+#                                        # ld a,(Timer.TicksOccured)
+#        BITB (R5)+,@$Timer.TicksOccured # and e
 #        BZE  ObjectAnimator_Done        # jp z,ObjectAnimator_Done    ;no tick, so end
 #                                        # inc hl
 #
@@ -467,7 +467,7 @@ ObjectAnimator:
 #                                        #
 #ObjectAnimator_CondJmp:
 #                                        # ld e,(hl)
-#                                        # ld a,(Timer_TicksOccured)
+#                                        # ld a,(Timer.TicksOccured)
 #                                        # and e
 #                                        # jr z,ObjectAnimator_CondLoopTrue    ; Just read the next frame
 #                                        # inc hl
@@ -482,7 +482,7 @@ ObjectAnimator:
 #
 #ObjectAnimator_CondLoop:
 #                                        # ld e,(hl)
-#                                        # ld a,(Timer_TicksOccured)
+#                                        # ld a,(Timer.TicksOccured)
 #                                        # and e
 #                                        # jp nz,ObjectAnimator_CondLoopTrue   ;Fall into endofloop
 #
@@ -664,7 +664,7 @@ ObjectProgram.FrameAnimate: # Used To animate spider legs in 1st boss
         CLR  R0
         INC  R0 # MOV $1,R0
         ASH  R3,R0
-        BIT  R0,@$Timer_CurrentTick
+        BIT  R0,@$Timer.CurrentTick
         BZE  1237$
 
         MOV  @$SpriteBanksVectors+4,@$SprShow_BankAddr
@@ -703,7 +703,7 @@ ObjectProgram.FastFire:
 ObjectProgram.Fire:
                                      # ld d,a
                                      # ei  ; Why is interrupts disabled here??
-        BIT  R0,@$Timer_TicksOccured # ld a,(Timer_TicksOccured)
+        BIT  R0,@$Timer.TicksOccured # ld a,(Timer_TicksOccured)
         BZE  1237$                   # and d
                                      # ret z
 ObjectProgram.HyperFire:

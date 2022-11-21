@@ -96,7 +96,7 @@ EventStream_Init:
 
 EventStream_Process:
        .equiv Event_LevelSpeed, .+2 # how often ticks occur
-        BIT  $0x04,@$Timer_TicksOccured
+        BIT  $0x04,@$Timer.TicksOccured
         BZE  1237$ # no ticks occured
 
        .equiv Event_LevelTime, .+2

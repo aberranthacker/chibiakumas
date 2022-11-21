@@ -7,7 +7,7 @@
       # R2 lines
       # R5 pointer to next line of sprite, we will use -(R5) to read the line
 BitShifterDouble:
-        BIT  @$Timer_TicksOccured,R0
+        BIT  @$Timer.TicksOccured,R0
         BZE  BitShifterDouble_Skip
       # we will restore R1 before next LinesLoop cycle, without advancing SP!
         PUSH R1

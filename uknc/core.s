@@ -214,11 +214,11 @@ not_implemented_check_R0:
        .global Stars_AddBurst_Top
 
        .include "core/timer.s"
-       .global SmartBombTimer
-       .global Timer_CurrentTick
-       .global Timer_GetTimer
-       .global Timer_TicksOccured
-       .global Timer_UpdateTimer
+       .global Timer.CurrentTick
+       .global Timer.GetTimer
+       .global Timer.SmartBombTimer
+       .global Timer.TicksOccured
+       .global Timer.UpdateTimer
 
        .include "core/virtual_screen_pos_320.s"
        .global ShowSpriteReconfigureEnableDisable

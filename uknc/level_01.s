@@ -647,7 +647,7 @@ Background_Draw:
 
         MOV  @$ScreenBuffer.ActiveScreen, R5
 
-        CALL @$Timer_UpdateTimer # R0 = SmartBomb color or 0
+        CALL @$Timer.UpdateTimer # R0 = SmartBomb color or 0
         BNZ  Background_SmartBomb
 
        .equiv jmpBackgroundRender, .+2

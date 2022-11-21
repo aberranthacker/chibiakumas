@@ -24,50 +24,27 @@ LevelTiles:
        .incbin "build/level_03_tiles.spr"
 
 EventStreamArray:
-# UseBackgroundFloodFillQuadSpriteColumn equ 1
-
-# .equiv BITERFLY, 5
-# .equiv COIN, 24
-# .equiv GNAT_PACK, 11
-# .equiv GRASS_TUFT_A, 16
-# .equiv GRASS_TUFT_B, 17
-# .equiv GRASS_TUFT_BIG, 20
-# .equiv GRASS_TUFT_C, 18
-# .equiv GRASS_TUFT_D, 19
-# .equiv KAMISAGI, 0
-# .equiv MUKADE_BACHI_1, 1
-# .equiv MUKADE_BACHI_2, 2
-# .equiv MUKADE_BACHI_3, 29
-# .equiv MUKADE_BACHI_4, 2
-# .equiv MUKADE_BACHI_5, 3
-# .equiv POWERUP_DRONE, 27
-# .equiv POWERUP_POWER, 25
-# .equiv POWERUP_RATE, 26
-# .equiv SHROOM_BOMBER, 21
-# .equiv ZOMBIE_CAPYBARA, 6
-# .equiv ZOMBIE_SALARYMAN, 4
-
-.equiv DUMMY_SPRITE, 0
-
-.equiv BITERFLY,          1
-.equiv COIN,              2
-.equiv GNAT_PACK,         3
-.equiv GRASS_TUFT_A,      4
-.equiv GRASS_TUFT_B,      5
-.equiv GRASS_TUFT_BIG,    6
-.equiv GRASS_TUFT_C,      7
-.equiv GRASS_TUFT_D,      8
-.equiv KAMISAGI,          9
-.equiv MUKADE_BACHI_1,   10
-.equiv MUKADE_BACHI_2,   11 # and MUKADE_BACHI_4
-.equiv MUKADE_BACHI_3,   12
-.equiv MUKADE_BACHI_5,   13
-.equiv POWERUP_DRONE,    14
-.equiv POWERUP_POWER,    15
-.equiv POWERUP_RATE,     16
-.equiv SHROOM_BOMBER,    17
-.equiv ZOMBIE_CAPYBARA,  18
-.equiv ZOMBIE_SALARYMAN, 19
+    .equiv DUMMY_SPRITE, 0
+    
+    .equiv BITERFLY,          1 #  5
+    .equiv COIN,              2 # 24
+    .equiv GNAT_PACK,         3 # 11
+    .equiv GRASS_TUFT_A,      4 # 16
+    .equiv GRASS_TUFT_B,      5 # 17
+    .equiv GRASS_TUFT_BIG,    6 # 20
+    .equiv GRASS_TUFT_C,      7 # 18
+    .equiv GRASS_TUFT_D,      8 # 19
+    .equiv KAMISAGI,          9 #  0
+    .equiv MUKADE_BACHI_1,   10 #  1
+    .equiv MUKADE_BACHI_2,   11 #  2 and MUKADE_BACHI_4
+    .equiv MUKADE_BACHI_3,   12 # 29
+    .equiv MUKADE_BACHI_5,   13 #  3
+    .equiv POWERUP_DRONE,    14 # 27
+    .equiv POWERUP_POWER,    15 # 25
+    .equiv POWERUP_RATE,     16 # 26
+    .equiv SHROOM_BOMBER,    17 # 21
+    .equiv ZOMBIE_CAPYBARA,  18 #  6
+    .equiv ZOMBIE_SALARYMAN, 19 #  4
 
     .word 0, evtResetPowerup
 
@@ -535,7 +512,7 @@ Background_Draw:
 
         MOV  @$ScreenBuffer.ActiveScreen,R5
 
-        CALL @$Timer_UpdateTimer # R0 = SmartBomb color or 0
+        CALL @$Timer.UpdateTimer # R0 = SmartBomb color or 0
         BNZ  Background_SmartBomb
 
        .equiv jmpBackgroundRender, .+2
@@ -676,7 +653,7 @@ CustomMove.Bouncer:
 
         MOV  R2,R0                     #     ld a,d
         BIC  $0xFFF0,R0                #     and %00001111
-        ADD  @$Timer_CurrentTick,R0    #     add a,l
+        ADD  @$Timer.CurrentTick,R0    #     add a,l
         MOV  R0,R5                     #     ldia
 
         BITB $0x20,R0                  #     bit 5,a
@@ -721,7 +698,7 @@ CustomMove.Bouncer.FireNormal:
 
 CustomMove.Bouncer.DoSprite:
                                        #     ld a,h
-        BIT  $0x02,@$Timer_TicksOccured#     bit 1,a
+        BIT  $0x02,@$Timer.TicksOccured#     bit 1,a
         BZE  CustomMove.Bouncer.Done    #     jp z,CustomMove.Bouncer_Done
 
         MOV  @$SpriteBanksVectors+4,@$SprShow_BankAddr # call Akuyou_ObjectProgram_SpriteBankSwitch
@@ -808,10 +785,10 @@ CustomMovePattern: # B=X C=Y D=Move
 
                                        #        ;dont update more than once per tick!
                                        #         ld a,(ix+1)
-        CMPB 1(R5),@$Timer_CurrentTick #         cp e
+        CMPB 1(R5),@$Timer.CurrentTick #         cp e
         BEQ  CustomMovePattern_NoTick  #         jr z,CustomMovePattern_NoTick
                                        #         ld a,e
-        MOVB @$Timer_CurrentTick,1(R5) #         ld (ix+1),e
+        MOVB @$Timer.CurrentTick,1(R5) #         ld (ix+1),e
 
                                        #        ;see if this is our first run
                                        #         ex af,af'
