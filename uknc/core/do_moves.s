@@ -64,7 +64,7 @@ DoMoves_Background: # Background sprites move much more slowly, and only in 1 di
         MOV  R2,R0
         BIC  $0xFFF0,R0 # ----XXXX tick point
         ASL  R0
-        BITB R0,@$Timer_TicksOccured
+        BITB R0,@$Timer.TicksOccured
         BNZ  1$
         RETURN
 
@@ -77,7 +77,7 @@ DoMoves_Background: # Background sprites move much more slowly, and only in 1 di
 
 DoMoves_Spec: # Special moves - various kinds
        .equiv SpecialMoveSlowdown, .+2
-        BITB $0xFF,@$Timer_TicksOccured
+        BITB $0xFF,@$Timer.TicksOccured
         BNZ  1$
         RETURN
 

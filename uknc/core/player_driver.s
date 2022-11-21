@@ -53,12 +53,12 @@ Player_HandlerOne:
             TSTB @$KeyboardScanner_P1
         BMI  CheckIfPauseKeyReleased
 
-        COM  @$Timer_Pause # Z=normal, NZ=paused
+        COM  @$Timer.Pause # Z=normal, NZ=paused
 
 1237$:  RETURN
 
 Player_Handler_PauseCheckDone:
-        MOV  @$Timer_TicksOccured,R0
+        MOV  @$Timer.TicksOccured,R0
         BZE  1237$  # abort handler if game paused
 
         CLR  @$PlayerSaveShot
@@ -168,7 +168,7 @@ Player_Handler_SmartBomb: # Check if we should fire the smarbomb
         ROLB R4 # push out smartbomb bit
         BCC  Player_Handler_KeyreadDone
 
-        TST  @$SmartBombTimer # smartbomb active?
+        TST  @$Timer.SmartBombTimer # smartbomb active?
         BNZ  Player_Handler_KeyreadDone
 
         TSTB 3(R5) # see if we've got any smartbombs left
@@ -203,7 +203,7 @@ Player_Handler_NoSaveFire:
         DEC  R5
         CLR  R3
        .equiv PlayerSpriteAnim, .+2
-        BIT  $0b00000010,@$Timer_CurrentTick
+        BIT  $0b00000010,@$Timer.CurrentTick
         BZE  Player_Handler_Frame1
 
         INC  R3
@@ -252,7 +252,7 @@ Player_Handler_NoDrones:
         TSTB 7(R5) # invincibility
         BZE  Player_NotInvincible
 
-        MOV  @$Timer_TicksOccured,R0
+        MOV  @$Timer.TicksOccured,R0
         BIT  $0b0010,R0
         BZE  Player_NotInvincible # invincible flash
 
@@ -487,7 +487,7 @@ SetFireDir_Fire:
       # R2 player X
       # R5 player array pointer
 Player_Handler_DoSmartBomb:
-        MOV  $5,@$SmartBombTimer
+        MOV  $5,@$Timer.SmartBombTimer
        .ppudo $PPU_PlaySoundEffect5
 
         MOV  $StarArraySizeBytes >> 2,R3

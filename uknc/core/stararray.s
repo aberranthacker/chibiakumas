@@ -21,7 +21,7 @@ Player_StarArray_Redraw:
         BR   Starloop_Start
 
 StarArray_Redraw:
-        TST  @$Timer_TicksOccured
+        TST  @$Timer.TicksOccured
         BNZ  1$ # see if game is not paused (TicksOccurred != 0 )
         RETURN
     1$:
@@ -94,7 +94,7 @@ StarArray_Redraw:
        .equiv opcStarSlowdown, .+2
         MOV  $0006200,R3 # ASR  R0
        .equiv SlowdownFreq, .+2
-        BIT  $0b10,@$Timer_TicksOccured
+        BIT  $0b10,@$Timer.TicksOccured
         BZE  Starloop_Start2
 
 Starloop_Start:

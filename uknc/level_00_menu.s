@@ -82,7 +82,7 @@ ShowMenu:
         MOV  $Event_SavedSettings,R3  # Saved Settings
         CALL @$EventStream_Init
         # TODO: show hiscore value
-        CALL @$Timer_UpdateTimer # Aku/Level00-Menu.asm:1180
+        CALL @$Timer.UpdateTimer # Aku/Level00-Menu.asm:1180
         CALL @$EventStream_Process
         CALL TRandW
         WAIT
@@ -117,7 +117,7 @@ ShowMenu_Loop: #-------------------------------------------------------------{{{
     .ifdef DebugMode
         CALL @$ShowKeysBitmap
     .endif
-        CALL @$Timer_UpdateTimer
+        CALL @$Timer.UpdateTimer
         CALL @$EventStream_Process
 
         WAIT

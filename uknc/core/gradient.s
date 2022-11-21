@@ -43,7 +43,7 @@ Background_NewLine:
 
       # Scroll rate for 'ground'
        .equiv ScrollPosRate1, .+2
-        BIT  $0xFF,@$Timer_TicksOccured
+        BIT  $0xFF,@$Timer.TicksOccured
         BZE  Background_NoShift
 
        .equiv jmpBackground_ShiftJumpA, .+2

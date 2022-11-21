@@ -331,7 +331,7 @@ Background_Draw:
 
         MOV  @$ScreenBuffer.ActiveScreen,R5
 
-        CALL @$Timer_UpdateTimer # R0 = SmartBomb color or 0
+        CALL @$Timer.UpdateTimer # R0 = SmartBomb color or 0
         BNZ  Background_SmartBomb
 
        .equiv jmpBackgroundRender, .+2
@@ -568,18 +568,18 @@ CustomMove.YoYo:
         CMP  @$BossLife,$1
         BEQ  1237$ # dont mess with moves if the boss is dead
 
-       #TSTB @$Timer_TicksOccured
+       #TSTB @$Timer.TicksOccured
        #BZE  1237$ # Only run every two ticks on v9990
 
-        BIT  $0b0100,@$Timer_TicksOccured # every forth tick
+        BIT  $0b0100,@$Timer.TicksOccured # every forth tick
         BZE  CustomMove.YoYo.NoTick
       # The boss consist of three pieces moving simultaneously
       # so the proc will be executed 3 times
        .equiv CustomMove.YoYo.Timer_CurrentTick, .+2
-        CMP  $0,@$Timer_CurrentTick # Timer_CurrentTick changed since last call?
+        CMP  $0,@$Timer.CurrentTick # Timer_CurrentTick changed since last call?
         BEQ  CustomMove.YoYo.NoTick # no, don't increase CustomMove.YoYo.Counter
 
-        MOV  @$Timer_CurrentTick,@$CustomMove.YoYo.Timer_CurrentTick
+        MOV  @$Timer.CurrentTick,@$CustomMove.YoYo.Timer_CurrentTick
         INC  @$CustomMove.YoYo.Counter
 CustomMove.YoYo.NoTick:
        .equiv CustomMove.YoYo.Counter, .+2
@@ -623,7 +623,7 @@ CustomMove.YoYo.NoAttack:
         MOV  $12,@$CustomMove.YoYo.Counter
 CustomMove.YoYo.Vert:
       # move 16 times up, 16 times down, and so on
-        BIT  $0x10,@$Timer_CurrentTick
+        BIT  $0x10,@$Timer.CurrentTick
         BZE  CustomMove.YoYo.Up
 #CustomMove.YoYo.Down:
         SUB  $6,R1

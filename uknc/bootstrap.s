@@ -669,13 +669,13 @@ ResetCore: # ../Aku/BootStrap.asm:2318
         CALL ShowSpriteReconfigureEnableDisable # ./SrcCPC/Akuyou_CPC_VirtualScreenPos_320.asm:82
 
         MOV  $0x69,R0
-        MOV  R0,@$Timer_CurrentTick
+        MOV  R0,@$Timer.CurrentTick
         MOV  R0,@$DroneFlipCurrent
 
         CLR  @$EventObjectAnimatorToAdd
         CLR  @$EventObjectSpriteSizeToAdd
         CLR  @$EventObjectProgramToAdd
-        CLR  @$Timer_TicksOccured
+        CLR  @$Timer.TicksOccured
 
         CLR  R0
         CALL @$DroneFlipFire
