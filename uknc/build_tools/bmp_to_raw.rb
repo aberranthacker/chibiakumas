@@ -50,7 +50,10 @@ raise 'Unknown file type.' unless signature == 'BM'
 raise 'Number of color planes other than 1 in not supported.' unless planes == 1
 raise "#{bits_per_pixel} bits per pixel not supported, 8 bits only." unless bits_per_pixel == 8
 raise 'Compression is not supported.' unless compression == 0
-raise 'Padded pixel array is not supported.' unless image_width * image_height == image_size
+if image_width * image_height != image_size
+  raise "Padded pixel array is not supported.\n" \
+        "#{image_width} * #{image_height} != #{image_size}"
+end
 
 bitmap = bmp[pixel_array_offset, image_size].bytes.reverse
 

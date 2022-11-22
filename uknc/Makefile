@@ -22,9 +22,14 @@ pre-build :
 	mkdir -p build/level_02
 	mkdir -p build/level_03
 	mkdir -p build/level_04
+	mkdir -p build/level_05
 
 clean :
 	rm -rf build/*
+
+spr5 :
+	./build_tools/add_sprites_to_s.rb resources/level_05/ && \
+		./build_tools/add_sprites_to_makefile.rb resources/level_05
 
 # chibiakumas.dsk -----------------------------------------------------------{{{
 build/chibiakumas.dsk : build_tools/build_dsk.rb \
@@ -44,6 +49,7 @@ build/chibiakumas.dsk : build_tools/build_dsk.rb \
 			build/level_03_title.bin \
 			build/level_03.bin \
 			build/level_04.bin \
+			build/level_05.bin \
 			build/level_05_title.bin \
 			build/level_07_title.bin \
 			build/saved_settings.bin
@@ -94,32 +100,32 @@ build/bootstrap.o : $(common) \
 	$(AS) -al bootstrap.s -o build/bootstrap.o | build_tools/format_list.rb
 
 build/high_score.bin.lzsa1 : build_tools/bmp_to_raw.rb \
-                             resources/bootstrap/high_score.bmp
+			     resources/bootstrap/high_score.bmp
 	build_tools/bmp_to_raw.rb resources/bootstrap/high_score.bmp build/high_score.bin
 	build_tools/lzsa -f 1 -r build/high_score.bin build/high_score.bin.lzsa1
 
 build/continue.bin.lzsa1 : build_tools/bmp_to_raw.rb \
-                           resources/bootstrap/continue-320x96.bmp
+			   resources/bootstrap/continue-320x96.bmp
 	build_tools/bmp_to_raw.rb resources/bootstrap/continue-320x96.bmp build/continue.bin
 	build_tools/lzsa -f 1 -r build/continue.bin build/continue.bin.lzsa1
 
 build/game_over.bin.lzsa1 : build_tools/bmp_to_raw.rb \
-                            resources/bootstrap/game_over.bmp
+			    resources/bootstrap/game_over.bmp
 	build_tools/bmp_to_raw.rb resources/bootstrap/game_over.bmp build/game_over.bin
 	build_tools/lzsa -f 1 -r build/game_over.bin build/game_over.bin.lzsa1
 
 build/level_03_title.bin.lzsa1 : build_tools/bmp_to_raw.rb \
-                                   resources/bootstrap/level_03-title.bmp
+				 resources/bootstrap/level_03-title.bmp
 	build_tools/bmp_to_raw.rb resources/bootstrap/level_03-title.bmp build/level_03_title.bin
 	build_tools/lzsa -f 1 -r build/level_03_title.bin build/level_03_title.bin.lzsa1
 
 build/level_05_title.bin.lzsa1 : build_tools/bmp_to_raw.rb \
-                                   resources/bootstrap/level_05-title.bmp
+				 resources/bootstrap/level_05-title.bmp
 	build_tools/bmp_to_raw.rb resources/bootstrap/level_05-title.bmp build/level_05_title.bin
 	build_tools/lzsa -f 1 -r build/level_05_title.bin build/level_05_title.bin.lzsa1
 
 build/level_07_title.bin.lzsa1 : build_tools/bmp_to_raw.rb \
-                                   resources/bootstrap/level_07-title.bmp
+				 resources/bootstrap/level_07-title.bmp
 	build_tools/bmp_to_raw.rb resources/bootstrap/level_07-title.bmp build/level_07_title.bin
 	build_tools/lzsa -f 1 -r build/level_07_title.bin build/level_07_title.bin.lzsa1
 # bootsrap.bin --------------------------------------------------------------}}}
@@ -1411,14 +1417,33 @@ build/level_04.bin : build/core.o \
 	ruby build_tools/aout2sav.rb build/level_04.out -b -s -o build/level_04.bin
 
 build/level_04.o : $(common) \
-                   level_04.s \
-                   star_array_warp.s \
+		   level_04.s \
+		   star_array_warp.s \
 		   build/level_04.0.spr \
 		   build/level_04.1.spr \
 		   build/level_03_tiles.spr \
 		   build/chibi_lr.spr
 	$(AS) -al level_04.s -o build/level_04.o | build_tools/format_list.rb
 # level_04.bin --------------------------------------------------------------}}}
+
+# level_05.bin --------------------------------------------------------------{{{
+build/level_05.bin : build/core.o \
+                     build/level_05.o
+	$(LD) $(LDFLAGS) build/level_05.o -R build/core.o -o build/level_05.out
+	ruby build_tools/aout2sav.rb build/level_05.out -b -s -o build/level_05.bin
+
+build/level_05.o : $(common) \
+		   level_05.s \
+		   build/level_05.0.spr \
+		   build/level_05.1.spr \
+		   build/level_05_tiles.spr \
+		   build/chibi_lr.spr
+	$(AS) -al level_05.s -o build/level_05.o | build_tools/format_list.rb
+
+build/level_05_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
+			   resources/level_05_tiles.cpc.spr
+	build_tools/spr_cpc_to_uknc.rb resources/level_05_tiles.cpc.spr -o build/level_05_tiles.spr
+# level_05.bin --------------------------------------------------------------}}}
 
 # level_03.0.spr ------------------------------------------------------------{{{
 build/level_03.0.spr : build/level_03.0.o \
@@ -2221,3 +2246,383 @@ build/level_04/s11_chu_text_mask.1.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb -b 1 resources/level_04/s11_chu_text_mask.1.bmp \
 	                               build/level_04/s11_chu_text_mask.1.bin
 # level_04.1.spr ------------------------------------------------------------}}}
+
+# level_05.0.spr ------------------------------------------------------------{{{
+build/level_05.0.spr : build/level_05.0.o \
+                       linker_scripts/sprites.cmd
+	$(LD) $(LDFLAGS) build/level_05.0.o -T linker_scripts/sprites.cmd \
+	                 -o build/level_05.0.spr
+
+build/level_05.0.o : level_05.0.s \
+	             build/level_05/s01_tentitack.0.bin \
+	             build/level_05/s02_superfish.0.bin \
+	             build/level_05/s03_lilifrog.0.bin \
+	             build/level_05/s04_spitfish.0.bin \
+	             build/level_05/s05_spitfish_bomber.0.bin \
+	             build/level_05/s06_pairanah.0.bin \
+	             build/level_05/s07_bubble24.0.bin \
+	             build/level_05/s08_bubble16.0.bin \
+	             build/level_05/s09_minerfish.0.bin \
+	             build/level_05/s10_coin.0.bin \
+	             build/level_05/s11_fishface_left.0.bin \
+	             build/level_05/s12_fishbone_left.0.bin \
+	             build/level_05/s13_powerup_power.0.bin \
+	             build/level_05/s14_powerup_rate.0.bin \
+	             build/level_05/s15_powerup_drone.0.bin \
+	             build/level_05/s16_wave1.0.bin \
+	             build/level_05/s17_wave2.0.bin \
+	             build/level_05/s18_wave3.0.bin \
+	             build/level_05/s19_weed1.0.bin \
+	             build/level_05/s20_weed2.0.bin \
+	             build/level_05/s21_coral1.0.bin \
+	             build/level_05/s22_coral2.0.bin \
+	             build/level_05/s23_fishface_right.0.bin \
+	             build/level_05/s24_fishbone_right.0.bin \
+	             build/level_05/s25_tuffet.0.bin \
+	             build/level_05/s26_grass1.0.bin \
+	             build/level_05/s27_grass2.0.bin \
+	             build/level_05/s28_bush.0.bin \
+	             build/level_05/s29_rock1.0.bin \
+	             build/level_05/s30_rock2.0.bin
+	$(AS) -al level_05.0.s -o build/level_05.0.o
+
+build/level_05/s01_tentitack.0.bin : build_tools/bmp_to_raw.rb \
+                                     resources/level_05/s01_tentitack.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s01_tentitack.0.bmp \
+	                          build/level_05/s01_tentitack.0.bin
+
+build/level_05/s02_superfish.0.bin : build_tools/bmp_to_raw.rb \
+                                     resources/level_05/s02_superfish.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s02_superfish.0.bmp \
+	                          build/level_05/s02_superfish.0.bin
+
+build/level_05/s03_lilifrog.0.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_05/s03_lilifrog.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s03_lilifrog.0.bmp \
+	                          build/level_05/s03_lilifrog.0.bin
+
+build/level_05/s04_spitfish.0.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_05/s04_spitfish.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s04_spitfish.0.bmp \
+	                          build/level_05/s04_spitfish.0.bin
+
+build/level_05/s05_spitfish_bomber.0.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_05/s05_spitfish_bomber.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s05_spitfish_bomber.0.bmp \
+	                          build/level_05/s05_spitfish_bomber.0.bin
+
+build/level_05/s06_pairanah.0.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_05/s06_pairanah.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s06_pairanah.0.bmp \
+	                          build/level_05/s06_pairanah.0.bin
+
+build/level_05/s07_bubble24.0.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_05/s07_bubble24.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s07_bubble24.0.bmp \
+	                          build/level_05/s07_bubble24.0.bin
+
+build/level_05/s08_bubble16.0.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_05/s08_bubble16.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s08_bubble16.0.bmp \
+	                          build/level_05/s08_bubble16.0.bin
+
+build/level_05/s09_minerfish.0.bin : build_tools/bmp_to_raw.rb \
+                                     resources/level_05/s09_minerfish.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s09_minerfish.0.bmp \
+	                          build/level_05/s09_minerfish.0.bin
+
+build/level_05/s10_coin.0.bin : build_tools/bmp_to_raw.rb \
+                                resources/level_05/s10_coin.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s10_coin.0.bmp \
+	                          build/level_05/s10_coin.0.bin
+
+build/level_05/s11_fishface_left.0.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_05/s11_fishface_left.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s11_fishface_left.0.bmp \
+	                          build/level_05/s11_fishface_left.0.bin
+
+build/level_05/s12_fishbone_left.0.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_05/s12_fishbone_left.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s12_fishbone_left.0.bmp \
+	                          build/level_05/s12_fishbone_left.0.bin
+
+build/level_05/s13_powerup_power.0.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_05/s13_powerup_power.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s13_powerup_power.0.bmp \
+	                          build/level_05/s13_powerup_power.0.bin
+
+build/level_05/s14_powerup_rate.0.bin : build_tools/bmp_to_raw.rb \
+                                        resources/level_05/s14_powerup_rate.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s14_powerup_rate.0.bmp \
+	                          build/level_05/s14_powerup_rate.0.bin
+
+build/level_05/s15_powerup_drone.0.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_05/s15_powerup_drone.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s15_powerup_drone.0.bmp \
+	                          build/level_05/s15_powerup_drone.0.bin
+
+build/level_05/s16_wave1.0.bin : build_tools/bmp_to_raw.rb \
+                                 resources/level_05/s16_wave1.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s16_wave1.0.bmp \
+	                          build/level_05/s16_wave1.0.bin
+
+build/level_05/s17_wave2.0.bin : build_tools/bmp_to_raw.rb \
+                                 resources/level_05/s17_wave2.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s17_wave2.0.bmp \
+	                          build/level_05/s17_wave2.0.bin
+
+build/level_05/s18_wave3.0.bin : build_tools/bmp_to_raw.rb \
+                                 resources/level_05/s18_wave3.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s18_wave3.0.bmp \
+	                          build/level_05/s18_wave3.0.bin
+
+build/level_05/s19_weed1.0.bin : build_tools/bmp_to_raw.rb \
+                                 resources/level_05/s19_weed1.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s19_weed1.0.bmp \
+	                          build/level_05/s19_weed1.0.bin
+
+build/level_05/s20_weed2.0.bin : build_tools/bmp_to_raw.rb \
+                                 resources/level_05/s20_weed2.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s20_weed2.0.bmp \
+	                          build/level_05/s20_weed2.0.bin
+
+build/level_05/s21_coral1.0.bin : build_tools/bmp_to_raw.rb \
+                                  resources/level_05/s21_coral1.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s21_coral1.0.bmp \
+	                          build/level_05/s21_coral1.0.bin
+
+build/level_05/s22_coral2.0.bin : build_tools/bmp_to_raw.rb \
+                                  resources/level_05/s22_coral2.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s22_coral2.0.bmp \
+	                          build/level_05/s22_coral2.0.bin
+
+build/level_05/s23_fishface_right.0.bin : build_tools/bmp_to_raw.rb \
+                                          resources/level_05/s23_fishface_right.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s23_fishface_right.0.bmp \
+	                          build/level_05/s23_fishface_right.0.bin
+
+build/level_05/s24_fishbone_right.0.bin : build_tools/bmp_to_raw.rb \
+                                          resources/level_05/s24_fishbone_right.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s24_fishbone_right.0.bmp \
+	                          build/level_05/s24_fishbone_right.0.bin
+
+build/level_05/s25_tuffet.0.bin : build_tools/bmp_to_raw.rb \
+                                  resources/level_05/s25_tuffet.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s25_tuffet.0.bmp \
+	                          build/level_05/s25_tuffet.0.bin
+
+build/level_05/s26_grass1.0.bin : build_tools/bmp_to_raw.rb \
+                                  resources/level_05/s26_grass1.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s26_grass1.0.bmp \
+	                          build/level_05/s26_grass1.0.bin
+
+build/level_05/s27_grass2.0.bin : build_tools/bmp_to_raw.rb \
+                                  resources/level_05/s27_grass2.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s27_grass2.0.bmp \
+	                          build/level_05/s27_grass2.0.bin
+
+build/level_05/s28_bush.0.bin : build_tools/bmp_to_raw.rb \
+                                resources/level_05/s28_bush.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s28_bush.0.bmp \
+	                          build/level_05/s28_bush.0.bin
+
+build/level_05/s29_rock1.0.bin : build_tools/bmp_to_raw.rb \
+                                 resources/level_05/s29_rock1.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s29_rock1.0.bmp \
+	                          build/level_05/s29_rock1.0.bin
+
+build/level_05/s30_rock2.0.bin : build_tools/bmp_to_raw.rb \
+                                 resources/level_05/s30_rock2.0.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s30_rock2.0.bmp \
+	                          build/level_05/s30_rock2.0.bin
+# level_05.0.spr ------------------------------------------------------------}}}
+
+# level_05.1.spr ------------------------------------------------------------{{{
+build/level_05.1.spr : build/level_05.1.o \
+                       linker_scripts/sprites.cmd
+	$(LD) $(LDFLAGS) build/level_05.1.o -T linker_scripts/sprites.cmd \
+	                 -o build/level_05.1.spr
+
+build/level_05.1.o : level_05.1.s \
+	             build/level_05/s01_tentitack.1.bin \
+	             build/level_05/s02_superfish.1.bin \
+	             build/level_05/s03_lilifrog.1.bin \
+	             build/level_05/s04_spitfish.1.bin \
+	             build/level_05/s05_spitfish_bomber.1.bin \
+	             build/level_05/s06_pairanah.1.bin \
+	             build/level_05/s07_bubble24.1.bin \
+	             build/level_05/s08_bubble16.1.bin \
+	             build/level_05/s09_minerfish.1.bin \
+	             build/level_05/s10_coin.1.bin \
+	             build/level_05/s11_fishface_left.1.bin \
+	             build/level_05/s12_fishbone_left.1.bin \
+	             build/level_05/s13_powerup_power.1.bin \
+	             build/level_05/s14_powerup_rate.1.bin \
+	             build/level_05/s15_powerup_drone.1.bin \
+	             build/level_05/s16_wave1.1.bin \
+	             build/level_05/s17_wave2.1.bin \
+	             build/level_05/s18_wave3.1.bin \
+	             build/level_05/s19_weed1.1.bin \
+	             build/level_05/s20_weed2.1.bin \
+	             build/level_05/s21_coral1.1.bin \
+	             build/level_05/s22_coral2.1.bin \
+	             build/level_05/s23_fishface_right.1.bin \
+	             build/level_05/s24_fishbone_right.1.bin \
+	             build/level_05/s25_tuffet.1.bin \
+	             build/level_05/s26_grass1.1.bin \
+	             build/level_05/s27_grass2.1.bin \
+	             build/level_05/s28_bush.1.bin \
+	             build/level_05/s29_rock1.1.bin \
+	             build/level_05/s30_rock2.1.bin
+	$(AS) -al level_05.1.s -o build/level_05.1.o
+
+build/level_05/s01_tentitack.1.bin : build_tools/bmp_to_raw.rb \
+                                     resources/level_05/s01_tentitack.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s01_tentitack.1.bmp \
+	                          build/level_05/s01_tentitack.1.bin
+
+build/level_05/s02_superfish.1.bin : build_tools/bmp_to_raw.rb \
+                                     resources/level_05/s02_superfish.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s02_superfish.1.bmp \
+	                          build/level_05/s02_superfish.1.bin
+
+build/level_05/s03_lilifrog.1.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_05/s03_lilifrog.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s03_lilifrog.1.bmp \
+	                          build/level_05/s03_lilifrog.1.bin
+
+build/level_05/s04_spitfish.1.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_05/s04_spitfish.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s04_spitfish.1.bmp \
+	                          build/level_05/s04_spitfish.1.bin
+
+build/level_05/s05_spitfish_bomber.1.bin : build_tools/bmp_to_raw.rb \
+                                           resources/level_05/s05_spitfish_bomber.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s05_spitfish_bomber.1.bmp \
+	                          build/level_05/s05_spitfish_bomber.1.bin
+
+build/level_05/s06_pairanah.1.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_05/s06_pairanah.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s06_pairanah.1.bmp \
+	                          build/level_05/s06_pairanah.1.bin
+
+build/level_05/s07_bubble24.1.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_05/s07_bubble24.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s07_bubble24.1.bmp \
+	                          build/level_05/s07_bubble24.1.bin
+
+build/level_05/s08_bubble16.1.bin : build_tools/bmp_to_raw.rb \
+                                    resources/level_05/s08_bubble16.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s08_bubble16.1.bmp \
+	                          build/level_05/s08_bubble16.1.bin
+
+build/level_05/s09_minerfish.1.bin : build_tools/bmp_to_raw.rb \
+                                     resources/level_05/s09_minerfish.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s09_minerfish.1.bmp \
+	                          build/level_05/s09_minerfish.1.bin
+
+build/level_05/s10_coin.1.bin : build_tools/bmp_to_raw.rb \
+                                resources/level_05/s10_coin.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s10_coin.1.bmp \
+	                          build/level_05/s10_coin.1.bin
+
+build/level_05/s11_fishface_left.1.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_05/s11_fishface_left.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s11_fishface_left.1.bmp \
+	                          build/level_05/s11_fishface_left.1.bin
+
+build/level_05/s12_fishbone_left.1.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_05/s12_fishbone_left.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s12_fishbone_left.1.bmp \
+	                          build/level_05/s12_fishbone_left.1.bin
+
+build/level_05/s13_powerup_power.1.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_05/s13_powerup_power.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s13_powerup_power.1.bmp \
+	                          build/level_05/s13_powerup_power.1.bin
+
+build/level_05/s14_powerup_rate.1.bin : build_tools/bmp_to_raw.rb \
+                                        resources/level_05/s14_powerup_rate.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s14_powerup_rate.1.bmp \
+	                          build/level_05/s14_powerup_rate.1.bin
+
+build/level_05/s15_powerup_drone.1.bin : build_tools/bmp_to_raw.rb \
+                                         resources/level_05/s15_powerup_drone.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s15_powerup_drone.1.bmp \
+	                          build/level_05/s15_powerup_drone.1.bin
+
+build/level_05/s16_wave1.1.bin : build_tools/bmp_to_raw.rb \
+                                 resources/level_05/s16_wave1.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s16_wave1.1.bmp \
+	                          build/level_05/s16_wave1.1.bin
+
+build/level_05/s17_wave2.1.bin : build_tools/bmp_to_raw.rb \
+                                 resources/level_05/s17_wave2.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s17_wave2.1.bmp \
+	                          build/level_05/s17_wave2.1.bin
+
+build/level_05/s18_wave3.1.bin : build_tools/bmp_to_raw.rb \
+                                 resources/level_05/s18_wave3.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s18_wave3.1.bmp \
+	                          build/level_05/s18_wave3.1.bin
+
+build/level_05/s19_weed1.1.bin : build_tools/bmp_to_raw.rb \
+                                 resources/level_05/s19_weed1.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s19_weed1.1.bmp \
+	                          build/level_05/s19_weed1.1.bin
+
+build/level_05/s20_weed2.1.bin : build_tools/bmp_to_raw.rb \
+                                 resources/level_05/s20_weed2.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s20_weed2.1.bmp \
+	                          build/level_05/s20_weed2.1.bin
+
+build/level_05/s21_coral1.1.bin : build_tools/bmp_to_raw.rb \
+                                  resources/level_05/s21_coral1.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s21_coral1.1.bmp \
+	                          build/level_05/s21_coral1.1.bin
+
+build/level_05/s22_coral2.1.bin : build_tools/bmp_to_raw.rb \
+                                  resources/level_05/s22_coral2.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s22_coral2.1.bmp \
+	                          build/level_05/s22_coral2.1.bin
+
+build/level_05/s23_fishface_right.1.bin : build_tools/bmp_to_raw.rb \
+                                          resources/level_05/s23_fishface_right.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s23_fishface_right.1.bmp \
+	                          build/level_05/s23_fishface_right.1.bin
+
+build/level_05/s24_fishbone_right.1.bin : build_tools/bmp_to_raw.rb \
+                                          resources/level_05/s24_fishbone_right.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s24_fishbone_right.1.bmp \
+	                          build/level_05/s24_fishbone_right.1.bin
+
+build/level_05/s25_tuffet.1.bin : build_tools/bmp_to_raw.rb \
+                                  resources/level_05/s25_tuffet.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s25_tuffet.1.bmp \
+	                          build/level_05/s25_tuffet.1.bin
+
+build/level_05/s26_grass1.1.bin : build_tools/bmp_to_raw.rb \
+                                  resources/level_05/s26_grass1.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s26_grass1.1.bmp \
+	                          build/level_05/s26_grass1.1.bin
+
+build/level_05/s27_grass2.1.bin : build_tools/bmp_to_raw.rb \
+                                  resources/level_05/s27_grass2.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s27_grass2.1.bmp \
+	                          build/level_05/s27_grass2.1.bin
+
+build/level_05/s28_bush.1.bin : build_tools/bmp_to_raw.rb \
+                                resources/level_05/s28_bush.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s28_bush.1.bmp \
+	                          build/level_05/s28_bush.1.bin
+
+build/level_05/s29_rock1.1.bin : build_tools/bmp_to_raw.rb \
+                                 resources/level_05/s29_rock1.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s29_rock1.1.bmp \
+	                          build/level_05/s29_rock1.1.bin
+
+build/level_05/s30_rock2.1.bin : build_tools/bmp_to_raw.rb \
+                                 resources/level_05/s30_rock2.1.bmp
+	build_tools/bmp_to_raw.rb resources/level_05/s30_rock2.1.bmp \
+	                          build/level_05/s30_rock2.1.bin
+# level_05.1.spr ------------------------------------------------------------}}}

@@ -4,7 +4,7 @@
 #.equiv DebugSprite, 1
 #.equiv ExtMemCore, 1
 #.equiv TwoPlayersGame, 1
- .equiv PlayerInvincible, 1
+#.equiv PlayerInvincible, 1
 #-------------------------------------------------------------------------------
 .equiv MainMenu, 0x8000
 .equiv Episode1_Intro, 0x0000
@@ -12,13 +12,15 @@
 .equiv Level2, 0x0002
 .equiv Level3, 0x0003
 .equiv Level4, 0x0004
+.equiv Level5, 0x0005
 
 #.equiv StartOnLevel, MainMenu
 #.equiv StartOnLevel, Episode1_Intro
 #.equiv StartOnLevel, Level1
 #.equiv StartOnLevel, Level2
 #.equiv StartOnLevel, Level3
- .equiv StartOnLevel, Level4
+#.equiv StartOnLevel, Level4
+ .equiv StartOnLevel, Level5
 
 .if StartOnLevel == MainMenu
   .equiv ShowLoadingScreen, 1

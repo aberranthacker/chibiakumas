@@ -3,8 +3,8 @@
                .include "./core_defs.s"
 
                .global start # make entry point available to a linker
-               .global Level03_TitlePalette
                .global level_03_title.bin.lzsa1
+               .global Level03_TitlePalette
                .global Level03_TitleText
 
                .equiv  Level03TitleSizeWords, (end - start) >> 1
@@ -23,6 +23,7 @@ Level03_TitlePalette:
 
 level_03_title.bin.lzsa1:
     .incbin "build/level_03_title.bin.lzsa1"
+    .even
                          #0---------1---------2---------3---------
 Level03_TitleText:       #0123456789012345678901234567890123456789
     .byte  3, 13; .ascii   "The monsters climbing the mountain"     ; .byte 0xFF ; .even
