@@ -14,6 +14,7 @@ FILES = [
   'build/level_03.bin',
   'build/level_04.bin',
   'build/level_05_title.bin',
+  'build/level_05.bin',
   'build/level_07_title.bin',
 ]
 

@@ -108,7 +108,7 @@ Bootstrap.SystemEvent:
 
 Bootstrap.Level:
     .ifdef DebugMode
-        CMP  R5,$4
+        CMP  R5,$5
         BLOS 1$
        .inform_and_hang2 "bootstrap: no levels further than 4"
         1$:
@@ -121,6 +121,7 @@ Bootstrap.Level:
        .word Bootstrap.Level_2
        .word Bootstrap.Level_3
        .word Bootstrap.Level_4
+       .word Bootstrap.Level_5
 
 Bootstrap.StartLevel:
         MOV  $SP_RESET,SP # we are not returning, so reset the stack
@@ -223,7 +224,38 @@ Bootstrap.Level_4: # --------------------------------------------------------
         CALL Bootstrap.DiskIO_WaitForFinish
        .check_for_loading_error "level_04.bin"
 
-#:bpt
+        JMP  @$Bootstrap.StartLevel
+#----------------------------------------------------------------------------
+Bootstrap.Level_5: # --------------------------------------------------------
+        MOV  $level_05_title.bin,R0
+        CALL Bootstrap.DiskRead_Start
+       .if StartOnLevel != MainMenu
+            CALL CLS
+       .endif
+        CALL Bootstrap.DiskIO_WaitForFinish
+       .check_for_loading_error "level_05_title.bin"
+
+        MOV  $level_05_title.bin.lzsa1,R1
+        MOV  $FB1+8000,R2
+        CALL @$unlzsa1
+
+       .ppudo_ensure $PPU_SetPalette,$Level05_TitlePalette
+        CALL Bootstrap.DisplayUnpackedTitleImage
+       .ppudo_ensure $PPU_PrintAt,$Level05_TitleText
+
+        MOV  $level_05.bin,R0
+        CALL Bootstrap.DiskRead_Start
+            CALL LevelReset0000
+        CALL Bootstrap.DiskIO_WaitForFinish
+       .check_for_loading_error "level_05.bin"
+
+        WAIT
+        CALL Bootstrap.WaitForFireKey
+
+       .ppudo_ensure $PPU_SetPalette, $BlackPalette
+        WAIT
+       .ppudo_ensure $PPU_LevelStart
+
         JMP  @$Bootstrap.StartLevel
 #----------------------------------------------------------------------------
 
@@ -264,6 +296,10 @@ Bootstrap.Continue: # ../Aku/BootStrap.asm:1324
         MOV  $FB1 + 36*80,R2
         CALL unlzsa1
         POP  R4
+
+        MOV  $75,R0
+        1$: WAIT
+        SOB  R0, 1$
 
         CLR  R1
         BISB 5(R4),R1 # number of continues
@@ -918,6 +954,10 @@ level_04.bin:
     .word 0
     .word 0
 level_05_title.bin:
+    .word Akuyou_LevelStart
+    .word 0
+    .word 0
+level_05.bin:
     .word Akuyou_LevelStart
     .word 0
     .word 0
