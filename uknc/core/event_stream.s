@@ -219,19 +219,19 @@ Event_ReprogramObjectBurstPosition:
         RETURN # to Event_LoadNextEvt
 
 Event_CoreReprogram_CustomMove1:
-        MOV  (R5)+,@$jmpLevelSpecificMoveA
+        MOV  (R5)+,@$LevelSpecificMoveA
         RETURN # to Event_LoadNextEvt
 
 Event_CoreReprogram_CustomMove2:
-        MOV  (R5)+,@$jmpLevelSpecificMoveB
+        MOV  (R5)+,@$LevelSpecificMoveB
         RETURN # to Event_LoadNextEvt
 
 Event_CoreReprogram_CustomMove3:
-        MOV  (R5)+,@$jmpLevelSpecificMoveC
+        MOV  (R5)+,@$LevelSpecificMoveC
         RETURN # to Event_LoadNextEvt
 
 #Event_CoreReprogram_CustomMove4:
-#        MOV  (R5)+,@$jmpLevelSpecificMoveD
+#        MOV  (R5)+,@$LevelSpecificMoveD
 #        RETURN # to Event_LoadNextEvt
 
 Event_SmartBombSpecial:

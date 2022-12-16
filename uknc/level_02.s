@@ -142,26 +142,26 @@ EventStreamArray:
 
 # hit target
 .word 20, evtMultipleCommands | 3
-.word     evtSetProgMoveLife, prgSpecial, mvSpecial | spdFast | 002, lifeEnemy | 40
+.word     evtSetProgMoveLife, prgSpecial, mveBackground | 002, lifeEnemy | 40
 .word     evtSingleSprite, DUMMY_SPRITE, (24+160+3)<<X | (24+90+16)<<Y
 .word     evtSaveObjPointer, SkullTarget
 
 DebugStartPoint:
 # Fire target 1
 .word 20, evtMultipleCommands | 3
-.word     evtSetProgMoveLife, prgFireSlow | fireLeft, mvSpecial | spdFast | 002, lifeImmortal
+.word     evtSetProgMoveLife, prgFireSlow | fireLeft, mveBackground | 002, lifeImmortal
 .word     evtSingleSprite, DUMMY_SPRITE, (24+160+3)<<X | (24+90+48)<<Y
 .word     evtSaveObjPointer, FireTarget1
 
 # Fire target 2
 .word 20, evtMultipleCommands | 3
-.word     evtSetProgMoveLife, prgFireSnail | fireBurst, mvSpecial | spdFast | 002, lifeImmortal
+.word     evtSetProgMoveLife, prgFireSnail | fireBurst, mveBackground | 002, lifeImmortal
 .word     evtSingleSprite, DUMMY_SPRITE, (24+160+3)<<X | (24+90+48)<<Y
 .word     evtSaveObjPointer, FireTarget2
 
 # Fire target 3
 .word 20, evtMultipleCommands | 3
-.word     evtSetProgMoveLife, prgFireSnail | fireBurst, mvSpecial | spdFast | 002, lifeImmortal
+.word     evtSetProgMoveLife, prgFireSnail | fireBurst, mveBackground | 002, lifeImmortal
 .word     evtSingleSprite, DUMMY_SPRITE, (24+160+3)<<X | (24+90)<<Y
 .word     evtSaveObjPointer, FireTarget3
 

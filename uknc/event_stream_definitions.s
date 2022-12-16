@@ -281,7 +281,7 @@
 # 100001XX   ; Seek player 1 speed -----XX1
 # 1010DSPP   D = Depth bit, S= Speed, PP Position
 # WARNING: comments display values used in the original version
-.equiv mvRegular, 0    # x0xxxxxx
+.equiv mvRegular, 0    # 0xxxxxxx
 .equiv mvSpecial, 0x40 # 1xxxxxxx
 .equiv spdNormal, 0    # x0xxxxxx
 # DoMoves and StarArray user TSTB/BPL to check this bit
@@ -317,16 +317,18 @@
 
 # WARNING: comments display values used in the original version
                                   # mveMisc       equ 0 ;used for visual clarity!
-.equiv mveBackground, 0b1100 << 4 # 1100xxxx, ----xxxx tick point
-.equiv mveWave,       0b0110 << 4 # 1010xxxx Wave pattern
-.equiv mveCustom1,    0b1111 << 4 # 1111xxxx Level specific 1
-.equiv mveCustom2,    0b1110 << 4 # 1110xxxx Level specific 2
-.equiv mveCustom3,    0b1101 << 4 # 1101xxxx Level specific 3
+.equiv mveBackground, 0b0100 << 4 # 1100xxxx, ----xxxx tick point
+.equiv mveWave,       0b0101 << 4 # 1010xxxx Wave pattern
+.equiv mveCustom1,    0b0110 << 4 # 1111xxxx Level specific 1
+.equiv mveCustom2,    0b0111 << 4 # 1110xxxx Level specific 2
+.equiv mveCustom3,    0b1100 << 4 # 1101xxxx Level specific 3
 #.equiv mveCustom4,    0b0111 << 4 # 1011xxxx Level specific 4
 
-.equiv mveSeaker_P1,  0b0100 << 4 | 0b00 << 2 # 100001xx
-.equiv mveSeaker_P2,  0b0100 << 4 | 0b01 << 2 # 100100xx
-.equiv mveSeaker,     0b0100 << 4 | 0b10 << 2 # 100010xx seek! I can't spel!
+.equiv mveSeaker,     0b1101 << 4 | 0b10 << 2 # 100010xx seek! I can't spel!
+.equiv mveSeaker_P1,  0b1110 << 4 | 0b00 << 2 # 100001xx
+   .ifdef TwoPlayersGame
+.equiv mveSeaker_P2,  0b1111 << 4 | 0b01 << 2 # 100100xx
+   .endif
 
                               # Life BPxxxxxx
                               # B=hurt by bullets,
