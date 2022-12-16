@@ -418,17 +418,9 @@ build/level_01.o : $(common) \
 		   build/chibi_lr.spr
 	$(AS) -al level_01.s -o build/level_01.o | build_tools/format_list.rb
 
-#build/level_01.0.spr : build_tools/spr_cpc_to_uknc.rb \
-#                       resources/level_01a.CPC.SPR
-#	build_tools/spr_cpc_to_uknc.rb resources/level_01a.CPC.SPR -o build/level_01.0.spr
-#build/level_01.1.spr : build_tools/spr_cpc_to_uknc.rb \
-#                           resources/level_01b.CPC.SPR
-#	build_tools/spr_cpc_to_uknc.rb resources/level_01b.CPC.SPR -o build/level_01.1.spr
-
 build/level_01_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
-	                       ../ResCPC/Level01-Tiles.SPR
-	build_tools/spr_cpc_to_uknc.rb ../ResCPC/Level01-Tiles.SPR -o build/level_01_tiles.spr
-
+	                   resources/level_01_tiles.cpc.spr
+	build_tools/spr_cpc_to_uknc.rb resources/level_01_tiles.cpc.spr -o build/level_01_tiles.spr
 # level_01.bin --------------------------------------------------------------}}}
 
 # level_01.0.spr ------------------------------------------------------------{{{
@@ -1019,8 +1011,8 @@ build/level_02.o : $(common) \
 	$(AS) -al level_02.s -o build/level_02.o | build_tools/format_list.rb
 
 build/level_02_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
-	                   ../ResCPC/Level2-Tiles-CPC.SPR
-	build_tools/spr_cpc_to_uknc.rb ../ResCPC/Level2-Tiles-CPC.SPR -o build/level_02_tiles.spr
+	                   resources/level_02_tiles.cpc.spr
+	build_tools/spr_cpc_to_uknc.rb resources/level_02_tiles.cpc.spr -o build/level_02_tiles.spr
 # level_02.bin --------------------------------------------------------------}}}
 
 # level_02.0.spr ------------------------------------------------------------{{{
