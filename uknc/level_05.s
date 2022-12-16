@@ -1,4 +1,4 @@
-               .nolist
+               .list
 
                .include "./hwdefs.s"
                .include "./macros.s"
@@ -25,35 +25,35 @@ LevelTiles:
 
 EventStreamArray:
     .equiv DUMMY_SPRITE, 0
-    
-    .equiv TENTITACK,       1 #  0 
-    .equiv SUPERFISH,       2 #  1 
-    .equiv LILIFROG,        3 #  2 
-    .equiv SPITFISH,        4 #  3 
-    .equiv STARFISH_BOMBER, 5 #  4 
-    .equiv PAIRANAH,        6 #  5 
-    .equiv BUBBLE24,        7 #  6 
-    .equiv BUBBLE16,        8 #  7 
-    .equiv MINERFISH,       9 #  8 
-    .equiv COIN,           10 #  9 
+
+    .equiv TENTITACK,       1 #  0
+    .equiv SUPERFISH,       2 #  1
+    .equiv LILIFROG,        3 #  2
+    .equiv SPITFISH,        4 #  3
+    .equiv STARFISH_BOMBER, 5 #  4
+    .equiv PAIRANAH,        6 #  5
+    .equiv BUBBLE24,        7 #  6
+    .equiv BUBBLE16,        8 #  7
+    .equiv MINERFISH,       9 #  8
+    .equiv COIN,           10 #  9
     .equiv FISHFACE_LEFT,  11 # 10 # height 24 -> 19
     .equiv FISHBONE_LEFT,  12 # 11 # height 23 -> 16
-    .equiv POWERUP_POWER,  13 # 12 
-    .equiv POWERUP_RATE,   14 # 13 
-    .equiv POWERUP_DRONE,  15 # 14 
-    .equiv WAVE1,          16 # 15 
-    .equiv WAVE2,          17 # 16 
-    .equiv WAVE3,          18 # 17 
-    .equiv WEED1,          19 # 18 
-    .equiv WEED2,          20 # 19 
-    .equiv CORAL1,         21 # 20 
-    .equiv CORAL2,         22 # 21 
-    .equiv FISHFACE_RIGHT, 23 # 22 
-    .equiv FISHBONE_RIGHT, 24 # 23 
-    .equiv TUFFET,         25 # 24 
-    .equiv GRASS1,         26 # 25 
-    .equiv GRASS2,         27 # 26 
-    .equiv BUSH,           28 # 27 
+    .equiv POWERUP_POWER,  13 # 12
+    .equiv POWERUP_RATE,   14 # 13
+    .equiv POWERUP_DRONE,  15 # 14
+    .equiv WAVE1,          16 # 15
+    .equiv WAVE2,          17 # 16
+    .equiv WAVE3,          18 # 17
+    .equiv WEED1,          19 # 18
+    .equiv WEED2,          20 # 19
+    .equiv CORAL1,         21 # 20
+    .equiv CORAL2,         22 # 21
+    .equiv FISHFACE_RIGHT, 23 # 22
+    .equiv FISHBONE_RIGHT, 24 # 23
+    .equiv TUFFET,         25 # 24
+    .equiv GRASS1,         26 # 25
+    .equiv GRASS2,         27 # 26
+    .equiv BUSH,           28 # 27
     .equiv ROCK1,          29 # 28 # height 16 -> 11
     .equiv ROCK2,          30 # 29 # height 16 ->  6
 
@@ -65,429 +65,582 @@ EventStreamArray:
 #  -----X---X-- (mid)           %11000010       Bank 1
 #  []=====[]=== (foreground)    %11000001       Bank 0
 
-    .word 0, evtReprogram_PowerupSprites  # Define powerup sprites
-    .byte    sprTwoFrame | POWERUP_DRONE
-    .byte    sprTwoFrame | POWERUP_RATE
-    .byte    sprTwoFrame | POWERUP_POWER
-    .byte    sprTwoFrame | COIN
-#
-#    .word 0, evtMultipleCommands | 5
-#    .word    evtSetProgMoveLife               # 1
-#    .word        prgBitShift
-#    .word        mveBackground | 0b0001
-#    .word        lifeImmortal
-#    .word    evtSetObjectSize | 0             # 2
-#    .word    evtSetAnimator | anmNone         # 3
-#    .word    evtAddToBackground               # 4
-#    .word    evtSaveObjSettings | 0           # 5
-#
-#    .word 0, evtMultipleCommands | 5
-#    .word    evtSetProgMoveLife, prgBitShift, mveBackground | 0b0010, lifeImmortal
-#    .word    evtSetObjectSize | 0             # 2
-#    .word    evtSetAnimator | anmNone         # 3
-#    .word    evtAddToBackground               # 4
-#    .word    evtSaveObjSettings | 1           # 5
-#   # Mukadebachi
-#    .word 0, evtMultipleCommands | 5
-#    .word    evtSetProgMoveLife, prgNone, mveCustom3 | 0b0100, lifeEnemy | 9
-#    .word    evtSetSprite | sprTwoFrame | MUKADE_BACHI_2
-#    .word    evtSetObjectSize | 24
-#    .word    evtAddToForeground
-#    .word    evtSaveObjSettings | 2
-#   # mukadebachi
-#    .word 0, evtReprogramCustomMove3, CustomMove3
-#   # Kamisagi
-#    .word 0, evtMultipleCommands | 5
-#    .word    evtSetProgMoveLife, prgNone, mveCustom1 | 0b0000, lifeEnemy | 5
-#    .word    evtSetSprite | sprSingleFrame | KAMISAGI
-#    .word    evtSetObjectSize | 24
-#    .word    evtAddToForeground
-#    .word    evtSaveObjSettings | 3
-#   # Kamisagi program code
-#    .word 0, evtReprogramCustomMove1, CustomMove.Bouncer
-#   # GnatPack
-#    .word 0, evtMultipleCommands | 5
-#    .word    evtSetProgMoveLife, prgFireFast | 16, mveWave | 0b0001, lifeEnemy | 3
-#    .word    evtSetSprite | sprTwoFrame | GNAT_PACK
-#    .word    evtSetObjectSize | 24
-#    .word    evtAddToForeground
-#    .word    evtSaveObjSettings | 4
-#   # Biterfly
-#    .word 0, evtMultipleCommands | 5
-#    .word    evtSetProgMoveLife, prgFireSlow | 13, mveWave | 0b0000, lifeEnemy | 6
-#    .word    evtSetSprite | sprTwoFrame | BITERFLY
-#    .word    evtSetObjectSize | 24
-#    .word    evtAddToForeground
-#    .word    evtSaveObjSettings | 5
-#   # Zombie Salaryman
-#    .word 0, evtMultipleCommands | 5
-#    .word    evtSetProgMoveLife, prgFireSlow | 1, mvRegular | spdNormal | 043, lifeEnemy | 6
-#    .word    evtSetSprite | sprTwoFrame | ZOMBIE_SALARYMAN
-#    .word    evtSetObjectSize | 24
-#    .word    evtAddToForeground
-#    .word    evtSaveObjSettings | 6
-#   # Zombie Capybara
-#    .word 0, evtMultipleCommands | 5
-#    .word    evtSetProgMoveLife, prgFireSnail | 5, mvRegular | spdNormal | 043, lifeEnemy | 9
-#    .word    evtSetSprite | sprTwoFrame | ZOMBIE_CAPYBARA
-#    .word    evtSetObjectSize | 24
-#    .word    evtAddToForeground
-#    .word    evtSaveObjSettings | 7
-#   # Shroom Bomber
-#    .word 0, evtMultipleCommands | 5
-#    .word    evtSetProgMoveLife, prgFireMid | 6, mvRegular | spdNormal | 043, lifeEnemy | 2
-#    .word    evtSetSprite | sprTwoFrame | SHROOM_BOMBER
-#    .word    evtSetObjectSize | 24
-#    .word    evtAddToForeground
-#    .word    evtSaveObjSettings | 8
-##-------------------------------------------------------------------------------
-#   # Grass Tuft
-#    .word 0, evtMultipleCommands | 2
-#    .word    evtLoadObjSettings | 1
-#    .word    evtSingleSprite, GRASS_TUFT_BIG, (24+70)<<X | (12*16)<<Y
-#   # Grass Tuft
-#    .word 0, evtMultipleCommands | 2
-#    .word    evtLoadObjSettings | 1
-#    .word    evtSingleSprite, GRASS_TUFT_B, (24+30)<<X | (11*16)<<Y
-#   # Grass Tuft
-#    .word 0, evtMultipleCommands | 2
-#    .word    evtLoadObjSettings | 1
-#    .word    evtSingleSprite, GRASS_TUFT_C, (24+110)<<X | (11*16)<<Y
-#
-## Start of fade in block -------------------------------------------------------
-#    .equiv FadeStartPoint, 0
-#    .word FadeStartPoint + 1, evtSetPalette, BluePalette
-#    .word FadeStartPoint + 2, evtSetPalette, DarkRealPalette
-#    .word FadeStartPoint + 3, evtSetPalette, RealPalette
-## End of fade in block ---------------------------------------------------------
-#
-#    #----------
-#   #.word 3, evtChangeStreamTime, 100, EventStreamArray_DebugPoint
-#    #----------
-#EventStreamArray_DebugPoint:
-#
-#   # GnatPack
-#    .word 5, evtMultipleCommands | 2
-#    .word    evtLoadObjSettings | 4
-#    .word    evtSingleSprite | 7 # Row 13, last Column, Last Sprite
-#   # Zombie Salaryman
-#    .word 9, evtMultipleCommands | 2
-#    .word    evtLoadObjSettings | 6
-#    .word    evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # Zombie Salaryman
-#    .word 24, evtMultipleCommands | 2
-#    .word     evtLoadObjSettings | 6
-#    .word     evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # drone
-#    .word 25, evtMultipleCommands | 2
-#    .word     evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 042), 64+63
-#    .word     evtSingleSprite, sprTwoFrame | POWERUP_DRONE, (24+160)<<X | (24+50)<<Y
-#   # GnatPack
-#    .word 28, evtMultipleCommands | 2
-#    .word     evtLoadObjSettings | 4
-#    .word     evtSingleSprite | 7 # Row 13, last Column, Last Sprite
-#   # Grass
-#    .word 30, evtMultipleCommands | 3
-#    .word     evtLoadObjSettings | 0
-#    .word     evtSetSprite | sprSingleFrame | GRASS_TUFT_BIG
-#    .word     evtSingleSprite | 13 # Row 25, last Column, Last Sprite
-#   # Shroom Bomber
-#    .word 38, evtMultipleCommands | 2
-#    .word     evtLoadObjSettings | 8
-#    .word     evtSingleSprite | 3 # Row 5, last Column, Last Sprite
-#   # Grass
-#    .word 40, evtMultipleCommands | 3
-#    .word     evtLoadObjSettings | 0
-#    .word     evtSetSprite | sprSingleFrame | GRASS_TUFT_A
-#    .word     evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # Zombie Salaryman
-#    .word 45, evtMultipleCommands | 2
-#    .word     evtLoadObjSettings | 6
-#    .word     evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # GnatPack
-#    .word 50, evtMultipleCommands | 2
-#    .word     evtLoadObjSettings | 4
-#    .word     evtSingleSprite | 7 # Row 13, last Column, Last Sprite
-#   # Shroom Bomber
-#    .word 60, evtMultipleCommands | 2
-#    .word     evtLoadObjSettings | 8
-#    .word     evtSingleSprite | 3 # Row 5, last Column, Last Sprite
-#   # drone
-#    .word 65, evtMultipleCommands | 2
-#    .word     evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 042), 64+63
-#    .word     evtSingleSprite, sprTwoFrame | POWERUP_DRONE, (24+160)<<X | (24+50)<<Y
-#   # Grass
-#    .word 70, evtMultipleCommands | 3
-#    .word     evtLoadObjSettings | 0
-#    .word     evtSetSprite | sprSingleFrame | GRASS_TUFT_BIG
-#    .word     evtSingleSprite | 13 # Row 25, last Column, Last Sprite
-#   # Zombie Capybara
-#    .word 70, evtMultipleCommands | 2
-#    .word     evtLoadObjSettings | 7
-#    .word     evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # Grass
-#    .word 80, evtMultipleCommands | 3
-#    .word     evtLoadObjSettings | 0
-#    .word     evtSetSprite | sprSingleFrame | GRASS_TUFT_B
-#    .word     evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # Grass
-#    .word 90, evtMultipleCommands | 3
-#    .word     evtLoadObjSettings | 0
-#    .word     evtSetSprite | sprSingleFrame | GRASS_TUFT_C
-#    .word     evtSingleSprite | 11 # Row 21, last Column, Last Sprite
-#   # Zombie Salaryman
-#    .word 95, evtMultipleCommands | 2
-#    .word     evtLoadObjSettings | 6
-#    .word     evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # Grass
-#    .word 100, evtMultipleCommands | 3
-#    .word      evtLoadObjSettings | 0
-#    .word      evtSetSprite | sprSingleFrame | GRASS_TUFT_A
-#    .word      evtSingleSprite | 13 # Row 25, last Column, Last Sprite
-#   # MukadeBachi1
-#    .word 100, evtMultipleCommands | 4
-#    .word      evtLoadObjSettings | 2
-#    .word      evtSetSprite | sprTwoFrame | MUKADE_BACHI_1
-#    .word      evtSetProg, prgFireSlow | 11
-#    .word      evtSingleSprite | 7 # Row 13, last Column, Last Sprite
-#   # MukadeBachi2
-#    .word 103, evtMultipleCommands | 3
-#    .word      evtLoadObjSettings | 2
-#    .word      evtSetSprite | sprTwoFrame | MUKADE_BACHI_2
-#    .word      evtSingleSprite | 7 # Row 13, last Column, Last Sprite
-#   # Powerup Rate
-#    .word 105, evtMultipleCommands | 2
-#    .word      evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 042), 64+63
-#    .word      evtSingleSprite, sprTwoFrame | POWERUP_RATE, (24+160)<<X | (24+50)<<Y
-#   # MukadeBachi3
-#    .word 106, evtMultipleCommands | 4
-#    .word      evtLoadObjSettings | 2
-#    .word      evtSetSprite | sprTwoFrame | MUKADE_BACHI_3
-#    .word      evtSetProg, prgFireSnail | 13
-#    .word      evtSingleSprite | 7 # Row 13, last Column, Last Sprite
-#   # MukadeBachi4
-#    .word 109, evtMultipleCommands | 3
-#    .word      evtLoadObjSettings | 2
-#    .word      evtSetSprite | sprTwoFrame | MUKADE_BACHI_3
-#    .word      evtSingleSprite | 7 # Row 13, last Column, Last Sprite
-#   # MukadeBachi5
-#    .word 112, evtMultipleCommands | 4
-#    .word      evtLoadObjSettings | 2
-#    .word      evtSetSprite | sprTwoFrame | MUKADE_BACHI_5
-#    .word      evtSetProg, prgFireSlow | 12
-#    .word      evtSingleSprite | 7 # Row 13, last Column, Last Sprite
-#   # Shroom Bomber
-#    .word 118, evtMultipleCommands | 2
-#    .word      evtLoadObjSettings | 8
-#    .word      evtSingleSprite | 3 # Row 5, last Column, Last Sprite
-#   # Grass
-#    .word 120, evtMultipleCommands | 3
-#    .word      evtLoadObjSettings | 0
-#    .word      evtSetSprite | sprSingleFrame | GRASS_TUFT_B
-#    .word      evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # Zombie Salaryman
-#    .word 130, evtMultipleCommands | 2
-#    .word      evtLoadObjSettings | 6
-#    .word      evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # Grass
-#    .word 140, evtMultipleCommands | 3
-#    .word      evtLoadObjSettings | 0
-#    .word      evtSetSprite | sprSingleFrame | GRASS_TUFT_D
-#    .word      evtSingleSprite | 11 # Row 21, last Column, Last Sprite
-#   # Kamisagi
-#    .word 145, evtMultipleCommands | 3
-#    .word      evtLoadObjSettings | 3
-#    .word      evtSetMove, mveCustom1 | 0b1000
-#    .word      evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # Bitterfly
-#    .word 146, evtMultipleCommands | 2
-#    .word      evtLoadObjSettings | 5
-#    .word      evtSingleSprite | 7 # Row 13, last Column, Last Sprite
-#   # drone
-#    .word 150, evtMultipleCommands | 2
-#    .word      evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 042), 64+63
-#    .word      evtSingleSprite, sprTwoFrame | POWERUP_DRONE, (24+160)<<X | (24+50)<<Y
-#   # Bitterfly
-#    .word 160, evtMultipleCommands | 2
-#    .word      evtLoadObjSettings | 5
-#    .word      evtSingleSprite | 7 # Row 13, last Column, Last Sprite
-#   # Grass
-#    .word 170, evtMultipleCommands | 3
-#    .word      evtLoadObjSettings | 0
-#    .word      evtSetSprite | sprSingleFrame | GRASS_TUFT_A
-#    .word      evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # Zombie Capybara
-#    .word 175, evtMultipleCommands | 2
-#    .word      evtLoadObjSettings | 7
-#    .word      evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # GnatPack
-#    .word 190, evtMultipleCommands | 2
-#    .word      evtLoadObjSettings | 4
-#    .word      evtSingleSprite | 7 # Row 13, last Column, Last Sprite
-#   # Grass
-#    .word 190, evtMultipleCommands | 3
-#    .word      evtLoadObjSettings | 0
-#    .word      evtSetSprite | sprSingleFrame | GRASS_TUFT_B
-#    .word      evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # Powerup Rate
-#    .word 195, evtMultipleCommands | 3
-#    .word      evtAddToForeground
-#    .word      evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 042), 64+63
-#    .word      evtSingleSprite, sprTwoFrame | POWERUP_RATE, (24+160)<<X | (24+50)<<Y
-#   # Zombie Salaryman
-#    .word 198, evtMultipleCommands | 2
-#    .word      evtLoadObjSettings | 6
-#    .word      evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # MukadeBachi1
-#    .word 200, evtMultipleCommands | 4
-#    .word      evtLoadObjSettings | 2
-#    .word      evtSetSprite | sprTwoFrame | MUKADE_BACHI_1
-#    .word      evtSetProg, prgFireMid | 11
-#    .word      evtSingleSprite | 7 # Row 13, last Column, Last Sprite
-#   # GnatPack
-#    .word 201, evtMultipleCommands | 2
-#    .word      evtLoadObjSettings | 4
-#    .word      evtSingleSprite | 7 # Row 13, last Column, Last Sprite
-#   # Shroom Bomber
-#    .word 202, evtMultipleCommands | 2
-#    .word      evtLoadObjSettings | 8
-#    .word      evtSingleSprite | 3 # Row 5, last Column, Last Sprite
-#   # MukadeBachi2
-#    .word 203, evtMultipleCommands | 3
-#    .word      evtLoadObjSettings | 2
-#    .word      evtSetSprite | sprTwoFrame | MUKADE_BACHI_2
-#    .word      evtSingleSprite | 7 # Row 13, last Column, Last Sprite
-#   # Kamisagi
-#    .word 205, evtMultipleCommands | 3
-#    .word      evtLoadObjSettings | 3
-#    .word      evtSetMove, mveCustom1 | 0b1000
-#    .word      evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # MukadeBachi3
-#    .word 206, evtMultipleCommands | 4
-#    .word      evtLoadObjSettings | 2
-#    .word      evtSetSprite | sprTwoFrame | MUKADE_BACHI_3
-#    .word      evtSetProg, prgFireSlow | 13
-#    .word      evtSingleSprite | 7 # Row 13, last Column, Last Sprite
-#   # GnatPack
-#    .word 207, evtMultipleCommands | 2
-#    .word      evtLoadObjSettings | 4
-#    .word      evtSingleSprite | 7 # Row 13, last Column, Last Sprite
-#   # Zombie Salaryman
-#    .word 208, evtMultipleCommands | 2
-#    .word      evtLoadObjSettings | 6
-#    .word      evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # MukadeBachi4
-#    .word 209, evtMultipleCommands | 3
-#    .word      evtLoadObjSettings | 2
-#    .word      evtSetSprite | sprTwoFrame | MUKADE_BACHI_3
-#    .word      evtSingleSprite | 7 # Row 13, last Column, Last Sprite
-#   # MukadeBachi5
-#    .word 212, evtMultipleCommands | 4
-#    .word      evtLoadObjSettings | 2
-#    .word      evtSetSprite | sprTwoFrame | MUKADE_BACHI_5
-#    .word      evtSetProg, prgFireMid | 12
-#    .word      evtSingleSprite | 7 # Row 13, last Column, Last Sprite
-#   # Zombie Salaryman
-#    .word 214, evtMultipleCommands | 2
-#    .word      evtLoadObjSettings | 6
-#    .word      evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # GnatPack
-#    .word 215, evtMultipleCommands | 2
-#    .word      evtLoadObjSettings | 4
-#    .word      evtSingleSprite | 7 # Row 13, last Column, Last Sprite
-#   # Grass
-#    .word 220, evtMultipleCommands | 3
-#    .word      evtLoadObjSettings | 0
-#    .word      evtSetSprite | sprSingleFrame | GRASS_TUFT_BIG
-#    .word      evtSingleSprite | 13 # Row 25, last Column, Last Sprite
-#   # Bitterfly
-#    .word 220, evtMultipleCommands | 4
-#    .word      evtAddToForeground
-#    .word      evtLoadObjSettings | 5
-#    .word      evtSetMove, mveWave | 0b0000
-#    .word      evtSingleSprite | 5 # Row 9, last Column, Last Sprite
-#   # Bitterfly
-#    .word 225, evtMultipleCommands | 3
-#    .word      evtLoadObjSettings | 5
-#    .word      evtSetMove, mveWave | 0b0001
-#    .word      evtSingleSprite | 9 # Row 9, last Column, Last Sprite
-#   # Zombie Capybara
-#    .word 227, evtMultipleCommands | 2
-#    .word      evtLoadObjSettings | 7
-#    .word      evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # Grass
-#    .word 230, evtMultipleCommands | 3
-#    .word      evtLoadObjSettings | 0
-#    .word      evtSetSprite | sprSingleFrame | GRASS_TUFT_C
-#    .word      evtSingleSprite | 11 # Row 21, last Column, Last Sprite
-#   # Zombie Salaryman
-#    .word 235, evtMultipleCommands | 2
-#    .word      evtLoadObjSettings | 6
-#    .word      evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # Grass
-#    .word 240, evtMultipleCommands | 3
-#    .word      evtLoadObjSettings | 0
-#    .word      evtSetSprite | sprSingleFrame | GRASS_TUFT_D
-#    .word      evtSingleSprite | 11 # Row 21, last Column, Last Sprite
-#   # Zombie Salaryman
-#    .word 245, evtMultipleCommands | 2
-#    .word      evtLoadObjSettings | 6
-#    .word      evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # Bitterfly
-#    .word 250, evtMultipleCommands | 4
-#    .word      evtAddToForeground
-#    .word      evtLoadObjSettings | 5
-#    .word      evtSetMove, mveWave | 0b0001
-#    .word      evtSingleSprite | 3 # Row 5, last Column, Last Sprite
-#   # Bitterfly
-#    .word 250, evtMultipleCommands | 3
-#    .word      evtLoadObjSettings | 5
-#    .word      evtSetMove, mveWave | 0b0010
-#    .word      evtSingleSprite | 10 # Row 19, last Column, Last Sprite
-#   # Zombie Capybara
-#    .word 254, evtMultipleCommands | 2
-#    .word      evtLoadObjSettings | 7
-#    .word      evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # Kamisagi
-#    .word 255+5, evtMultipleCommands | 3
-#    .word        evtLoadObjSettings | 3
-#    .word        evtSetMove, mveCustom1 | 0b1000
-#    .word        evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # Kamisagi
-#    .word 255+7, evtMultipleCommands | 3
-#    .word        evtLoadObjSettings | 3
-#    .word        evtSetMove, mveCustom1 | 0b1001
-#    .word        evtSingleSprite | 12 # Row 23, last Column, Last Sprite
-#   # Bitterfly
-#    .word 255+10, evtMultipleCommands | 3
-#    .word         evtLoadObjSettings | 5
-#    .word         evtSetMove, mveWave | 0b0000
-#    .word         evtSingleSprite | 5 # Row 9, last Column, Last Sprite
-#   # Bitterfly
-#    .word 255+15, evtMultipleCommands | 3
-#    .word         evtLoadObjSettings | 5
-#    .word         evtSetMove, mveWave | 0b0001
-#    .word         evtSingleSprite | 9 # Row 17, last Column, Last Sprite
-#
-#LevelEndAnim:
-#    .word 255+30, evtMultipleCommands | 2
-#    .word         evtSetProgMoveLife, prgMovePlayer, mvStatic, 10
-#    .word         evtSingleSprite, sprTwoFrame | DUMMY_SPRITE, (24+140)<<X | (24+100)<<Y
-#
-#    .word 255+30, evtCallAddress, Player_Handler_DoSmartBomb
-## Start of fade out block ------------------------------------------------------
-#    .equiv FadeOutStartPoint, 255+31
-#    .word FadeOutStartPoint + 1, evtSetPalette, DarkRealPalette
-#    .word FadeOutStartPoint + 2, evtSetPalette, BluePalette
-#
-#    .word 255+35, evtCallAddress, EndLevel
-##----------------------------------------------------------------------------}}}
-#EndLevel:
-#       .ppudo_ensure $PPU_LevelEnd
-#       .ppudo_ensure $PPU_MusicStop
-#        MOV  $0x8000,R5
-#        JMP  ExecuteBootstrap
-#
+  .word 0, evtReprogram_PowerupSprites # Define powerup sprites
+  .byte    sprTwoFrame | POWERUP_DRONE
+  .byte    sprTwoFrame | POWERUP_RATE
+  .byte    sprTwoFrame | POWERUP_POWER
+  .byte    sprTwoFrame | COIN
+
+  .word 0, evtMultipleCommands | 5
+  .word    evtSetProgMoveLife               # 1
+  .word        prgBitShift
+  .word        mveBackground | 0b0001
+  .word        lifeImmortal
+  .word    evtSetObjectSize | 0             # 2
+  .word    evtSetAnimator | anmNone         # 3
+  .word    evtAddToBackground               # 4
+  .word    evtSaveObjSettings | 0           # 5
+
+  .word 0, evtMultipleCommands | 5
+  .word    evtSetProgMoveLife, prgBitShift, mveBackground | 0b0010, lifeImmortal
+  .word    evtSetObjectSize | 0             # 2
+  .word    evtSetAnimator | anmNone         # 3
+  .word    evtAddToBackground               # 4
+  .word    evtSaveObjSettings | 1           # 5
+ # Miner Fish
+  .word 0, evtMultipleCommands | 5
+  .word    evtSetProgMoveLife, prgFireHyper | 16, mveWave | 0b0000, lifeEnemy | 20
+  .word    evtSetSprite | sprTwoFrame | MINERFISH
+  .word    evtSetObjectSize | 32
+  .word    evtAddToForeground
+  .word    evtSaveObjSettings | 11
+ # Tentitack
+  .word 0, evtMultipleCommands | 5
+  .word    evtSetProgMoveLife, prgFireSlow | 13, mveWave | 0b0000, lifeEnemy | 6
+  .word    evtSetSprite | sprTwoFrame | TENTITACK
+  .word    evtSetObjectSize | 24
+  .word    evtAddToForeground
+  .word    evtSaveObjSettings | 2
+ # Tentitack
+  .word 0, evtMultipleCommands | 5
+  .word    evtSetProgMoveLife, prgFireSlow | 13, mveWave | 0b0001, lifeEnemy | 6
+  .word    evtSetSprite | sprTwoFrame | TENTITACK
+  .word    evtSetObjectSize | 24
+  .word    evtAddToForeground
+  .word    evtSaveObjSettings | 3
+ # Starfish Bomber
+  .word 0, evtMultipleCommands | 5
+  .word    evtSetProgMoveLife, prgFireMid | 10, mvRegular | spdNormal | 043, lifeEnemy | 7
+  .word    evtSetSprite | sprTwoFrame | STARFISH_BOMBER
+  .word    evtSetObjectSize | 24
+  .word    evtAddToForeground
+  .word    evtSaveObjSettings | 4
+ # LiliFrog
+  .word 0, evtMultipleCommands | 5
+  .word    evtSetProgMoveLife, prgFireSlow | 7, mvRegular | spdNormal | 043, lifeEnemy | 5
+  .word    evtSetSprite | sprTwoFrame | LILIFROG
+  .word    evtSetObjectSize | 24
+  .word    evtAddToForeground
+  .word    evtSaveObjSettings | 5
+ # SpitFish
+  .word 0, evtMultipleCommands | 5
+  .word    evtSetProgMoveLife, prgFireFast | 17, mvRegular | spdNormal | 043, lifeEnemy | 5
+  .word    evtSetSprite | sprTwoFrame | SPITFISH
+  .word    evtSetObjectSize | 24
+  .word    evtAddToForeground
+  .word    evtSaveObjSettings | 6
+ # Bubble
+  .word 0, evtMultipleCommands | 5
+  .word    evtSetProgMoveLife, prgFireSnail | 5, mvRegular | spdNormal | 043, lifeEnemy | 9
+  .word    evtSetSprite | sprTwoFrame | BUBBLE24
+  .word    evtSetObjectSize | 24
+  .word    evtAddToForeground
+  .word    evtSaveObjSettings | 7
+
+ # Bubble Move
+  .word 0, evtReprogramCustomMove1, CustomMove1
+
+ # Bubble 2
+  .word 0, evtMultipleCommands | 5
+  .word    evtSetProgMoveLife, prgNone, mveCustom1 | 0b0001, lifeCustom
+  .word    evtSetSprite | sprTwoFrame | BUBBLE16
+  .word    evtSetObjectSize | 16
+  .word    evtAddToForeground
+  .word    evtSaveObjSettings | 8
+
+ # Bubble Move 2
+  .word 0, evtReprogramCustomMove2, CustomMove2
+
+ # Super Fish
+  .word 0, evtMultipleCommands | 5
+  .word    evtSetProgMoveLife, prgCustom1, mveCustom3 | 0b0010, lifeCustom
+  .word    evtSetSprite | sprTwoFrame | SUPERFISH
+  .word    evtSetObjectSize | 32
+  .word    evtAddToForeground
+  .word    evtSaveObjSettings | 9
+
+ # Super Fish Move
+  .word 0, evtReprogramCustomMove3, CustomMove3
+
+  .word 0, evtReprogramCustomProg1, CustomProgram1
+
+ # Pairanah
+  .word 0, evtMultipleCommands | 5
+  .word    evtSetProgMoveLife, prgCustom2, mvRegular | spdNormal | 042, lifeEnemy | 20
+  .word    evtSetSprite | sprTwoFrame | PAIRANAH
+  .word    evtSetObjectSize | 32
+  .word    evtAddToForeground
+  .word    evtSaveObjSettings | 10
+
+  .word 0, evtReprogramCustomProg2, CustomProgram2
+
+ # Fish Face
+  .word 0, evtMultipleCommands | 5
+  .word    evtSetProgMoveLife, prgFireSnail | 0b01101, mvRegular | spdNormal | 042, lifeEnemy | 30
+  .word    evtSetSprite | sprTwoFrame | FISHFACE_LEFT
+  .word    evtSetObjectSize | 24
+  .word    evtAddToForeground
+  .word    evtSaveObjSettings | 12
+
+ # Fish Bone
+  .word 0, evtMultipleCommands | 5
+  .word    evtSetProgMoveLife, prgFireSlow | 0b01011, mvRegular | spdNormal | 043, lifeEnemy | 10
+  .word    evtSetSprite | sprTwoFrame | FISHBONE_LEFT
+  .word    evtSetObjectSize | 24
+  .word    evtAddToForeground
+  .word    evtSaveObjSettings | 13
+
+ # Background Grass
+  .word 0, evtMultipleCommands | 9
+  .word    evtLoadObjSettings | 1
+  .word    evtSingleSprite, TUFFET, (24+ 70)<<X | (24+16*7 +16)<<Y
+  .word    evtSingleSprite, GRASS1, (24+120)<<X | (24+16*7 +16)<<Y
+  .word    evtSingleSprite, BUSH,   (24+160)<<X | (24+16*6 + 8+16)<<Y
+  .word    evtSingleSprite, ROCK1,  (24+ 20)<<X | (24+16*6 +16+16)<<Y
+  .word    evtSetProg, prgNone
+  .word    evtSingleSprite, sprTwoFrame | WAVE1, (24+ 50)<<X | (24+16* 9+ 4)<<Y
+  .word    evtSingleSprite, sprTwoFrame | WAVE2, (24+100)<<X | (24+16*10+24)<<Y
+  .word    evtSingleSprite, sprTwoFrame | WAVE3, (24+150)<<X | (24+16*10+24+8)<<Y
+#-------------------------------------------------------------------------------
+# Start of fade in block -------------------------------------------------------
+  .equiv FadeStartPoint, 0
+  .word FadeStartPoint + 1, evtSetPalette, BluePalette
+  .word FadeStartPoint + 2, evtSetPalette, DarkRealPalette
+  .word FadeStartPoint + 3, evtSetPalette, RealPalette
+# End of fade in block ---------------------------------------------------------
+
+    #----------
+   #.word 3, evtChangeStreamTime, 100, EventStreamArray_DebugPoint
+    #----------
+EventStreamArray_DebugPoint:
+
+   # Spitfish
+    .word 10, evtMultipleCommands | 2
+    .word     evtLoadObjSettings | 6
+    .word     evtSingleSprite | 12 # Row 23, last Column, Last Sprite
+   # Wave
+    .word 15, evtMultipleCommands | 3
+    .word     evtLoadObjSettings | 1
+    .word     evtSetProg, prgNone
+    .word     evtSingleSprite, sprTwoFrame | WAVE1, (24+160)<<X | (24+16*12)<<Y
+   # Lilifrog
+    .word 20, evtMultipleCommands | 2
+    .word     evtLoadObjSettings | 5
+    .word     evtSingleSprite | 10 # Row 19, last Column, Last Sprite
+   # Starfish Bomber
+    .word 25, evtMultipleCommands | 2
+    .word     evtLoadObjSettings | 4
+    .word     evtSingleSprite | 3 # Row 5, last Column, Last Sprite
+   # Lilifrog
+    .word 30, evtMultipleCommands | 2
+    .word     evtLoadObjSettings | 5
+    .word     evtSingleSprite | 10 # Row 19, last Column, Last Sprite
+   # Starfish Bomber
+    .word 35, evtMultipleCommands | 2
+    .word     evtLoadObjSettings | 4
+    .word     evtSingleSprite | 3 # Row 5, last Column, Last Sprite
+   # Lilifrog
+    .word 40, evtMultipleCommands | 2
+    .word     evtLoadObjSettings | 5
+    .word     evtSingleSprite | 10 # Row 19, last Column, Last Sprite
+   # Starfish Bomber
+    .word 45, evtMultipleCommands | 2
+    .word     evtLoadObjSettings | 4
+    .word     evtSingleSprite | 3 # Row 5, last Column, Last Sprite
+   # Lilifrog
+    .word 50, evtMultipleCommands | 2
+    .word     evtLoadObjSettings | 5
+    .word     evtSingleSprite | 10 # Row 19, last Column, Last Sprite
+   # Bubble
+    .word 50, evtMultipleCommands | 3
+    .word     evtLoadObjSettings | 7
+    .word     evtSetMove, mveCustom2 | 0b0011
+    .word     evtSingleSprite, sprTwoFrame | BUBBLE24, (24+40)<<X | (24+200)<<Y
+   # Bubble
+    .word 60, evtMultipleCommands | 3
+    .word     evtLoadObjSettings | 7
+    .word     evtSetMove, mveCustom2 | 0b1001
+    .word     evtSingleSprite, sprTwoFrame | BUBBLE24, (24+80)<<X | (24+200)<<Y
+   # Bubble
+    .word 65, evtMultipleCommands | 3
+    .word     evtLoadObjSettings | 8
+    .word     evtSetMove, mveCustom1 | 0b1010
+    .word     evtSingleSprite, sprTwoFrame | BUBBLE16, (24+60)<<X | (24+200)<<Y
+   # Bubble
+    .word 70, evtMultipleCommands | 3
+    .word     evtLoadObjSettings | 7
+    .word     evtSetMove, mveCustom2 | 0b0001
+    .word     evtSingleSprite, sprTwoFrame | BUBBLE16, (24+120)<<X | (24+200)<<Y
+   # Powerup Rate
+    .word 70, evtMultipleCommands | 4
+    .word     evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 042), lifeDeadly | 63
+    .word     evtSingleSprite, sprTwoFrame | POWERUP_RATE, (24+160)<<X | (24+ 10)<<Y
+    .word     evtSingleSprite, sprTwoFrame | POWERUP_RATE, (24+160)<<X | (24+ 90)<<Y
+    .word     evtSingleSprite, sprTwoFrame | POWERUP_RATE, (24+160)<<X | (24+170)<<Y
+   # Super Fish
+    .word 75, evtMultipleCommands | 3
+    .word     evtLoadObjSettings | 9
+    .word     evtSetMove, mveCustom3 | 0b1111
+    .word     evtSingleSprite, sprTwoFrame | SUPERFISH, (24+80)<<X | (24+190)<<Y
+   # Bubble
+    .word 80, evtMultipleCommands | 3
+    .word     evtLoadObjSettings | 8
+    .word     evtSetMove, mveCustom1 | 0b0010
+    .word     evtSingleSprite, sprTwoFrame | BUBBLE16, (24+130)<<X | (24+200)<<Y
+   # Bubble
+    .word 80, evtMultipleCommands | 3
+    .word     evtLoadObjSettings | 7
+    .word     evtSetMove, mveCustom2 | 0b0100
+    .word     evtSingleSprite, sprTwoFrame | BUBBLE24, (24+ 30)<<X | (24+200)<<Y
+   # Super Fish
+    .word 90, evtMultipleCommands | 3
+    .word     evtLoadObjSettings | 9
+    .word     evtSetMove, mveCustom3 | 0b1110
+    .word     evtSingleSprite, sprTwoFrame | SUPERFISH, (24+ 60)<<X | (24+190)<<Y
+   # Starfish Bomber
+    .word 95, evtMultipleCommands | 2
+    .word     evtLoadObjSettings | 4
+    .word     evtSingleSprite | 3 # Row 5, last Column, Last Sprite
+   # Super Fish
+    .word 100, evtMultipleCommands | 3
+    .word     evtLoadObjSettings | 9
+    .word     evtSetMove, mveCustom3 | 0b1101
+    .word     evtSingleSprite, sprTwoFrame | SUPERFISH, (24+120)<<X | (24+190)<<Y
+   # Super Fish
+    .word 110, evtMultipleCommands | 3
+    .word     evtLoadObjSettings | 9
+    .word     evtSetMove, mveCustom3 | 0b1100
+    .word     evtSingleSprite, sprTwoFrame | SUPERFISH, (24+120)<<X | (24+190)<<Y
+   # Lilifrog
+    .word 115, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 5
+    .word      evtSingleSprite | 10 # Row 19, last Column, Last Sprite
+   # Powerup Drone
+    .word 120, evtMultipleCommands | 3
+    .word     evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 046), lifeDeadly | 63
+    .word     evtSingleSprite, sprTwoFrame | POWERUP_DRONE, (24+0)<<X | (24+ 50)<<Y
+    .word     evtSingleSprite, sprTwoFrame | POWERUP_DRONE, (24+0)<<X | (24+150)<<Y
+   # Super Fish
+    .word 120, evtMultipleCommands | 3
+    .word     evtLoadObjSettings | 9
+    .word     evtSetMove, mveCustom3 | 0b1011
+    .word     evtSingleSprite, sprTwoFrame | SUPERFISH, (24+120)<<X | (24+190)<<Y
+   # Starfish Bomber
+    .word 125, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 4
+    .word      evtSingleSprite | 3 # Row 5, last Column, Last Sprite
+   # Super Fish
+    .word 130, evtMultipleCommands | 3
+    .word     evtLoadObjSettings | 9
+    .word     evtSetMove, mveCustom3 | 0b1100
+    .word     evtSingleSprite, sprTwoFrame | SUPERFISH, (24+60)<<X | (24+190)<<Y
+   # Lilifrog
+    .word 135, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 5
+    .word      evtSingleSprite | 10 # Row 19, last Column, Last Sprite
+
+   # Bubble 16
+    .word 145, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 8
+    .word      evtSetMove, mveCustom1 | 0b1001
+    .word      evtSingleSprite, sprTwoFrame | BUBBLE16, (24+20)<<X | (24+200)<<Y
+   # Bubble 24
+    .word 150, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 7
+    .word      evtSetMove, mveCustom2 | 0b0001
+    .word      evtSingleSprite, sprTwoFrame | BUBBLE24, (24+150)<<X | (24+200)<<Y
+   # Bubble 16
+    .word 155, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 8
+    .word      evtSetMove, mveCustom1 | 0b0110
+    .word      evtSingleSprite, sprTwoFrame | BUBBLE16, (24+145)<<X | (24+200)<<Y
+   # Bubble 24
+    .word 160, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 7
+    .word      evtSetMove, mveCustom2 | 0b0010
+    .word      evtSingleSprite, sprTwoFrame | BUBBLE24, (24+145)<<X | (24+200)<<Y
+   # Bubble 16
+    .word 165, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 8
+    .word      evtSetMove, mveCustom1 | 0b0111
+    .word      evtSingleSprite, sprTwoFrame | BUBBLE16, (24+30)<<X | (24+200)<<Y
+   # Bubble 24
+    .word 160, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 7
+    .word      evtSetMove, mveCustom2 | 0b0011
+    .word      evtSingleSprite, sprTwoFrame | BUBBLE24, (24+140)<<X | (24+200)<<Y
+   # Bubble 16
+    .word 175, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 8
+    .word      evtSetMove, mveCustom1 | 0b1000
+    .word      evtSingleSprite, sprTwoFrame | BUBBLE16, (24+35)<<X | (24+200)<<Y
+   # Bubble 24
+    .word 180, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 7
+    .word      evtSetMove, mveCustom2 | 0b0100
+    .word      evtSingleSprite, sprTwoFrame | BUBBLE24, (24+135)<<X | (24+200)<<Y
+   # Bubble 16
+    .word 185, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 8
+    .word      evtSetMove, mveCustom1 | 0b1001
+    .word      evtSingleSprite, sprTwoFrame | BUBBLE16, (24+140)<<X | (24+200)<<Y
+
+UnderwaterPart:
+
+    .word 185, evtSetLevelSpeed, 0b00000010
+    .word 185, evtCallAddress, BlackoutOn
+
+    .word 185, evtCallAddress, CallBounce, Blackout5
+    .word 186, evtCallAddress, CallBounce, Blackout4
+    .word 187, evtCallAddress, CallBounce, Blackout3
+    .word 187, evtCallAddress, setPaletteSink, PlusSink1
+  # .word 188 set palette
+    .word 188, evtCallAddress, CallBounce, Blackout2
+    .word 188, evtCallAddress, setPaletteSink, PlusSink2
+  # .word 189 set palette
+    .word 189, evtCallAddress, CallBounce, Blackout1
+    .word 189, evtCallAddress, setPaletteSink, PlusSink3
+  # .word 190 set palette
+    .word 189, evtCallAddress, setPaletteSink, PlusSink4
+  # .word 191 set palette
+    .word 191, evtCallAddress, setPaletteSink, PlusSink5
+    .word 192, evtCallAddress, setPaletteUnderwater
+  # .word 192 set palette
+    .word 193, evtCallAddress, CallBounce, SetUnderwater
+    .word 193, evtCallAddress, CallBounce, Blackout2
+
+   # CoralAndWeeds 18-21
+    .word 193, evtMultipleCommands | 6
+    .word      evtLoadObjSettings | 1
+    .word      evtSetProg, prgNone
+    .word      evtSingleSprite, sprTwoFrame | WEED1,  (24+ 40)<<X | (24+199-24)<<Y
+    .word      evtSingleSprite, sprTwoFrame | CORAL1, (24+160)<<X | (24+190-24)<<Y
+    .word      evtSingleSprite, sprTwoFrame | WEED2,  (24+ 80)<<X | (24+185-24)<<Y
+    .word      evtSingleSprite, sprTwoFrame | CORAL2, (24+120)<<X | (24+195-24)<<Y
+   # Powerup Power
+    .word 193, evtMultipleCommands | 2
+    .word      evtSetProgMoveLife, prgBonus, (mvRegular | spdNormal | 046), lifeDeadly | 63
+    .word      evtSingleSprite, sprTwoFrame | POWERUP_POWER, (24+0)<<X | (24+100)<<Y
+
+    .word 194, evtCallAddress, CallBounce, Blackout3
+    .word 195, evtCallAddress, CallBounce, Blackout4
+    .word 196, evtCallAddress, CallBounce, Blackout5
+    .word 197, evtCallAddress, BlackoutOff
+    .word 197, evtSetLevelSpeed, 0b00000100
+
+   # Miner Fish
+    .word 197, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 11
+    .word      evtSingleSprite, sprTwoFrame | MINERFISH, (24+160-16)<<X | (24+100)<<Y
+   # Bubble 24
+    .word 200, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 7
+    .word      evtSetMove, mveCustom2 | 0b1100
+    .word      evtSingleSprite, sprTwoFrame | BUBBLE24, (24+50)<<X | (24+200)<<Y
+   # Bubble 16
+    .word 200, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 8
+    .word      evtSetMove, mveCustom1 | 0b1011
+    .word      evtSingleSprite, sprTwoFrame | BUBBLE16, (24+120)<<X | (24+200)<<Y
+   # Miner Fish
+    .word 205, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 11
+    .word      evtSingleSprite, sprTwoFrame | MINERFISH, (24+160-16)<<X | (24+100)<<Y
+   # Bubble 24
+    .word 210, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 7
+    .word      evtSetMove, mveCustom2 | 0b1100
+    .word      evtSingleSprite, sprTwoFrame | BUBBLE24, (24+130)<<X | (24+200)<<Y
+   # Bubble 16
+    .word 210, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 8
+    .word      evtSetMove, mveCustom1 | 0b1101
+    .word      evtSingleSprite, sprTwoFrame | BUBBLE16, (24+120)<<X | (24+200)<<Y
+   # Bubble 24
+    .word 215, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 7
+    .word      evtSetMove, mveCustom2 | 0b1110
+    .word      evtSingleSprite, sprTwoFrame | BUBBLE24, (24+70)<<X | (24+200)<<Y
+   # Bubble 16
+    .word 215, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 8
+    .word      evtSetMove, mveCustom1 | 0b1111
+    .word      evtSingleSprite, sprTwoFrame | BUBBLE16, (24+120)<<X | (24+200)<<Y
+   # Bubble 24
+    .word 220, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 7
+    .word      evtSetMove, mveCustom2 | 0b0001
+    .word      evtSingleSprite, sprTwoFrame | BUBBLE24, (24+120)<<X | (24+200)<<Y
+   # Bubble 16
+    .word 225, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 8
+    .word      evtSetMove, mveCustom1 | 0b1101
+    .word      evtSingleSprite, sprTwoFrame | BUBBLE16, (24+80)<<X | (24+200)<<Y
+   # Pairanah
+    .word 230, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 10
+    .word      evtSingleSprite | 7 # Row 13, last Column, Last Sprite
+   # Bubble 24
+    .word 230, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 7
+    .word      evtSetMove, mveCustom2 | 0b0011
+    .word      evtSingleSprite, sprTwoFrame | BUBBLE24, (24+90)<<X | (24+200)<<Y
+   # Bubble 16
+    .word 235, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 8
+    .word      evtSetMove, mveCustom1 | 0b0100
+    .word      evtSingleSprite, sprTwoFrame | BUBBLE16, (24+110)<<X | (24+200)<<Y
+   # Miner Fish
+    .word 250, evtMultipleCommands | 2
+    .word      evtLoadObjSettings | 11
+    .word      evtSingleSprite, sprTwoFrame | MINERFISH, (24+160-16)<<X | (24+100)<<Y
+   # Coral and weeds
+    .word 250, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 1
+    .word      evtSetProg, 0
+    .word      evtSingleSprite, sprTwoFrame | WEED1, (24+160)<<X | (24+190-24)<<Y
+   # Starfish Bomber
+    .word 255+5, evtMultipleCommands | 3
+    .word        evtLoadObjSettings | 4
+    .word        evtSetMove, mvRegular | spdNormal | 045
+    .word        evtSingleSprite, sprTwoFrame | STARFISH_BOMBER, (24)<<X | (24+8)<<Y
+   # Pairanah
+    .word 255+20, evtMultipleCommands | 2
+    .word         evtLoadObjSettings | 10
+    .word         evtSingleSprite | 7 # Row 13, last Column, Last Sprite
+   # FishFace
+    .word 255+25, evtMultipleCommands | 3
+    .word      evtLoadObjSettings | 12
+    .word      evtSetMove, mvRegular | spdNormal | 046
+    .word      evtSingleSprite, sprTwoFrame | FISHFACE_RIGHT, (24)<<X | (24+80)<<Y
+   # Miner Fish
+    .word 255+30, evtMultipleCommands | 2
+    .word         evtLoadObjSettings | 11
+    .word         evtSingleSprite, sprTwoFrame | MINERFISH, (24+160-16)<<X | (24+100)<<Y
+   # Pairanah
+    .word 255+35, evtMultipleCommands | 2
+    .word         evtLoadObjSettings | 10
+    .word         evtSingleSprite | 6 # Row 11, last Column, Last Sprite
+   # Coral and weeds
+    .word 255+35, evtMultipleCommands | 3
+    .word         evtLoadObjSettings | 1
+    .word         evtSetProg, 0
+    .word         evtSingleSprite, sprTwoFrame | CORAL1, (24+160)<<X | (24+195-24)<<Y
+   # Starfish Bomber
+    .word 255+35, evtMultipleCommands | 3
+    .word         evtLoadObjSettings | 4
+    .word         evtSetMove, mvRegular | spdNormal | 045
+    .word         evtSingleSprite, sprTwoFrame | STARFISH_BOMBER, (24)<<X | (24+8)<<Y
+   # Pairanah
+    .word 255+40, evtMultipleCommands | 2
+    .word         evtLoadObjSettings | 10
+    .word         evtSingleSprite | 9 # Row 17, last Column, Last Sprite
+   # Pairanah
+    .word 255+45, evtMultipleCommands | 2
+    .word         evtLoadObjSettings | 10
+    .word         evtSingleSprite | 7 # Row 13, last Column, Last Sprite
+   # Pairanah
+    .word 255+50, evtMultipleCommands | 2
+    .word         evtLoadObjSettings | 10
+    .word         evtSingleSprite | 6 # Row 11, last Column, Last Sprite
+   # Pairanah
+    .word 255+55, evtMultipleCommands | 2
+    .word         evtLoadObjSettings | 10
+    .word         evtSingleSprite | 9 # Row 17, last Column, Last Sprite
+   # Miner Fish
+    .word 255+60, evtMultipleCommands | 2
+    .word         evtLoadObjSettings | 11
+    .word         evtSingleSprite, sprTwoFrame | MINERFISH, (24+160-16)<<X | (24+100)<<Y
+   # Miner Fish
+    .word 255+70, evtMultipleCommands | 2
+    .word         evtLoadObjSettings | 11
+    .word         evtSingleSprite, sprTwoFrame | MINERFISH, (24+160-16)<<X | (24+100)<<Y
+   # FishFace
+    .word 255+75, evtMultipleCommands | 3
+    .word         evtLoadObjSettings | 12
+    .word         evtSetMove, mvRegular | spdNormal | 046
+    .word         evtSingleSprite, sprTwoFrame | FISHFACE_RIGHT, (24)<<X | (24+80)<<Y
+   # FishFace
+    .word 255+75, evtMultipleCommands | 3
+    .word         evtLoadObjSettings | 12
+    .word         evtSetMove, mvRegular | spdNormal | 046
+    .word         evtSingleSprite, sprTwoFrame | FISHFACE_RIGHT, (24)<<X | (24+100)<<Y
+   # Coral and weeds
+    .word 255+75, evtMultipleCommands | 3
+    .word         evtLoadObjSettings | 1
+    .word         evtSetProg, 0
+    .word         evtSingleSprite, sprTwoFrame | CORAL1, (24+160)<<X | (24+199-24)<<Y
+   # Pairanah
+    .word 255+80, evtMultipleCommands | 2
+    .word         evtLoadObjSettings | 10
+    .word         evtSingleSprite | 5 # Row 9, last Column, Last Sprite
+   # Pairanah
+    .word 255+85, evtMultipleCommands | 2
+    .word         evtLoadObjSettings | 10
+    .word         evtSingleSprite | 7 # Row 13, last Column, Last Sprite
+   # Pairanah
+    .word 255+90, evtMultipleCommands | 2
+    .word         evtLoadObjSettings | 10
+    .word         evtSingleSprite | 9 # Row 17, last Column, Last Sprite
+   # Super Fish
+    .word 255+100, evtMultipleCommands | 3
+    .word          evtLoadObjSettings | 9
+    .word          evtSetMove, mveCustom3 | 0b1010
+    .word          evtSingleSprite, sprTwoFrame | SUPERFISH, (24+60)<<X | (24+190)<<Y
+   # Pairanah
+    .word 255+100, evtMultipleCommands | 2
+    .word          evtLoadObjSettings | 10
+    .word          evtSingleSprite | 7 # Row 13, last Column, Last Sprite
+   # Coral and weeds
+    .word 255+100, evtMultipleCommands | 3
+    .word          evtLoadObjSettings | 1
+    .word          evtSetProg, 0
+    .word          evtSingleSprite, sprTwoFrame | WEED1, (24+160)<<X | (24+195-24)<<Y
+   # Fish Bone
+    .word 255+110, evtMultipleCommands | 4
+    .word          evtLoadObjSettings | 13
+    .word          evtSingleSprite, sprTwoFrame | FISHBONE_LEFT, (24+160)<<X | (24+16*1)<<Y
+    .word          evtSingleSprite | 7 # Row 13, last Column, Last Sprite
+    .word          evtSingleSprite | 11 # Row 21, last Column, Last Sprite
+   # Fish Bone
+    .word 255+110, evtMultipleCommands | 5
+    .word          evtLoadObjSettings | 11
+    .word          evtSetMove, mvRegular | spdNormal | 45
+    .word          evtSetProg, prgFireSlow | 0b01100
+    .word          evtSingleSprite, sprTwoFrame | FISHBONE_RIGHT, (24)<<X | (24+16*0)<<Y
+    .word          evtSingleSprite, sprTwoFrame | FISHBONE_RIGHT, (24)<<X | (24+16*0)<<Y
+   # Fish Bone
+    .word 255+120, evtMultipleCommands | 3
+    .word          evtLoadObjSettings | 13
+    .word          evtSingleSprite | 5 # Row 9, last Column, Last Sprite
+    .word          evtSingleSprite | 9 # Row 17, last Column, Last Sprite
+   # Fish Bone
+    .word 255+120, evtMultipleCommands | 5
+    .word          evtLoadObjSettings | 11
+    .word          evtSetMove, mvRegular | spdNormal | 45
+    .word          evtSetProg, prgFireSlow | 0b01100
+    .word          evtSingleSprite, sprTwoFrame | FISHBONE_RIGHT, (24)<<X | (24+16* 4)<<Y
+    .word          evtSingleSprite, sprTwoFrame | FISHBONE_RIGHT, (24)<<X | (24+16*10)<<Y
+
+LevelEndAnim:
+    .word 255+150, evtMultipleCommands | 2
+    .word          evtSetProgMoveLife, prgMovePlayer, mvStatic, 10
+    .word          evtSingleSprite, sprTwoFrame | DUMMY_SPRITE, (24+140)<<X | (24+100)<<Y
+    .word 255+150, evtCallAddress, Player_Handler_DoSmartBomb
+# Start of fade out block ------------------------------------------------------
+    .equiv FadeOutStartPoint, 255+152
+    .word FadeOutStartPoint + 1, evtSetPalette, DarkRealPalette
+    .word FadeOutStartPoint + 2, evtSetPalette, BluePalette
+
+    .word 255+156, evtCallAddress, EndLevel
+    .even
+#----------------------------------------------------------------------------}}}
+EndLevel:
+       .ppudo_ensure $PPU_LevelEnd
+       .ppudo_ensure $PPU_MusicStop
+        MOV  $0x8000,R5
+        JMP  ExecuteBootstrap
+
 LevelInit:
        .ppudo_ensure $PPU_LevelMusicRestart
         MOV  $LevelSprites,R0
@@ -498,142 +651,154 @@ LevelInit:
         MOV  R0,(R1)+
 
         MOV  $EventStreamArray,R5
+#:bpt
         CALL EventStream_Init
         MTPS $PR0
-#LevelLoop:
-#        CALL @$Background_Draw
-#
-#        CALL @$EventStream_Process
-#        CALL @$ObjectArray_Redraw
-#
-#        MOV  $ChibiSprites,@$SprShow_BankAddr
-#        CALL @$PlayerHandler
-#
-#        CALL @$Player_StarArray_Redraw
-#        CALL @$StarArray_Redraw
-#
-#        CALL @$ScreenBuffer.Flip
-#
-#        BR   LevelLoop
-##-------------------------------------------------------------------------------
-## Generic Background Begin -----------------------------------------------------
-#Background_Draw:
-#        MOV  $0,R0 # 0=left
-#        CALL @$Background_GradientScroll
-#
-#        MOV  @$ScreenBuffer.ActiveScreen,R5
-#
-#        CALL @$Timer.UpdateTimer # R0 = SmartBomb color or 0
-#        BNZ  Background_SmartBomb
-#
-#       .equiv jmpBackgroundRender, .+2
-#        JMP  @$Background_DrawB
-#
-#Background_SmartBomb:
-#        MOV  $200,R1
-#        JMP  @$Background_SolidFill
-#
-#Background_DrawB:
-#        MOV  $GradientTop,R3 # 40 lines
-#        MOV  $GradientTopStart,R1
-#        MOV  $0b11111100,R2  # Shift on Timer Ticks
-#        CALL @$Background_Gradient
-#
-#        CLR  R0 # sprite number
-#        MOV  $LevelTiles,R4
-#        CALL GetSpriteMempos
-#
-#      # we will need the position later for Tile bitshifts
-#        MOV  R4,-(SP)
-#        MOV  $8,R1
-#        MOV  $1,R2
-#        CALL @$Background_FloodFillQuadSpriteColumn
-#
-#        CLR  R0
-#        MOV  $4,R1
-#        CALL @$Background_SolidFill
-#
-#        MOV  $16,R1
-#        MOV  $3,R2
-#        CALL @$Background_FloodFillQuadSpriteColumn
-#
-#        CLR  R0
-#        MOV  $4,R1
-#        CALL @$Background_SolidFill
-#
-#        MOV  $8,R1
-#        CALL @$Background_FloodFillQuadSprite
-#
-#        CLR  R0
-#        MOV  $16,R1
-#        CALL @$Background_SolidFill
-#
-#        MOV  $GradientBottom,R3 # 40 lines
-#        MOV  $GradientBottomStart,R1
-#        MOV  $0b11111111,R2 # Shift on Timer Ticks
-#        MOV  R4,-(SP) # Background_Gradient corrupts R4
-#        CALL @$Background_Gradient
-#        MOV  (SP)+,R4
-#
-#        MOV  $8,R1 # number of lines
-#        CALL @$Background_FloodFillQuadSprite
-## Tile Bitshifts ---------------------------------------------------------------
-#      # pop de ;needed to keep this for the bitshifts
-#        MOV  (SP)+,R5 # ponter to the first tile
-#
-#       .equiv TileWidthBytes, 8
-#      # we do MOV  -(R5),R0 to read words, to be able to use ASH for shifts
-#      # so R5 should point to next line
-#        ADD  $TileWidthBytes,R5
-#
-#        MOV  $0b11111110,R0     # shift on timer ticks
-#        MOV  $TileWidthBytes,R1 # bytes
-#        MOV  $8,R2              # lines
-#        CALL @$BitShifter       #
-#
-#        MOV  $0b11111100,R0     # shift on timer ticks
-#        MOV  $TileWidthBytes,R1 # bytes
-#        MOV  $16,R2             # lines
-#        CALL @$BitShifter       #
-#
-#        MOV  $0b11111110,R0     # shift on timer ticks
-#        MOV  $TileWidthBytes,R1 # bytes
-#        MOV  $8,R2              # lines
-#        CALL @$BitShifter       #
-#
-#        MOV  $0b11111111,R0     # shift on timer ticks
-#        MOV  $TileWidthBytes,R1 # bytes
-#        MOV  $8,R2              # lines
-#        CALL @$BitShifterDouble #
-#
-#        RETURN
-## Background Data ----------------------------------------------#
-#   .equiv GradientTopStart, 40 # lines count                    #
-# GradientTop:                                                   #
-#    .word 0xFF00, 0xFF00                # 1st line              # defb &0F,&0F    ;1; first line
-#    .word GradientTopStart - 10, 0xDD00 # 2nd line num, new word# defb GradientTopStart-10,&0D ;2; line num, New byte
-#    .word GradientTopStart - 16, 0x7700                         # defb GradientTopStart-16,&07 ;3
-#    .word GradientTopStart - 20, 0xAA00                         # defb GradientTopStart-20,&0A ;4
-#    .word GradientTopStart - 26, 0x5500                         # defb GradientTopStart-26,&05 ;5
-#    .word GradientTopStart - 30, 0x8800                         # defb GradientTopStart-30,&08 ;6
-#    .word GradientTopStart - 36, 0x2200                         # defb GradientTopStart-36,&02 ;7
-#    .word GradientTopStart - 38, 0x0000                         # defb GradientTopStart-38,&00 ;7
-#    .word GradientTopStart - 40, 0x0000                         # defb GradientTopStart-40,&00 ;7
-#    .word 0xFFFF                                                # defb 255
-#
-#    .equiv GradientBottomStart, 40 # lines count
-# GradientBottom:                                                #
-#    .word 0x0000, 0x0000 # 1st line                             # defb &0,&0  ;1; first line
-#    .word 40, 0x0022     # 2nd line num, new word               # defb 40,&20 ;10
-#    .word 36, 0x0088                                            # defb 36,&80 ;11
-#    .word 30, 0x0055                                            # defb 30,&50 ;12
-#    .word 26, 0x00AA                                            # defb 26,&A0 ;13
-#    .word 20, 0x0077                                            # defb 20,&70 ;14
-#    .word 10, 0x00DD                                            # defb 10,&D0 ;15
-#    .word  4, 0x00FF                                            # defb 4,&F0  ;15
-#    .word  2, 0x00FF                                            # defb 2,&F0  ;15
-#    .word 0xFFFF                                                # defb 255
-##---------------------------------------------------------------#
+LevelLoop:
+        CALL @$Background_Draw
+
+        CALL @$EventStream_Process
+        CALL @$ObjectArray_Redraw
+
+        MOV  $ChibiSprites,@$SprShow_BankAddr
+        CALL @$PlayerHandler
+
+        CALL @$Player_StarArray_Redraw
+        CALL @$StarArray_Redraw
+
+        CALL @$ScreenBuffer.Flip
+
+        BR   LevelLoop
+#-------------------------------------------------------------------------------
+# Generic Background Begin -----------------------------------------------------
+Background_Draw:
+        MOV  $0,R0 # 0=left
+        CALL @$Background_GradientScroll
+
+        MOV  @$ScreenBuffer.ActiveScreen,R5
+
+        CALL @$Timer.UpdateTimer # R0 = SmartBomb color or 0
+        BNZ  Background_SmartBomb
+
+       .equiv jmpBackgroundRender, .+2
+        JMP  @$Background_DrawB
+
+Background_SmartBomb:
+        MOV  $200,R1
+        JMP  @$Background_SolidFill
+
+Background_DrawB:
+        MOV  $GradientTop,R3 # 48 lines
+        MOV  $GradientTopStart,R1
+        MOV  $0b11111100,R2  # Shift on Timer Ticks
+        CALL @$Background_Gradient
+
+        CLR  R0 # sprite number
+        MOV  $LevelTiles,R4
+        CALL GetSpriteMempos
+
+      # we will need the position later for Tile bitshifts
+        MOV  R4,-(SP)
+        MOV  $16,R1
+        CALL @$Background_FloodFillQuadSprite
+
+        CLR  R0
+        MOV  $32,R1
+        CALL @$Background_SolidFill
+
+        MOV  $16,R1
+        CALL @$Background_FloodFillQuadSprite
+
+        CLR  R0
+        MOV  $24,R1
+        CALL @$Background_SolidFill
+
+        MOV  $8,R1
+        CALL @$Background_FloodFillQuadSprite
+
+        CLR  R0
+        MOV  $16,R1
+        CALL @$Background_SolidFill
+
+        MOV  $GradientBottom,R3 # 32 lines
+        MOV  $GradientBottomStart,R1
+        MOV  $0b11111111,R2 # Shift on Timer Ticks
+        MOV  R4,-(SP) # Background_Gradient corrupts R4
+        CALL @$Background_Gradient
+        MOV  (SP)+,R4
+
+        MOV  $8,R1 # number of lines
+        CALL @$Background_FloodFillQuadSprite
+# Tile Bitshifts ---------------------------------------------------------------
+      # pop de ;needed to keep this for the bitshifts
+        MOV  (SP)+,R5 # ponter to the first tile
+
+       .equiv TileWidthBytes, 8
+      # we do MOV  -(R5),R0 to read words, to be able to use ASH for shifts
+      # so R5 should point to next line
+        ADD  $TileWidthBytes,R5
+
+        MOV  $0b11111100,R0     # shift on timer ticks
+        MOV  $TileWidthBytes,R1 # bytes
+        MOV  $16,R2             # lines
+        CALL @$BitShifter       #
+
+        MOV  $0b11111110,R0     # shift on timer ticks
+        MOV  $TileWidthBytes,R1 # bytes
+        MOV  $16,R2             # lines
+        CALL @$BitShifter       #
+
+        MOV  $0b11111111,R0     # shift on timer ticks
+        MOV  $TileWidthBytes,R1 # bytes
+        MOV  $8,R2              # lines
+        CALL @$BitShifter       #
+
+        MOV  $0b11111111,R0     # shift on timer ticks
+        MOV  $TileWidthBytes,R1 # bytes
+        MOV  $8,R2              # lines
+        CALL @$BitShifterDouble #
+
+        RETURN
+# Background Data ----------------------------------------------#
+   .equiv GradientTopStart, 48 # lines count                    #
+GradientTop:                                                    #
+   .word 0x00FF, 0x00FF                # 1st line               # defb &0F,&0F    ; 1 first line
+   .word GradientTopStart - 10, 0x00DD # 2nd line num, new word # defb GradientTopStart-10,&D0 ;2; line num, New byte
+   .word GradientTopStart - 16, 0x0077                          # defb GradientTopStart-16,&70 ;3
+   .word GradientTopStart - 20, 0x00AA                          # defb GradientTopStart-20,&A0 ;4
+   .word GradientTopStart - 26, 0x0055                          # defb GradientTopStart-26,&50 ;5
+   .word GradientTopStart - 30, 0x0088                          # defb GradientTopStart-30,&80 ;6
+   .word GradientTopStart - 36, 0x0022                          # defb GradientTopStart-36,&20 ;7
+   .word GradientTopStart - 40, 0x0000                          # defb GradientTopStart-40,&00 ;7
+   .word GradientTopStart - 46, 0x0000                          # defb GradientTopStart-46,&00 ;7
+   .word 0xFFFF                                                 # defb 255
+
+   .equiv GradientTopStartB, 32 # lines count                   #
+GradientTop32:
+   .word 0xFF00, 0xFF00                 # 1st line              # defb &F0,&F0    ; 1 first line
+   .word GradientTopStartB - 00, 0x00DD # 2nd line num, new word# defb GradientTopStartB-00,&D0 ;2; line num, New byte
+   .word GradientTopStartB - 06, 0x0077                         # defb GradientTopStartB-06,&70 ;3
+   .word GradientTopStartB - 10, 0x00AA                         # defb GradientTopStartB-10,&A0 ;4
+   .word GradientTopStartB - 16, 0x0055                         # defb GradientTopStartB-16,&50 ;5
+   .word GradientTopStartB - 20, 0x0088                         # defb GradientTopStartB-20,&80 ;6
+   .word GradientTopStartB - 26, 0x0022                         # defb GradientTopStartB-26,&20 ;7
+   .word GradientTopStartB - 28, 0x0000                         # defb GradientTopStartB-28,&00 ;8
+   .word GradientTopStartB - 30, 0x0000                         # defb GradientTopStartB-30,&00 ;9
+   .word 0xFFFF                                                 # defb 255
+
+   .equiv GradientBottomStart, 32 # lines count
+GradientBottom:                                                 #
+   .word 0x0000, 0x0000 # 1st line                              # defb &0,&0  ; 1 first line
+   .word 30, 0x0022     # 2nd line num, new word                # defb 30,&20 ;10
+   .word 26, 0x0088                                             # defb 26,&80 ;11
+   .word 20, 0x0055                                             # defb 20,&50 ;12
+   .word 18, 0x00AA                                             # defb 18,&A0 ;13
+   .word 14, 0x0077                                             # defb 14,&70 ;14
+   .word 10, 0x00DD                                             # defb 10,&D0 ;15
+   .word  4, 0x00FF                                             # defb 4,&F0  ;15
+   .word  2, 0x00FF                                             # defb 2,&F0  ;15
+   .word 0xFFFF                                                 # defb 255
+#---------------------------------------------------------------#
 #      # in:  R1 C = Y
 #      #      R2 LSB D = move,
 #      #      R2 MSB iyh = sprite
@@ -899,27 +1064,52 @@ LevelInit:
 #                                       #        inc a
 #                                       #        ld (ix+0),a
 #        RETURN                         # ret
-#
-#BluePalette: #---------------------------------------------------------------{{{
-#    .word 0, cursorGraphic, scale320 | rgb
-#    .byte 1, setColors, Black, Blue, Blue, Magenta
-#    .word endOfScreen
-##----------------------------------------------------------------------------}}}
-#DarkRealPalette: #-----------------------------------------------------------{{{
-#    .word   0, cursorGraphic, scale320 | rgb
-#    .byte   1, setColors, Black, brBlue,  Gray, White
-#    .byte  65, setColors, Black, Magenta, Gray, White
-#    .byte 160, setColors, Black, Red,     Gray, White
-#    .word endOfScreen
-##----------------------------------------------------------------------------}}}
-#RealPalette: #---------------------------------------------------------------{{{
-#    .byte   0, setOffscreenColors
-#    .word      BLACK  | BR_BLUE    << 4 | BR_GREEN  << 8 | BR_CYAN << 12
-#    .word      BR_RED | BR_MAGENTA << 4 | BR_YELLOW << 8 | WHITE   << 12
-#
-#    .word   0, cursorGraphic, scale320 | RGB
-#    .byte   1, setColors, Black, Red,     brGreen, White
-#    .byte 150, setColors, Black, Magenta, brGreen, White
-#    .word endOfScreen
-##----------------------------------------------------------------------------}}}
+
+CustomMove1:
+CustomMove2:
+CustomMove3:
+CustomProgram1:
+CustomProgram2:
+Blackout1:
+Blackout2:
+Blackout3:
+Blackout4:
+Blackout5:
+PlusSink1:
+PlusSink2:
+PlusSink3:
+PlusSink4:
+PlusSink5:
+CallBounce:
+setPaletteSink:
+BlackoutOn:
+BlackoutOff:
+setPaletteUnderwater:
+SetUnderwater:
+        RETURN
+
+BluePalette: #---------------------------------------------------------------{{{
+    .word 0, cursorGraphic, scale320 | rgb
+    .byte 1, setColors, Black, Blue, Blue, Magenta
+    .word endOfScreen
+#----------------------------------------------------------------------------}}}
+DarkRealPalette: #-----------------------------------------------------------{{{
+    .word   0, cursorGraphic, scale320 | rgb
+    .byte   1, setColors, Black, brBlue,  Gray, White
+    .byte  65, setColors, Black, Magenta, Gray, White
+    .byte 160, setColors, Black, Red,     Gray, White
+    .word endOfScreen
+#----------------------------------------------------------------------------}}}
+RealPalette: #---------------------------------------------------------------{{{
+    .byte   0, setOffscreenColors
+    .word      BLACK  | BR_BLUE    << 4 | BR_GREEN  << 8 | BR_CYAN << 12
+    .word      BR_RED | BR_MAGENTA << 4 | BR_YELLOW << 8 | WHITE   << 12
+
+    .word   0, cursorGraphic, scale320 | RGB
+    .byte   1, setColors, Black, brMagenta, brYellow, White
+    .byte  28, setColors, Black, Magenta, brYellow, White
+    .byte  80, setColors, Black, Red,     brGreen, White
+    .byte 120, setColors, Black, brBlue, brCyan, White
+    .word endOfScreen
+#----------------------------------------------------------------------------}}}
 end:

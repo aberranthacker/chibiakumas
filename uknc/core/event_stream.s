@@ -96,7 +96,7 @@ EventStream_Init:
 
 EventStream_Process:
        .equiv Event_LevelSpeed, .+2 # how often ticks occur
-        BIT  $0x04,@$Timer.TicksOccured
+        BIT  $0b00000100,@$Timer.TicksOccured
         BZE  1237$ # no ticks occured
 
        .equiv Event_LevelTime, .+2
@@ -230,9 +230,9 @@ Event_CoreReprogram_CustomMove3:
         MOV  (R5)+,@$jmpLevelSpecificMoveC
         RETURN # to Event_LoadNextEvt
 
-Event_CoreReprogram_CustomMove4:
-        MOV  (R5)+,@$jmpLevelSpecificMoveD
-        RETURN # to Event_LoadNextEvt
+#Event_CoreReprogram_CustomMove4:
+#        MOV  (R5)+,@$jmpLevelSpecificMoveD
+#        RETURN # to Event_LoadNextEvt
 
 Event_SmartBombSpecial:
       # Custom smartbomb handler - needed to wipe Omega array during final boss
@@ -340,10 +340,10 @@ Event_AddToBackground: # Event_AddBack_0111:
 
 # Change time between events, used on water level when waterlevel changes -
 # it was too slow by default
-                                                            # Event_ChangeStreamSpeed_1100:
-                                                            #     rst 6
-                                                            #     ld (Event_LevelSpeed_Plus1-1),a
-                                                            #     ret
+Event_SetLevelSpeed:                                        # Event_ChangeStreamSpeed_1100:
+        MOV  (R5)+,@$Event_LevelSpeed                       #     rst 6
+                                                            #     ld (Event_LevelSpeed_Plus1 - 1),a
+        RETURN                                              #     ret
 
 # we don't have a tile array - this does spikes in stage 7 and 8 - this can work
 # horiz or vert depending on scroll

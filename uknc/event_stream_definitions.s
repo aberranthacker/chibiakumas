@@ -55,9 +55,12 @@
 #                            ; the object array to memory location w1
 #                            ; used for boss sprites
 .equiv evtSaveObjPointer,   (0x1A * 2) << 8 # 52
+
 # evtResetPowerup    equ 139 ; Take away the player powerups... how mean!
-.equiv evtResetPowerup,     (0x1B * 2) << 8 # 52
+.equiv evtResetPowerup,     (0x1B * 2) << 8 # 54
+
 # evtSetLevelSpeed   equ 140 ; Change the speed of the object array to b1...
+.equiv evtSetLevelSpeed,    (0x1C * 2) << 8 # 56
 #                            ; %00000100 is default.. .%00000010 is faster
 
 # evtSetObjectSize   equ 128+13 ; set Object sprite size to b1... default is 24
@@ -97,8 +100,10 @@
                                         #
                                         # evtReprogramCustomProg1 equ %11111001 ; Define Custom Programmer handler1 to call
                                         #                                       ; w1 each program tick (custom fire patterns)
+.equiv evtReprogramCustomProg1, (0x29 * 2) << 8 # 82
                                         # evtReprogramCustomProg2 equ %11111010 ; Define Custom Programmer handler1 to call
                                         #                                       ; w2 each program tick (custom fire patterns)
+.equiv evtReprogramCustomProg2, (0x2A * 2) << 8 # 84
                                         # evtReprogramCustomPlayerHitter equ %11111011 ; Define Custom hit handler for players as call to w1 - used for steaks in Alchemy level of ep2
                                         #
                                         # evtReprogramSmartBombed equ %11111100
@@ -212,7 +217,7 @@
 .equiv prgFireMid,   0b01000000    # prgFireMid   equ %010xxxxx
 .equiv prgFireSlow,  0b01100000    # prgFireSlow  equ %011xxxxx
 .equiv prgFireSnail, 0b10000000    # prgFireSnail equ %100xxxxx
-                                   # prgFireHyper equ %101xxxxx
+.equiv prgFireHyper, 0b10100000    # prgFireHyper equ %101xxxxx
 .equiv prgFireAboveAvg, 0b11000000 # prgFireMid2  equ %110xxxxx
 
  # Used To animate spider legs in 1st boss
@@ -264,10 +269,10 @@
                             # ;   Fire NW              17
                             # ;   Fire N               18
                             #
-                            # prgCustom1  equ %11111100 ;Custom 1
-                            # prgCustom2  equ %11111101 ;Custom 2
-                            # prgCustom3  equ %11111110 ;Custom 3
-                            # prgCustom4  equ %11111111 ;Custom 4
+.equiv prgCustom1, 0b11111100 # prgCustom1  equ %11111100 ;Custom 1
+.equiv prgCustom2, 0b11111101 # prgCustom2  equ %11111101 ;Custom 2
+.equiv prgCustom3, 0b11111110 # prgCustom3  equ %11111110 ;Custom 3
+.equiv prgCustom4, 0b11111111 # prgCustom4  equ %11111111 ;Custom 4
                             # specMoveChibiko equ 255
 
 # Domoves
@@ -311,23 +316,28 @@
 #  3  7       38  39  3A  3B  3C  3D  3E  3F
 
 # WARNING: comments display values used in the original version
-                                 # mveMisc       equ 0 ;used for visual clarity!
-.equiv mveBackground, 0b11000000 # 1100xxxx, ----xxxx tick point
-.equiv mveSeaker_P1,  0b01000100 # 100001xx
-.equiv mveSeaker_P2,  0b01010000 # 100100xx
-.equiv mveSeaker,     0b01001000 # 100010xx seek! I can't spel!
-.equiv mveWave,       0b01100000 # 1010xxxx Wave pattern
-.equiv mveCustom1,    0b11110000 # 1111xxxx Level specific 1
-.equiv mveCustom2,    0b11100000 # 1110xxxx Level specific 2
-.equiv mveCustom3,    0b11010000 # 1101xxxx Level specific 3
-.equiv mveCustom4,    0b01110000 # 1011xxxx Level specific 4
+                                  # mveMisc       equ 0 ;used for visual clarity!
+.equiv mveBackground, 0b1100 << 4 # 1100xxxx, ----xxxx tick point
+.equiv mveWave,       0b0110 << 4 # 1010xxxx Wave pattern
+.equiv mveCustom1,    0b1111 << 4 # 1111xxxx Level specific 1
+.equiv mveCustom2,    0b1110 << 4 # 1110xxxx Level specific 2
+.equiv mveCustom3,    0b1101 << 4 # 1101xxxx Level specific 3
+#.equiv mveCustom4,    0b0111 << 4 # 1011xxxx Level specific 4
 
-                             # lifCustom   equ 255       ; We use 63 as a marker for custom code's INIT -
-                             #                           ; a real life will be set by the custom code
-.equiv lifeEnemy, 0b11000000 # lifEnemy    equ %11000000 ; HurtByBullets,Hurts Player
-.equiv lifeTimed, 0b00000000 # lifTimed    equ %00000000 ; Doesnt hurt, dies automatically
-                             # lifDeadly   equ %01000000 ; Deadly and cant be shot
-.equiv lifeImmortal, 0       # lifImmortal equ 0
+.equiv mveSeaker_P1,  0b0100 << 4 | 0b00 << 2 # 100001xx
+.equiv mveSeaker_P2,  0b0100 << 4 | 0b01 << 2 # 100100xx
+.equiv mveSeaker,     0b0100 << 4 | 0b10 << 2 # 100010xx seek! I can't spel!
+
+                              # Life BPxxxxxx
+                              # B=hurt by bullets,
+                              # P=hurts player,
+                              # xxxxxx = hit points (if not B then ages over time)
+.equiv lifeImmortal, 0b00000000 # lifImmortal equ 0
+.equiv lifeCustom,   0b11111111 # lifCustom   equ 255    ; We use 63 as a marker for custom code's INIT -
+                                #                        ; a real life will be set by the custom code
+.equiv lifeEnemy,  0b11 << 6 # lifEnemy    equ %11000000 ; HurtByBullets, Hurts Player
+.equiv lifeTimed,  0b00 << 6 # lifTimed    equ %00000000 ; Doesn't hurt, dies automatically
+.equiv lifeDeadly, 0b01 << 6 # lifDeadly   equ %01000000 ; Deadly and cant be shot
 
 .equiv sprSingleFrame, 0
 .equiv sprTwoFrame, 128     # TwoFrameSprite  equ 128    ; sequence is 1,2 1,2 etc

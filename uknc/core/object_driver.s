@@ -108,29 +108,23 @@ ObjectArray_NextObject:
         PUSH R5
 
         MOVB R1,@$SprShow_Y
-        SWAB R1
+        SWAB R1       # R1 LSB b = X, R1 MSB c = Y
         MOVB R1,@$SprShow_X
-      # R1 LSB b = X, R1 MSB c = Y
-        MOV  (R5)+,R2
-      # R2 LSB ixh = Move, R2 MSB iyh = Sprite
-        MOV  (R5)+,R3
-      # R3 LSB ixl = Life, R3 MSB iyl = Program Code
-        MOV  (R5),R4
-      # R4 LSB = Sprite Size, R4 MSB = Animator
+        MOV  (R5)+,R2 # R2 LSB ixh = Move, R2 MSB iyh = Sprite
+        MOV  (R5)+,R3 # R3 LSB ixl = Life, R3 MSB iyl = Program Code
+        MOV  (R5),R4  # R4 LSB = Sprite Size, R4 MSB = Animator
 
        .equiv ObjectSpriteSizeCurrent, .+2
         CMPB $0x00,R4
         BEQ  1$
         CALL ObjectArray_reConfigureForSize # Code to change sprite size!
     1$:
-        SWAB R4
-      # R4 LSB = Animator, R4 MSB = Sprite size
+        SWAB R4 # R4 LSB = Animator, R4 MSB = Sprite size
         TSTB R4
         BZE  2$
         CALL ObjectAnimator
    2$:
-        SWAB R2
-      # R2 LSB iyh = Sprite, R2 MSB ixh = Move
+        SWAB R2 # R2 LSB iyh = Sprite, R2 MSB ixh = Move
         MOV  R2,R0
         BIC  $0xFFC0,R0
         MOV  R0,@$SprShow_SprNum
@@ -162,7 +156,7 @@ Objectloop_SpriteBankSet:
         ASL  R0
         MOV  SpriteBanksVectors(R0),@$SprShow_BankAddr
 
-      # Life BPxxxxx
+      # Life BPxxxxxx
       # B=hurt by bullets,
       # P=hurts player,
       # xxxxxx = hit points (if not B then ages over time)
@@ -245,8 +239,8 @@ ObjectLoopBothPlayerSkip:                                   # ObjectLoopBothPlay
         TSTB R3
         BZE  ObjectLoop_NotShot # immortal object (background)
 
-        BIT  $0x80,R3
-        BNZ  ObjectLoop_AgelessIXLCheck # If it can be shot, it doesn't auto age
+        TSTB R3
+        BMI  ObjectLoop_AgelessIXLCheck # If it can be shot, it doesn't auto age
 
         BIT  $0b00001000,@$Timer.TicksOccured # see if its time to age the sprite
         BZE  ObjectLoop_Ageless
@@ -256,8 +250,8 @@ ObjectLoopBothPlayerSkip:                                   # ObjectLoopBothPlay
         TST  R1
         BZE  ObjectLoop_SaveChanges
 ObjectLoop_Ageless:
-        BIT  $0x80,R3
-        BZE  ObjectLoop_NotShot # cant be shot
+        TSTB R3
+        BPL  ObjectLoop_NotShot # cant be shot
 ObjectLoop_AgelessIXLCheck:
 #-----------------------------------player bullet collisions---------------------------------
       # R1 LSB b = X, R1 MSB c = Y

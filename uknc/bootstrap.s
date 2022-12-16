@@ -1,6 +1,6 @@
                 .list
 
-                .TITLE BootstrapChibi Akumas loader
+                .TITLE Bootstrap Chibi Akumas loader
 
                 .global start
                 .global Bootstrap.Launch
@@ -23,6 +23,7 @@
                 .global level_03.bin
                 .global level_04.bin
                 .global level_05_title.bin
+                .global level_05.bin
                 .global level_07_title.bin
 
                 .include "./hwdefs.s"
@@ -227,21 +228,21 @@ Bootstrap.Level_4: # --------------------------------------------------------
         JMP  @$Bootstrap.StartLevel
 #----------------------------------------------------------------------------
 Bootstrap.Level_5: # --------------------------------------------------------
-        MOV  $level_05_title.bin,R0
-        CALL Bootstrap.DiskRead_Start
-       .if StartOnLevel != MainMenu
-            CALL CLS
-       .endif
-        CALL Bootstrap.DiskIO_WaitForFinish
-       .check_for_loading_error "level_05_title.bin"
+      # MOV  $level_05_title.bin,R0
+      # CALL Bootstrap.DiskRead_Start
+      #.if StartOnLevel != MainMenu
+      #     CALL CLS
+      #.endif
+      # CALL Bootstrap.DiskIO_WaitForFinish
+      #.check_for_loading_error "level_05_title.bin"
 
-        MOV  $level_05_title.bin.lzsa1,R1
-        MOV  $FB1+8000,R2
-        CALL @$unlzsa1
+      # MOV  $level_05_title.bin.lzsa1,R1
+      # MOV  $FB1+8000,R2
+      # CALL @$unlzsa1
 
-       .ppudo_ensure $PPU_SetPalette,$Level05_TitlePalette
-        CALL Bootstrap.DisplayUnpackedTitleImage
-       .ppudo_ensure $PPU_PrintAt,$Level05_TitleText
+      #.ppudo_ensure $PPU_SetPalette,$Level05_TitlePalette
+      # CALL Bootstrap.DisplayUnpackedTitleImage
+      #.ppudo_ensure $PPU_PrintAt,$Level05_TitleText
 
         MOV  $level_05.bin,R0
         CALL Bootstrap.DiskRead_Start
@@ -250,9 +251,8 @@ Bootstrap.Level_5: # --------------------------------------------------------
        .check_for_loading_error "level_05.bin"
 
         WAIT
-        CALL Bootstrap.WaitForFireKey
-
-       .ppudo_ensure $PPU_SetPalette, $BlackPalette
+       #CALL Bootstrap.WaitForFireKey
+      #.ppudo_ensure $PPU_SetPalette, $BlackPalette
         WAIT
        .ppudo_ensure $PPU_LevelStart
 
