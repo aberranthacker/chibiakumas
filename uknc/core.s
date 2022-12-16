@@ -97,7 +97,7 @@ Event_VectorArray:
        .word Event_CallSubroutine                # 0x19 0x32  evtCallAddress
        .word Event_LoadLastAddedObjectToAddress  # 0x1A 0x34  evtSaveLstObjToAdd
        .word Event_ResetPowerups                 # 0x1B 0x36    defw Event_ClearPowerups
-       .word not_implemented_check_R0            # 0x1C 0x38    defw Event_ChangeStreamSpeed_1100
+       .word Event_SetLevelSpeed                 # 0x1C 0x38    defw Event_ChangeStreamSpeed_1100
        .word Event_SetSpriteSize                 # 0x1D 0x3A  evtSetObjectSize
        .word Event_SetAnimator                   # 0x1E 0x3C  evtSetAnimator
        .word Event_CoreReprogram_AnimatorPointer # 0x1F 0x3E    defw Event_CoreReprogram_AnimatorPointer
@@ -109,10 +109,10 @@ Event_VectorArray:
        .word Event_CoreReprogram_CustomMove1      # 0x24 0x48  mveCustom1
        .word Event_CoreReprogram_CustomMove2      # 0x25 0x4A  mveCustom2
        .word Event_CoreReprogram_CustomMove3      # 0x26 0x4E  mveCustom3
-       .word Event_CoreReprogram_CustomMove4      # 0x27 0x50  mveCustom4
+       .word not_implemented_check_R0             # 0x27 0x50  mveCustom4
        .word Event_CoreReprogram_PowerupSprites   # 0x28 0x4C  defw Event_CoreReprogram_PowerupSprites
-       .word not_implemented_check_R0             # 0x29 0x52  defw Event_CustomProgram1
-       .word not_implemented_check_R0             # 0x2A 0x54  defw Event_CustomProgram2
+       .word Event_CustomProgram1                 # 0x29 0x52  defw Event_CustomProgram1
+       .word Event_CustomProgram2                 # 0x2A 0x54  defw Event_CustomProgram2
        .word not_implemented_check_R0             # 0x2B 0x56  defw Event_CustomPlayerHitter
        .word not_implemented_check_R0             # 0x2C 0x58  defw Event_CustomSmartBomb
        .word not_implemented_check_R0             # 0x2D 0x5A  defw Event_ReprogramObjectBurstPosition

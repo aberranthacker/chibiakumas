@@ -358,8 +358,8 @@ Player_Fire4D: # Fire bullets!
 
 Player_Handler_KeyreadJoy1Fire2_DroneLimit:
         MOVB R0,6(R5)    # drone pos
-        BITB $0x80,2(R5) # check if player is allowed to fire
-        BNZ  1237$
+        TSTB 2(R5) # check if player is allowed to fire
+        BMI  1237$
 
         BISB $0x80,2(R5)
 

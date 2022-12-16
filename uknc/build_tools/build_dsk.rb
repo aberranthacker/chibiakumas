@@ -14,6 +14,7 @@ module BuildDskImage
     bytes_used = 0
     sectors_used = 0
 
+    puts "#{' ' * COL1_WIDTH}                57344"
     puts "#{' ' * COL1_WIDTH}  entry   size    end blocks block"
 
     FILES.each do |file_name|

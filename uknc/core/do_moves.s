@@ -65,66 +65,64 @@ DoMoves_Background: # Background sprites move much more slowly, and only in 1 di
         BIC  $0xFFF0,R0 # ----XXXX tick point
         ASL  R0
         BITB R0,@$Timer.TicksOccured
-        BNZ  1$
-        RETURN
+        BZE  1237$
 
-    1$: # it's time for a left move
+      # it's time for a left move
        .equiv opcDoMovesBGShift, . # check Xpos
         DEC  R4 # X
         CMP  R4, $24+ 160+24 # we are offscreen
         BHIS DoMoves_Kill # over the page
-        RETURN
+1237$:  RETURN
 
 DoMoves_Spec: # Special moves - various kinds
        .equiv SpecialMoveSlowdown, .+2
         BITB $0xFF,@$Timer.TicksOccured
-        BNZ  1$
-        RETURN
+        BZE  1237$
 
-    1$: # R2 - LSB=Move, MSB=Sprite
+      # R2 - LSB=Move, MSB=Sprite
         MOV  R2,R0
         BICB $0b00001111,R0
-        CMPB R0,$mveBackground # 1100xxxx Background
+        CMPB R0,$mveBackground # 1100xxxx Background 12
         BEQ  DoMoves_Background
 
-        CMPB R0,$mveWave # 1010xxxx Wave
+        CMPB R0,$mveWave # 0110xxxx Wave 6
         BEQ  DoMoves_Wave # Wave pattern - pretty naff, but it seemed a good idea at the time
 
-        # Level specifics are overriden by the code in the level
-        CMPB R0,$mveCustom4 # 1011xxxx Custom4
-        BNE  2$
-       .equiv jmpLevelSpecificMoveD, .+2
-        JMP  @$null
-    2$:
-        CMPB R0,$mveCustom3 # 1101xxxx Custom3
+      # Level specifics are overriden by the code in the level
+#        CMPB R0,$mveCustom4 # 0111xxxx Custom4 7
+#        BNE  2$
+#       .equiv jmpLevelSpecificMoveD, .+2
+#        JMP  @$null
+#    2$:
+        CMPB R0,$mveCustom3 # 1101xxxx Custom3 13
         BNE  3$
        .equiv jmpLevelSpecificMoveC, .+2
         JMP  @$null
     3$:
-        CMPB R0,$mveCustom2 # 1110xxxx Custom2
+        CMPB R0,$mveCustom2 # 1110xxxx Custom2 14
         BNE  4$
        .equiv jmpLevelSpecificMoveB, .+2
         JMP  @$null
     4$:
-        CMPB R0,$mveCustom1 # 1111xxxx Custom 1
+        CMPB R0,$mveCustom1 # 1111xxxx Custom 1 15
         BNE  5$
        .equiv jmpLevelSpecificMoveA, .+2
         JMP  @$null
     5$:
-        MOV  R2,R0          # 1000xxxx
-        BICB $0b00000011,R0 # 101111xx
+        MOV  R2,R0          # 0100xxxx
+        BICB $0b00000011,R0 # 011111xx
 
+        CMPB R0,$mveSeaker_P1
+        BEQ  DoMoves_SeekerP1   # Used by 'Chu attack' - and also coins!
    .ifdef TwoPlayersGame
         CMPB R0,$mveSeaker_P2
         BEQ  DoMoves_SeekerP2   # Used by 'Chu attack' - and also coins!
    .endif
-        CMPB R0,$mveSeaker_P1
-        BEQ  DoMoves_SeekerP1   # Used by 'Chu attack' - and also coins!
 
         CMPB R0,$mveSeaker
         BEQ  DoMoves_SeekerAuto # Pick a live player to target!
 
-        RETURN
+1237$:  RETURN
 
       # R4=B=X, R1=C=Y, R2: LSB=D=move, MSB=anything
 DoMoves_Wave:
