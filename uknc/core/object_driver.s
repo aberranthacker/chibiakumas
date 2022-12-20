@@ -590,7 +590,7 @@ ObjectProgram.Fire_JumpTable:
        .word ObjectProgram.CustomPrograms
 
 ObjectProgram.CustomPrograms:
-        BIC  $0xFFFC0,R3 # 0b11111100
+        BIC  $0xFFFC,R3 # 0b11111100
         ASL  R3
         JMP  @ObjectProgram.CustomPrograms_JumpTable(R3)
 ObjectProgram.CustomPrograms_JumpTable:
@@ -702,7 +702,9 @@ ObjectProgram.Fire:
                                      # ret z
 ObjectProgram.HyperFire:
        .ppudo $PPU_PlaySoundEffect2
-      # B=R4=X, C=R1=Y, IYL=R3=Prg         #
+      # R4 B = X
+      # R1 C = Y
+      # R3 IYL = Prg
         MOV  @$SpriteSizeShiftHalfB,R2     # ld a,(SpriteSizeShiftHalfB_Plus1 - 1)
         ADD  R2,R1                         # ld d,a
                                            # add c
@@ -714,9 +716,9 @@ ObjectProgram.HyperFire:
                                            # ld d,a
                                            # ld a,iyl
         BIC  $0xFFE0,R3 # ---XXXXX         # and %00011111
-      # B = R3 = pattern (0-15)            # ld b,a  ; top left
-      # C = R1 = Y pos                     #
-      # D = R2 = X pos                     # FireCustomStar:
+      # R3 B = pattern (0-15)              # ld b,a  ; top left
+      # R1 C = Y pos                       #
+      # R2 D = X pos                       # FireCustomStar:
         JMP  @$Stars_AddObjectBatchDefault #     jp Stars_AddObjectBatchDefault
                                            #
                                            # Object_DecreaseShot_Player2:

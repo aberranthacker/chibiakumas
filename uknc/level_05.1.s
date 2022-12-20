@@ -22,7 +22,7 @@
     .word S02SuperfishMask # bit-mask offset
     .byte 32 # height of the sprite
     .byte 0 # Y offset
-    .byte 5 # witdh
+    .byte 4 # witdh
     .byte SPR_HAS_MASK # attributes
 
    # sprite 3 S03Lilifrog

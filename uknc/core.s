@@ -163,6 +163,7 @@ not_implemented_check_R0:
 
        .include "core/object_driver.s"
        .global ObjectArray_Redraw
+       .global ObjectProgram.HyperFire
 
        .include "core/player_driver.s"
        .global ContinuesScreenPos
