@@ -23,6 +23,10 @@ ChibiSprites:
 LevelTiles:
        .incbin "build/level_05_tiles.spr"
 
+CustomRam:
+    .space 128
+    .word 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF # Marker for end of data
+
 EventStreamArray:
     .equiv DUMMY_SPRITE, 0
 
@@ -70,6 +74,16 @@ EventStreamArray:
   .byte    sprTwoFrame | POWERUP_RATE
   .byte    sprTwoFrame | POWERUP_POWER
   .byte    sprTwoFrame | COIN
+ # Bubble Move
+  .word 0, evtReprogramCustomMove1, CustomMove1
+ # Bubble Move 2
+  .word 0, evtReprogramCustomMove2, CustomMove2
+ # Super Fish Move
+  .word 0, evtReprogramCustomMove3, CustomMove3
+ # Super Fish
+  .word 0, evtReprogramCustomProg1, CustomProgram1
+ # Pairanah
+  .word 0, evtReprogramCustomProg2, CustomProgram2
 
   .word 0, evtMultipleCommands | 5
   .word    evtSetProgMoveLife               # 1
@@ -131,14 +145,11 @@ EventStreamArray:
   .word    evtSaveObjSettings | 6
  # Bubble
   .word 0, evtMultipleCommands | 5
-  .word    evtSetProgMoveLife, prgFireSnail | 5, mvRegular | spdNormal | 043, lifeEnemy | 9
+  .word    evtSetProgMoveLife, prgNone, mveCustom2, lifeCustom
   .word    evtSetSprite | sprTwoFrame | BUBBLE24
   .word    evtSetObjectSize | 24
   .word    evtAddToForeground
   .word    evtSaveObjSettings | 7
-
- # Bubble Move
-  .word 0, evtReprogramCustomMove1, CustomMove1
 
  # Bubble 2
   .word 0, evtMultipleCommands | 5
@@ -148,9 +159,6 @@ EventStreamArray:
   .word    evtAddToForeground
   .word    evtSaveObjSettings | 8
 
- # Bubble Move 2
-  .word 0, evtReprogramCustomMove2, CustomMove2
-
  # Super Fish
   .word 0, evtMultipleCommands | 5
   .word    evtSetProgMoveLife, prgCustom1, mveCustom3 | 0b0010, lifeCustom
@@ -159,11 +167,6 @@ EventStreamArray:
   .word    evtAddToForeground
   .word    evtSaveObjSettings | 9
 
- # Super Fish Move
-  .word 0, evtReprogramCustomMove3, CustomMove3
-
-  .word 0, evtReprogramCustomProg1, CustomProgram1
-
  # Pairanah
   .word 0, evtMultipleCommands | 5
   .word    evtSetProgMoveLife, prgCustom2, mvRegular | spdNormal | 042, lifeEnemy | 20
@@ -171,8 +174,6 @@ EventStreamArray:
   .word    evtSetObjectSize | 32
   .word    evtAddToForeground
   .word    evtSaveObjSettings | 10
-
-  .word 0, evtReprogramCustomProg2, CustomProgram2
 
  # Fish Face
   .word 0, evtMultipleCommands | 5
@@ -210,9 +211,8 @@ EventStreamArray:
 # End of fade in block ---------------------------------------------------------
 
     #----------
-   #.word 3, evtChangeStreamTime, 100, EventStreamArray_DebugPoint
+    .word 3, evtChangeStreamTime, 74, EventStreamArray_DebugPoint
     #----------
-EventStreamArray_DebugPoint:
 
    # Spitfish
     .word 10, evtMultipleCommands | 2
@@ -261,7 +261,7 @@ EventStreamArray_DebugPoint:
     .word     evtLoadObjSettings | 7
     .word     evtSetMove, mveCustom2 | 0b1001
     .word     evtSingleSprite, sprTwoFrame | BUBBLE24, (24+80)<<X | (24+200)<<Y
-   # Bubble
+   # Bubble 2
     .word 65, evtMultipleCommands | 3
     .word     evtLoadObjSettings | 8
     .word     evtSetMove, mveCustom1 | 0b1010
@@ -277,6 +277,7 @@ EventStreamArray_DebugPoint:
     .word     evtSingleSprite, sprTwoFrame | POWERUP_RATE, (24+160)<<X | (24+ 10)<<Y
     .word     evtSingleSprite, sprTwoFrame | POWERUP_RATE, (24+160)<<X | (24+ 90)<<Y
     .word     evtSingleSprite, sprTwoFrame | POWERUP_RATE, (24+160)<<X | (24+170)<<Y
+EventStreamArray_DebugPoint:
    # Super Fish
     .word 75, evtMultipleCommands | 3
     .word     evtLoadObjSettings | 9
@@ -409,7 +410,7 @@ UnderwaterPart:
     .word 193, evtCallAddress, CallBounce, SetUnderwater
     .word 193, evtCallAddress, CallBounce, Blackout2
 
-   # CoralAndWeeds 18-21
+   # Coral and Weeds 18-21
     .word 193, evtMultipleCommands | 6
     .word      evtLoadObjSettings | 1
     .word      evtSetProg, prgNone
@@ -651,7 +652,6 @@ LevelInit:
         MOV  R0,(R1)+
 
         MOV  $EventStreamArray,R5
-#:bpt
         CALL EventStream_Init
         MTPS $PR0
 LevelLoop:
@@ -799,277 +799,236 @@ GradientBottom:                                                 #
    .word  2, 0x00FF                                             # defb 2,&F0  ;15
    .word 0xFFFF                                                 # defb 255
 #---------------------------------------------------------------#
-#      # in:  R1 C = Y
-#      #      R2 LSB D = move,
-#      #      R2 MSB iyh = sprite
-#      #      R3 LSB ixl = Life,
-#      #      R3 MSB iyl = Program Code
-#      #      R4 B = X
-#      #
-#      # out: R1 new Y
-#      #      R2 unmodified
-#      #      R3 LSB unmodified
-#      #      R3 MSB updated program code
-#      #      R4 new X
-#      #      R5 unmodified
-#CustomMove.Bouncer:
-#        MOV  $190,R1                   # ld c,190
-#        PUSH R5                        # push hl
-#                                       #     ; B=X C=Y D=Move
-#                                       #     ld a,b
-#        CMP  R4,$24+160                #     cp 184
-#        BNE  1$                        #     call z,CustomMove.Bouncer_Init
-#        DEC  R4
-#    1$:                                #     call Akuyou_Timer.GetTimer
-#                                       #     ld h,a
-#
-#                                       #     ;shift the time
-#                                       #     ldai
-#                                       #     ld l,a
-#
-#        MOV  R2,R0                     #     ld a,d
-#        BIC  $0xFFF0,R0                #     and %00001111
-#        ADD  @$Timer.CurrentTick,R0    #     add a,l
-#        MOV  R0,R5                     #     ldia
-#
-#        BITB $0x20,R0                  #     bit 5,a
-#        BZE  CustomMove.Bouncer.Vert   #     jr z,CustomMove.Bouncer_Vert
-#
-#        DEC  R4                        #     dec b
-#        BIC  $0xFF00,R3                #     ld iyl,0 ; Program - do nothing
-#        BR   CustomMove.Bouncer.Done   #     jr CustomMove.Bouncer_Done
-#CustomMove.Bouncer.Vert:
-#                                       #     ;0000D111
-#        BITB $0x10,R0                  #     bit 4,a
-#        BZE  CustomMove.Bouncer.DoJump  #     jr z,CustomMove.Bouncer_DoJump
-#
-#        PUSH R0
-#        MOV  $0x0F,R0
-#        XOR  R0,(SP)                   #     xor %00001111
-#        POP  R0
-#        BR   CustomMove.Bouncer.DoJump  #     jr CustomMove.Bouncer_DoJump
-#
-#CustomMove.Bouncer.DoJump:
-#        BIC  $0xFFF0,R0                #     and %00001111
-#        ASL  R0                        #     rlca
-#        ASL  R0                        #     rlca
-#        ASL  R0                        #     rlca
-#        COM  R0                        #     cpl
-#        INC  R0                        #     inc a
-#        ADD  R0,R1                     #     add c
-#                                       #     ld c,a
-#
-#        MOV  R5,R0                     #     ldai
-#        BIC  $0xFFE0,R0                #     and %00011111
-#        CMPB R0,$0b00001110            #     cp  %00001110
-#        BNE  CustomMove.Bouncer.FireNormal #     jp nz,CustomMove.Bouncer_FireNormal
-#      # R3 MSB iyl = Program Code
-#        BIC  $0xFF00,R3
-#        BIS  $(prgFireFast|13)<<8,R3   #     ld iyl,prgFireFast+13 ; Program Fire
-#        BR   CustomMove.Bouncer.DoSprite#     jp CustomMove.Bouncer_DoSprite
-#
-#CustomMove.Bouncer.FireNormal:
-#        BIC  $0xFF00,R3
-#        BIS  $(prgFireFast|16)<<8,R3   #     ld iyl,prgFireFast+16 ; Program Fire
-#
-#CustomMove.Bouncer.DoSprite:
-#                                       #     ld a,h
-#        BIT  $0x02,@$Timer.TicksOccured#     bit 1,a
-#        BZE  CustomMove.Bouncer.Done    #     jp z,CustomMove.Bouncer_Done
-#
-#        MOV  @$SpriteBanksVectors+4,@$SprShow_BankAddr # call Akuyou_ObjectProgram_SpriteBankSwitch
-#CustomMove.Bouncer.Done:
-#        POP  R5                        # pop hl
-#        RETURN                         # ret
-#
-#                                       # CustomMove.Bouncer_Init:
-#                                       #        dec b
-#                                       # ret
-#
-#CustomMove3:
-#        MOV  $CustomMovePatternGeneric, @$dstCustomMovePatternA # ld hl,CustomMovePatternGeneric
-#        MOV  $CustomMovePatternMiniWave,@$dstCustomMovePatternB # ld de,CustomMovePatternMiniWave
-#        MOV  $CustomMovePattern_Init10, @$dstCustomMovePattern_Init # ld bc,CustomMovePattern_Init10
-#        BR   CustomMovePattern         #   jr CustomMovePattern
-#
-#      # R4=B=X, R1=C=Y, R2: LSB=D=move, MSB=anything
-#CustomMovePatternMiniWave:
-#      # WaveSmall pattern  1010SPPP  S= Speed, PPP Position
-#        MOV  R4,R1                     #        ld a,b
-#        ASR  R1                        #        srl a ; rem for speedup
-#        ASR  R1                        #        srl a ; rem for speedup
-#        BIC  $0xFFE0,R1                #        and %00011111
-#        CMP  R1,$0x10                  #        cp  %00010000
-#        BLO  DoMoves_WaveSmallContinue #        jr C,DoMoves_WaveSmallContinue
-#        MOV  $0x1F,R0
-#        XOR  R0,R1                     #        xor %00011111
-#DoMoves_WaveSmallContinue:
-#        MOV  R2,R0                     #        ld C,a
-#        MOV  $0x03,R0                  #        ld a,%00000011
-## DoMoves_WaveEnd
-#        ASH  $5,R0                     #        rrca
-#                                       #        rrca
-#                                       #        rrca    ; equivalent to 5 left shifts
-#        BIS  $0b00011100,R0            #        or %00011100
-#        ADD  R0,R1                     #        add C
-#                                       #        ld C,a
-#
-#        DEC  R4                        #        ld a,B
-#                                       #        sub 1
-#                                       #        ld B,A
-#        CMP  R4,$16                    #        cp 24   ; we are at the edge of the screen
-#        BLO  CustomMovePatternKill     #        jp C,CustomMovePatternKill ; over the page
-#        RETURN                         #        ret
-#
-#GetCustomRam:
-#        BIC  $0xFFF0,R5                # and %00001111
-#                                       # ld hl,CustomRam
-#                                       #   ld d,0
-#                                       #   ld e,a
-#        ASL  R5                        #   add hl,de
-#        ASL  R5                        #   add hl,de
-#        ADD  $CustomRam,R5             #   add hl,de
-#                                       #   add hl,de
-#                                       # push hl
-#                                       # pop ix
-#        RETURN                         # ret
-#
-#CustomRam:
-#       .space 128
-#
-#      # in:  R1 C = Y
-#      #      R2 LSB D = move, R2 MSB = sprite
-#      #      R3 LSB ixl = Life, R3 MSB iyl = Program Code
-#      #      R4 B = X
-#      #
-#      # out: R1 new Y
-#      #      R2 LSB unmodified, MSB sprite
-#      #      R3 LSB life, MSB unmodified
-#      #      R4 new X
-#      #      R5 unmodified
-#CustomMovePattern: # B=X C=Y D=Move
-#        MOVB R3,@$CustomMove_LifeCustom # ld a,ixl        ;lifCustom
-#        PUSH R5                        # ex af,af'
-#        MOVB R2,R5                     # ld a,d
-#                                       # exx
-#                                       # push ix
-#        CALL GetCustomRam              #         call GetCustomRam
-#                                       #         call Akuyou_ Timer.GetTimer
-#                                       #         ld d,a ; Timer.TicksOccured
-#                                       #         ldai    ; Level time
-#                                       #         ld e,a ; Timer.CurrentTick
-#
-#                                       #        ;dont update more than once per tick!
-#                                       #         ld a,(ix+1)
-#        CMPB 1(R5),@$Timer.CurrentTick #         cp e
-#        BEQ  CustomMovePattern_NoTick  #         jr z,CustomMovePattern_NoTick
-#                                       #         ld a,e
-#        MOVB @$Timer.CurrentTick,1(R5) #         ld (ix+1),e
-#
-#                                       #        ;see if this is our first run
-#                                       #         ex af,af'
-#        CMPB R3,$0xFF                  #         cp 255
-#        BLO  CustomMove_DoMove
-#
-#      # not used
-#       .equiv dstCustomMovePattern_Init, .+2
-#        CALL @$CustomMovePattern_Init  #         call nc,CustomMovePattern_Init :CustomMovePattern_Init_Plus2
-#                                       #         ex af,af'
-#
-#                                       #        ;here is where we make some moves!
-#                                       #         exx
-#CustomMove_DoMove:
-#       .equiv dstCustomMovePatternA, .+2
-#        CALL @$CustomMovePatternGeneric#         call CustomMovePatternGeneric :CustomPatternJump_Plus2
-#                                       #         exx
-#                                       #        ;increment the pos
-#CustomMovePattern_NoTick:
-#                                       #        ; here is where we make some moves!
-#                                       #        exx
-#       .equiv dstCustomMovePatternB, .+2
-#        CALL @$CustomMovePatternMiniWave #        call null :CustomPatternBJump_Plus2
-#
-#                                       #        ld a,b
-#        CMP  R4,$24+160                #        cp 160+24
-#        BLO  CustomMovePattern_Done    #        call NC,CustomMovePatternKill
-#        CALL CustomMovePatternKill
-#                                       #        exx
-#                                       #        ;increment the pos
-#CustomMovePattern_Done:
-#      # R3 LSB ixl = Life, R3 MSB iyl = Program Code
-#        MOV  R3,R0                           # ld a,iyl
-#        CLRB R0
-#        CMP  R0,$prgSpecial<<8               # cp prgSpecial
-#        BNE  CustomMovePattern_NotBossTarget # jr nz,CustomMovePattern_NotBossTarget
-#
-#      # not used
-#       .equiv TargetSpriteCountdown, .+2     # ld a,0:TargetSpritecountdown_Plus1
-#        TST  $0                              # or a
-#        BZE  CustomMovePattern_TargetReset   # jr z,CustomMovePattern_TargetReset
-#
-#        DEC  @$TargetSpriteCountdown         # dec a
-#                                             # ld (TargetSpritecountdown_Plus1-1),a
-## CustomMovePattern_TargetSet:
-#      # R2 LSB D = move, R2 MSB = sprite
-#        SWAB R2
-#        CLRB R2
-#       .equiv HitTargetSprite, .+2
-#        BISB $sprTwoFrame|9,R2               # ld a,128+9      :HitTargetSprite_Plus1
-#        SWAB R2                              # ld iyh,a
-#        BR   CustomMovePattern_NotBossTarget # jr CustomMovePattern_NotBossTarget
-#
-#      # not used
-#CustomMovePattern_TargetReset:
-#        SWAB R2
-#        CLRB R2
-#       .equiv ResetTargetSprite, .+2
-#        BISB $sprTwoFrame|8,R2               # ld a,128+8      :ResetTargetSprite_Plus1
-#        SWAB R2                              # ld iyh,a
-#CustomMovePattern_NotBossTarget:
-#        POP  R5                        #        pop ix
-#                                       #        exx
-#                                       #        ex af,af'
-#      # R3 LSB ixl = Life, R3 MSB iyl = Program Code
-#        CLRB R3
-#       .equiv CustomMove_LifeCustom, .+2
-#        BISB $0,R3                     #        ld ixl,a        ;lifCustom
-#                                       # ei
-#        RETURN                         # ret
-#
-#CustomMovePatternKill:
-#        CLR  R4 #        ld b,0
-#        CLR  R1 #        ld c,b
-#        CLRB R2 #        ld D,b
-#        RETURN  # ret
-#
-#      # not used
-#CustomMovePattern_Init10:
-#        CALL CustomMovePattern_Init    # call CustomMovePattern_Init
-#        MOV  $lifeEnemy|10,@$CustomMove_LifeCustom # ld a,lifEnemy+10 ;New Life
-#        RETURN                         # ret
-#
-#      # not used
-#CustomMovePattern_Init:
-#        PUSH R5                        #        xor a
-#        CLRB (R5)+                     #        ld (ix+0),a
-#        CLRB (R5)+                     #        ld (ix+1),a
-#        CLRB (R5)+                     #        ld (ix+2),a
-#        CLRB (R5)+                     #        ld (ix+3),a
-#        POP  R5
-#        MOV  $lifeEnemy|6,@$CustomMove_LifeCustom # ld a,lifEnemy+6 ;New Life
-#        RETURN                         # ret
-#
-#CustomMovePatternGeneric:
-#        INCB (R5)                      #        ld a,(ix+0)
-#                                       #        inc a
-#                                       #        ld (ix+0),a
-#        RETURN                         # ret
-
 CustomMove1:
+        MOV  $CustomMovePattern1, @$jmpCustomPatternJump
+        BR   CustomMovePattern
 CustomMove2:
+        MOV  $CustomMovePattern2, @$jmpCustomPatternJump
+        BR   CustomMovePattern
 CustomMove3:
+        MOV  $CustomMovePattern3, @$jmpCustomPatternJump
+        BR   CustomMovePattern
+      # in:  R1 C = Y
+      #      R2 LSB D = move,
+      #      R2 MSB iyh = sprite
+      #      R3 LSB ixl = Life,
+      #      R3 MSB iyl = Program Code
+      #      R4 B = X
+      #
+      # out: R1 new Y
+      #      R2 unmodified
+      #      R3 LSB unmodified
+      #      R3 MSB updated program code
+      #      R4 new X
+      #      R5 unmodified
+CustomMovePattern:                     # CustomMovePattern:      ; B=X C=Y D=Move
+                                       # di
+                                       #     ld a,ixl    ;lifCustom
+                                       #     ex af,af'
+                                       #
+        MOV  R2,R0                     #     ld a,d
+                                       #     exx
+        PUSH R5                        #     push ix
+        BIC  $0xFFF0,R0                #         and %00001111
+        MOV  $CustomRam,R5             #         ld hl,CustomRam
+                                       #
+                                       #             ld d,0
+                                       #             ld e,a
+        ASL  R0                        #             add hl,de
+        ADD  R0,R5                     #             add hl,de
+                                       #         push hl
+                                       #         pop ix
+                                       #
+                                       #         call Akuyou_Timer_GetTimer
+                                       #         ld d,a
+                                       #         ld a,i  ; Level time
+                                       #         ld e,a
+                                       #
+                                       #         ;dont update more than once per tick!
+        CMPB 1(R5),@$Timer.CurrentTick #         ld a,(ix+1)
+                                       #         cp e
+        BEQ  CustomMovePattern_NoTick  #         jr z,CustomMovePattern_NoTick
+                                       #         ld a,e
+        MOVB @$Timer.CurrentTick,1(R5) #         ld (ix+1),e
+                                       #
+                                       #         ;see if this is our first run
+                                       #         ex af,af'
+        CMPB R3,$0xFF                  #             cp 255
+        BNE  CustomMovePattern_MakeMove
+        CALL CustomMovePattern_Init    #             call nc,CustomMovePattern_Init
+                                       #         ex af,af'
+                                       #
+                                       #         ; here is where we make some moves!
+                                       #         exx
+CustomMovePattern_MakeMove:
+       .equiv jmpCustomPatternJump, .+2
+        CALL @$CustomMovePattern1      #         call CustomMovePattern1 :CustomPatternJump_Plus2
+                                       #         exx
+                                       #         ;increment the pos
+                                       #
+CustomMovePattern_NoTick:              # CustomMovePattern_NoTick:
+                                       #         jp CustomMovePattern_Done
+CustomMovePattern_Done:                # CustomMovePattern_Done:
+        POP  R5                        #     pop ix
+                                       #     exx
+                                       #
+                                       #     ex af,af'
+                                       #
+                                       #     ld ixl,a    ;lifCustom
+                                       # ei
+        RETURN                         # ret
+
+CustomMovePattern_Init:                # CustomMovePattern_Init:
+                                       #     xor a
+        CLR  (R5)                      #     ld (ix+0),a
+                                       #     ld (ix+1),a
+        CLRB R3
+        BISB $lifeEnemy | 6,R3         #     ld a,lifEnemy+6         ;New Life
+        RETURN                         # ret
+
+CustomMovePattern1: #--------------------------------------------------------{{{
+        MOVB (R5),R0                   #     ld a,(ix+0)
+        BIC  $0xFFC0,R0                #     and %00111111
+CustomMovePattern1Continue:            # CustomMovePattern1Continue
+        CMP  R0,$32                    #     cp 32
+        BLO  CustomMovePattern1Left    #     jr C,CustomMovePattern1Left
+                                       #
+        INC  R4                        #     inc b
+        BR   CustomMovePattern1Done    #     jr CustomMovePattern1Done
+                                       #
+CustomMovePattern1Left:                # CustomMovePattern1Left:
+        DEC  R4                        #     dec b
+        BR   CustomMovePattern1Done    #     jr CustomMovePattern1Done
+                                       #
+CustomMovePattern1Done:                # CustomMovePattern1Done:
+        DEC  R1                        #     dec c   ;m
+        DEC  R1                        #     dec c   ;m
+                                       #
+                                       #     ld a,(ix+0)
+        INCB (R5)                      #     inc a
+                                       #     ld (ix+0),a
+                                       #
+        CMPB (R5),$64                  #     cp 64
+        BHIS CustomMovePattern1Explode #     jp NC,CustomMovePattern1Explode
+        RETURN                         # ret
+
+CustomMovePattern1Explode:             # CustomMovePattern1Explode:
+        SWAB R3
+        CLRB R3
+        BISB $prgFireFast | 0b1110,R3  #     ld iyl,prgFireFast+14       ; Program Fire
+        SWAB R3                        #
+        CMPB (R5),$66                  #     cp 66
+        BHIS CustomMovePatternKill     #     jp NC,CustomMovePatternKill
+        RETURN                         # ret
+#----------------------------------------------------------------------------}}}
+CustomMovePattern2: #--------------------------------------------------------{{{
+        MOVB (R5),R0                   #     ld a,(ix+0)
+        BIC  $0xFFC0,R0                #     and %00111111
+CustomMovePattern2Continue:            # CustomMovePattern2Continue
+        CMP  R0,$32                    #     cp 32
+        BLO  CustomMovePattern2Left    #     jr C,CustomMovePattern2Left
+                                       #
+        INC  R4                        #     inc b
+        BR   CustomMovePattern2Done    #     jr CustomMovePattern2Done
+                                       #
+CustomMovePattern2Left:                # CustomMovePattern2Left:
+        DEC  R4                        #     dec b
+        BR   CustomMovePattern2Done    #     jr CustomMovePattern2Done
+                                       #
+CustomMovePattern2Done:                # CustomMovePattern2Done:
+        DEC  R1                        #     dec c   ;m
+                                       #
+                                       #     ld a,(ix+0)
+        INCB (R5)                      #     inc a
+                                       #     ld (ix+0),a
+                                       #
+        CMPB (R5),$168                 #     cp 168
+        BHIS CustomMovePattern2Explode #     jp NC,CustomMovePattern2Explode
+        RETURN                         # ret
+
+CustomMovePattern2Explode:             # CustomMovePattern2Explode:
+        SWAB R3
+        CLRB R3                        #
+        BISB $prgFireFast | 0b1101,R3   #     ld iyl,prgFireFast+13       ; Program Fire
+        SWAB R3
+        CMPB (R5),$170                 #     cp 170
+        BHIS CustomMovePatternKill     #     jp NC,CustomMovePatternKill
+        RETURN                         # ret
+#----------------------------------------------------------------------------}}}
+CustomMovePattern3: #--------------------------------------------------------{{{
+                                       #     ld a,(ix+0)
+                                       # CustomMovePattern3Continue
+        CMPB (R5),$64                  #     cp 64
+        BLO  CustomMovePattern3up      #     jr C,CustomMovePattern3up
+        ADD  $3,R1                     #     inc c
+                                       #     inc c
+                                       #     inc c
+        BR   CustomMovePattern3Done    #     jr CustomMovePattern3Done
+                                       #
+CustomMovePattern3up:                  # CustomMovePattern3up:
+        SUB  $3,R1                     #     dec c
+                                       #     dec c
+                                       #     dec c
+                                       #     jr CustomMovePattern3Done
+                                       #
+CustomMovePattern3Done:                # CustomMovePattern3Done:
+                                       #     ld a,(ix+0)
+        INCB (R5)                      #     inc a
+                                       #     ld (ix+0),a
+                                       #     jr CustomMovePattern3Explode
+                                       # ret
+                                       #
+                                       # CustomMovePattern3Explode:
+        CMPB (R5),$128                 #     cp 128
+        BEQ  CustomMovePatternKill     #     jr z,CustomMovePatternKill
+        RETURN                         # ret
+#----------------------------------------------------------------------------}}}
+CustomMovePatternKill:                 # CustomMovePatternKill:
+        CLR R4                         #     ld b,0
+        CLR R1                         #     ld c,b
+                                       #     ld D,b
+        RETURN                         # ret
+
+      # R3 LSB iyl = Program code, MSB = 0, ixl = Life
+      # check ObjectProgram.CustomPrograms
 CustomProgram1:
-CustomProgram2:
+#:bpt
+        MOV  @$Timer.CurrentTick,R3    #     call Akuyou_Timer_GetTimer
+                                       #     ld a,i  ; Level time
+        BIC  $0xFFFC,R3                #     and %00000011
+                                       #     ;rrca
+        ADD  $16,R3                    #     add 16
+                                       #     ld iyl,a        ; Program Fire
+        PUSH R1                        #     push bc
+        PUSH R4
+        PUSH R2                        #     push de
+        PUSH R3                        #     push iy
+        CALL ObjectProgram.HyperFire   #     call Akuyou_FireStar
+        POP  R3                        #     pop iy
+        POP  R2                        #     pop de
+        POP  R4                        #     pop bc
+        POP  R1                        #
+                                       #     ld a,iyl
+        ADD  $4,R3                     #     add 4
+                                       #     ld iyl,a
+        JMP  @$ObjectProgram.HyperFire #     jp Akuyou_FireStar
+                                       #
+CustomProgram2:                        # CustomProgram2:
+                                       #     call Akuyou_Timer_GetTimer
+                                       #     ld a,i  ; Level time
+        BIT  $0x01,@$Timer.CurrentTick #     bit 0,a
+        BZE  CustomProgram2_Fire2      #     jr z,CustomProgram2_Fire2
+                                       #
+                                       #     ld a,17
+        MOV  $17,R3                    #     ld iyl,a
+        JMP  @$ObjectProgram.HyperFire #     jp Akuyou_FireStar
+                                       #
+CustomProgram2_Fire2:                  # CustomProgram2_Fire2:
+                                       #     ld a,23
+        MOV  $23,R3                    #     ld iyl,a
+        JMP  @$ObjectProgram.HyperFire #     jp Akuyou_FireStar
+
+
 Blackout1:
 Blackout2:
 Blackout3:
@@ -1095,9 +1054,10 @@ BluePalette: #---------------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 DarkRealPalette: #-----------------------------------------------------------{{{
     .word   0, cursorGraphic, scale320 | rgb
-    .byte   1, setColors, Black, brBlue,  Gray, White
-    .byte  65, setColors, Black, Magenta, Gray, White
-    .byte 160, setColors, Black, Red,     Gray, White
+    .byte   1, setColors, Black, Magenta, Yellow, Gray
+    .byte  28, setColors, Black, Magenta, Yellow, Gray
+    .byte  66, setColors, Black, Red,     Green,  Gray
+    .byte 120, setColors, Black, Blue,    Cyan,   Gray
     .word endOfScreen
 #----------------------------------------------------------------------------}}}
 RealPalette: #---------------------------------------------------------------{{{
@@ -1107,9 +1067,9 @@ RealPalette: #---------------------------------------------------------------{{{
 
     .word   0, cursorGraphic, scale320 | RGB
     .byte   1, setColors, Black, brMagenta, brYellow, White
-    .byte  28, setColors, Black, Magenta, brYellow, White
-    .byte  80, setColors, Black, Red,     brGreen, White
-    .byte 120, setColors, Black, brBlue, brCyan, White
+    .byte  28, setColors, Black, Magenta,   brYellow, White
+    .byte  66, setColors, Black, Red,       brGreen,  White
+    .byte 120, setColors, Black, brBlue,    brCyan,   White
     .word endOfScreen
 #----------------------------------------------------------------------------}}}
 end:
