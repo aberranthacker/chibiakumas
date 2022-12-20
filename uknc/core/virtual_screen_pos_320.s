@@ -82,15 +82,22 @@ VirtualPosToScreenByte:
         BR   VirtualPos_4$
 
     VirtualPos_3$:
-       .equiv SpriteSizeConfig224less24A, .+2
-        CMP  R1,$224-24 # check Y
-        BLO  VirtualPos_4$
-      # Y > 224
         MOV  R1,R3
-       .equiv SpriteSizeConfig224less24B, .+2
-        SUB  $224-24,R3
+        ADD  @$SprShow_SprDstHeightLines,R3
+        CMP  R3,$224  # check if (Y + height) > 224
+        BHI  VirtualPos_5$
+      # (Y + height) <= 224
+        CLR  R3
 
     VirtualPos_4$:
+        SUB  R0,R1 # R0 = 24
+        MOV  R1,@$SprShow_ScrLine
+
+        RETURN
+
+    VirtualPos_5$:
+      # (Y + height) > 224
+        SUB  $224,R3
         SUB  R0,R1 # R0 = 24
         MOV  R1,@$SprShow_ScrLine
 
@@ -128,60 +135,40 @@ ShowSpriteReconfigureVectors:
 ShowSpriteReconfigure_128px: # Not actually used!
        #MOV  $184-64,R2
        #MOV  $-184+64,R3
-       #MOV  $224-128,R4
        #BR   ShowSpriteReconfigure_all
 ShowSpriteReconfigure_104px: # Not actually used!
        #MOV  $184-52,R2
        #MOV  $-184+52,R3
-       #MOV  $224-104,R4
        #BR   ShowSpriteReconfigure_all
 ShowSpriteReconfigure_96px:  # Used by Boss 1
-        MOV  $184-48,R2
-        MOV  $-184+48,R3
-        MOV  $224-96,R4
-        BR   ShowSpriteReconfigure_all
+        MOV  $184-48,@$SpriteSizeConfig184less12
+        MOV  $-184+48,@$SpriteSizeConfigMinus184Plus12
+        RETURN
 ShowSpriteReconfigure_80px:  # Not actually used!
        #MOV  $184-40,R2
        #MOV  $-184+40,R3
-       #MOV  $224-80,R4
        #BR   ShowSpriteReconfigure_all
 ShowSpriteReconfigure_64px:  # not actually used
        #MOV  $184-32,R2
        #MOV  $-184+32,R3
-       #MOV  $224-64,R4
        #BR   ShowSpriteReconfigure_all
 ShowSpriteReconfigure_48px:
-        MOV  $184-24,R2
-        MOV  $-184+24,R3
-        MOV  $224-48,R4
-        BR   ShowSpriteReconfigure_all
+        MOV  $184-24,@$SpriteSizeConfig184less12
+        MOV  $-184+24,@$SpriteSizeConfigMinus184Plus12
+        RETURN
 ShowSpriteReconfigure_32px:
-        MOV  $184-16,R2
-        MOV  $-184+16,R3
-        MOV  $224-32,R4
-        BR   ShowSpriteReconfigure_all
+        MOV  $184-16,@$SpriteSizeConfig184less12
+        MOV  $-184+16,@$SpriteSizeConfigMinus184Plus12
+        RETURN
 ShowSpriteReconfigure_16px:
-        MOV  $184- 8,R2
-        MOV  $-184+8,R3
-        MOV  $224-16,R4
-        BR   ShowSpriteReconfigure_all
+        MOV  $184- 8,@$SpriteSizeConfig184less12
+        MOV  $-184+8,@$SpriteSizeConfigMinus184Plus12
+        RETURN
 ShowSpriteReconfigure_8px:
-        MOV  $184-4,R2
-        MOV  $-184+4,R3
-        MOV  $224-8,R4
-        BR   ShowSpriteReconfigure_all
+        MOV  $184-4,@$SpriteSizeConfig184less12
+        MOV  $-184+4,@$SpriteSizeConfigMinus184Plus12
+        RETURN
 ShowSpriteReconfigure_24px:
-        MOV  $184-12,R2
-        MOV  $-184+12,R3
-        MOV  $224-24,R4
-
-ShowSpriteReconfigure_all:
-        # Right X
-        MOV  R2,@$SpriteSizeConfig184less12
-        MOV  R3,@$SpriteSizeConfigMinus184Plus12
-
-        # Bottom Y
-        MOV  R4,@$SpriteSizeConfig224less24A
-        MOV  R4,@$SpriteSizeConfig224less24B
-
+        MOV  $184-12,@$SpriteSizeConfig184less12
+        MOV  $-184+12,@$SpriteSizeConfigMinus184Plus12
         RETURN
