@@ -32,12 +32,12 @@ ShowSprite_ReadInfo: # ---------------------------------------------------------
 
         MOVB (R0)+,R1
         BZE  SpriteGiveUp
-        MOV  R1,@$SprShow_TempH # height of the sprite in lines
+        MOV  R1,@$SprShow_SprDstHeightLines # height of the sprite in lines
 
         MOVB (R0)+,R1 # Y offset
         MOVB (R0)+,R2 # width in bytes
       # don't care about sign extension, 80 is a maximum value
-        MOV  R2,@$SprShow_DrawWidth
+        MOV  R2,@$SprShow_SprDstWidthBytes
         MOV  R2,@$SprShow_SpriteWidth
 
       # Sprite attributes such as PSet, Doubleheight and transp color
@@ -99,13 +99,11 @@ ShowSprite_SizeNotChanged:
 # truncate the sprite ----------------------------------------------------------
         MOV  $SprDraw_BasicRenderer,@$jmpShowSprite_DrawAndReturn
       # R3 = Y lines less to draw
-        MOV  @$SprShow_TempH,R0
-        SUB  R3,R0
+        SUB  R3,@$SprShow_SprDstHeightLines
         BLOS 1237$ # return if new height is <= 0
-        MOV  R0,@$SprShow_TempH
 
       # R5 = X bytes to remove from the right side
-        SUB  R5,@$SprShow_DrawWidth
+        SUB  R5,@$SprShow_SprDstWidthBytes
         BLOS 1237$ # return if new width is <= 0
 
       # R2 = Y lines of the sprite to skip
@@ -130,8 +128,8 @@ ShowSprite_SizeNotChanged:
        .equiv SprShow_ScrWord, .+2
         ADD  $0x4000,R5 # add X position and the frame buffer MSB
 
-      # SprShow_TempH = (H - lines to remove) or (H - lines to skip)
-       .equiv SprShow_TempH, .+2
+      # SprShow_SprDstHeightLines = (H - lines to remove) or (H - lines to skip)
+       .equiv SprShow_SprDstHeightLines, .+2
         MOV  $0x00,R2
       # address of the visible part of the sprite
        .equiv SprShow_TempAddr, .+2
@@ -164,7 +162,7 @@ SprDrawLn_SetLineLoopBR:
 SprDrawLn_LineLoop:
         MOV  R5,-(SP)
         MOV  R4,R3
-       .equiv SprShow_DrawWidth, .+2
+       .equiv SprShow_SprDstWidthBytes, .+2
         MOV  $0x00,R1
         ASR  R1
 
@@ -219,7 +217,7 @@ SprDraw_TurboRenderer_LineDoubler:
 SprDraw_TurboRenderer: # Pick the render based on width
        .equiv TranspBitA, .+2
         MOV  $0x00,R0 # Set R0 to ZERO / Transp byte
-        MOV  @$SprShow_DrawWidth,R1
+        MOV  @$SprShow_SprDstWidthBytes,R1
 
     .ifdef DebugMode
         CMP  R1,$24
@@ -382,7 +380,7 @@ SprDraw_PsetRenderer_LineDoubler:
         BR   SprDraw_PsetRenderer_Double
 
 SprDraw_PsetRenderer:
-        MOV  @$SprShow_DrawWidth,R1
+        MOV  @$SprShow_SprDstWidthBytes,R1
 
     .ifdef DebugMode
         CMP  R1,$24
@@ -497,7 +495,7 @@ SprDraw_WithMaskRenderer_LineDoubler:
 SprDraw_WithMaskRenderer:
        .equiv SprShow_MaskAddr, .+2
         MOV  $0x0000,R0
-        MOV  @$SprShow_DrawWidth,R1
+        MOV  @$SprShow_SprDstWidthBytes,R1
         MOV  R5,R3
         PUSH R2
 
