@@ -61,7 +61,7 @@ SpriteRenderersVectors:
 #-------------------------------------------------------------------------------
 ShowSprite: # ShowSprite is the main routine of our program!
         CALL @$ShowSprite_ReadInfo # Get Sprite Details
-      # A  R5 sprite attributes
+      # A  R0 sprite attributes
       #    R1 Y offset
       # B  R2 width
        .equiv SpriteSizeConfig6, .+2

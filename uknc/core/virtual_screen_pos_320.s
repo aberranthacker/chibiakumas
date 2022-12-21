@@ -69,9 +69,6 @@ VirtualPosToScreenByte:
         MOVB R2,@$SprShow_ScrWord
       #-------------------------------------------------------------------------
       # R1 Y
-        CLR  R2 # Y lines to skip
-        CLR  R3 # Y lines to remove
-
         CMP  R1,R0 # check Y, R0 = 24
         BHIS VirtualPos_3$
       # Y < 24
@@ -82,6 +79,7 @@ VirtualPosToScreenByte:
         BR   VirtualPos_4$
 
     VirtualPos_3$:
+        CLR  R2 # no lines to skip from the top of the sprite
         MOV  R1,R3
         ADD  @$SprShow_SprDstHeightLines,R3
         CMP  R3,$224  # check if (Y + height) > 224
@@ -107,68 +105,44 @@ ShowSpriteReconfigureEnableDisable:
         MOV  $null,R5
         TST  R0
         BEQ  ShowSpriteReconfigureEnableDisableB
+
         MOV  $ShowSpriteReconfigure,R5
 ShowSpriteReconfigureEnableDisableB:
         MOV  R5,@$dstShowSpriteReconfigureCommand
-        BR   ShowSpriteReconfigure_24px
+        MOV  $6,R2 # reconfigure width to 24px
 
 ShowSpriteReconfigure:
       # Akuyou was designed for 24x24 sprites, but this module can
       # 'reconfigure' it for other sizes
         MOV  R2,@$SpriteSizeConfig6
-        JMP  @ShowSpriteReconfigureVectors-2(R2)
+        MOV  SpriteSizeConfig184less12_Vectors-2(R2),@$SpriteSizeConfig184less12
+        MOV  SpriteSizeConfigMinus184Plus12_Vectors-2(R2),@$SpriteSizeConfigMinus184Plus12
+        RETURN
 
-ShowSpriteReconfigureVectors:
-       .word ShowSpriteReconfigure_8px  #  2 bytes wide
-       .word ShowSpriteReconfigure_16px #  4 bytes wide
-       .word ShowSpriteReconfigure_24px #  6 bytes wide
-       .word ShowSpriteReconfigure_32px #  8 bytes wide
-       .word null                       # 10 bytes wide
-       .word ShowSpriteReconfigure_48px # 12 bytes wide
-       .word null                       # 14 bytes wide
-       .word null                       # 16 bytes wide
-       .word null                       # 18 bytes wide
-       .word null                       # 20 bytes wide
-       .word null                       # 22 bytes wide
-       .word ShowSpriteReconfigure_96px # 24 bytes wide
+SpriteSizeConfig184less12_Vectors:
+       .word 184 -  4  #  2 bytes,  8px wide
+       .word 184 -  8  #  4 bytes, 16px wide
+       .word 184 - 12  #  6 bytes, 24px wide
+       .word 184 - 16  #  8 bytes, 32px wide
+       .word 184 - 20  # 10 bytes, 40px wide
+       .word 184 - 24  # 12 bytes, 48px wide
+       .word 184 - 28  # 14 bytes, 56px wide
+       .word 184 - 32  # 16 bytes, 64px wide
+       .word 184 - 36  # 18 bytes, 72px wide
+       .word 184 - 40  # 20 bytes, 80px wide
+       .word 184 - 44  # 22 bytes, 88px wide
+       .word 184 - 48  # 24 bytes, 96px wide
 
-ShowSpriteReconfigure_128px: # Not actually used!
-       #MOV  $184-64,R2
-       #MOV  $-184+64,R3
-       #BR   ShowSpriteReconfigure_all
-ShowSpriteReconfigure_104px: # Not actually used!
-       #MOV  $184-52,R2
-       #MOV  $-184+52,R3
-       #BR   ShowSpriteReconfigure_all
-ShowSpriteReconfigure_96px:  # Used by Boss 1
-        MOV  $184-48,@$SpriteSizeConfig184less12
-        MOV  $-184+48,@$SpriteSizeConfigMinus184Plus12
-        RETURN
-ShowSpriteReconfigure_80px:  # Not actually used!
-       #MOV  $184-40,R2
-       #MOV  $-184+40,R3
-       #BR   ShowSpriteReconfigure_all
-ShowSpriteReconfigure_64px:  # not actually used
-       #MOV  $184-32,R2
-       #MOV  $-184+32,R3
-       #BR   ShowSpriteReconfigure_all
-ShowSpriteReconfigure_48px:
-        MOV  $184-24,@$SpriteSizeConfig184less12
-        MOV  $-184+24,@$SpriteSizeConfigMinus184Plus12
-        RETURN
-ShowSpriteReconfigure_32px:
-        MOV  $184-16,@$SpriteSizeConfig184less12
-        MOV  $-184+16,@$SpriteSizeConfigMinus184Plus12
-        RETURN
-ShowSpriteReconfigure_16px:
-        MOV  $184- 8,@$SpriteSizeConfig184less12
-        MOV  $-184+8,@$SpriteSizeConfigMinus184Plus12
-        RETURN
-ShowSpriteReconfigure_8px:
-        MOV  $184-4,@$SpriteSizeConfig184less12
-        MOV  $-184+4,@$SpriteSizeConfigMinus184Plus12
-        RETURN
-ShowSpriteReconfigure_24px:
-        MOV  $184-12,@$SpriteSizeConfig184less12
-        MOV  $-184+12,@$SpriteSizeConfigMinus184Plus12
-        RETURN
+SpriteSizeConfigMinus184Plus12_Vectors:
+       .word -184 +  4 #  2 bytes,  8px wide
+       .word -184 +  8 #  4 bytes, 16px wide
+       .word -184 + 12 #  6 bytes, 24px wide
+       .word -184 + 16 #  8 bytes, 32px wide
+       .word -184 + 20 # 10 bytes, 40px wide
+       .word -184 + 24 # 12 bytes, 48px wide
+       .word -184 + 28 # 14 bytes, 56px wide
+       .word -184 + 32 # 16 bytes, 64px wide
+       .word -184 + 36 # 18 bytes, 72px wide
+       .word -184 + 40 # 20 bytes, 80px wide
+       .word -184 + 44 # 22 bytes, 88px wide
+       .word -184 + 48 # 24 bytes, 96px wide
