@@ -98,7 +98,7 @@ ShowSprite_SizeNotChanged:
 
 # truncate the sprite ----------------------------------------------------------
         MOV  $SprDraw_BasicRenderer,@$jmpShowSprite_DrawAndReturn
-      # R3 = Y lines less to draw
+      # R3 less lines to draw
         SUB  R3,@$SprShow_SprDstHeightLines
         BLOS 1237$ # return if new height is <= 0
 
@@ -106,7 +106,7 @@ ShowSprite_SizeNotChanged:
         SUB  R5,@$SprShow_SprDstWidthBytes
         BLOS 1237$ # return if new width is <= 0
 
-      # R2 = Y lines of the sprite to skip
+      # R2 = lines to skip from the top
       # MUL beats ADD+SOB when factor is more than 2 in this case
         MUL  @$SprShow_SpriteWidth,R2
         ADD  R3,R4
