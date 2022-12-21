@@ -31,9 +31,6 @@ VirtualPosToScreenByte:
       #-------------------------------------------------------------------------
         MOV  $24,R0
 
-        CLR  R4 # X bytes to skip, left
-        CLR  R5 # X bytes to remove, right
-
         CMP  R2,R0  # check X, R0 = 24
         BHIS VirtualPos_1$
       # X < 24
@@ -41,29 +38,33 @@ VirtualPosToScreenByte:
         SUB  R2,R4
         ASR  R4
         ASR  R4
-        ASL  R4
+        ASL  R4 # ASR/ASL to align to word boundary (clear bit 0)
         MOV  R4,R5 # need to skip R4 bytes
         MOV  R0,R2 # R2 is offscreen, so move it back on, R0 = 24
         BR   VirtualPos_2$
 
     VirtualPos_1$:
+        CLR  R4 # X bytes to skip, left
+        CLR  R5 # X bytes to remove, right
+
        .equiv SpriteSizeConfig184less12, .+2
         CMP  R2,$184-12    # check X
         BLO  VirtualPos_2$ # X < 172
-        # X >= 172
+
+      # X >= 172
+      # X pos is ok, but plot R5 less bytes
        .equiv SpriteSizeConfigMinus184Plus12, .+2
-        MOV  $-184+12,R3
-        ADD  R2,R3
-        ASR  R3
-        ASR  R3
-        ASL  R3 # align to word boundary
-        ADD  R3,R5 # X pos is ok, but plot R5 less bytes
+        MOV  $-184+12,R5
+        ADD  R2,R5
+        ASR  R5
+        ASR  R5
+        ASL  R5 # ASR/ASL to align to word boundary (clear bit 0)
 
     VirtualPos_2$:
         SUB  R0,R2 # R0 = 24
         ASR  R2 # halve the result, as we have 80 bytes, but 160 x co-ords
         ASR  R2
-        ASL  R2 # align to word boundary
+        ASL  R2 # ASR/ASL to align to word boundary (clear bit 0)
       # using MOVB because MSB contains frame buffer offset
       # show_sprite.s:265
         MOVB R2,@$SprShow_ScrWord
