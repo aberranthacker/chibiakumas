@@ -1,7 +1,6 @@
 #!/usr/bin/ruby
-require 'optparse'
 
-BINARIES_INFO_FILENAME = 'binaries_info.txt'
+require 'optparse'
 
 options = Struct.new(:in_filename, :out_filename, :binary, :brief).new
 OptionParser.new do |opts|
@@ -12,7 +11,7 @@ OptionParser.new do |opts|
     options.out_filename = v
   end
 
-  opts.on("-b", "--binary", "binary, pluck from entry point to end of text segment") do
+  opts.on("-b", "--binary", "binary, pluck from entry point to end of a text segment") do
     options.binary = true
   end
 

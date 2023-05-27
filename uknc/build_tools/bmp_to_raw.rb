@@ -6,7 +6,7 @@ options = Struct.new(:bpp, :verbose, :src_filename, :dst_filename)
                 .new(2, false, nil, nil)
 
 OptionParser.new do |opts|
-  opts.banner = 'Converts 8bpp .bmp file to MS0511 raw bitplanes data'
+  opts.banner = 'Converts 8bpp .bmp file to the MS0511 raw bitplanes data'
   opts.banner = 'only first 1, 2 or 3 bits of color will be used'
   opts.banner = 'Usage: bmp_to_raw.rb [--bpp=n] SRC DST'
 
@@ -46,12 +46,13 @@ bits_per_pixel     = bmp[0x1C,2].unpack1('v')
 compression        = bmp[0x1E,4].unpack1('V')
 image_size         = bmp[0x22,4].unpack1('V')
 
-raise 'Unknown file type.' unless signature == 'BM'
-raise 'Number of color planes other than 1 in not supported.' unless planes == 1
-raise "#{bits_per_pixel} bits per pixel not supported, 8 bits only." unless bits_per_pixel == 8
-raise 'Compression is not supported.' unless compression == 0
+raise "#{options.src_filename} : Unknown file type." unless signature == 'BM'
+raise "#{options.src_filename} : Number of color planes other than 1 in not supported." unless planes == 1
+raise "#{options.src_filename} : #{bits_per_pixel} bits per pixel not supported, 8 bits only." unless bits_per_pixel == 8
+raise "#{options.src_filename} : Compression is not supported." unless compression == 0
 if image_width * image_height != image_size
-  raise "Padded pixel array is not supported.\n" \
+  raise "#{options.src_filename} : " \
+        "Padded pixel array is not supported.\n" \
         "#{image_width} * #{image_height} != #{image_size}"
 end
 
@@ -67,8 +68,11 @@ bp1_byte = 0
 bp2_byte = 0
 
 bitmap.each.with_index do |byte_pixel, idx|
-  bit_number = idx % 16 if options.bpp == 1
-  bit_number = idx % 8 unless options.bpp == 1
+  bit_number = if options.bpp == 1
+                 idx % 16
+               else
+                 idx % 8
+               end
 
   bit0 = byte_pixel & 1
   bit1 = byte_pixel >> 1 & 1

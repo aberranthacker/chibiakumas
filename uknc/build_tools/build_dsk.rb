@@ -1,27 +1,25 @@
-#!/bin/ruby
-# frozen_string_literal: true
+#!/usr/bin/ruby
 
 require_relative 'dsk_image_constants'
 
 module BuildDskImage
   extend self
 
-  COL1_WIDTH = FILES.map(&:length).max
-
-  def call
+  def call(dsk_files_list, output_file_name)
+    col1_width = dsk_files_list.map(&:length).max
     dsk = []
 
     bytes_used = 0
     sectors_used = 0
 
-    puts "#{' ' * COL1_WIDTH}                57344"
-    puts "#{' ' * COL1_WIDTH}  entry   size    end blocks block"
+    puts "#{' ' * col1_width}                57344"
+    puts "#{' ' * col1_width}  entry   size    end blocks block"
 
-    FILES.each do |file_name|
+    dsk_files_list.each do |file_name|
       bin = File.binread(file_name).unpack('C*')
       target_size = (bin.size + 511) / 512 * 512
 
-      print_info(file_name, bin, target_size, sectors_used)
+      print_info(file_name, bin, target_size, sectors_used, col1_width)
 
       bytes_used += bin.size
       sectors_used += (target_size / 512)
@@ -31,9 +29,9 @@ module BuildDskImage
     end
 
     dsk += Array.new(BYTES_IN_TOTAL - dsk.size, FILLER)
-    File.binwrite('build/chibiakumas.dsk', dsk.pack('C*'))
+    File.binwrite(output_file_name, dsk.pack('C*'))
 
-    puts "#{' ' * COL1_WIDTH} " \
+    puts "#{' ' * col1_width} " \
          "#{' ' * 6} " \
          "#{bytes_used.to_s.rjust(6, ' ')} " \
          "#{' ' * 6} " \
@@ -42,15 +40,15 @@ module BuildDskImage
 
   private
 
-  def print_info(file_name, bin, target_size, sectors_used)
-    binary_info = if File.exists?("#{file_name}._")
+  def print_info(file_name, bin, target_size, sectors_used, col1_width)
+    binary_info = if File.exist?("#{file_name}._")
                     File.read("#{file_name}._").split(',')
                   else
                     nil
                   end
 
     puts [
-      file_name.ljust(COL1_WIDTH, ' '),
+      file_name.ljust(col1_width, ' '),
       entry_address_str(binary_info),
       bin_size_str(binary_info, bin),
       ending_address_str(binary_info),
@@ -83,4 +81,4 @@ module BuildDskImage
   end
 end
 
-BuildDskImage.call
+BuildDskImage.call(File.readlines(ARGV[0]).map(&:chomp), ARGV[1])
