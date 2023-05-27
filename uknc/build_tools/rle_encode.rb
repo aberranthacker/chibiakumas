@@ -1,13 +1,10 @@
-# frozen_string_literal: true
-
-# The code is taken from https://github.com/nzeemin/ukncbtl-utils/blob/master/Sav2Cartridge/Sav2Cart.cpp
+# The code is taken from
+# https://github.com/nzeemin/ukncbtl-utils/blob/master/Sav2Cartridge/Sav2Cart.cpp
 # One can write C in any laguage)
 
 module Encoders
-  class RLE
-    def self.call(*args, **options)
-      self.new.call(*args, **options)
-    end
+  module Rle
+    extend self
 
     def call(src, debug: false)
       seq_block_offset = 0
@@ -116,4 +113,4 @@ module Encoders
   end
 end
 
-Encoders::RLE.call(File.binread('resources/ep1-intro-pics.SPR'), debug: true)
+Encoders::Rle.call(File.binread('resources/ep1-intro-pics.SPR'), debug: true)

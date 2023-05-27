@@ -1,4 +1,3 @@
-
 sav = File.binread(ARGV[0])
 entry = sav[040, 2].unpack1('v')
 eof = sav[050, 2].unpack1('v') + 2

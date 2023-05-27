@@ -1,5 +1,3 @@
-#!/usr/bin/ruby
-#
 # Binary Sprite file format (CPC/ENT/ZX/SAM)
 #
 #     Akusprite files that have been saved for a platform such as the CPC will

@@ -1,4 +1,4 @@
-#!/bin/ruby
+#!/usr/bin/ruby
 
 def convert_opcode(str)
   str.scan(/.{4}/)

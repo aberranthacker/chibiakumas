@@ -1,5 +1,10 @@
-AS=~/opt/binutils-pdp11/pdp11-dec-aout/bin/as
-LD=~/opt/binutils-pdp11/pdp11-dec-aout/bin/ld
+BIN_UTILS_PATH=~/opt/binutils-pdp11/pdp11-dec-aout/bin
+AS=$(BIN_UTILS_PATH)/as
+LD=$(BIN_UTILS_PATH)/ld
+NM=$(BIN_UTILS_PATH)/nm
+
+UPDATE_DISK_MAP=build_tools/update_disk_map.rb
+BUILD_DSK=build_tools/build_dsk.rb
 # 2.38
 MAKEFLAGS += --silent --jobs
 LDFLAGS += --strip-all
@@ -32,10 +37,9 @@ spr5 :
 		./build_tools/add_sprites_to_makefile.rb resources/level_05
 
 # chibiakumas.dsk -----------------------------------------------------------{{{
-build/chibiakumas.dsk : build_tools/build_dsk.rb \
-			build_tools/dsk_image_constants.rb \
-			build_tools/update_bootsector_disk_map.rb \
-			build_tools/update_bootstrap_disk_map.rb \
+build/chibiakumas.dsk : $(BUILD_DSK) \
+			$(UPDATE_DISK_MAP) \
+			dsk_files_list \
 			build/bootsector.bin \
 			build/bootstrap.bin \
 			build/ppu_module.bin \
@@ -53,9 +57,9 @@ build/chibiakumas.dsk : build_tools/build_dsk.rb \
 			build/level_05_title.bin \
 			build/level_07_title.bin \
 			build/saved_settings.bin
-	build_tools/update_bootstrap_disk_map.rb
-	build_tools/update_bootsector_disk_map.rb
-	build_tools/build_dsk.rb
+	$(UPDATE_DISK_MAP) dsk_files_list build/bootstrap.map.txt build/bootstrap.bin -e 512
+	$(UPDATE_DISK_MAP) dsk_files_list build/bootsector.map.txt build/bootsector.bin
+	$(BUILD_DSK) dsk_files_list build/chibiakumas.dsk
 # chibiakumas.dsk -----------------------------------------------------------}}}
 
 # bootsector.bin ------------------------------------------------------------{{{
@@ -78,14 +82,15 @@ build/bootstrap.bin : build/bootstrap.o \
                       build/core.o \
                       build/saved_settings.o \
                       build/level_03_title.o \
+                      build/level_03_title.o \
                       build/level_05_title.o \
                       build/level_07_title.o
 	$(LD) $(LDFLAGS) -M build/bootstrap.o \
 	      -R build/core.o \
 	      -R build/saved_settings.o \
-              -R build/level_03_title.o \
-              -R build/level_05_title.o \
-              -R build/level_07_title.o \
+          -R build/level_03_title.o \
+          -R build/level_05_title.o \
+          -R build/level_07_title.o \
 	      -o build/bootstrap.out > build/bootstrap.map.txt
 	ruby build_tools/aout2sav.rb build/bootstrap.out -b -s -o build/bootstrap.bin
 
@@ -1426,6 +1431,7 @@ build/level_05.bin : build/core.o \
 
 build/level_05.o : $(common) \
 		   level_05.s \
+		   background_blackout.s \
 		   build/level_05.0.spr \
 		   build/level_05.1.spr \
 		   build/level_05_tiles.spr \
@@ -2277,8 +2283,11 @@ build/level_05.0.o : level_05.0.s \
 	             build/level_05/s15_powerup_drone.0.bin \
 	             build/level_05/s15_powerup_drone_mask.0.bin \
 	             build/level_05/s16_wave1.0.bin \
+	             build/level_05/s16_wave1_mask.0.bin \
 	             build/level_05/s17_wave2.0.bin \
+	             build/level_05/s17_wave2_mask.0.bin \
 	             build/level_05/s18_wave3.0.bin \
+	             build/level_05/s18_wave3_mask.0.bin \
 	             build/level_05/s19_weed1.0.bin \
 	             build/level_05/s20_weed2.0.bin \
 	             build/level_05/s21_coral1.0.bin \
@@ -2450,15 +2459,30 @@ build/level_05/s16_wave1.0.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/level_05/s16_wave1.0.bmp \
 	                          build/level_05/s16_wave1.0.bin
 
+build/level_05/s16_wave1_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                      resources/level_05/s16_wave1_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_05/s16_wave1_mask.0.bmp \
+	                               build/level_05/s16_wave1_mask.0.bin
+
 build/level_05/s17_wave2.0.bin : build_tools/bmp_to_raw.rb \
                                  resources/level_05/s17_wave2.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_05/s17_wave2.0.bmp \
 	                          build/level_05/s17_wave2.0.bin
 
+build/level_05/s17_wave2_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                      resources/level_05/s17_wave2_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_05/s17_wave2_mask.0.bmp \
+	                               build/level_05/s17_wave2_mask.0.bin
+
 build/level_05/s18_wave3.0.bin : build_tools/bmp_to_raw.rb \
                                  resources/level_05/s18_wave3.0.bmp
 	build_tools/bmp_to_raw.rb resources/level_05/s18_wave3.0.bmp \
 	                          build/level_05/s18_wave3.0.bin
+
+build/level_05/s18_wave3_mask.0.bin : build_tools/bmp_to_raw.rb \
+                                      resources/level_05/s18_wave3_mask.0.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_05/s18_wave3_mask.0.bmp \
+	                               build/level_05/s18_wave3_mask.0.bin
 
 build/level_05/s19_weed1.0.bin : build_tools/bmp_to_raw.rb \
                                  resources/level_05/s19_weed1.0.bmp
@@ -2569,8 +2593,11 @@ build/level_05.1.o : level_05.1.s \
 	             build/level_05/s15_powerup_drone.1.bin \
 	             build/level_05/s15_powerup_drone_mask.1.bin \
 	             build/level_05/s16_wave1.1.bin \
+	             build/level_05/s16_wave1_mask.1.bin \
 	             build/level_05/s17_wave2.1.bin \
+	             build/level_05/s17_wave2_mask.1.bin \
 	             build/level_05/s18_wave3.1.bin \
+	             build/level_05/s18_wave3_mask.1.bin \
 	             build/level_05/s19_weed1.1.bin \
 	             build/level_05/s20_weed2.1.bin \
 	             build/level_05/s21_coral1.1.bin \
@@ -2742,15 +2769,30 @@ build/level_05/s16_wave1.1.bin : build_tools/bmp_to_raw.rb \
 	build_tools/bmp_to_raw.rb resources/level_05/s16_wave1.1.bmp \
 	                          build/level_05/s16_wave1.1.bin
 
+build/level_05/s16_wave1_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                      resources/level_05/s16_wave1_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_05/s16_wave1_mask.1.bmp \
+	                               build/level_05/s16_wave1_mask.1.bin
+
 build/level_05/s17_wave2.1.bin : build_tools/bmp_to_raw.rb \
                                  resources/level_05/s17_wave2.1.bmp
 	build_tools/bmp_to_raw.rb resources/level_05/s17_wave2.1.bmp \
 	                          build/level_05/s17_wave2.1.bin
 
+build/level_05/s17_wave2_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                      resources/level_05/s17_wave2_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_05/s17_wave2_mask.1.bmp \
+	                               build/level_05/s17_wave2_mask.1.bin
+
 build/level_05/s18_wave3.1.bin : build_tools/bmp_to_raw.rb \
                                  resources/level_05/s18_wave3.1.bmp
 	build_tools/bmp_to_raw.rb resources/level_05/s18_wave3.1.bmp \
 	                          build/level_05/s18_wave3.1.bin
+
+build/level_05/s18_wave3_mask.1.bin : build_tools/bmp_to_raw.rb \
+                                      resources/level_05/s18_wave3_mask.1.bmp
+	build_tools/bmp_to_raw.rb -b 1 resources/level_05/s18_wave3_mask.1.bmp \
+	                               build/level_05/s18_wave3_mask.1.bin
 
 build/level_05/s19_weed1.1.bin : build_tools/bmp_to_raw.rb \
                                  resources/level_05/s19_weed1.1.bmp
