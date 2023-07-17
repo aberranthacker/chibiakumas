@@ -2,7 +2,7 @@
 
 def convert_opcode(str)
   str.scan(/.{4}/)
-    .map { |w| w.scan(/.{2}/).reverse.join.to_i(16).to_s(8).rjust(7, '0') }
+     .map { |w| w.scan(/.{2}/).reverse.join.to_i(16).to_s(8).rjust(7, '0') }
 end
 
 INSTR_REGEX = /^(?<ln>\s+\d+)\s+(?<addr>[0-9a-f]+)\s+(?<opcode>[0-9A-F]+)\s+(?<text>.+)$/
@@ -11,8 +11,8 @@ stdout_next_line = false
 
 File.open('build/subtitles.lst', 'a+') do |f|
   $stdin.read.each_line do |line|
-    unless (matches = line.chomp.match(INSTR_REGEX))
-      stdout_next_line = true if /^\s*\d+\s+#:bpt/.match?(line)
+    unless (matches = line.chomp.force_encoding('ASCII-8BIT').match(INSTR_REGEX))
+      stdout_next_line = true if /^\s*\d+\s+#:bpt/.match?(line.force_encoding('ASCII-8BIT'))
       next
     end
 
