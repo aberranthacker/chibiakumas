@@ -35,6 +35,7 @@ unless (options.dst_filename = ARGV[1])
 end
 
 # https://github.com/bordeeinc/bmp-ruby
+# https://en.wikipedia.org/wiki/BMP_file_format
 bmp = File.binread(options.src_filename)
 
 signature          = bmp[0,2]
@@ -48,48 +49,84 @@ image_size         = bmp[0x22,4].unpack1('V') # 32-bit unsigned, VAX (little-end
 
 raise "#{options.src_filename} : Unknown file type." unless signature == 'BM'
 raise "#{options.src_filename} : Number of color planes other than 1 in not supported." unless planes == 1
-raise "#{options.src_filename} : #{bits_per_pixel} bits per pixel not supported, 8 bits only." unless bits_per_pixel == 8
+unless [4, 8].include?(bits_per_pixel)
+  raise "#{options.src_filename} : #{bits_per_pixel} bits per pixel not supported, 4 or 8 bits only."
+end
+if bits_per_pixel < options.bpp
+  raise "#{options.src_filename} has #{bits_per_pixel}bpp, which is less than resulting #{options.bpp}bpp."
+end
 raise "#{options.src_filename} : Compression is not supported." unless compression == 0
-if image_width * image_height != image_size
-  raise "#{options.src_filename} : " \
-        "Padded pixel array is not supported.\n" \
-        "#{image_width} * #{image_height} != #{image_size}"
+if image_width % 8 != 0
+  puts "#{options.src_filename} WARNING: Image width #{image_width} is not multiple of 8"
 end
 
-bitmap = bmp[pixel_array_offset, image_size].bytes.reverse
+row_width = bits_per_pixel * image_width / 8
+row_width_with_padding = (bits_per_pixel * image_width + 31) / 32 * 4
 
-(0...bitmap.length).step(image_width).each do |idx|
-  bitmap[idx, image_width] = bitmap[idx, image_width].reverse
-end
+bitmap = bmp[pixel_array_offset, image_size].bytes
 
 dst_bitmap = []
 bp0_byte = 0
 bp1_byte = 0
 bp2_byte = 0
+bit_number = 0
 
-bitmap.each.with_index do |byte_pixel, idx|
-  bit_number = idx % 8
+if bits_per_pixel == 8
+  (0...bitmap.length).step(row_width_with_padding).to_a.reverse.each do |row_idx|
+    (0...row_width).each do |col_idx|
+      bitmap_byte = bitmap[row_idx + col_idx]
 
-  bit0 = byte_pixel & 1
-  bit1 = byte_pixel >> 1 & 1
-  bit2 = byte_pixel >> 2 & 1
+      bp0_byte |= (bitmap_byte >> 0 & 1) << bit_number
+      bp1_byte |= (bitmap_byte >> 1 & 1) << bit_number
+      bp2_byte |= (bitmap_byte >> 2 & 1) << bit_number
 
-  bp0_byte |= bit0 << bit_number
-  bp1_byte |= bit1 << bit_number
-  bp2_byte |= bit2 << bit_number
+      next if (bit_number += 1) < 8
 
-  next unless bit_number == 7
+      if options.bpp == 1
+        dst_bitmap.push(bp0_byte)
+      elsif options.bpp == 2
+        dst_bitmap.push(bp1_byte << 8 | bp0_byte)
+      elsif options.bpp == 3
+        dst_bitmap.push(bp0_byte)
+        dst_bitmap.push(bp2_byte << 8 | bp1_byte)
+      end
 
-  if options.bpp == 1
-    dst_bitmap.push(bp0_byte)
-  elsif options.bpp == 2
-    dst_bitmap.push(bp0_byte << 8 | bp1_byte)
-  elsif options.bpp == 3
-    dst_bitmap.push(bp0_byte)
-    dst_bitmap.push(bp2_byte << 8 | bp1_byte)
+      bit_number = 0
+      bp0_byte, bp1_byte, bp2_byte = [0, 0, 0]
+    end
   end
+elsif bits_per_pixel == 4
+  (0...bitmap.length).step(row_width_with_padding).to_a.reverse.each do |row_idx|
+    (0...row_width).each do |col_idx|
+      bitmap_byte = bitmap[row_idx + col_idx]
 
-  bp0_byte, bp1_byte, bp2_byte = [0, 0, 0]
+      nibble = bitmap_byte >> 4
+      bp0_byte |= (nibble >> 0 & 1) << bit_number
+      bp1_byte |= (nibble >> 1 & 1) << bit_number
+      bp2_byte |= (nibble >> 2 & 1) << bit_number
+
+      bit_number += 1
+      nibble = bitmap_byte
+
+      bp0_byte |= (nibble >> 0 & 1) << bit_number
+      bp1_byte |= (nibble >> 1 & 1) << bit_number
+      bp2_byte |= (nibble >> 2 & 1) << bit_number
+
+      next if (bit_number += 1) < 8
+
+      if options.bpp == 1
+        dst_bitmap.push(bp0_byte)
+      elsif options.bpp == 2
+        dst_bitmap.push(bp1_byte << 8 | bp0_byte)
+      elsif options.bpp == 3
+        dst_bitmap.push(bp0_byte)
+        dst_bitmap.push(bp2_byte << 8 | bp1_byte)
+      end
+
+      bit_number = 0
+      bp0_byte, bp1_byte, bp2_byte = [0, 0, 0]
+    end
+  end
 end
 
 bin = if options.bpp == 1
