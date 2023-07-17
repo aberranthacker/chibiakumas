@@ -43,7 +43,7 @@ metadata.each do |label, data|
     offset = address / 2
     offset -= options.entry / 2 unless options.entry.nil?
 
-    bootstrap_bin[offset + 1] = size / 2
+    bootstrap_bin[offset + 1] = (size + 1) / 2
     bootstrap_bin[offset + 2] = current_block_num
   end
 
