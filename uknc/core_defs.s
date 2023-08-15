@@ -248,5 +248,5 @@
 .equiv INC_R0_OPCODE, 0005200
 .equiv DECB_R3_OPCODE, 0105303
 .equiv MOVB_R3_R3_OPCODE, 0110303
-
+# Show Boss Text persistance counter initial value
 .equiv SBT_PersistanceCounterReset, 10

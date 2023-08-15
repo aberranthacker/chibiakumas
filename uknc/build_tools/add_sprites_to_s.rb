@@ -60,14 +60,17 @@ def generate_s_file(sprites_dir, level_name, s_file_idx)
 
     spritenames.each do |spritename|
       next if spritename.include?('_mask')
+
       spritename_camelcase = spritename.split('_').map(&:capitalize).join
       f.puts("#{spritename_camelcase}:")
       bin_filename = File.join('build', level_name, "#{spritename}.#{s_file_idx}.bin")
       f.puts(%(    .incbin "#{bin_filename}"))
+
       if spritenames.include?("#{spritename}_mask")
         f.puts("#{spritename_camelcase}Mask:")
         bin_mask_filename = File.join('build', level_name, "#{spritename}_mask.#{s_file_idx}.bin")
         f.puts(%(    .incbin "#{bin_mask_filename}"))
+        f.puts(%(    .even))
       end
       f.puts
     end

@@ -13,7 +13,7 @@ module BuildDskImage
     sectors_used = 0
 
     puts "#{' ' * col1_width}                57344"
-    puts "#{' ' * col1_width}  entry   size    end blocks block"
+    puts "#{' ' * col1_width}  entry   size    end   free blocks block"
 
     dsk_files_list.each do |file_name|
       bin = File.binread(file_name).unpack('C*')
@@ -35,6 +35,7 @@ module BuildDskImage
          "#{' ' * 6} " \
          "#{bytes_used.to_s.rjust(6, ' ')} " \
          "#{' ' * 6} " \
+         "#{' ' * 6} " \
          "#{sectors_used.to_s.rjust(6, ' ')}"
   end
 
@@ -52,6 +53,7 @@ module BuildDskImage
       entry_address_str(binary_info),
       bin_size_str(binary_info, bin),
       ending_address_str(binary_info),
+      free_ram_str(binary_info, bin),
       (target_size / 512).to_s.rjust(6, ' '),
       sectors_used.to_s.rjust(5, ' ')
     ].join(' ')
@@ -78,6 +80,12 @@ module BuildDskImage
     return "\u001b[31m#{str}\u001b[0m" unless ending_address >= 63*1024
 
     "\u001b[31;1m#{str}\u001b[0m"
+  end
+
+  def free_ram_str(binary_info, bin)
+    return ' ' * 6 if binary_info.nil?
+
+    (56 * 1024 - binary_info[2].to_i).to_s.rjust(6, ' ')
   end
 end
 

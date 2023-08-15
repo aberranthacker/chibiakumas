@@ -261,92 +261,136 @@ Coin:
     .incbin "build/level_01/coin.1.bin"
 PowerupDrone:
     .incbin "build/level_01/powerup_drone.1.bin"
+    .even
 PowerupRate:
     .incbin "build/level_01/powerup_rate.1.bin"
+    .even
 PowerupPower:
     .incbin "build/level_01/powerup_power.1.bin"
+    .even
 Boulder:
     .incbin "build/level_01/boulder.1.bin"
+    .even
 BoulderSmall:
     .incbin "build/level_01/boulder_small.1.bin"
+    .even
 BurningBloke:
     .incbin "build/level_01/burning_bloke.1.bin"
+    .even
 Castle:
     .incbin "build/level_01/castle.1.bin"
+    .even
 CloudA:
     .incbin "build/level_01/cloud_a.1.bin"
+    .even
 CloudB:
     .incbin "build/level_01/cloud_b.1.bin"
+    .even
 CloudC:
     .incbin "build/level_01/cloud_c.1.bin"
+    .even
 CloudAMask:
     .incbin "build/level_01/cloud_a_mask.1.bin"
+    .even
 CloudBMask:
     .incbin "build/level_01/cloud_b_mask.1.bin"
+    .even
 CloudCMask:
     .incbin "build/level_01/cloud_c_mask.1.bin"
+    .even
 Cross:
     .incbin "build/level_01/cross.1.bin"
+    .even
 CrossCrucifiedBloke:
     .incbin "build/level_01/cross_crucified_bloke.1.bin"
+    .even
 CrossImpaledBloke:
     .incbin "build/level_01/cross_impaled_bloke.1.bin"
+    .even
 Gravecross:
     .incbin "build/level_01/gravecross.1.bin"
+    .even
 GravecrossMask:
     .incbin "build/level_01/gravecross_mask.1.bin"
+    .even
 Gravestone:
     .incbin "build/level_01/gravestone.1.bin"
+    .even
 GravestoneMask:
     .incbin "build/level_01/gravestone_mask.1.bin"
+    .even
 Moon:
     .incbin "build/level_01/moon.1.bin"
+    .even
 MoonMask:
     .incbin "build/level_01/moon_mask.1.bin"
+    .even
 RockPT1:
     .incbin "build/level_01/rock_pt1.1.bin"
+    .even
 RockPT2:
     .incbin "build/level_01/rock_pt2.1.bin"
+    .even
 RockPT3:
     .incbin "build/level_01/rock_pt3.1.bin"
+    .even
 RockPT1Mask:
     .incbin "build/level_01/rock_pt1_mask.1.bin"
+    .even
 RockPT2Mask:
     .incbin "build/level_01/rock_pt2_mask.1.bin"
+    .even
 RockPT3Mask:
     .incbin "build/level_01/rock_pt3_mask.1.bin"
+    .even
 SpikeyRockA:
     .incbin "build/level_01/spikey_rock_a.1.bin"
+    .even
 SpikeyRockB:
     .incbin "build/level_01/spikey_rock_b.1.bin"
+    .even
 SpikeyRockC:
     .incbin "build/level_01/spikey_rock_c.1.bin"
+    .even
 SpikeyRockAMask:
     .incbin "build/level_01/spikey_rock_a_mask.1.bin"
+    .even
 SpikeyRockBMask:
     .incbin "build/level_01/spikey_rock_b_mask.1.bin"
+    .even
 SpikeyRockCMask:
     .incbin "build/level_01/spikey_rock_c_mask.1.bin"
+    .even
 AntAttacker:
     .incbin "build/level_01/ant_attacker.1.bin"
+    .even
 BoniBurd:
     .incbin "build/level_01/boni_burd.1.bin"
+    .even
 BoniBurdMask:
     .incbin "build/level_01/boni_burd_mask.1.bin"
+    .even
 EyeClopse:
     .incbin "build/level_01/eye_clopse.1.bin"
+    .even
 EyeClopseMask:
     .incbin "build/level_01/eye_clopse_mask.1.bin"
+    .even
 RockChick:
     .incbin "build/level_01/rock_chick.1.bin"
+    .even
 SkeletonCrawler:
     .incbin "build/level_01/skeleton_crawler.1.bin"
+    .even
 SkeletonCrawlerMask:
     .incbin "build/level_01/skeleton_crawler_mask.1.bin"
+    .even
 SkullBomber:
     .incbin "build/level_01/skull_bomber.1.bin"
+    .even
 SkullGang:
     .incbin "build/level_01/skull_gang.1.bin"
+    .even
 SpliceFace:
     .incbin "build/level_01/splice_face.1.bin"
-
+    .even

@@ -181,6 +181,7 @@ S01BossAbove75A:
     .incbin "build/level_04/s01_boss_above_75_a.0.bin"
 S01BossAbove75AMask:
     .incbin "build/level_04/s01_boss_above_75_a_mask.0.bin"
+    .even
 
 S02BossAbove75B:
     .incbin "build/level_04/s02_boss_above_75_b.0.bin"
@@ -189,11 +190,13 @@ S03BossAbove75C:
     .incbin "build/level_04/s03_boss_above_75_c.0.bin"
 S03BossAbove75CMask:
     .incbin "build/level_04/s03_boss_above_75_c_mask.0.bin"
+    .even
 
 S04BossBelow75A:
     .incbin "build/level_04/s04_boss_below_75_a.0.bin"
 S04BossBelow75AMask:
     .incbin "build/level_04/s04_boss_below_75_a_mask.0.bin"
+    .even
 
 S05BossBelow75B:
     .incbin "build/level_04/s05_boss_below_75_b.0.bin"
@@ -202,41 +205,49 @@ S06BossBelow75C:
     .incbin "build/level_04/s06_boss_below_75_c.0.bin"
 S06BossBelow75CMask:
     .incbin "build/level_04/s06_boss_below_75_c_mask.0.bin"
+    .even
 
 S07Coin:
     .incbin "build/level_04/s07_coin.0.bin"
 S07CoinMask:
     .incbin "build/level_04/s07_coin_mask.0.bin"
+    .even
 
 S08Akanbee:
     .incbin "build/level_04/s08_akanbee.0.bin"
 S08AkanbeeMask:
     .incbin "build/level_04/s08_akanbee_mask.0.bin"
+    .even
 
 S09Lambtron:
     .incbin "build/level_04/s09_lambtron.0.bin"
 S09LambtronMask:
     .incbin "build/level_04/s09_lambtron_mask.0.bin"
+    .even
 
 S10Chu:
     .incbin "build/level_04/s10_chu.0.bin"
 S10ChuMask:
     .incbin "build/level_04/s10_chu_mask.0.bin"
+    .even
 
 S11ChuText:
     .incbin "build/level_04/s11_chu_text.0.bin"
 S11ChuTextMask:
     .incbin "build/level_04/s11_chu_text_mask.0.bin"
+    .even
 
 S12Shoe:
     .incbin "build/level_04/s12_shoe.0.bin"
 S12ShoeMask:
     .incbin "build/level_04/s12_shoe_mask.0.bin"
+    .even
 
 S13BossAbove75HitA:
     .incbin "build/level_04/s13_boss_above_75_hit_a.0.bin"
 S13BossAbove75HitAMask:
     .incbin "build/level_04/s13_boss_above_75_hit_a_mask.0.bin"
+    .even
 
 S15BossAbove75HitB:
     .incbin "build/level_04/s15_boss_above_75_hit_b.0.bin"
@@ -245,11 +256,13 @@ S15BossAbove75HitC:
     .incbin "build/level_04/s15_boss_above_75_hit_c.0.bin"
 S15BossAbove75HitCMask:
     .incbin "build/level_04/s15_boss_above_75_hit_c_mask.0.bin"
+    .even
 
 S16BossBelow75HitA:
     .incbin "build/level_04/s16_boss_below_75_hit_a.0.bin"
 S16BossBelow75HitAMask:
     .incbin "build/level_04/s16_boss_below_75_hit_a_mask.0.bin"
+    .even
 
 S18BossBelow75HitB:
     .incbin "build/level_04/s18_boss_below_75_hit_b.0.bin"
@@ -258,6 +271,7 @@ S18BossBelow75HitC:
     .incbin "build/level_04/s18_boss_below_75_hit_c.0.bin"
 S18BossBelow75HitCMask:
     .incbin "build/level_04/s18_boss_below_75_hit_c_mask.0.bin"
+    .even
 
 S19BossDeadA:
     .incbin "build/level_04/s19_boss_dead_a.0.bin"

@@ -1,4 +1,4 @@
-               .list
+               .nolist
 
                .include "./hwdefs.s"
                .include "./macros.s"
