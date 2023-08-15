@@ -7,4 +7,3 @@ end
 REVERSE_TABLE_4BIT = generate(4).freeze
 
 REVERSE_TABLE_8BIT = generate(8).freeze
-

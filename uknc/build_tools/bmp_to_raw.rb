@@ -57,7 +57,8 @@ if bits_per_pixel < options.bpp
 end
 raise "#{options.src_filename} : Compression is not supported." unless compression == 0
 if image_width % 8 != 0
-  puts "#{options.src_filename} WARNING: Image width #{image_width} is not multiple of 8"
+  puts "#{options.src_filename} \u001b[31;1mWARNING\u001b[0m: " \
+       "Image width #{image_width} is not multiple of 8"
 end
 
 row_width = bits_per_pixel * image_width / 8

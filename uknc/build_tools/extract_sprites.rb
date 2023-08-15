@@ -57,8 +57,6 @@ header = []
   header << rec
 end
 
-binding.pry
-
 header.each.with_index(1) do |md, idx|
   print "i: #{md[:idx].to_s.rjust(3, ' ')} "
   print "h: #{md[:height].to_s.rjust(3, ' ')} "
@@ -70,4 +68,3 @@ header.each.with_index(1) do |md, idx|
   sprite = file[md[:offset], md[:height] * md[:width]]
   File.binwrite("#{options.out_prefix}-#{idx.to_s.rjust(2,'0')}", sprite)
 end
-

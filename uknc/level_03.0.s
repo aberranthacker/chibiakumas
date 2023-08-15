@@ -170,61 +170,73 @@ Coin:
     .incbin "build/level_03/coin.0.bin"
 CoinMask:
     .incbin "build/level_03/coin_mask.0.bin"
+    .even
 
 GnatPack:
     .incbin "build/level_03/gnat_pack.0.bin"
 GnatPackMask:
     .incbin "build/level_03/gnat_pack_mask.0.bin"
+    .even
 
 GrassTuftA:
     .incbin "build/level_03/grass_tuft_a.0.bin"
 GrassTuftAMask:
     .incbin "build/level_03/grass_tuft_a_mask.0.bin"
+    .even
 
 GrassTuftB:
     .incbin "build/level_03/grass_tuft_b.0.bin"
 GrassTuftBMask:
     .incbin "build/level_03/grass_tuft_b_mask.0.bin"
+    .even
 
 GrassTuftBig:
     .incbin "build/level_03/grass_tuft_big.0.bin"
 GrassTuftBigMask:
     .incbin "build/level_03/grass_tuft_big_mask.0.bin"
+    .even
 
 GrassTuftC:
     .incbin "build/level_03/grass_tuft_c.0.bin"
 GrassTuftCMask:
     .incbin "build/level_03/grass_tuft_c_mask.0.bin"
+    .even
 
 GrassTuftD:
     .incbin "build/level_03/grass_tuft_d.0.bin"
 GrassTuftDMask:
     .incbin "build/level_03/grass_tuft_d_mask.0.bin"
+    .even
 
 Kamisagi:
     .incbin "build/level_03/kamisagi.0.bin"
 KamisagiMask:
     .incbin "build/level_03/kamisagi_mask.0.bin"
+    .even
 
 MukadeBachi1:
     .incbin "build/level_03/mukade_bachi_1.0.bin"
 MukadeBachi1Mask:
     .incbin "build/level_03/mukade_bachi_1_mask.0.bin"
+    .even
 
 MukadeBachi2:
     .incbin "build/level_03/mukade_bachi_2.0.bin"
 MukadeBachi2Mask:
     .incbin "build/level_03/mukade_bachi_2_mask.0.bin"
+    .even
 
 MukadeBachi3:
     .incbin "build/level_03/mukade_bachi_3.0.bin"
 MukadeBachi3Mask:
     .incbin "build/level_03/mukade_bachi_3_mask.0.bin"
+    .even
 
 MukadeBachi5:
     .incbin "build/level_03/mukade_bachi_5.0.bin"
 MukadeBachi5Mask:
     .incbin "build/level_03/mukade_bachi_5_mask.0.bin"
+    .even
 
 PowerupDrone:
     .incbin "build/level_03/powerup_drone.0.bin"
@@ -234,19 +246,23 @@ PowerupRate:
     .incbin "build/level_03/powerup_rate.0.bin"
 PowerupMask:
     .incbin "build/level_03/powerup_drone_mask.0.bin"
+    .even
 
 ShroomBomber:
     .incbin "build/level_03/shroom_bomber.0.bin"
 ShroomBomberMask:
     .incbin "build/level_03/shroom_bomber_mask.0.bin"
+    .even
 
 ZombieCapybara:
     .incbin "build/level_03/zombie_capybara.0.bin"
 ZombieCapybaraMask:
     .incbin "build/level_03/zombie_capybara_mask.0.bin"
+    .even
 
 ZombieSalaryman:
     .incbin "build/level_03/zombie_salaryman.0.bin"
 ZombieSalarymanMask:
     .incbin "build/level_03/zombie_salaryman_mask.0.bin"
+    .even
 
