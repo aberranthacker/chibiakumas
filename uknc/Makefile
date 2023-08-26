@@ -17,7 +17,9 @@ LDFLAGS += --strip-all
 # --print-map -M
 # --strip-all -s
 
-common = core_defs.s event_stream_definitions.s hwdefs.s macros.s
+INCS = -I./common
+
+common = core_defs.s event_stream_definitions.s common/hwdefs.s common/macros.s
 
 all : pre-build build/chibiakumas.dsk
 
@@ -74,7 +76,7 @@ build/bootsector.bin : build/bootsector.o \
 
 build/bootsector.o : $(common) \
                      bootsector.s
-	$(AS) -al bootsector.s -o build/bootsector.o | build_tools/format_list.rb
+	$(AS) $(INCS) -al bootsector.s -o build/bootsector.o | build_tools/format_list.rb
 # bootsector.bin ------------------------------------------------------------}}}
 
 # bootsrap.bin --------------------------------------------------------------{{{
@@ -102,7 +104,7 @@ build/bootstrap.o : $(common) \
                     build/level_03_title.bin.lzsa1 \
                     build/level_05_title.bin.lzsa1 \
                     build/level_07_title.bin.lzsa1
-	$(AS) -al bootstrap.s -o build/bootstrap.o | build_tools/format_list.rb
+	$(AS) $(INCS) -al bootstrap.s -o build/bootstrap.o | build_tools/format_list.rb
 
 build/high_score.bin.lzsa1 : build_tools/bmp_to_raw.rb \
 			     resources/bootstrap/high_score.bmp
@@ -132,7 +134,8 @@ build/level_05_title.bin.lzsa1 : build_tools/bmp_to_raw.rb \
 build/level_07_title.bin.lzsa1 : build_tools/bmp_to_raw.rb \
 				 resources/bootstrap/level_07-title.bmp
 	build_tools/bmp_to_raw.rb resources/bootstrap/level_07-title.bmp build/level_07_title.bin
-	build_tools/lzsa -f 1 -r build/level_07_title.bin build/level_07_title.bin.lzsa1
+	build_tools/lzsa3 build/level_07_title.bin build/level_07_title.bin.lzsa1
+#build_tools/lzsa -f 1 -r build/level_07_title.bin build/level_07_title.bin.lzsa1
 # bootsrap.bin --------------------------------------------------------------}}}
 
 # saved_settings.bin --------------------------------------------------------{{{
@@ -141,7 +144,7 @@ build/saved_settings.bin : build/saved_settings.o
 	ruby build_tools/aout2sav.rb build/saved_settings.out -b -s -o build/saved_settings.bin
 
 build/saved_settings.o : saved_settings.s
-	$(AS) -al saved_settings.s -o build/saved_settings.o
+	$(AS) $(INCS) -al saved_settings.s -o build/saved_settings.o
 # saved_settings.bin --------------------------------------------------------}}}
 
 # loading_screen.bin --------------------------------------------------------{{{
@@ -173,7 +176,7 @@ build/ppu.o : $(common) \
 	      build/smartbomb_icon.bin \
               resources/font.raw \
               resources/cga8x8b.raw
-	$(AS) ppu.s -I../../akg_player -al -o build/ppu.o | build_tools/format_list.rb
+	$(AS) $(INCS) ppu.s -I../../akg_player -al -o build/ppu.o | build_tools/format_list.rb
 
 build/smartbomb_icon.bin : build_tools/bmp_to_raw.rb \
                            resources/icons/smartbomb_icon-3bpp.bmp
@@ -229,7 +232,7 @@ build/core.o : $(common) \
                core/stararray_add.s \
                core/timer.s \
                core/virtual_screen_pos_320.s
-	$(AS) core.s -al -o build/core.o | build_tools/format_list.rb
+	$(AS) $(INCS) core.s -al -o build/core.o | build_tools/format_list.rb
 	build_tools/level_start_update.rb
 # core.bin ------------------------------------------------------------------}}}
 
@@ -247,7 +250,7 @@ build/level_00_menu.o : $(common) \
                         build/menu.spr \
                         build/menu_cursor.spr \
                         build/level_01_title.bin.lzsa1
-	$(AS) -al level_00_menu.s -o build/level_00_menu.o | build_tools/format_list.rb
+	$(AS) $(INCS) -al level_00_menu.s -o build/level_00_menu.o | build_tools/format_list.rb
 
 build/menu.spr : build_tools/spr_cpc_to_uknc.rb \
 	         resources/menu/TITLETEX.SPR
@@ -285,7 +288,7 @@ build/ep1_intro.o : $(common) \
                     build/ep1-intro/ep1-intro-slide06.raw.lzsa1 \
                     build/ep1-intro/ep1-intro-slide07.raw.lzsa1 \
                     build/ep1-intro/ep1-intro-slide08.raw.lzsa1
-	$(AS) -al ep1_intro.s -o build/ep1_intro.o | build_tools/format_list.rb
+	$(AS) $(INCS) -al ep1_intro.s -o build/ep1_intro.o | build_tools/format_list.rb
 
 build/ep1_intro_slides.bin : build/ep1_intro_slides.o
 	$(LD) $(LDFLAGS) build/ep1_intro_slides.o -o build/ep1_intro_slides.out
@@ -299,7 +302,7 @@ build/ep1_intro_slides.o : ep1_intro_slides.s \
                            build/ep1-intro/ep1-intro-slide13.raw.lzsa1 \
                            build/ep1-intro/ep1-intro-slide14.raw.lzsa1 \
                            build/ep1-intro/ep1-intro-slide15.raw.lzsa1
-	$(AS) -al ep1_intro_slides.s -o build/ep1_intro_slides.o
+	$(AS) $(INCS) -al ep1_intro_slides.s -o build/ep1_intro_slides.o
 
 build/ep1_intro.spr : build_tools/spr_cpc_to_uknc.rb \
 	              ../ResCPC/LEVEL252A.SPR
@@ -352,7 +355,7 @@ build/chibi_lr.spr : build_tools/bmp_to_raw.rb \
 		     build/chibi/drone.1.bin \
 		     build/chibi/drone_mask.1.bin \
 		     chibi_lr.s
-	$(AS) -al chibi_lr.s -o build/chibi_lr.o
+	$(AS) $(INCS) -al chibi_lr.s -o build/chibi_lr.o
 	$(LD) $(LDFLAGS) build/chibi_lr.o -T linker_scripts/sprites.cmd -o build/chibi_lr.spr
 
 build/chibi/chibi_r.0.bin : build_tools/bmp_to_raw.rb \
@@ -421,7 +424,7 @@ build/level_01.o : $(common) \
 		   build/level_01.1.spr \
 		   build/level_01_tiles.spr \
 		   build/chibi_lr.spr
-	$(AS) -al level_01.s -o build/level_01.o | build_tools/format_list.rb
+	$(AS) $(INCS) -al level_01.s -o build/level_01.o | build_tools/format_list.rb
 
 build/level_01_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
 	                   resources/level_01_tiles.cpc.spr
@@ -1013,7 +1016,7 @@ build/level_02.o : $(common) \
 		   build/level_02.1.spr \
 		   build/level_02_tiles.spr \
 		   build/chibi_lr.spr
-	$(AS) -al level_02.s -o build/level_02.o | build_tools/format_list.rb
+	$(AS) $(INCS) -al level_02.s -o build/level_02.o | build_tools/format_list.rb
 
 build/level_02_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
 	                   resources/level_02_tiles.cpc.spr
@@ -1361,7 +1364,7 @@ build/level_03_title.bin : build/core.o \
 build/level_03_title.o : $(common) \
                          level_03_title.s \
                          build/level_03_title.bin.lzsa1
-	$(AS) level_03_title.s -o build/level_03_title.o
+	$(AS) $(INCS) level_03_title.s -o build/level_03_title.o
 # level_03_title.bin --------------------------------------------------------}}}
 
 # level_05_title.bin --------------------------------------------------------{{{
@@ -1373,7 +1376,7 @@ build/level_05_title.bin : build/core.o \
 build/level_05_title.o : $(common) \
                          level_05_title.s \
                          build/level_05_title.bin.lzsa1
-	$(AS) level_05_title.s -o build/level_05_title.o
+	$(AS) $(INCS) level_05_title.s -o build/level_05_title.o
 # level_05_title.bin --------------------------------------------------------}}}
 
 # level_07_title.bin --------------------------------------------------------{{{
@@ -1385,7 +1388,7 @@ build/level_07_title.bin : build/core.o \
 build/level_07_title.o : $(common) \
                          level_07_title.s \
                          build/level_07_title.bin.lzsa1
-	$(AS) level_07_title.s -o build/level_07_title.o
+	$(AS) $(INCS) level_07_title.s -o build/level_07_title.o
 # level_07_title.bin --------------------------------------------------------}}}
 
 # level_03.bin --------------------------------------------------------------{{{
@@ -1400,7 +1403,7 @@ build/level_03.o : $(common) \
 		   build/level_03.1.spr \
 		   build/level_03_tiles.spr \
 		   build/chibi_lr.spr
-	$(AS) -al level_03.s -o build/level_03.o | build_tools/format_list.rb
+	$(AS) $(INCS) -al level_03.s -o build/level_03.o | build_tools/format_list.rb
 
 build/level_03_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
 	                   resources/level_03_tiles.cpc.spr
@@ -1420,7 +1423,7 @@ build/level_04.o : $(common) \
 		   build/level_04.1.spr \
 		   build/level_03_tiles.spr \
 		   build/chibi_lr.spr
-	$(AS) -al level_04.s -o build/level_04.o | build_tools/format_list.rb
+	$(AS) $(INCS) -al level_04.s -o build/level_04.o | build_tools/format_list.rb
 # level_04.bin --------------------------------------------------------------}}}
 
 # level_05.bin --------------------------------------------------------------{{{
@@ -1436,7 +1439,7 @@ build/level_05.o : $(common) \
 		   build/level_05.1.spr \
 		   build/level_05_tiles.spr \
 		   build/chibi_lr.spr
-	$(AS) -al level_05.s -o build/level_05.o | build_tools/format_list.rb
+	$(AS) $(INCS) -al level_05.s -o build/level_05.o | build_tools/format_list.rb
 
 build/level_05_tiles.spr : build_tools/spr_cpc_to_uknc.rb \
 			   resources/level_05_tiles.cpc.spr
