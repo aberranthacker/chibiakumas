@@ -1,0 +1,3 @@
+[submodule "uknc/build_tools"]
+	path = uknc/build_tools
+	url = git@github.com:aberranthacker/ms0511_build_tools.git
