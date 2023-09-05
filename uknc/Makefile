@@ -21,7 +21,7 @@ INCS = -I./common
 
 common = core_defs.s event_stream_definitions.s common/hwdefs.s common/macros.s
 
-all : pre-build build/chibiakumas.dsk
+all : pre-build dsk/chibiakumas.dsk
 
 pre-build :
 	mkdir -p build/chibi
@@ -33,35 +33,36 @@ pre-build :
 
 clean :
 	rm -rf build/*
+	rm dsk/chibiakumas.dsk
 
 spr5 :
 	./build_tools/add_sprites_to_s.rb resources/level_05/ && \
 		./build_tools/add_sprites_to_makefile.rb resources/level_05
 
 # chibiakumas.dsk -----------------------------------------------------------{{{
-build/chibiakumas.dsk : $(BUILD_DSK) \
-			$(UPDATE_DISK_MAP) \
-			dsk_files_list \
-			build/bootsector.bin \
-			build/bootstrap.bin \
-			build/ppu_module.bin \
-			build/loading_screen.bin \
-			build/core.bin \
-			build/ep1_intro.bin \
-			build/ep1_intro_slides.bin \
-			build/level_00.bin \
-			build/level_01.bin \
-			build/level_02.bin \
-			build/level_03_title.bin \
-			build/level_03.bin \
-			build/level_04.bin \
-			build/level_05.bin \
-			build/level_05_title.bin \
-			build/level_07_title.bin \
-			build/saved_settings.bin
+dsk/chibiakumas.dsk : $(BUILD_DSK) \
+		      $(UPDATE_DISK_MAP) \
+		      dsk_files_list \
+		      build/bootsector.bin \
+		      build/bootstrap.bin \
+		      build/ppu_module.bin \
+		      build/loading_screen.bin \
+		      build/core.bin \
+		      build/ep1_intro.bin \
+		      build/ep1_intro_slides.bin \
+		      build/level_00.bin \
+		      build/level_01.bin \
+		      build/level_02.bin \
+		      build/level_03_title.bin \
+		      build/level_03.bin \
+		      build/level_04.bin \
+		      build/level_05.bin \
+		      build/level_05_title.bin \
+		      build/level_07_title.bin \
+		      build/saved_settings.bin
 	$(UPDATE_DISK_MAP) dsk_files_list build/bootstrap.map.txt build/bootstrap.bin -e 512
 	$(UPDATE_DISK_MAP) dsk_files_list build/bootsector.map.txt build/bootsector.bin
-	$(BUILD_DSK) dsk_files_list build/chibiakumas.dsk
+	$(BUILD_DSK) dsk_files_list dsk/chibiakumas.dsk
 # chibiakumas.dsk -----------------------------------------------------------}}}
 
 # bootsector.bin ------------------------------------------------------------{{{
