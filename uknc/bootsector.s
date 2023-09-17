@@ -13,29 +13,36 @@
        .=0
         NOP  # Bootable disk marker
         BR   68$
-
+       .word 040, 0600 # set dummy TRAP 4 handler
+       .word 042, 0600 # set dummy unknown instruction interrupt handler
        .=040
-        RTI                 # dummy interrupt handler
+        BR .           # TRAP 4 handler
+       .=042
+        BR .           # unknown instruction interrupt handler
+       .=044
+        RTI            # dummy interrupt handler
+       .=0100
+       .word 044, 0200 # set dummy Vblank interrupt handler
+
        .=0104
 68$:
       # R0 - drive number
       # R1 - CSR
-        MOVB R0,@$PS.DeviceNumber
-        MOV  $040,@$0100    # set dummy Vblank int handler
-        MOV  $0160000,SP
+        MOVB R0, @$PS.DeviceNumber
+        MOV  $0160000, SP
 
         CALL @$PrintTitleStr
 
       # load PPU module
         CALL Channel2Send
         30$:
-            MOVB @$PS.Status,R0
+            TSTB @$PS.Status
         BMI  30$
 
       # PPU will clear the value when finishes initializiton
-        MOV  $-1,@$PPUCommandArg
+        MOV  $-1, @$PPUCommandArg
       # execute the PPU module
-        MOV  $PPUModule_PS,@$ParamsAddr+4
+        MOV  $PPUModule_PS, @$ParamsAddr+4
         CALL PPEXEC
 
         WaitForPPUInit:
@@ -43,93 +50,90 @@
         BNZ  WaitForPPUInit
 
      .ifdef ShowLoadingScreen
-        MOV  $loading_screen.bin,R0
-        CALL LoadDiskFile_Start
-       .ppudo $PPU_SetPalette, $TitleScreenPalette
+        MOV  $loading_screen.bin, R0
+        CALL LoadDiskFile
+       .ppudo_enqueue $PPU_SetPalette, $TitleScreenPalette
      .endif
       #-------------------------------------------------------------------------
-        MOV  $bootstrap.bin,R0
-        CALL LoadDiskFile_Start
+        MOV  $bootstrap.bin, R0
+        CALL LoadDiskFile
       #-------------------------------------------------------------------------
-        BISB @$PS.DeviceNumber,@$Bootstrap.PS.DeviceNumber
+        BISB @$PS.DeviceNumber, @$Bootstrap.PS.DeviceNumber
       #-------------------------------------------------------------------------
-      # copy the bootstrap to upper memory while PPU module loads
-        MOV  $BootstrapSizeQWords,R0
-        MOV  $CBPADR,R1
-        MOV  $CBP12D,R2
-        MOV  $BootstrapStart,R3
-        MOV  $BootstrapCopyAddr,(R1)
+      # copy the bootstrap to upper memory
+        MOV  $BootstrapSizeQWords, R0
+        MOV  $CBPADR, R1
+        MOV  $CBP12D, R2
+        MOV  $BootstrapStart, R3
+        MOV  $BootstrapCopyAddr, (R1)
         100$:
             .rept 4
-             MOV  (R3)+,(R2)
+             MOV  (R3)+, (R2)
              INC  (R1)
             .endr
-        SOB  R0,100$
+        SOB  R0, 100$
       #-------------------------------------------------------------------------
-        MOV  $core.bin,R0
-        CALL LoadDiskFile_Start
+        MOV  $core.bin, R0
+        CALL LoadDiskFile
       #-------------------------------------------------------------------------
-        MOV  $saved_settings.bin,R0
-        CALL LoadDiskFile_Start
+        MOV  $saved_settings.bin, R0
+        CALL LoadDiskFile
       #-------------------------------------------------------------------------
    .ifdef ExtMemCore # copy the core to the extended memory
-        MOV  $GameVarsEnd,R4
-        MOV  $CoreStart,R5
-        MOV  $ExtMemSizeBytes>>3 - 1,R1 # -1 to preserve stack
+        MOV  $GameVarsEnd, R4
+        MOV  $CoreStart, R5
+        MOV  $ExtMemSizeBytes>>3 - 1, R1 # -1 to preserve stack
         200$:
            .rept 4
             MOV  (R4)+, (R5)+
            .endr
-        SOB R1,200$
+        SOB R1, 200$
    .endif
       #-------------------------------------------------------------------------
         JMP  @$BootstrapStart
       #-------------------------------------------------------------------------
-      #-------------------------------------------------------------------------
-LoadDiskFile_Start: # ----------------------------------------------------------
-        MOV  (R0)+,@$PS.CPU_RAM_Address
-        MOV  (R0)+,@$PS.WordsCount
-        MOV  (R0),R0 # starting block number
+LoadDiskFile: #-----------------------------------------------------------------
+        MOV  (R0)+, @$PS.CPU_RAM_Address
+        MOV  (R0)+, @$PS.WordsCount
+        MOV  (R0), R0 # starting block number
       # calculate location of a file on a disk from the starting block number
-        CLR  R2      # R2 - most significant word
-        MOV  R0,R3   # R3 - least significant word
-        DIV  $20,R2  # quotient -> R2, remainder -> R3
-        MOVB R2,@$PS.AddressOnDevice     # track number (0-79)
+        CLR  R2       # R2 - most significant word
+        MOV  R0, R3   # R3 - least significant word
+        DIV  $20, R2  # quotient -> R2, remainder -> R3
+        MOVB R2, @$PS.AddressOnDevice     # track number (0-79)
 
         CLR  R2
-        DIV  $10,R2
+        DIV  $10, R2
         INC  R3
-        MOVB R3,@$PS.AddressOnDevice + 1 # sector (1-10)
+        MOVB R3, @$PS.AddressOnDevice + 1 # sector (1-10)
 
-        ASH  $7,R2
-        BICB $0x80,@$PS.DeviceNumber     # BICB/BISB to preserve drive number
-        BISB R2,@$PS.DeviceNumber        # head (0, 1)
+        ASH  $7, R2
+        BICB $0x80, @$PS.DeviceNumber     # BICB/BISB to preserve drive number
+        BISB R2, @$PS.DeviceNumber        # head (0, 1)
 
-        MOVB $-1,@$PS.Status
-       .ppudo_ensure $PPU_LoadDiskFile,$ParamsStruct
-        #RETURN
-LoadDiskFile_WaitForFinish: #---------------------------------------------------
+        MOVB $-1, @$PS.Status
+       .ppudo_enqueue_ensure $PPU_LoadDiskFile, $ParamsStruct
         10$:
             TSTB @$PS.Status
         BMI  10$
         RETURN
 
 Channel2Send:
-        MOV  $ParamsAddr,R0     # R0 - pointer to channel's init sequence array
-        MOV  $8,R1              # R1 - size of the array, 8 bytes
+        MOV  $ParamsAddr, R0     # R0 - pointer to channel's init sequence array
+        MOV  $8, R1              # R1 - size of the array, 8 bytes
         10$:
-            MOVB (R0)+,@$CCH2OD # Send a byte to the channel 2
+            MOVB (R0)+, @$CCH2OD # Send a byte to the channel 2
             20$:
                 TSTB @$CCH2OS   #
             BPL  20$            # Wait until the channel is ready
-        SOB  R1,10$             # Next byte
+        SOB  R1, 10$            # Next byte
 
         RETURN
 
 PrintTitleStr:
-        MOV  $TitleStr,R0
+        MOV  $TitleStr, R0
         10$:
-            MOVB (R0)+,R1
+            MOVB (R0)+, R1
             BZE  1237$
             20$:
                 TSTB @$TTYOST
@@ -138,15 +142,15 @@ PrintTitleStr:
         BR   10$
 1237$:  RETURN
 TitleStr: #---------------------------------------------------------------------
-       .asciz "ChibiAkumas"
+       .asciz "Loading Chibi Akuma(s)..."
        .even
 #-------------------------------------------------------------------------------
 PPEXEC: #-----------------------------------------------------------------------
-        MOV  $PPUModule_PS,@$ParamsAddr+4
+        MOV  $PPUModule_PS, @$ParamsAddr+4
         CALL Channel2Send                 # => Send request to PPU
                                           # PS.A1 contains address of allocated area
-        MOV  $FB1,@$PPUModule_PS.A2       # Arg 2 - addr of mem block in CPUs RAM
-        MOV  $PPU_ModuleSizeWords,@$PPUModule_PS.A3 # Arg 3 - size of mem block, words
+        MOV  $FB1, @$PPUModule_PS.A2      # Arg 2 - addr of mem block in CPUs RAM
+        MOV  $PPU_ModuleSizeWords, @$PPUModule_PS.A3 # Arg 3 - size of mem block, words
         MOVB $020, @$PPUModule_PS.Request # 020 - CPU to PPU memory copy
         CALL Channel2Send                 # => Send request to PPU
         MOVB $030, @$PPUModule_PS.Request # 030 - Execute programm
@@ -155,14 +159,14 @@ PPEXEC: #-----------------------------------------------------------------------
 
 ParamsAddr: .byte  0, 0, 0, 0xFF # init sequence (just in case)
             .word  ParamsStruct
-            .byte  0xFF, 0xFF    # two termination bytes 0xff, 0xff
+            .byte  0xFF, 0xFF    # two termination bytes 0xFF, 0xFF
 
 ParamsStruct:
     PS.Status:          .byte  -1   # operation status code
     PS.Command:         .byte  010  # read data from disk
     PS.DeviceType:      .byte  02        # double sided disk
     PS.DeviceNumber:    .byte  0x00 | 0  # bit 7: side(0-bottom, 1-top) ∨ drive number(0-3)
-    PS.AddressOnDevice: .byte  0,2       # track 0(0-79), sector 2(1-10)
+    PS.AddressOnDevice: .byte  0, 2       # track 0(0-79), sector 2(1-10)
     PS.CPU_RAM_Address: .word  FB1
     PS.WordsCount:      .word  PPU_ModuleSizeWords # number of words to transfer
 
