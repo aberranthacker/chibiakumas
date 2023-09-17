@@ -131,27 +131,27 @@
 
    # sprite 16 S16Wave1
     .word S16Wave1 # sprite offset
-    .word 0 # bit-mask offset
+    .word S16Wave1Mask # bit-mask offset
     .byte 7 # height of the sprite
     .byte 0 # Y offset
     .byte 6 # witdh
-    .byte SPR_TURBO # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 17 S17Wave2
     .word S17Wave2 # sprite offset
-    .word 0 # bit-mask offset
+    .word S17Wave2Mask # bit-mask offset
     .byte 7 # height of the sprite
     .byte 0 # Y offset
     .byte 6 # witdh
-    .byte SPR_TURBO # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 18 S18Wave3
     .word S18Wave3 # sprite offset
-    .word 0 # bit-mask offset
+    .word S18Wave3Mask # bit-mask offset
     .byte 8 # height of the sprite
     .byte 0 # Y offset
     .byte 6 # witdh
-    .byte SPR_TURBO # attributes
+    .byte SPR_HAS_MASK # attributes
 
    # sprite 19 S19Weed1
     .word S19Weed1 # sprite offset
@@ -253,85 +253,109 @@ S01Tentitack:
     .incbin "build/level_05/s01_tentitack.0.bin"
 S01TentitackMask:
     .incbin "build/level_05/s01_tentitack_mask.0.bin"
+    .even
 
 S02Superfish:
     .incbin "build/level_05/s02_superfish.0.bin"
 S02SuperfishMask:
     .incbin "build/level_05/s02_superfish_mask.0.bin"
+    .even
 
 S03Lilifrog:
     .incbin "build/level_05/s03_lilifrog.0.bin"
 S03LilifrogMask:
     .incbin "build/level_05/s03_lilifrog_mask.0.bin"
+    .even
 
 S04Spitfish:
     .incbin "build/level_05/s04_spitfish.0.bin"
 S04SpitfishMask:
     .incbin "build/level_05/s04_spitfish_mask.0.bin"
+    .even
 
 S05SpitfishBomber:
     .incbin "build/level_05/s05_spitfish_bomber.0.bin"
 S05SpitfishBomberMask:
     .incbin "build/level_05/s05_spitfish_bomber_mask.0.bin"
+    .even
 
 S06Pairanah:
     .incbin "build/level_05/s06_pairanah.0.bin"
 S06PairanahMask:
     .incbin "build/level_05/s06_pairanah_mask.0.bin"
+    .even
 
 S07Bubble24:
     .incbin "build/level_05/s07_bubble24.0.bin"
 S07Bubble24Mask:
     .incbin "build/level_05/s07_bubble24_mask.0.bin"
+    .even
 
 S08Bubble16:
     .incbin "build/level_05/s08_bubble16.0.bin"
 S08Bubble16Mask:
     .incbin "build/level_05/s08_bubble16_mask.0.bin"
+    .even
 
 S09Minerfish:
     .incbin "build/level_05/s09_minerfish.0.bin"
 S09MinerfishMask:
     .incbin "build/level_05/s09_minerfish_mask.0.bin"
+    .even
 
 S10Coin:
     .incbin "build/level_05/s10_coin.0.bin"
 S10CoinMask:
     .incbin "build/level_05/s10_coin_mask.0.bin"
+    .even
 
 S11FishfaceLeft:
     .incbin "build/level_05/s11_fishface_left.0.bin"
 S11FishfaceLeftMask:
     .incbin "build/level_05/s11_fishface_left_mask.0.bin"
+    .even
 
 S12FishboneLeft:
     .incbin "build/level_05/s12_fishbone_left.0.bin"
 S12FishboneLeftMask:
     .incbin "build/level_05/s12_fishbone_left_mask.0.bin"
+    .even
 
 S13PowerupPower:
     .incbin "build/level_05/s13_powerup_power.0.bin"
 S13PowerupPowerMask:
     .incbin "build/level_05/s13_powerup_power_mask.0.bin"
+    .even
 
 S14PowerupRate:
     .incbin "build/level_05/s14_powerup_rate.0.bin"
 S14PowerupRateMask:
     .incbin "build/level_05/s14_powerup_rate_mask.0.bin"
+    .even
 
 S15PowerupDrone:
     .incbin "build/level_05/s15_powerup_drone.0.bin"
 S15PowerupDroneMask:
     .incbin "build/level_05/s15_powerup_drone_mask.0.bin"
+    .even
 
 S16Wave1:
     .incbin "build/level_05/s16_wave1.0.bin"
+S16Wave1Mask:
+    .incbin "build/level_05/s16_wave1_mask.0.bin"
+    .even
 
 S17Wave2:
     .incbin "build/level_05/s17_wave2.0.bin"
+S17Wave2Mask:
+    .incbin "build/level_05/s17_wave2_mask.0.bin"
+    .even
 
 S18Wave3:
     .incbin "build/level_05/s18_wave3.0.bin"
+S18Wave3Mask:
+    .incbin "build/level_05/s18_wave3_mask.0.bin"
+    .even
 
 S19Weed1:
     .incbin "build/level_05/s19_weed1.0.bin"
@@ -349,11 +373,13 @@ S23FishfaceRight:
     .incbin "build/level_05/s23_fishface_right.0.bin"
 S23FishfaceRightMask:
     .incbin "build/level_05/s23_fishface_right_mask.0.bin"
+    .even
 
 S24FishboneRight:
     .incbin "build/level_05/s24_fishbone_right.0.bin"
 S24FishboneRightMask:
     .incbin "build/level_05/s24_fishbone_right_mask.0.bin"
+    .even
 
 S25Tuffet:
     .incbin "build/level_05/s25_tuffet.0.bin"
