@@ -5,13 +5,8 @@ compatible microcomputer [Elektronika MS 0511](https://en.wikipedia.org/wiki/UKN
 [-](https://guides.github.com/features/mastering-markdown/)
 
 ## TODO
-  * ~~Main menu~~
-  * ~~Connect the AY chip to UKNC~~
-  * Intro
-  * ~~[Port](https://github.com/aberranthacker/akg_player) the [AKG (generic)
-  player](http://www.julien-nevo.com/arkostracker/index.php/the-akg-generic-player/)~~
-  * ~~Connect the AY to UKNC
-  [right way](https://github.com/aberranthacker/aberrant_sound_module)~~
+    * port levels 5, 6, 7, 8 and 9
+    * port episode 2 of the game
 
 ## How to build the project
 Since default assembler for PDP-11 [MACRO-11](https://en.wikipedia.org/wiki/MACRO-11)
@@ -37,5 +32,5 @@ configure it to support PDP-11
    make install
 ```
 and thats it.
-Now you are all set to run the `make` command within `./uknc/` directory to build the project.
 
+Now you are all set to run the `make` command within `./uknc/` directory to build the project.

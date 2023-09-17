@@ -24,6 +24,7 @@ VirtualPosToScreenByte:
       # Y < 24 or Y >= 224 is not drawn
 
       # input:  R1 = Y, R2 = X
+      #
       # output: R2 = Y lines to skip
       #         R3 = Y lines to remove
       #         R4 = X bytes to skip, left
@@ -67,7 +68,7 @@ VirtualPosToScreenByte:
         ASL  R2 # ASR/ASL to align to word boundary (clear bit 0)
       # using MOVB because MSB contains frame buffer offset
       # show_sprite.s:265
-        MOVB R2,@$SprShow_ScrWord
+        MOVB R2,@$SprShow_DstWord
       #-------------------------------------------------------------------------
       # R1 Y
         CMP  R1,R0 # check Y, R0 = 24
@@ -90,7 +91,7 @@ VirtualPosToScreenByte:
 
     VirtualPos_4$:
         SUB  R0,R1 # R0 = 24
-        MOV  R1,@$SprShow_ScrLine
+        MOV  R1,@$SprShow_DstLine
 
         RETURN
 
@@ -98,7 +99,7 @@ VirtualPosToScreenByte:
       # (Y + height) > 224
         SUB  $224,R3
         SUB  R0,R1 # R0 = 24
-        MOV  R1,@$SprShow_ScrLine
+        MOV  R1,@$SprShow_DstLine
 
         RETURN
 #-------------------------------------------------------------------------------
@@ -125,13 +126,13 @@ SpriteSizeConfig184less12_Vectors:
        .word 184 -  8  #  4 bytes, 16px wide
        .word 184 - 12  #  6 bytes, 24px wide
        .word 184 - 16  #  8 bytes, 32px wide
-       .word 184 - 20  # 10 bytes, 40px wide
+       .word 184 - 20  # 10 bytes, 40px wide # Not actually used!
        .word 184 - 24  # 12 bytes, 48px wide
-       .word 184 - 28  # 14 bytes, 56px wide
-       .word 184 - 32  # 16 bytes, 64px wide
-       .word 184 - 36  # 18 bytes, 72px wide
-       .word 184 - 40  # 20 bytes, 80px wide
-       .word 184 - 44  # 22 bytes, 88px wide
+       .word 184 - 28  # 14 bytes, 56px wide # Not actually used!
+       .word 184 - 32  # 16 bytes, 64px wide # Not actually used!
+       .word 184 - 36  # 18 bytes, 72px wide # Not actually used!
+       .word 184 - 40  # 20 bytes, 80px wide # Not actually used!
+       .word 184 - 44  # 22 bytes, 88px wide # Not actually used!
        .word 184 - 48  # 24 bytes, 96px wide
 
 SpriteSizeConfigMinus184Plus12_Vectors:
@@ -139,11 +140,11 @@ SpriteSizeConfigMinus184Plus12_Vectors:
        .word -184 +  8 #  4 bytes, 16px wide
        .word -184 + 12 #  6 bytes, 24px wide
        .word -184 + 16 #  8 bytes, 32px wide
-       .word -184 + 20 # 10 bytes, 40px wide
+       .word -184 + 20 # 10 bytes, 40px wide # Not actually used!
        .word -184 + 24 # 12 bytes, 48px wide
-       .word -184 + 28 # 14 bytes, 56px wide
-       .word -184 + 32 # 16 bytes, 64px wide
-       .word -184 + 36 # 18 bytes, 72px wide
-       .word -184 + 40 # 20 bytes, 80px wide
-       .word -184 + 44 # 22 bytes, 88px wide
+       .word -184 + 28 # 14 bytes, 56px wide # Not actually used!
+       .word -184 + 32 # 16 bytes, 64px wide # Not actually used!
+       .word -184 + 36 # 18 bytes, 72px wide # Not actually used!
+       .word -184 + 40 # 20 bytes, 80px wide # Not actually used!
+       .word -184 + 44 # 22 bytes, 88px wide # Not actually used!
        .word -184 + 48 # 24 bytes, 96px wide

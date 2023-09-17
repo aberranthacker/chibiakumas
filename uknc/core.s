@@ -225,7 +225,8 @@ not_implemented_check_R0:
        .global ShowSpriteReconfigureEnableDisable
 
        .include "decoders/lzsa1.s"
-       .global unlzsa1
+      #.include "decoders/unlzsa3.s"
+       .global Unpack
 
        .include "core/background_solid_fill.s"
        .global Background_SolidFill
@@ -245,7 +246,6 @@ not_implemented_check_R0:
        .global GetSpriteMempos
 
        .even
-       .space 2
 end: FileEndCore:
 
 LevelStart:

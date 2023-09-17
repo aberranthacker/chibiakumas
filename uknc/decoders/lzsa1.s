@@ -37,6 +37,7 @@
 #      misrepresented as being the original software.
 #   3. This notice may not be removed or altered from any source distribution.
 
+Unpack:
 unlzsa1:
                 MOV  $0xFF00,R4
                 CLR  R3

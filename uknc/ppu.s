@@ -250,19 +250,17 @@ SLTABInit:
         MOV  $VblankIntHandler,@$0100
         MOV  $KeyboardIntHadler,@$KBINT
         MOV  $Channel0In_IntHandler,@$PCH0II
-      # read from the channel, just in case
-        TST  @$PCH0ID
 
         MOV  $Channel1In_IntHandler,@$PCH1II
-        BIS  $Ch1StateInInt,@$PCHSIS
-      # read from the channel, just in case
-        TST  @$PCH1ID
+        MOV  $PR7,@$PCH1II + 2
+
+        BIC  $Ch2StateInInt, @$PCHSIS # disable channel 2 on data in interrupt
 
        .equiv ScanRangeWords, 3
       # Aberrant Sound Module detection
         MOV  $PSG0+ScanRangeWords * 2,R1
         MOV  $PSG1,R2
-        MOV  $Trap4,@$4
+        MOV  $Trap4, @$4
       # Aberrant Sound Module uses addresses range 0177360-0177377
       # 16 addresses in total
         MOV  $ScanRangeWords,R0
@@ -274,7 +272,7 @@ SLTABInit:
         TST  @$Trap4Detected
         BZE  AberrantSoundModulePresent
 
-        MOV  $DummyPSG,R1
+        MOV  $DUMMY_PSG,R1
         MOV  R1,R2
 
 AberrantSoundModulePresent:
@@ -290,35 +288,37 @@ AberrantSoundModulePresent:
         MOV  $CommandsQueue_CurrentPosition,R4
         MTPS $PR0
 #-------------------------------------------------------------------------------
-Queue_Loop:
-        MOV  (R4),R5
-        CMP  R5,$CommandsQueue_Bottom
-        BEQ  Queue_Loop
+WaitForCommandLoop:
+        BIT  $Ch2InReady, @$PCHSIS
+        BZE  CheckQueue
+        MOV  @$PCH2ID, R1
+        CALL @Channel0.CommandVectors(R1)
+        BR   WaitForCommandLoop
+    CheckQueue:
+        MOV  @$CommandsQueue_CurrentPosition, R5
+        CMP  R5, $CommandsQueue_Bottom
+        BEQ  WaitForCommandLoop
 
-        #MTPS $PR7
-        MOV  (R5)+,R1
-        MOV  (R5)+,R0
-        MOV  R5,(R4)
-        #MTPS $PR0
+        MOV  (R5)+, R1
+        MOV  (R5)+, R0
+        MOV  R5, @$CommandsQueue_CurrentPosition
     .ifdef DebugMode
         CMP  R1,$PPU_LastJMPTableIndex
         BHI  .
     .endif
-        CALL @CommandVectors(R1)
-        MOV  $CommandsQueue_CurrentPosition,R4
-        BR   Queue_Loop
+        CALL @Channel0.CommandVectors(R1)
+        BR   WaitForCommandLoop
 #-------------------------------------------------------------------------------
-CommandVectors:
+Channel0.CommandVectors:
        .word LoadDiskFile
        .word SetPalette            # PPU_SetPalette
        .word Print                 # PPU_Print
        .word PrintAt               # PPU_PrintAt
        .word ShowBossText.Init     # PPU_ShowBossText.Start
        .word ShowBossText          # PPU_ShowBossText.Init
-       .word MusicRestart          # PPU_MusicRestart
-       .word MusicStop             # PPU_MusicStop
        .word Debug_Print           # PPU_Debug_Print
        .word Debug_PrintAt         # PPU_Debug_PrintAt
+       .word MusicStop             # PPU_MusicStop
        .word TitleMusicRestart
        .word IntroMusicRestart
        .word LevelMusicRestart
@@ -334,6 +334,7 @@ CommandVectors:
        .word LevelStart
        .word LevelEnd
        .word Player_DrawUI         # PPU_DrawPlayerUI
+       .word RestoreVblankInt
 #-------------------------------------------------------------------------------
 SetPalette: #----------------------------------------------------------------{{{
         PUSH @$PASWCR
@@ -563,7 +564,7 @@ DonePrinting:
         RETURN
 
 #----------------------------------------------------------------------------}}}
-ShowBossText.Init: #----------------------------------------------------------{{{
+ShowBossText.Init: #---------------------------------------------------------{{{
         MOV  $StrBuffer,R3
         MOV  $PBP12D,R4
         MOV  $PBPADR,R5
@@ -769,37 +770,36 @@ Debug_DonePrinting:
         RETURN
 #----------------------------------------------------------------------------}}}
 TitleMusicRestart: #---------------------------------------------------------{{{
-        MOV  $TitleMusic,-(SP)
+        MOV  $TitleMusic, -(SP)
         BR   MusicRestart
 #----------------------------------------------------------------------------}}}
 IntroMusicRestart: #---------------------------------------------------------{{{
-        MOV  $IntroMusic,-(SP)
+        MOV  $IntroMusic, -(SP)
         BR   MusicRestart
 #----------------------------------------------------------------------------}}}
 LevelMusicRestart: #---------------------------------------------------------{{{
-        MOV  $LevelMusic,-(SP)
+        MOV  $LevelMusic, -(SP)
         BR   MusicRestart
 #----------------------------------------------------------------------------}}}
 BossMusicRestart: #----------------------------------------------------------{{{
-        MOV  $BossMusic,-(SP)
+        MOV  $BossMusic, -(SP)
         BR   MusicRestart
 #----------------------------------------------------------------------------}}}
 MusicRestart: #--------------------------------------------------------------{{{
       # don't call PLY_AKG_Play on VblankInt
-        MOV  $0000401,@$MusicPlayerCall # BR .+4
+        MOV  $NULL, @$MusicPlayerAddr
         CALL PLY_AKG_Stop
 
         CLR  R0 # Subsong0
-        MOV  (SP)+,R5
+        MOV  (SP)+, R5
         CALL PLY_AKG_Init
       # call PLY_Play on VblankInt
-        MOV  $0004737,@$MusicPlayerCall # CALL @(PC)+
+        MOV  $PLY_AKG_Play, @$MusicPlayerAddr
 
         RETURN
 #----------------------------------------------------------------------------}}}
 MusicStop: #-----------------------------------------------------------------{{{
-      # don't call PLY_Play on VblankInt
-        MOV  $0000401,@$MusicPlayerCall # BR .+4
+        MOV  $NULL, @$MusicPlayerAddr
         CALL PLY_AKG_Stop
         CALL PLY_SE_Stop
 
@@ -902,8 +902,6 @@ PrintDebugInfo: #------------------------------------------------------------{{{
 LevelTimeStr:   .ascii "12345"
 LevelTimeStrEnd:
        .even
-
-
 #----------------------------------------------------------------------------}}}
 StartANewGame: #-------------------------------------------------------------{{{
         MOV  $PPU_Player_ScoreBytes,R3
@@ -983,7 +981,6 @@ Player_UpdateScore:
         CLR  R2
         INC  R2                        # inc c ; We've rolled into another digit.
 Player_AddScore_NextDigit:
-
                                        # xor a
         TSTB R2                        # cp c
         BZE  Player_DrawScore          # ret z ; check if C is zero
@@ -1155,9 +1152,9 @@ RestoreVblankInt:
        .include "music/ep1_intro_music_playerconfig.s"
        .include "music/ep1_level_music_playerconfig.s"
        .include "music/ep1_boss_music_playerconfig.s"
-       .include "../../akg_player/akg_player.s"
+       .include "akg_player.s"
        .include "music/ep1_sfx_playerconfig.s"
-       .include "../../akg_player/player_sound_effects.s"
+       .include "player_sound_effects.s"
 
 TitleMusic: .include "build/ep1_title_music.formatted.s"
 IntroMusic: .include "build/ep1_intro_music.formatted.s"
@@ -1165,10 +1162,10 @@ LevelMusic: .include "build/ep1_level_music.formatted.s"
 BossMusic:  .include "build/ep1_boss_music.formatted.s"
 SoundEffects: .include "music/ep1_sfx.s"
 
-      .equiv Font, FontBitmap - (32 * 8)
+       .equiv Font, FontBitmap - (32 * 8)
 FontBitmap:
-      .space 8 # whitespace symbol
-      .incbin "resources/font.raw"
+       .space 8 # whitespace symbol
+       .incbin "resources/font.raw"
 
 CGAFontBitmap: .incbin "resources/cga8x8b.raw"
 HitpointIcon:  .incbin "build/hitpoint_icon.bin"
@@ -1181,8 +1178,6 @@ CharLinesTable:
 
 PPU_Player_ScoreBytes: .space 8
 PPU_Player_ScoreBytesEnd:
-
-DummyPSG: .word 0
 
 CommandsQueue_Top:
        .space 2*2*16

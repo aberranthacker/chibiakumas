@@ -44,19 +44,19 @@ start:
 
 .ifdef ShowLoadingScreen
        .ppudo_ensure $PPU_TitleMusicRestart
-       .ppudo_ensure $PPU_PrintAt,$PressFireKeyStr
+       .ppudo_enqueue_ensure $PPU_PrintAt, $PressFireKeyStr
 ShowTitlePic_Loop: #---------------------------------------------------------{{{
-       .ppudo_ensure $PPU_SetPalette, $FireKeyDarkPalette
+       .ppudo_enqueue_ensure $PPU_SetPalette, $FireKeyDarkPalette
         CALL glow_delay_and_wait_key$
-       .ppudo_ensure $PPU_SetPalette, $FireKeyNormalPalette
+       .ppudo_enqueue $PPU_SetPalette, $FireKeyNormalPalette
         CALL glow_delay_and_wait_key$
-       .ppudo_ensure $PPU_SetPalette, $FireKeyBrightPalette
+       .ppudo_enqueue $PPU_SetPalette, $FireKeyBrightPalette
         CALL glow_delay_and_wait_key$
-       .ppudo_ensure $PPU_SetPalette, $FireKeyNormalPalette
+       .ppudo_enqueue $PPU_SetPalette, $FireKeyNormalPalette
         CALL glow_delay_and_wait_key$
-       .ppudo_ensure $PPU_SetPalette, $FireKeyDarkPalette
+       .ppudo_enqueue $PPU_SetPalette, $FireKeyDarkPalette
         CALL glow_delay_and_wait_key$
-       .ppudo_ensure $PPU_SetPalette, $FireKeyBlackPalette
+       .ppudo_enqueue $PPU_SetPalette, $FireKeyBlackPalette
         CALL glow_delay_and_wait_key$
 
         BR   ShowTitlePic_Loop
@@ -66,7 +66,7 @@ ShowTitlePic_Loop: #---------------------------------------------------------{{{
         100$:
             CALL TRandW
             WAIT
-            BITB $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
+            BITB $KEYMAP_ANY_FIRE, @$KeyboardScanner_P1
             BNZ  finalize_title_pic_loop$
         SOB  R1,100$
 
@@ -85,7 +85,7 @@ ShowTitlePic_Loop: #---------------------------------------------------------{{{
 
 Bootstrap.FromR5:
         TST  R5                    # R5 is used as the bootstrap command
-        BMI  Bootstrap.SystemEvent # negative means system events (Menu etc)
+        BMI  Bootstrap.SystemEvent # negative means system events (Menu and etc.)
         BR   Bootstrap.Level       # positive means levels
 
 Bootstrap.SystemEvent:
@@ -125,7 +125,7 @@ Bootstrap.Level:
        .word Bootstrap.Level_5
 
 Bootstrap.StartLevel:
-        MOV  $SP_RESET,SP # we are not returning, so reset the stack
+        MOV  $SP_RESET, SP # we are not returning, so reset the stack
         JMP  @$Akuyou_LevelStart
 
 Bootstrap.StartGame:
@@ -136,17 +136,18 @@ Bootstrap.Level_0:
 Bootstrap.LoadLevel_0: # ../Aku/BootStrap.asm:838  main menu --------------------
         MOV  $level_00.bin,R0
         CALL Bootstrap.DiskRead_Start
-            CALL StartANewGame
-            CALL LevelReset0000
         CALL Bootstrap.DiskIO_WaitForFinish
        .check_for_loading_error "level_00.bin"
+            CALL StartANewGame
+            CALL LevelReset0000
         RETURN
 #----------------------------------------------------------------------------
 Bootstrap.Level_Intro:
+        CALL LevelReset0000
+       .ppudo_enqueue_ensure $PPU_SetPalette, $BlackPalette
+
         MOV  $ep1_intro.bin,R0
         CALL Bootstrap.DiskRead_Start
-           .ppudo_ensure $PPU_SetPalette, $BlackPalette
-            CALL LevelReset0000
         CALL Bootstrap.DiskIO_WaitForFinish
        .check_for_loading_error "ep1_intro.bin"
 
@@ -160,16 +161,17 @@ Bootstrap.Level_Intro:
 Bootstrap.Level_1: # --------------------------------------------------------
         MOV  $level_01.bin,R0
         CALL Bootstrap.DiskRead_Start
+        CALL Bootstrap.DiskIO_WaitForFinish
             CALL StartANewGame
             CALL LevelReset0000
-            MOVB $3,@$Player_Array + 9 # set number of lives for the first player
-        CALL Bootstrap.DiskIO_WaitForFinish
+            MOVB $3, @$Player_Array + 9 # set number of lives for the first player
        .check_for_loading_error "level_01.bin"
 
+    .if StartOnLevel != Level1
         CALL Bootstrap.WaitForFireKey
+    .endif
 
-       .ppudo_ensure $PPU_SetPalette, $BlackPalette
-        WAIT
+       .ppudo_enqueue_ensure $PPU_SetPalette, $BlackPalette
        .ppudo_ensure $PPU_LevelStart
 
         JMP  @$Bootstrap.StartLevel
@@ -178,7 +180,7 @@ Bootstrap.Level_2: # --------------------------------------------------------
         MOV  $level_02.bin,R0
         CALL Bootstrap.DiskRead_Start
            .ppudo_ensure $PPU_LevelStart
-           .ppudo_ensure $PPU_SetPalette, $BlackPalette
+           .ppudo_enqueue_ensure $PPU_SetPalette, $BlackPalette
             CALL LevelReset0000
         CALL Bootstrap.DiskIO_WaitForFinish
        .check_for_loading_error "level_02.bin"
@@ -196,11 +198,11 @@ Bootstrap.Level_3: # --------------------------------------------------------
 
         MOV  $level_03_title.bin.lzsa1,R1
         MOV  $FB1+8000,R2
-        CALL @$unlzsa1
+        CALL @$Unpack
 
-       .ppudo_ensure $PPU_SetPalette,$Level03_TitlePalette
+       .ppudo_enqueue_ensure $PPU_SetPalette, $Level03_TitlePalette
         CALL Bootstrap.DisplayUnpackedTitleImage
-       .ppudo_ensure $PPU_PrintAt,$Level03_TitleText
+       .ppudo_enqueue_ensure $PPU_PrintAt, $Level03_TitleText
 
         MOV  $level_03.bin,R0
         CALL Bootstrap.DiskRead_Start
@@ -210,8 +212,7 @@ Bootstrap.Level_3: # --------------------------------------------------------
 
         CALL Bootstrap.WaitForFireKey
 
-       .ppudo_ensure $PPU_SetPalette, $BlackPalette
-        WAIT
+       .ppudo_enqueue_ensure $PPU_SetPalette, $BlackPalette
        .ppudo_ensure $PPU_LevelStart
 
         JMP  @$Bootstrap.StartLevel
@@ -220,7 +221,7 @@ Bootstrap.Level_4: # --------------------------------------------------------
         MOV  $level_04.bin,R0
         CALL Bootstrap.DiskRead_Start
            .ppudo_ensure $PPU_LevelStart
-           .ppudo_ensure $PPU_SetPalette, $BlackPalette
+           .ppudo_enqueue_ensure $PPU_SetPalette, $BlackPalette
             CALL LevelReset0000
         CALL Bootstrap.DiskIO_WaitForFinish
        .check_for_loading_error "level_04.bin"
@@ -238,11 +239,11 @@ Bootstrap.Level_5: # --------------------------------------------------------
 
       # MOV  $level_05_title.bin.lzsa1,R1
       # MOV  $FB1+8000,R2
-      # CALL @$unlzsa1
+      # CALL @$Unpack
 
-      #.ppudo_ensure $PPU_SetPalette,$Level05_TitlePalette
+      #.ppudo_enqueue_ensure $PPU_SetPalette, $Level05_TitlePalette
       # CALL Bootstrap.DisplayUnpackedTitleImage
-      #.ppudo_ensure $PPU_PrintAt,$Level05_TitleText
+      #.ppudo_enqueue_ensure $PPU_PrintAt, $Level05_TitleText
 
         MOV  $level_05.bin,R0
         CALL Bootstrap.DiskRead_Start
@@ -252,13 +253,12 @@ Bootstrap.Level_5: # --------------------------------------------------------
 
         WAIT
        #CALL Bootstrap.WaitForFireKey
-      #.ppudo_ensure $PPU_SetPalette, $BlackPalette
+      #.ppudo_enqueue_ensure $PPU_SetPalette, $BlackPalette
         WAIT
        .ppudo_ensure $PPU_LevelStart
 
         JMP  @$Bootstrap.StartLevel
 #----------------------------------------------------------------------------
-
 Bootstrap.DisplayUnpackedTitleImage:
         MOV  $FB1+8000,R1
         MOV  $FB1+(12*2),R2
@@ -286,7 +286,7 @@ Bootstrap.Continue_SpendCredit:
 
 Bootstrap.Continue: # ../Aku/BootStrap.asm:1324
        .ppudo_ensure $PPU_LevelEnd
-       .ppudo_ensure $PPU_SetPalette,$ContinuePalette
+       .ppudo_enqueue_ensure $PPU_SetPalette, $ContinuePalette
         MOV  $Player_Array,R4
         TSTB 5(R4)
         BZE  Bootstrap.GameOver
@@ -294,11 +294,12 @@ Bootstrap.Continue: # ../Aku/BootStrap.asm:1324
         PUSH R4
         MOV  $continue.bin.lzsa1,R1
         MOV  $FB1 + 36*80,R2
-        CALL unlzsa1
+        CALL Unpack
         POP  R4
 
         MOV  $75,R0
-        1$: WAIT
+        1$:
+            WAIT
         SOB  R0, 1$
 
         CLR  R1
@@ -307,7 +308,7 @@ Bootstrap.Continue: # ../Aku/BootStrap.asm:1324
         MOV  $ContinueStr+23,R2
         MOV  $2,R3 # number of digits
         CALL NumberToDecStr
-       .ppudo_ensure $PPU_PrintAt,$ContinueStr
+       .ppudo_enqueue_ensure $PPU_PrintAt, $ContinueStr
 
         MOV  $9,R0
         BIC  $KEYMAP_ANY_FIRE,@$KeyboardScanner_P1
@@ -318,7 +319,7 @@ Bootstrap.Continue: # ../Aku/BootStrap.asm:1324
             MOV  $8*80,R1 # 8 lines, 80 bytes per line
             MOV  $FB1+20*8*80,R3
             CALL ClearR1Words
-           .ppudo_ensure $PPU_PrintAt,$ContinueCountdownStr
+           .ppudo_enqueue_ensure $PPU_PrintAt, $ContinueCountdownStr
 
             MOV  $50,R1
             Continue_WaitASecondLoop:
@@ -331,19 +332,19 @@ Bootstrap.Continue: # ../Aku/BootStrap.asm:1324
 
 Bootstrap.GameOver:
        .ppudo_ensure $PPU_MusicStop
-       .ppudo_ensure $PPU_SetPalette,$BlackPalette
+       .ppudo_enqueue_ensure $PPU_SetPalette, $BlackPalette
         CALL CLS
-       .ppudo_ensure $PPU_PrintAt,$GameOver_Text
-       .ppudo_ensure $PPU_SetPalette,$GameOverPalette
+       .ppudo_enqueue_ensure $PPU_PrintAt, $GameOver_Text
+       .ppudo_enqueue_ensure $PPU_SetPalette, $GameOverPalette
 
         MOV  $game_over.bin.lzsa1,R1
         MOV  $FB1 + 20*80,R2
-        CALL unlzsa1
+        CALL Unpack
 
         CALL Bootstrap.WaitForFireKey_NoMessage
 
 Bootstrap.Review:
-       .ppudo_ensure $PPU_SetPalette,$BlackPalette
+       .ppudo_enqueue_ensure $PPU_SetPalette, $BlackPalette
         CALL CLS
 
         MOV  $8,R1
@@ -393,19 +394,18 @@ Bootstrap.Review_NewScore:
         CALL Bootstrap.DiskIO_WaitForFinish
 
 Bootstrap.Review_ShowScore:
-       .wait_ppu
         CALL @$TRandW
         BIC  $0xFFF9,R0
        .equiv MehOrNewScore, .+2
         MOV  ChibikoReviewsNewScore(R0),@$PPUCommandArg
-       .ppudo $PPU_PrintAt
-       .ppudo_ensure $PPU_PrintAt,$ChibikoReview
+       .ppudo_enqueue_ensure $PPU_PrintAt
+       .ppudo_enqueue_ensure $PPU_PrintAt, $ChibikoReview
 
         MOV  $high_score.bin.lzsa1,R1
         MOV  $LevelStart,R2
-        CALL unlzsa1
+        CALL Unpack
 
-       .ppudo_ensure $PPU_PrintAt,$RankText
+       .ppudo_enqueue_ensure $PPU_PrintAt, $RankText
 
         MOV  $LevelStart,R4
         MOV  $FB1+80*136,R5
@@ -419,11 +419,11 @@ Bootstrap.Review_ShowScore:
             ADD  $64,R5
         SOB  R1,LinesLoop
 
-       .ppudo_ensure $PPU_SetPalette,$ReviewPalette
+       .ppudo_enqueue_ensure $PPU_SetPalette, $ReviewPalette
 
-       .ppudo_ensure $PPU_PrintAt,$PlayerScoreText
-       .ppudo_ensure $PPU_PrintAt,$HighScoreText
-       .ppudo_ensure $PPU_PrintAt,$RankF
+       .ppudo_enqueue_ensure $PPU_PrintAt, $PlayerScoreText
+       .ppudo_enqueue_ensure $PPU_PrintAt, $HighScoreText
+       .ppudo_enqueue_ensure $PPU_PrintAt, $RankF
 
         CALL Bootstrap.WaitForFireKey_NoMessage
 
@@ -774,20 +774,20 @@ Bootstrap.WaitForFireKey_NoMessage:
 #-------------------------------------------------------------------------------
 
 Bootstrap.WaitForFireKey: # Bootstrap.WFK -----------------------------------{{{
-       .ppudo $PPU_DebugPrintAt,$HitAFireKeyStr
+       .ppudo_enqueue $PPU_DebugPrintAt, $HitAFireKeyStr
         Bootstrap.WFK_Loop:
             CALL Bootstrap.WFK_DelayLoop
-           .ppudo $PPU_SetPalette,$P3
+           .ppudo_enqueue $PPU_SetPalette, $P3
             CALL Bootstrap.WFK_DelayLoop
-           .ppudo $PPU_SetPalette,$P4
+           .ppudo_enqueue $PPU_SetPalette, $P4
             CALL Bootstrap.WFK_DelayLoop
-           .ppudo $PPU_SetPalette,$P3
+           .ppudo_enqueue $PPU_SetPalette, $P3
             CALL Bootstrap.WFK_DelayLoop
-           .ppudo $PPU_SetPalette,$P2
+           .ppudo_enqueue $PPU_SetPalette, $P2
             CALL Bootstrap.WFK_DelayLoop
-           .ppudo $PPU_SetPalette,$P1
+           .ppudo_enqueue $PPU_SetPalette, $P1
             CALL Bootstrap.WFK_DelayLoop
-           .ppudo $PPU_SetPalette,$P2
+           .ppudo_enqueue $PPU_SetPalette, $P2
         BR   Bootstrap.WFK_Loop
 
 Bootstrap.WFK_DelayLoop:
@@ -834,7 +834,7 @@ ClearR1Words:
       # we have to deal with odd number of iterations before entering the cycle
         INC  R1
         ASR  R1
-        BCC  2$ # number of iterations is odd, skipping first command
+        BCC  2$ # number of iterations is odd, skip first command
         100$:
             CLR  (R3)+
         2$:
@@ -871,7 +871,7 @@ Bootstrap.DiskIO_Start:
 
         MOVB $-1,@$PS.Status
 
-       .ppudo_ensure $PPU_LoadDiskFile,$ParamsStruct
+       .ppudo_enqueue_ensure $PPU_LoadDiskFile, $ParamsStruct
         RETURN
 # Bootstrap.DiskRead_Start #------------------------------------------------
 ParamsStruct:
@@ -927,7 +927,7 @@ ep1_intro.bin:
     .word 0
     .word 0
 ep1_intro_slides.bin:
-    .word Ep1IntroSlidesStart
+    .word FB1 # it will be copied to Ep1IntroSlidesStart by ep1_intro.s
     .word 0
     .word 0
 level_00.bin:

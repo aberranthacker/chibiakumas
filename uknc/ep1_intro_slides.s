@@ -10,11 +10,13 @@
                .global slide15
                .global Ep1IntroSlidesSize
                .global Ep1IntroSlidesSizeWords
+               .global  Ep1IntroSlidesSizeDWords
 
                .include "./core_defs.s"
 
                .equiv  Ep1IntroSlidesSize, (end - start)
                .equiv  Ep1IntroSlidesSizeWords, Ep1IntroSlidesSize >> 1
+               .equiv  Ep1IntroSlidesSizeDWords, Ep1IntroSlidesSize >> 2
 
                .=Ep1IntroSlidesStart
 

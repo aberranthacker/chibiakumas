@@ -1,10 +1,10 @@
 #-------------------------------------------------------------------------------
-# Note that the PRESENCE of those variables is tested, NOT their values. -------
-#.equiv DebugMode, 1
+#---- Note that the PRESENCE of those variables is tested, NOT their values ----
+ .equiv DebugMode, 1
 #.equiv DebugSprite, 1
 #.equiv ExtMemCore, 1
 #.equiv TwoPlayersGame, 1
-#.equiv PlayerInvincible, 1
+ .equiv PlayerInvincible, 1
 #-------------------------------------------------------------------------------
 .equiv MainMenu, 0x8000
 .equiv Episode1_Intro, 0x0000
@@ -14,13 +14,13 @@
 .equiv Level4, 0x0004
 .equiv Level5, 0x0005
 
-#.equiv StartOnLevel, MainMenu
+ .equiv StartOnLevel, MainMenu
 #.equiv StartOnLevel, Episode1_Intro
 #.equiv StartOnLevel, Level1
 #.equiv StartOnLevel, Level2
 #.equiv StartOnLevel, Level3
 #.equiv StartOnLevel, Level4
- .equiv StartOnLevel, Level5
+#.equiv StartOnLevel, Level5
 
 .if StartOnLevel == MainMenu
   .equiv ShowLoadingScreen, 1
@@ -28,33 +28,34 @@
 
 .equiv CPU_PPUCommandArg, PPUCommandArg >> 1
 
-.equiv PPU_LoadDiskFile,       0
-.equiv PPU_SetPalette,         2
-.equiv PPU_Print,              4
-.equiv PPU_PrintAt,            6
-.equiv PPU_ShowBossText.Init,  8
-.equiv PPU_ShowBossText,      10
-.equiv PPU_MusicRestart,      12
-.equiv PPU_MusicStop,         14
-.equiv PPU_DebugPrint,        16
-.equiv PPU_DebugPrintAt,      18
-.equiv PPU_TitleMusicRestart, 20
-.equiv PPU_IntroMusicRestart, 22
-.equiv PPU_LevelMusicRestart, 24
-.equiv PPU_BossMusicRestart,  26
-.equiv PPU_PlaySoundEffect1,  28
-.equiv PPU_PlaySoundEffect2,  30
-.equiv PPU_PlaySoundEffect3,  32
-.equiv PPU_PlaySoundEffect4,  34
-.equiv PPU_PlaySoundEffect5,  36
-.equiv PPU_PlaySoundEffect6,  38
-.equiv PPU_PlaySoundEffect7,  40
-.equiv PPU_StartANewGame,     42
-.equiv PPU_LevelStart,        44
-.equiv PPU_LevelEnd,          46
-.equiv PPU_DrawPlayerUI,      48
+# queued commands
+.equiv PPU_LoadDiskFile,       0 * 2 # requires argument
+.equiv PPU_SetPalette,         1 * 2 # requires argument
+.equiv PPU_Print,              2 * 2 # requires argument
+.equiv PPU_PrintAt,            3 * 2 # requires argument
+.equiv PPU_ShowBossText.Init,  4 * 2 # requires argument
+.equiv PPU_ShowBossText,       5 * 2
+.equiv PPU_DebugPrint,         6 * 2 # requires argument
+.equiv PPU_DebugPrintAt,       7 * 2 # requires argument
+.equiv PPU_MusicStop,          8 * 2
+.equiv PPU_TitleMusicRestart,  9 * 2
+.equiv PPU_IntroMusicRestart, 10 * 2
+.equiv PPU_LevelMusicRestart, 11 * 2
+.equiv PPU_BossMusicRestart,  12 * 2
+.equiv PPU_PlaySoundEffect1,  13 * 2
+.equiv PPU_PlaySoundEffect2,  14 * 2
+.equiv PPU_PlaySoundEffect3,  15 * 2
+.equiv PPU_PlaySoundEffect4,  16 * 2
+.equiv PPU_PlaySoundEffect5,  17 * 2
+.equiv PPU_PlaySoundEffect6,  18 * 2
+.equiv PPU_PlaySoundEffect7,  19 * 2
+.equiv PPU_StartANewGame,     20 * 2
+.equiv PPU_LevelStart,        21 * 2
+.equiv PPU_LevelEnd,          22 * 2
+.equiv PPU_DrawPlayerUI,      23 * 2
+.equiv PPU_RestoreVblankInt,  24 * 2
 
-.equiv PPU_LastJMPTableIndex, 48
+.equiv PPU_LastJMPTableIndex, 24 * 2
 
 .equiv PPU_SET_FB0_VISIBLE, 0
 .equiv PPU_SET_FB1_VISIBLE, 1
@@ -86,12 +87,12 @@
 #-------------------------------------------------------------------------------
 # CPU memory map ---------------------------------------------------------------
 # 040 dummy interrupt handler, see bootsector
-.equiv KeyboardScanner_P1, 042 # 34 0x22
-.equiv CPU_KeyboardScanner_P1, KeyboardScanner_P1 >> 1 # 34 0x22
-.equiv KeyboardScanner_P2, 044 # 36 0x24
-.equiv CPU_KeyboardScanner_P2, KeyboardScanner_P2 >> 1 # 34 0x22
-.equiv PPUCommandArg, 046 # 38 0x26 command for PPU argument
-# 050, 052, 054, 056 four words are available
+.equiv KeyboardScanner_P1, 050 # 40
+.equiv CPU_KeyboardScanner_P1, KeyboardScanner_P1 >> 1
+.equiv KeyboardScanner_P2, 052 # 42
+.equiv CPU_KeyboardScanner_P2, KeyboardScanner_P2 >> 1
+.equiv PPUCommandArg, 054 # 44 command for PPU argument
+# 056 available word are available
 # 070, 072, 074, 076 another four available words
 .equiv SavedSettingsStart, 0104 # 68
 
@@ -106,9 +107,8 @@
 .equiv PlayerStarArrayPointer, FB_GAP # it fits nicely into the gap
 .equiv FB1, FB_GAP + 384
 
-# update bootstrap starting address in build_tools/update_bootstrap_disk_map.rb
-# after you change it here
-.equiv BootstrapStart, 01000 
+# WARNING: update BOOTSTRAP_START in Makefile if you change the value below
+.equiv BootstrapStart, 01000 # next address after bootsector
 .equiv Ep1IntroSlidesStart, FB0 + 4096
 
 .equiv GameVarsStart, FB1 + 16000
@@ -119,7 +119,7 @@
 
     .ifndef ExtMemCore
 .equiv CoreStart, GameVarsEnd
-.equiv Akuyou_LevelStart, 0x9E3A # 40506 0117072 # auto-generated during a build
+.equiv Akuyou_LevelStart, 0x9D7E # 40318 0116576 # auto-generated during a build
     .else
 .equiv CoreStart, 0160000
 .equiv Akuyou_LevelStart, GameVarsEnd
@@ -143,8 +143,8 @@
 .equiv OffscreenAreaAddr, 0160000 # 49152 0xC000 # banks 0, 1 and 2
 #-end of VRAM memory map--------------------------------------------------------
 #-------------------------------------------------------------------------------
-# player_driver uses ROLB to check which keys were pressed
-# so if you change keymap here, modify player_driver code as well
+# Player_driver uses ROLB to check which keys were pressed.
+# So if you change keymap here, modify player_driver code as well.
 .equiv KEYMAP_PAUSE, 0x80
 .equiv KEYMAP_F2,    0x40
 .equiv KEYMAP_F1,    0x20
@@ -248,5 +248,6 @@
 .equiv INC_R0_OPCODE, 0005200
 .equiv DECB_R3_OPCODE, 0105303
 .equiv MOVB_R3_R3_OPCODE, 0110303
+
 # Show Boss Text persistance counter initial value
 .equiv SBT_PersistanceCounterReset, 10

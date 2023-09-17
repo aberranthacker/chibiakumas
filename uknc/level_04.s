@@ -656,10 +656,10 @@ RealPalette: #---------------------------------------------------------------{{{
 #----------------------------------------------------------------------------}}}
 
 ShowBossText.Init:
-       .ppudo_ensure $PPU_ShowBossText.Init,$BossText
+       .ppudo_enqueue_ensure $PPU_ShowBossText.Init, $BossText
         RETURN
 ShowBossText.Init2:
-       .ppudo_ensure $PPU_ShowBossText.Init,$BossText2
+       .ppudo_enqueue_ensure $PPU_ShowBossText.Init, $BossText2
         RETURN
 ShowBossText.RemoveWait:
         MOV  $NOP_OPCODE,@$ShowBossText.WaitOpcode
