@@ -1,4 +1,4 @@
-               .list
+               .nolist
 
                .include "./hwdefs.s"
                .include "./macros.s"
@@ -211,7 +211,7 @@ EventStreamArray:
 # End of fade in block ---------------------------------------------------------
 
     #----------
-    .word 3, evtChangeStreamTime, 74, EventStreamArray_DebugPoint
+    .word 3, evtChangeStreamTime, 184, EventStreamArray_DebugPoint
     #----------
 
    # Spitfish
@@ -277,7 +277,6 @@ EventStreamArray:
     .word     evtSingleSprite, sprTwoFrame | POWERUP_RATE, (24+160)<<X | (24+ 10)<<Y
     .word     evtSingleSprite, sprTwoFrame | POWERUP_RATE, (24+160)<<X | (24+ 90)<<Y
     .word     evtSingleSprite, sprTwoFrame | POWERUP_RATE, (24+160)<<X | (24+170)<<Y
-EventStreamArray_DebugPoint:
    # Super Fish
     .word 75, evtMultipleCommands | 3
     .word     evtLoadObjSettings | 9
@@ -380,6 +379,7 @@ EventStreamArray_DebugPoint:
     .word      evtLoadObjSettings | 7
     .word      evtSetMove, mveCustom2 | 0b0100
     .word      evtSingleSprite, sprTwoFrame | BUBBLE24, (24+135)<<X | (24+200)<<Y
+EventStreamArray_DebugPoint:
    # Bubble 16
     .word 185, evtMultipleCommands | 3
     .word      evtLoadObjSettings | 8
@@ -406,7 +406,7 @@ UnderwaterPart:
   # .word 191 set palette
     .word 191, evtCallAddress, setPaletteSink, PlusSink5
     .word 192, evtCallAddress, setPaletteUnderwater
-  # .word 192 set palette
+  # .word 192, evtSetPalette, 
     .word 193, evtCallAddress, CallBounce, SetUnderwater
     .word 193, evtCallAddress, CallBounce, Blackout2
 
@@ -655,6 +655,7 @@ LevelInit:
         CALL EventStream_Init
         MTPS $PR0
 LevelLoop:
+       .equiv jmpBackground_Draw, .+2
         CALL @$Background_Draw
 
         CALL @$EventStream_Process
@@ -759,6 +760,13 @@ Background_DrawB:
         CALL @$BitShifterDouble #
 
         RETURN
+
+Background_Draw_UnderWater:
+        CALL Background_Draw
+        RETURN
+
+       .include "background_blackout.s"
+
 # Background Data ----------------------------------------------#
    .equiv GradientTopStart, 48 # lines count                    #
 GradientTop:                                                    #
@@ -992,7 +1000,6 @@ CustomMovePatternKill:                 # CustomMovePatternKill:
       # R3 LSB iyl = Program code, MSB = 0, ixl = Life
       # check ObjectProgram.CustomPrograms
 CustomProgram1:
-#:bpt
         MOV  @$Timer.CurrentTick,R3    #     call Akuyou_Timer_GetTimer
                                        #     ld a,i  ; Level time
         BIC  $0xFFFC,R3                #     and %00000011
@@ -1028,23 +1035,28 @@ CustomProgram2_Fire2:                  # CustomProgram2_Fire2:
         MOV  $23,R3                    #     ld iyl,a
         JMP  @$ObjectProgram.HyperFire #     jp Akuyou_FireStar
 
-
-Blackout1:
-Blackout2:
-Blackout3:
-Blackout4:
-Blackout5:
 PlusSink1:
 PlusSink2:
 PlusSink3:
 PlusSink4:
 PlusSink5:
 CallBounce:
+        CALL @(R5)+
+        RETURN
 setPaletteSink:
-BlackoutOn:
-BlackoutOff:
+        INC  R5
+        INC  R5
+        RETURN
 setPaletteUnderwater:
+        RETURN
+BlackoutOn:
+        MOV  $Background_DrawBlackout, @$jmpBackground_Draw
+        RETURN
+BlackoutOff:
+        MOV  $Background_Draw, @$jmpBackground_Draw
+        RETURN
 SetUnderwater:
+        MOV  $Background_Draw_UnderWater, @$jmpBackground_Draw
         RETURN
 
 BluePalette: #---------------------------------------------------------------{{{
@@ -1070,6 +1082,7 @@ RealPalette: #---------------------------------------------------------------{{{
     .byte  28, setColors, Black, Magenta,   brYellow, White
     .byte  66, setColors, Black, Red,       brGreen,  White
     .byte 120, setColors, Black, brBlue,    brCyan,   White
+    .byte 143, setColors, Blue,  brBlue,    brCyan,   White
     .word endOfScreen
 #----------------------------------------------------------------------------}}}
 end:
