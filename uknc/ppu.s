@@ -1139,11 +1139,15 @@ ClearIcon:
 .equiv SmartbombIconPosition, OffscreenAreaAddr + 40 * 29 + 38
 #----------------------------------------------------------------------------}}}
 LoadDiskFile:
-        MOV  $1,@$VblankInt_SkipMusic
-        MOV  R0,@$023200 # set ParamsStruct address for firmware proc to use
-        CALL @$0125030   # firmware proc that handles channel 2
-       #CALL @$0134454   # stop floppy drive spindle
-        CLR  @$VblankInt_SkipMusic
+        MOV  $DummyInterruptHandler, @$0100
+        MOV  R0, @$023200 # set ParamsStruct address for firmware proc to use
+        CALL @$0125030    # firmware proc that handles channel 2
+        RETURN
+
+NULL:   RETURN
+
+RestoreVblankInt:
+        MOV  $VblankIntHandler, @$0100
         RETURN
 
        .include "ppu/interrupts_handlers.s"
