@@ -485,6 +485,7 @@ SprDraw_WithMaskRenderer_Vectors:
 
 SprDraw_WithMaskRenderer_LineDoubler:
         MOV  $80-6,R1
+        MOV  R5,R3
         ASL  R2
         PUSH R2
         MOV  $opcSOBToEndOfWithMaskBICBChain +24+6,@$SprDraw_WithMaskRenderer_BICB_SOB #
