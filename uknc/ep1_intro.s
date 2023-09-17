@@ -1,4 +1,4 @@
-               .nolist
+               .list
 
                .include "./hwdefs.s"
                .include "./macros.s"
@@ -173,6 +173,14 @@ EndLevel:
         JMP  @$ExecuteBootstrap
 
 LevelInit:
+        MOV  $Ep1IntroSlidesSizeDWords,R1
+        MOV  $Ep1IntroSlidesStart,R2
+        MOV  $FB1,R3
+    100$:
+        MOV  (R3)+,(R2)+
+        MOV  (R3)+,(R2)+
+        SOB  R1, 100$
+
         CALL @$ScreenBuffer.Reset
        .ppudo_ensure $PPU_IntroMusicRestart
 
@@ -221,7 +229,7 @@ LevelLoop:
         ASL  R0
 
         MOV  SubtitlesTable(R0), @$PPUCommandArg
-       .ppudo_ensure $PPU_ShowBossText.Init
+       .ppudo_enqueue_ensure $PPU_ShowBossText.Init
 
         MOV  $1, @$CharsToPrint
         MOV  $ShowBossText, @$dstShowBossTextCommand
@@ -231,14 +239,14 @@ LevelLoop:
         TST  R0
         BZE  skip_palette_change$
         MOV  PalettesTable(R0), @$PPUCommandArg
-       .ppudo_ensure $PPU_SetPalette
+       .ppudo_enqueue_ensure $PPU_SetPalette
 
     skip_palette_change$:
        .equiv PicAddr, .+2
         MOV  $0x0000,R1
         BZE  1237$ # address is zero, no slide to display
         MOV  $FB0,R2
-        CALL @$unlzsa1
+        CALL @$Unpack
 
         MOV  $FB0,R1
         MOV  $FB1+(12*2),R2
@@ -252,7 +260,6 @@ LevelLoop:
 
 1237$:
         JMP  @$LevelLoop
-
 
     SubtitlesTable:
        .word SubtitlesEmpty

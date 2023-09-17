@@ -449,7 +449,7 @@ SetFireDir_UP:
         MOV  $0x4C,@$PlayerThisShot
         RETURN
 
- SetFireDir_DOWN:
+SetFireDir_DOWN:
         MOV  $0x80,@$PlayerThisSprite
         MOV  $0x7C,@$PlayerThisShot
         RETURN
@@ -552,32 +552,32 @@ Player_Hit: #-------------------------------------------------------------------
       # R5 points to Player_Array
         MOV  R3,R0
         SWAB R0
-        CMPB R0,$16+2
-        BNZ  Player_Hit_SkipCustomPlayerHitter
+        CMPB R0, $prgSpecialHitPlayer
+        BNE  Player_Hit_SkipCustomPlayerHitter
 
        .equiv dstCustomPlayerHitter, .+2
         CALL @$null
 
 Player_Hit_SkipCustomPlayerHitter:
-        CMPB R0,$3
-        BNZ  Player_Hit_Injure
+        CMPB R0, $prgBonus
+        BNE  Player_Hit_Injure
 
       # we hit a powerup if we got here
         CLR  R1 # remove the powerup
        .equiv DroneSprite, .+2
-        CMPB R2, $128+38
+        CMPB R2, $mvSpecial+38
         BEQ  Player_Hit_PowerupDrone
 
        .equiv ShootSpeedSprite, .+2
-        CMPB R2, $128+39
+        CMPB R2, $mvSpecial+39
         BEQ  Player_Hit_PowerupShootSpeed
 
        .equiv ShootPowerSprite, .+2
-        CMPB R2, $128+40
+        CMPB R2, $mvSpecial+40
         BEQ  Player_Hit_PowerupShootPower
 
        .equiv PointsSpriteA, .+2
-        CMPB R2, $128+16
+        CMPB R2, $mvSpecial+16
         BEQ  Player_Hit_Points
 
         RETURN

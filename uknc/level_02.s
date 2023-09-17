@@ -493,7 +493,7 @@ RealPalette: #---------------------------------------------------------------{{{
                                             #     ret
 
 ShowBossText.Init:
-       .ppudo_ensure $PPU_ShowBossText.Init,$BossText
+       .ppudo_enqueue_ensure $PPU_ShowBossText.Init, $BossText
         RETURN
 ShowBossText.RemoveWait:
         MOV  $NOP_OPCODE,@$ShowBossText.WaitOpcode

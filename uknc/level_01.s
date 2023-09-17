@@ -1,4 +1,4 @@
-               .nolist
+               .list
 
                .include "./hwdefs.s"
                .include "./macros.s"
@@ -228,8 +228,8 @@ EventStreamArray_Ep1: #---------------------------------------------------------
 
 # Start of fade in block -------------------------------------------------------
     .equiv FadeStartPoint, 0
-    .word FadeStartPoint + 1, evtSetPalette, BluePalette
-    .word FadeStartPoint + 2, evtSetPalette, DarkRealPalette
+   #.word FadeStartPoint + 1, evtSetPalette, BluePalette
+   #.word FadeStartPoint + 2, evtSetPalette, DarkRealPalette
     .word FadeStartPoint + 3, evtSetPalette, RealPalette
 # End of fade in block ---------------------------------------------------------
 
@@ -609,7 +609,7 @@ EndLevel:
         JMP  ExecuteBootstrap
 
 LevelInit:
-       .ppudo_ensure $PPU_LevelMusicRestart
+      #.ppudo_ensure $PPU_LevelMusicRestart
 
         MOV  $LevelSprites.0,R0
         MOV  $SpriteBanksVectors,R1

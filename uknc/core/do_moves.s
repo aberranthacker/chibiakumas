@@ -51,7 +51,7 @@ DoMoves:
         ASL  R0
     DoMoves_NoMultX:
         ADD  R0,R4
-        CMP  R4,$160+24   # we are at the bottom of the screen
+        CMP  R4,$160+24   # we are outside of the screen
         BHIS DoMoves.Kill # over the page
 
         RETURN

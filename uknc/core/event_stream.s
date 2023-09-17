@@ -277,7 +277,7 @@ Event_RestorePalette:
       # used to restore palette after displaying continue screen
        .equiv LastPalette, .+2
         MOV  $0,@$PPUCommandArg
-       .ppudo_ensure $PPU_SetPalette
+       .ppudo_enqueue_ensure $PPU_SetPalette
         RETURN # to Event_LoadNextEvt
 
       # reads in Offset then Bytecount from (HL) and dumps to destination DE

@@ -62,10 +62,10 @@ start:
     FireMode:        .byte 0b00000000   #  playmode 0 normal / 128 - 4D
     ContinueMode:    .byte   0          #  Continue Sharing (0/1) # not implemented
     SmartBombsReset: .byte   3          #  SmartbombsReset
-    ContinuesReset:  .byte   3          #  Continues Reset
-    GameDifficulty:  .byte 0b00000000   #  Game difficulty
-                                        #  (enemy Fire Speed 0=normal, ;1=easy, 2=hard)
-                                        #  +128 = heaven mode , +64 = star Speedup
+    ContinuesReset:  .byte   9          #  Continues Reset
+    GameDifficulty:  .byte 0b10000000   #  Game difficulty
+                                        #  (enemy Fire Speed 0=normal, 1=easy, 2=hard)
+                                        #  +128 = heaven mode, +64 = star Speedup
     Achivements:     .byte 0b00000000   #  Achievements (WPx54321) (W=Won P=Played)
     MultiplayConfig: .byte 0b00000000   #  Joy Config (xxxxxxFM)
                                         #  M=Multiplay

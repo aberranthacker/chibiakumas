@@ -196,7 +196,7 @@
                                 # prgSpriteBank2 equ 6 ; removed
                                 # prgSpriteBank3 equ 7 ; removed, use PrgNothing for Bank 0
                                 #
-                                # prgSpecialHitPlayer equ 2+16
+.equiv prgSpecialHitPlayer, 2+16# prgSpecialHitPlayer equ 2+16
                                 #
                                 # prgSmartBombableSpriteBank0 equ 0+16
                                 # prgSmartBombableSpriteBank1 equ 5+16

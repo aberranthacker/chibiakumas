@@ -87,7 +87,7 @@ ShowMenu:
         CALL TRandW
         WAIT
 
-       .ppudo_ensure $PPU_PrintAt,$MenuText
+       .ppudo_enqueue_ensure $PPU_PrintAt, $MenuText
 
         MOV  $8,R1
         MOV  $HighScoreBytes+8,R4
@@ -99,7 +99,7 @@ ShowMenu:
             MOVB R0,(R5)+
         SOB  R1,ScoreToStrLoop
 
-       .ppudo_ensure $PPU_PrintAt,$HighScoreText
+       .ppudo_enqueue_ensure $PPU_PrintAt, $HighScoreText
         CALL @$ObjectArray_Redraw
 
         JSR  R5,@$OnscreenCursorDefine
@@ -164,12 +164,12 @@ StartGame_1UP: #-------------------------------------------------------------{{{
        .ppudo_ensure $PPU_MusicStop
         CALL Fader
 
-       .ppudo $PPU_SetPalette,$Level01_TitlePalette
+       .ppudo_enqueue $PPU_SetPalette, $Level01_TitlePalette
         MOV  $level_01_title.bin.lzsa1,R1
         MOV  $FB0,R2
-        CALL @$unlzsa1
+        CALL @$Unpack
 
-       .ppudo $PPU_PrintAt,$Level1_TitleText
+       .ppudo_enqueue $PPU_PrintAt,$Level1_TitleText
         MOV  $FB0,R1
         MOV  $FB1+(12*2),R2
         MOV  $96,R3
@@ -377,13 +377,12 @@ ShowKeysBitmap: # -----------------------------------------------------------{{{
 
         MOV  $ScanCodeStr+2,R1
         CALL @$NumToStr
-       .ppudo_ensure $PPU_DebugPrintAt, $ScanCodeStr
+       .ppudo_enqueue_ensure $PPU_DebugPrintAt, $ScanCodeStr
         MOV  (SP)+,R5
         MOV  (SP)+,R3
         MOV  (SP)+,R2
         MOV  (SP)+,R1
         MOV  (SP)+,R0
-       .wait_ppu
 1237$:
         RETURN
 
