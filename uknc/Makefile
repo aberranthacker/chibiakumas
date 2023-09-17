@@ -9,6 +9,8 @@ BUILD_DSK=build_tools/build_dsk.rb
 MAKEFLAGS += --silent --jobs
 LDFLAGS += --strip-all
 
+BOOTSTRAP_START=512
+
 .SUFFIXES:
 .SUFFIXES: .s .o
 .PHONY: clean
@@ -60,7 +62,7 @@ dsk/chibiakumas.dsk : $(BUILD_DSK) \
 		      build/level_05_title.bin \
 		      build/level_07_title.bin \
 		      build/saved_settings.bin
-	$(UPDATE_DISK_MAP) dsk_files_list build/bootstrap.map.txt build/bootstrap.bin -e 512
+	$(UPDATE_DISK_MAP) dsk_files_list build/bootstrap.map.txt build/bootstrap.bin -e $(BOOTSTRAP_START)
 	$(UPDATE_DISK_MAP) dsk_files_list build/bootsector.map.txt build/bootsector.bin
 	$(BUILD_DSK) dsk_files_list dsk/chibiakumas.dsk
 # chibiakumas.dsk -----------------------------------------------------------}}}

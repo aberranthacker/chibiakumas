@@ -31,8 +31,8 @@
                 .include "./core_defs.s"
 
                 .equiv BootstrapSize, (end - start)
-                .equiv BootstrapSizeWords, BootstrapSize >> 1 + 1
-                .equiv BootstrapSizeQWords, BootstrapSize >> 3 + 1
+                .equiv BootstrapSizeWords, (BootstrapSize + 1) >> 1
+                .equiv BootstrapSizeQWords, (BootstrapSize + 7) >> 3
 
                 .=BootstrapStart
 start:
@@ -909,7 +909,8 @@ Bootstrap.DiskIO_WaitForFinish: #--------------------------------------------{{{
       # +------------------------------------------------------+
         SEC  # set carry flag to indicate that there was an error
 
-1237$:  RETURN
+1237$: .ppudo_ensure $PPU_RestoreVblankInt
+        RETURN
 # Bootstrap.DiskIO_WaitForFinish #-------------------------------------------}}}
 
 # files related data --------------------------------------------------------{{{
