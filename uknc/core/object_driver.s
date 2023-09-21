@@ -18,45 +18,50 @@
 # ObjectArray_ConfigureForSize ----------------------------------------------{{{
 ObjectArray_reConfigureForSize:
         TSTB R4
-        BZE  1237$
+        BNZ  ObjectArray_ConfigureForSizeB
+        RETURN
 
 ObjectArray_ConfigureForSizeB:
         CLR  R0
-        BISB R4,R0
-        MOV  R0,@$ObjectSpriteSizeCurrent
-        MOV  R0,@$SpriteSizeShiftFull
-       #MOV  R0,@$SpriteSizeShiftFullB # TODO: uncomment for player 2
-        MOV  R0,@$SpriteSizeShiftFullC
+        BISB R4, R0
+        MOV  R0, @$ObjectSpriteSizeCurrent
+        MOV  R0, @$SpriteSizeShiftFull
+   .ifdef TwoPlayersGame
+        MOV  R0, @$SpriteSizeShiftFullB
+   .endif
+        MOV  R0, @$SpriteSizeShiftFullC
         ASR  R0
-        MOV  R0,@$SpriteSizeShiftHalfB
-       #MOV  R0,@$SpriteSizeShiftHalfD # TODO: uncomment for player 2
-        BIS  $0b00000011,R0
-        MOV  R0,@$SpriteSizeShiftHalfH
+        MOV  R0, @$SpriteSizeShiftHalfB
+   .ifdef TwoPlayersGame
+        MOV  R0, @$SpriteSizeShiftHalfD
+   .endif
+        BIS  $0b00000011, R0
+        MOV  R0, @$SpriteSizeShiftHalfH
 
       # Define player 1 and 2 hitboxes
 ObjectArray_ConfigureForSize:
       # We update player location in advance for fast collision detection
       # Define player 1's hitbox
         CLR  R0
-        BISB @$P1_P00,R0 # PlayerY
-        MOV  R0,@$PlayerY2
+        BISB @$P1_P00, R0 # PlayerY
+        MOV  R0, @$PlayerY2
        .equiv SpriteSizeShiftFull, .+2
-        SUB  $24,R0
+        SUB  $24, R0
         BHIS 1$
 
         CLR  R0
     1$:
-        MOV  R0,@$PlayerY1
+        MOV  R0, @$PlayerY1
         CLR  R0
-        BISB @$P1_P01,R0 # PlayerX
-        MOV  R0,@$PlayerX2
+        BISB @$P1_P01, R0 # PlayerX
+        MOV  R0, @$PlayerX2
        .equiv SpriteSizeShiftHalfB, .+2
-        SUB  $12,R0
+        SUB  $12, R0
         BHIS 2$
 
         CLR  R0
     2$:
-        MOV  R0,@$PlayerX1
+        MOV  R0, @$PlayerX1
 
    .ifdef TwoPlayersGame # {{{
       # Define player 2's hitbox
@@ -80,7 +85,7 @@ ObjectArray_ConfigureForSize:
     4$: MOV  R0,@$Player2X1
    .endif # }}}
 
-1234$:  RETURN
+        RETURN
 # ObjectArray_ConfigureForSize ----------------------------------------------}}}
 ObjectArray_Redraw:
         TST  @$Timer.TicksOccured # see if game is paused (TicksOccurred = 0)
@@ -154,13 +159,13 @@ Objectloop_SpriteBankSet:
       # R3 LSB ixl = Life, R3 MSB iyl = Program Code
       # R4 LSB = Animator, R4 MSB = Sprite size
         ASL  R0
-        MOV  SpriteBanksVectors(R0),@$SprShow_BankAddr
+        MOV  SpriteBanksVectors(R0), @$SprShow_BankAddr
 
       # Life BPxxxxxx
       # B=hurt by bullets,
       # P=hurts player,
       # xxxxxx = hit points (if not B then ages over time)
-        BIT  $0x40,R3 # R3 Life=LSB, Program=MSB
+        BIT  $0x40, R3 # R3 Life=LSB, Program=MSB
         BZE  ObjectLoopBothPlayerSkip # Doesn't hurt player
 
 # used to modify this, but now we assume the player is alway vunurable
@@ -173,29 +178,29 @@ Objectloop_SpriteBankSet:
       # R3 LSB ixl = Life, R3 MSB iyl = Program Code
       # R4 use at will
       # R5 ObjectArray current object last element pointer
-        MOV  R1,R0
+        MOV  R1, R0
        .equiv PlayerX1, .+2
-        CMPB R0,$20
+        CMPB R0, $20
         BLO  ObjectLoopP1Skip
 
        .equiv PlayerX2, .+2
-        CMPB R0,$32
+        CMPB R0, $32
         BHIS ObjectLoopP1Skip
 
         SWAB R0
        .equiv PlayerY1, .+2
-        CMPB R0,$76
+        CMPB R0, $76
         BLO  ObjectLoopP1Skip
 
        .equiv PlayerY2, .+2
-        CMPB R0,$100
+        CMPB R0, $100
         BHIS ObjectLoopP1Skip
 
         TSTB @$P1_P09
         BZE  ObjectLoopP1Skip
 
         PUSH R5
-        MOV  $Player_Array,R5
+        MOV  $Player_Array, R5
         CALL Player_Hit
         POP  R5
 
