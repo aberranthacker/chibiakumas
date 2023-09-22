@@ -413,7 +413,7 @@ ShowBossText: # ../Aku/Level252-Intro.asm:1950
         INC  @$CharsToPrint
        .equiv CharsToPrint, .+2
         MOV  $1, @$PPUCommandArg
-       .ppudo_ensure $PPU_ShowBossText
+       .ppudo_enqueue_ensure $PPU_ShowBossText
 
         RETURN
 
